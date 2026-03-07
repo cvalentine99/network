@@ -1,0 +1,21 @@
+# Network Performance Dashboard — TODO
+
+- [x] Apply Obsidian Instrument Panel CSS theme (index.css replacement)
+- [x] Add Google Fonts (Inter + JetBrains Mono) to index.html
+- [x] Set ThemeProvider to dark mode
+- [x] Remove Manus OAuth authentication system entirely
+- [x] Install framer-motion and lucide-react (already in dependencies)
+- [x] Copy DashboardWidgets.tsx components
+- [x] Build sidebar navigation layout (NOC-style, ultrawide optimized)
+- [x] Create dashboard home page with KPI cards
+- [x] Build network devices page with data tables (sort/filter)
+- [x] Build network alerts page with severity badges (critical/high/medium/low)
+- [x] Build network interfaces page
+- [x] Build network performance metrics page
+- [x] Set up MySQL database schema for network data
+- [x] Create tRPC procedures for fetching network data
+- [x] Wire frontend to backend tRPC queries (no mock data)
+- [x] Add Framer Motion stagger entrance animations
+- [x] Optimize layout for ultrawide monitors (max-width: 1920px)
+- [x] Write vitest tests (6 passing)
+- [x] Final polish and checkpoint
