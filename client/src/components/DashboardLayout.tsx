@@ -14,12 +14,8 @@ import {
 import { useIsMobile } from "@/hooks/useMobile";
 import {
   LayoutDashboard,
-  Server,
-  AlertTriangle,
-  Network,
-  Radio,
-  Cpu,
   PanelLeft,
+  Radio,
 } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
@@ -27,11 +23,6 @@ import { GOLD, MUTED, BRIGHT, CYAN } from "./DashboardWidgets";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
-  { icon: Server, label: "Devices", path: "/devices" },
-  { icon: AlertTriangle, label: "Alerts", path: "/alerts" },
-  { icon: Network, label: "Networks", path: "/networks" },
-  { icon: Radio, label: "Detections", path: "/detections" },
-  { icon: Cpu, label: "Appliances", path: "/appliances" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";

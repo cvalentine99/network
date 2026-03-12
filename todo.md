@@ -43,3 +43,8 @@
 - [ ] Strip Performance.tsx (Detections) of all placeholder content
 - [ ] Strip Appliances.tsx of all placeholder content
 - [ ] Leave only Obsidian theme shell + sidebar nav + empty page containers
+
+## Remove Extra Tabs
+- [x] Remove Devices, Alerts, Networks, Detections, Appliances from sidebar
+- [x] Remove routes for those pages from App.tsx
+- [x] Delete page files (Devices.tsx, Alerts.tsx, Interfaces.tsx, Performance.tsx, Appliances.tsx)

@@ -6,22 +6,12 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import DashboardLayout from "./components/DashboardLayout";
 import Home from "./pages/Home";
-import Devices from "./pages/Devices";
-import Alerts from "./pages/Alerts";
-import Networks from "./pages/Interfaces";
-import Detections from "./pages/Performance";
-import Appliances from "./pages/Appliances";
 
 function Router() {
   return (
     <DashboardLayout>
       <Switch>
         <Route path="/" component={Home} />
-        <Route path="/devices" component={Devices} />
-        <Route path="/alerts" component={Alerts} />
-        <Route path="/networks" component={Networks} />
-        <Route path="/detections" component={Detections} />
-        <Route path="/appliances" component={Appliances} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>
