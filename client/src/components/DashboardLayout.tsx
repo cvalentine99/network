@@ -20,13 +20,22 @@ import {
   Radio,
   Cpu,
   PanelLeft,
+  Gauge,
 } from "lucide-react";
-import { CSSProperties, useEffect, useRef, useState } from "react";
+import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { GOLD, MUTED, BRIGHT, CYAN } from "./DashboardWidgets";
 
+type BffStatusData = {
+  configured: boolean;
+  connected: boolean;
+  ehHost: string | null;
+  appliance: { version: string; hostname: string } | null;
+};
+
 const menuItems = [
-  { icon: LayoutDashboard, label: "Dashboard", path: "/" },
+  { icon: Gauge, label: "Impact Deck", path: "/" },
+  { icon: LayoutDashboard, label: "Overview", path: "/overview" },
   { icon: Server, label: "Devices", path: "/devices" },
   { icon: AlertTriangle, label: "Alerts", path: "/alerts" },
   { icon: Network, label: "Networks", path: "/networks" },
@@ -121,6 +130,20 @@ function DashboardLayoutContent({
     };
   }, [isResizing, setSidebarWidth]);
 
+  const [bffStatus, setBffStatus] = useState<BffStatusData | null>(null);
+
+  useEffect(() => {
+    async function checkStatus() {
+      try {
+        const res = await fetch('/api/bff/impact/status');
+        if (res.ok) setBffStatus(await res.json());
+      } catch { /* ignore */ }
+    }
+    checkStatus();
+    const interval = setInterval(checkStatus, 60_000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <>
       <div className="relative" ref={sidebarRef}>
@@ -203,19 +226,34 @@ function DashboardLayoutContent({
                 }}
               >
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="status-dot status-connected" />
+                  <span
+                    className={`status-dot ${
+                      bffStatus?.connected ? 'status-connected'
+                      : bffStatus?.configured ? 'status-pending'
+                      : 'status-disconnected'
+                    }`}
+                  />
                   <span
                     className="text-[10px] font-bold uppercase tracking-wider"
-                    style={{ color: "oklch(0.723 0.219 149.579)" }}
+                    style={{
+                      color: bffStatus?.connected
+                        ? 'oklch(0.723 0.219 149.579)'
+                        : bffStatus?.configured
+                        ? GOLD
+                        : MUTED,
+                    }}
                   >
-                    System Online
+                    {bffStatus?.connected ? 'System Online'
+                     : bffStatus?.configured ? 'Connecting...'
+                     : 'Not Configured'}
                   </span>
                 </div>
-                <p
-                  className="text-[10px]"
-                  style={{ color: MUTED }}
-                >
-                  ExtraHop Connected
+                <p className="text-[10px]" style={{ color: MUTED }}>
+                  {bffStatus?.connected && bffStatus.appliance
+                    ? `EDA v${bffStatus.appliance.version}`
+                    : bffStatus?.configured && bffStatus.ehHost
+                    ? bffStatus.ehHost
+                    : 'Set EH_HOST & EH_API_KEY'}
                 </p>
               </div>
             )}

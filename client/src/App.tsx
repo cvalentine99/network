@@ -11,12 +11,14 @@ import Alerts from "./pages/Alerts";
 import Networks from "./pages/Interfaces";
 import Detections from "./pages/Performance";
 import Appliances from "./pages/Appliances";
+import ImpactDeck from "./pages/ImpactDeck/ImpactDeck";
 
 function Router() {
   return (
     <DashboardLayout>
       <Switch>
-        <Route path="/" component={Home} />
+        <Route path="/" component={ImpactDeck} />
+        <Route path="/overview" component={Home} />
         <Route path="/devices" component={Devices} />
         <Route path="/alerts" component={Alerts} />
         <Route path="/networks" component={Networks} />

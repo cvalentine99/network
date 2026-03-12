@@ -7,6 +7,13 @@ import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { healthRouter } from "../bff/routes/health";
+import { impactRouter } from "../bff/routes/impact";
+import { initApplianceIdentity } from "../bff/lib/ehClient";
+import { bffConfig } from "../bff/config";
+import { requestLogger } from "../bff/middleware/requestLogger";
+import { globalRateLimiter } from "../bff/middleware/rateLimiter";
+import { errorHandler } from "../bff/middleware/errorHandler";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -35,6 +42,15 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
+
+  // BFF middleware
+  app.use(requestLogger());
+  app.use('/api/bff', globalRateLimiter);
+
+  // BFF routes — ExtraHop proxy
+  app.use('/api/bff/health', healthRouter);
+  app.use('/api/bff/impact', impactRouter);
+
   // tRPC API
   app.use(
     "/api/trpc",
@@ -57,9 +73,24 @@ async function startServer() {
     console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
   }
 
-  server.listen(port, () => {
+  server.listen(port, async () => {
     console.log(`Server running on http://localhost:${port}/`);
+
+    // Initialize ExtraHop appliance identity in background
+    if (bffConfig.EH_API_KEY && bffConfig.EH_API_KEY !== 'PLACEHOLDER') {
+      try {
+        const identity = await initApplianceIdentity();
+        console.log(`[BFF] ExtraHop connected: ${identity.edition} v${identity.version} (${identity.licensedModules.length} modules)`);
+      } catch (err: any) {
+        console.warn(`[BFF] ExtraHop init failed (will retry on first request): ${err.message}`);
+      }
+    } else {
+      console.log('[BFF] ExtraHop API key not configured — BFF routes will return 503 until EH_HOST and EH_API_KEY are set');
+    }
   });
+
+  // BFF error handler (must be after routes)
+  app.use(errorHandler());
 }
 
 startServer().catch(console.error);
