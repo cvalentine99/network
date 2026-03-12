@@ -33,3 +33,13 @@
 - [x] Update server/routers.ts tRPC procedures for ExtraHop data
 - [x] Update frontend pages for ExtraHop data shapes (Dashboard, Devices, Alerts, Networks, Detections, Appliances)
 - [x] Write/update vitest tests (19 passing, 0 failures)
+
+## Cleanup — Remove All Canned Content
+
+- [ ] Strip Home.tsx (Dashboard) of all placeholder KPIs, charts, tables
+- [ ] Strip Devices.tsx of all placeholder content
+- [ ] Strip Alerts.tsx of all placeholder content
+- [ ] Strip Interfaces.tsx (Networks) of all placeholder content
+- [ ] Strip Performance.tsx (Detections) of all placeholder content
+- [ ] Strip Appliances.tsx of all placeholder content
+- [ ] Leave only Obsidian theme shell + sidebar nav + empty page containers

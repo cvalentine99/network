@@ -193,33 +193,7 @@ function DashboardLayoutContent({
             </SidebarMenu>
           </SidebarContent>
 
-          <SidebarFooter className="p-3">
-            {!isCollapsed && (
-              <div
-                className="rounded-lg p-3"
-                style={{
-                  background: "oklch(0.06 0.005 260)",
-                  border: "1px solid oklch(1 0 0 / 6%)",
-                }}
-              >
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="status-dot status-connected" />
-                  <span
-                    className="text-[10px] font-bold uppercase tracking-wider"
-                    style={{ color: "oklch(0.723 0.219 149.579)" }}
-                  >
-                    System Online
-                  </span>
-                </div>
-                <p
-                  className="text-[10px]"
-                  style={{ color: MUTED }}
-                >
-                  ExtraHop Connected
-                </p>
-              </div>
-            )}
-          </SidebarFooter>
+          <SidebarFooter className="p-3" />
         </Sidebar>
         <div
           className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/20 transition-colors ${isCollapsed ? "hidden" : ""}`}
