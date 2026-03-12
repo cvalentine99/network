@@ -383,8 +383,10 @@ Receipt correction note: The original receipt (commit 6b73a133) stated "65 tests
 - fixtures/impact/headline.negative-baseline.fixture.json
 - fixtures/formatters/formatters.fixture.json
 
+**Fixture backing clarification:** The BFF route at GET /api/bff/impact/headline serves data extracted from the Slice 00 fixtures: `impact-overview.populated.fixture.json` (extracting .headline) and `impact-overview.quiet.fixture.json` (extracting .headline). It does NOT serve the headline.*.fixture.json files directly. The headline.*.fixture.json files are used exclusively by slice02.test.ts for schema validation tests. These are two different fixture sets serving two different purposes.
+
 **Screenshots:**
-- Populated state: Captured. 5 KPI cards visible with formatted values (7.96 GB, 12.45M pkts, 27.17 MB/s, 41.50K pps, +12.3%).
+- Populated state: Captured as screenshots/slice02-populated.png (77,325 bytes). 5 KPI cards visible with formatted values (7.96 GB, 12.45M pkts, 27.17 MB/s, 41.50K pps, +12.3%). Note: values "12.45M..." and "27.17..." and "41.50K..." appear truncated in the card layout — a known visual issue.
 - Loading state: Transient. 5 KPICardSkeleton pulse animations render during fetch. Not separately captured because the state lasts < 200ms on local dev server.
 - Quiet state: Not separately screenshotted. The component renders EmptyState when all values are 0. Proven by code path analysis and schema validation test.
 - Error state: Not separately screenshotted. The component renders ErrorState type="transport" when fetch fails. Proven by code path analysis.
@@ -413,13 +415,15 @@ Not attempted. Deferred by contract.
 
 ### Verdict
 
-**Passed.** 81 vitest executions from 42 it() call sites, all passing. 5 formatter functions tested against deterministic fixtures. BFF route tested with live local requests (not fixture fallback). Schema validation proves populated, quiet, and malformed states. Populated state screenshotted. Loading/quiet/error/malformed states proven by code path but not individually screenshotted.
+**Passed (corrected).** 81 vitest executions from 42 it() call sites, all passing. 5 formatter functions tested against deterministic fixtures. BFF route tested with live local requests (not fixture fallback). Schema validation proves populated, quiet, and malformed states. Populated state screenshotted as screenshots/slice02-populated.png. Loading/quiet/error/malformed states proven by code path but not individually screenshotted.
+
+**Correction note (revision 2):** Original receipt (commit e2e8f97a) had two inaccuracies: (1) claimed screenshot evidence existed but only a notes markdown file was present — no actual PNG image was in the project; (2) did not distinguish that the BFF route serves data from Slice 00 impact-overview.*.fixture.json files while the headline.*.fixture.json files are used only by tests. Both corrected in this revision.
 
 # TRUTH RECEIPT
 
 Slice: 02 — Impact Deck KPI Strip
-Status: Passed
-Commit: pending checkpoint
+Status: Passed (corrected — receipt revision 2)
+Commit: e2e8f97a (original), pending (correction checkpoint)
 
 ## Claims
 - 5 pure formatter functions exported from shared/formatters.ts
@@ -427,7 +431,8 @@ Commit: pending checkpoint
 - KPIStrip component handles 5 UI states via KPIStripState discriminated union
 - useImpactHeadline hook fetches from BFF, validates, and returns typed state
 - Client-side re-validation via ImpactHeadlineSchema before rendering
-- 6 headline fixture files + 1 formatter fixture file created
+- 6 headline fixture files + 1 formatter fixture file created (for test use)
+- BFF route serves headline data extracted from Slice 00 impact-overview.*.fixture.json files, not from headline.*.fixture.json
 - 81 vitest executions from 42 it() call sites, all passing
 - 215 total vitest executions across repo, all passing
 - No ExtraHop direct access from client code
@@ -436,7 +441,7 @@ Commit: pending checkpoint
 ## Evidence
 - tests passed: 81/81 in slice02.test.ts, 215/215 repo-wide
 - fixtures present: 6 headline + 1 formatter = 7 new files
-- screenshots present: populated state captured
+- screenshots present: populated state captured as screenshots/slice02-populated.png (77,325 bytes, actual PNG image file)
 - validators present: ImpactHeadlineSchema, TimeWindowSchema, TimeWindowQuerySchema
 - BFF route tested with live local HTTP requests (not fixture fallback)
 - Static grep audit: no ExtraHop host in client code (proven in Slice 00)
