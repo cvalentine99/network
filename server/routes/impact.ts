@@ -16,7 +16,8 @@
  *   5. Returning proper error shapes for transport failures and malformed data
  */
 import { Router } from 'express';
-import { TimeWindowQuerySchema, ImpactHeadlineSchema } from '../../shared/cockpit-validators';
+import { TimeWindowQuerySchema, ImpactHeadlineSchema, SeriesPointSchema } from '../../shared/cockpit-validators';
+import { z } from 'zod';
 import { resolveTimeWindow } from '../../shared/normalize';
 import type { ImpactOverviewPayload } from '../../shared/cockpit-types';
 import { readFileSync } from 'fs';
@@ -123,6 +124,84 @@ impactRouter.get('/headline', (req, res) => {
   } catch (err: any) {
     return res.status(500).json({
       error: 'Impact headline fetch failed',
+      message: err.message || 'Unknown error',
+    });
+  }
+});
+
+/**
+ * GET /api/bff/impact/timeseries
+ *
+ * Query params: from, until, cycle (all optional, validated by TimeWindowQuerySchema)
+ *
+ * Response shape on success:
+ *   { timeseries: SeriesPoint[], timeWindow: TimeWindow }
+ *
+ * Response shape on quiet (no data):
+ *   { timeseries: [], timeWindow: TimeWindow }
+ *
+ * Response shape on error:
+ *   { error: string, message: string }
+ *
+ * Fixture backing: extracts .timeseries from impact-overview.populated.fixture.json
+ * (or impact-overview.quiet.fixture.json for invalid windows).
+ * Timeseries-specific fixtures (timeseries.*.fixture.json) are for test use only.
+ */
+impactRouter.get('/timeseries', (req, res) => {
+  try {
+    // 1. Validate query params
+    const queryResult = TimeWindowQuerySchema.safeParse(req.query);
+    if (!queryResult.success) {
+      return res.status(400).json({
+        error: 'Invalid time window query',
+        message: queryResult.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('; '),
+      });
+    }
+
+    const { from, until, cycle } = queryResult.data;
+
+    // 2. Resolve time window
+    const timeWindow = resolveTimeWindow(from, until, cycle);
+
+    // 3. In fixture mode, return fixture data
+    if (isFixtureMode()) {
+      const fixtureName = timeWindow.durationMs > 0
+        ? 'impact-overview.populated.fixture.json'
+        : 'impact-overview.quiet.fixture.json';
+
+      const fixture = loadImpactFixture(fixtureName);
+      if (!fixture) {
+        return res.status(500).json({
+          error: 'Fixture load failed',
+          message: `Could not load fixture: ${fixtureName}`,
+        });
+      }
+
+      // Validate each series point before sending
+      const timeseriesArray = z.array(SeriesPointSchema);
+      const validation = timeseriesArray.safeParse(fixture.timeseries);
+      if (!validation.success) {
+        return res.status(502).json({
+          error: 'Malformed timeseries data',
+          message: 'Timeseries data from source failed schema validation',
+          details: validation.error.issues,
+        });
+      }
+
+      return res.json({
+        timeseries: validation.data,
+        timeWindow,
+      });
+    }
+
+    // 4. Live mode — placeholder for future ExtraHop integration
+    return res.json({
+      timeseries: [],
+      timeWindow,
+    });
+  } catch (err: any) {
+    return res.status(500).json({
+      error: 'Impact timeseries fetch failed',
       message: err.message || 'Unknown error',
     });
   }

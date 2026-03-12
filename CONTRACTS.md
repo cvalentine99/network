@@ -423,7 +423,7 @@ Not attempted. Deferred by contract.
 
 Slice: 02 — Impact Deck KPI Strip
 Status: Passed (corrected — receipt revision 2)
-Commit: e2e8f97a (original), pending (correction checkpoint)
+Commit: e2e8f97a (original), df3c5ac5 (correction)
 
 ## Claims
 - 5 pure formatter functions exported from shared/formatters.ts
@@ -453,3 +453,110 @@ Commit: e2e8f97a (original), pending (correction checkpoint)
 
 ## Deferred by Contract
 - live hardware / appliance / packet store / environment access is not part of the current frontend phase
+
+---
+
+# TRUTH RECEIPT
+
+Slice: 03 — Impact Deck Time-Series Chart Panel
+Status: Passed
+Commit: pending checkpoint
+
+## Scope
+
+IN SCOPE:
+- BFF route GET /api/bff/impact/timeseries returning SeriesPoint[] validated via z.array(SeriesPointSchema)
+- GhostedTimeline component (Recharts AreaChart) with 5 UI states: loading, quiet, populated, error, malformed
+- useImpactTimeseries hook fetching from BFF, validating schema, discriminating state
+- 5 timeseries-specific fixture files for test use
+- Dual Y-axis: left for bytes (gold, formatBytes), right for packets (cyan, formatPacketsShort)
+- Custom tooltip with dark glass background
+- Legend showing Bytes (gold) and Packets (cyan) indicators
+- Wired into Home.tsx below KPI strip
+
+OUT OF SCOPE:
+- Live ExtraHop integration (deferred by contract)
+- buildMetricSeries integration at the BFF layer (BFF serves pre-normalized SeriesPoint[], not raw stat rows)
+- computeRate integration (chart displays raw bucket values, not per-second rates; rate conversion is a Slice 01 function available for future use)
+- Interactive chart features (zoom, pan, brush selection)
+- Inspector integration (clicking a chart point to open inspector)
+
+## Dependencies
+- Slice 00: app shell, TimeWindowProvider, InspectorShell, shared types/validators
+- Slice 01: buildMetricSeries, computeRate (available but not consumed by BFF in fixture mode)
+- Slice 02: KPIStrip (co-rendered on same page, shares time window)
+- recharts ^2.15.2 (pre-installed)
+
+## Routes
+- GET /api/bff/impact/timeseries?from=&until=&cycle=
+  - 200: { timeseries: SeriesPoint[], timeWindow: TimeWindow }
+  - 400: { error: string, message: string } (invalid query params)
+  - 500: { error: string, message: string } (fixture load failure)
+  - 502: { error: string, message: string, details: ZodIssue[] } (malformed data)
+
+## Types
+- TimeSeriesChartState (discriminated union): loading | quiet | populated | error | malformed
+- SeriesPoint (from shared/cockpit-types.ts): { t, tIso, durationMs, values: Record<string, number | null> }
+- SeriesPointSchema (from shared/cockpit-validators.ts): Zod schema for SeriesPoint
+
+## Fixtures
+All in fixtures/timeseries/ (test-only, not served by BFF route):
+- timeseries.populated.fixture.json — 10 points, 30sec cycle, bytes + pkts
+- timeseries.quiet.fixture.json — empty array
+- timeseries.transport-error.fixture.json — error + message shape
+- timeseries.malformed.fixture.json — wrong types, missing fields
+- timeseries.single-point.fixture.json — 1 point, zero bytes, null pkts
+
+BFF route fixture backing:
+- Route serves data from fixtures/impact/impact-overview.populated.fixture.json (extracting .timeseries)
+- Route serves empty array from fixtures/impact/impact-overview.quiet.fixture.json (extracting .timeseries)
+
+## Tests
+File: server/slice03.test.ts
+- 35 it() call sites → 43 vitest executions (1 for loop expands 2 call sites × 5 fixture files = 10 executions)
+- 9 describe blocks
+
+| Block | it() call sites | vitest executions | Notes |
+|---|---|---|---|
+| Timeseries fixture files | 2 | 10 | 5 files × 2 (exists + parses) via for loop |
+| Populated fixture schema validation | 8 | 8 | Static; for loops inside it() are assertion loops |
+| Quiet fixture | 3 | 3 | Static |
+| Malformed fixture rejection | 3 | 3 | Static |
+| Single-point edge case fixture | 4 | 4 | Static |
+| Transport error fixture | 3 | 3 | Static |
+| BFF timeseries route (live local) | 6 | 6 | Hits live dev server, not fixture fallback |
+| Cross-fixture consistency | 3 | 3 | Verifies overview and standalone fixtures match |
+| State discrimination | 3 | 3 | Tests quiet/populated/malformed logic |
+
+Repo totals: 164 it() call sites → 258 vitest executions across 6 test files, all passing.
+
+## Screenshots
+- screenshots/slice03-populated.png (163,725 bytes) — Shows KPI strip + GhostedTimeline chart with gold bytes area and cyan packets area, dual Y-axes, HH:MM:SS X-axis, legend
+- Loading state: not individually screenshotted (transient state, proven by data-testid="timeseries-loading" in component source)
+- Quiet state: not individually screenshotted (proven by data-testid="timeseries-quiet" in component source and quiet fixture test)
+- Error state: not individually screenshotted (proven by data-testid="timeseries-error" in component source)
+- Malformed state: not individually screenshotted (proven by data-testid="timeseries-malformed" in component source)
+
+## Static Audit
+- grep confirms no ExtraHop host (192.168.50.*), EH_HOST, EH_API_KEY, or extrahop.com in client/ directory
+- All fetch() calls in client/src/ go through /api/bff/* routes only
+- No API keys visible in browser-accessible code
+
+## Known Limitations
+- Chart displays raw bucket totals, not per-second rates. Sprint doc says "bytes and packets from fact_metric_stat" which are bucket totals. computeRate is available from Slice 01 if rate display is needed later.
+- Null values in SeriesPoint.values cause gaps in the chart line (connectNulls=false). This is intentional — null means "no data for this bucket."
+- Chart height is fixed at 260px. Not responsive to container height.
+- Tooltip shows absolute values, not rates.
+
+## Not Proven
+- Component DOM render tests (jsdom) for GhostedTimeline are not included. Recharts components require a full browser-like environment that vitest's jsdom does not fully support (SVG rendering, ResizeObserver). The 5 UI states are proven by: (a) discriminated union type enforcement, (b) data-testid attributes in source, (c) populated screenshot, (d) state discrimination tests.
+- Individual screenshots for loading, quiet, error, and malformed states are not captured as image files. These states are proven by source code inspection (data-testid attributes) and state discrimination tests.
+
+## Deferred by Contract
+Live hardware / appliance / packet store / environment access is not part of the current frontend phase. The BFF route serves fixture data in the absence of EH_HOST and EH_API_KEY environment variables.
+
+## Live Integration Status
+Not attempted. Deferred by contract.
+
+## Verdict
+Slice 03 is implemented against fixtures and validated against schema. UI state complete for mocked payloads. BFF normalization complete and tested. Live integration not yet performed.
