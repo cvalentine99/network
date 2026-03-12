@@ -5,77 +5,111 @@ import {
   GlassCard,
   KPICard,
   PageHeader,
-  SeverityBadge,
   GOLD,
   CYAN,
   GREEN,
   RED,
   MUTED,
   BRIGHT,
+  ORANGE,
+  AMBER,
+  PURPLE,
 } from "@/components/DashboardWidgets";
 import {
-  Activity,
   Server,
   AlertTriangle,
+  Shield,
   Network,
-  Wifi,
-  HardDrive,
+  MonitorDot,
+  Eye,
+  Cpu,
+  Radio,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Home() {
-  const { data: overview, isLoading } = trpc.network.overview.useQuery();
+  const { data: stats, isLoading: statsLoading } = trpc.dashboard.stats.useQuery();
+  const { data: alertsBySeverity, isLoading: alertsLoading } = trpc.dashboard.alertsBySeverity.useQuery();
+  const { data: devicesByClass, isLoading: classLoading } = trpc.dashboard.devicesByClass.useQuery();
+  const { data: devicesByRole, isLoading: roleLoading } = trpc.dashboard.devicesByRole.useQuery();
+
+  const isLoading = statsLoading || alertsLoading || classLoading || roleLoading;
+
+  // Map ExtraHop severity numbers to labels: 0-7 scale
+  const severityLabel = (sev: number): string => {
+    if (sev >= 6) return "critical";
+    if (sev >= 4) return "high";
+    if (sev >= 2) return "medium";
+    return "low";
+  };
+
+  const severityColor = (sev: number): string => {
+    if (sev >= 6) return RED;
+    if (sev >= 4) return ORANGE;
+    if (sev >= 2) return AMBER;
+    return GREEN;
+  };
 
   return (
     <div>
       <PageHeader
         title="Network Operations Center"
-        subtitle="Real-time network performance monitoring and analytics"
+        subtitle="ExtraHop network performance monitoring — real-time device, alert, and detection analytics"
       />
 
       <StaggerContainer className="space-y-6">
         {/* KPI Row */}
         <StaggerItem>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4">
             {isLoading ? (
-              Array.from({ length: 6 }).map((_, i) => (
+              Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="glass-card gold-accent-top p-5">
                   <Skeleton className="h-3 w-20 mb-3" />
                   <Skeleton className="h-7 w-16 mb-2" />
                   <Skeleton className="h-3 w-24" />
                 </div>
               ))
-            ) : overview ? (
+            ) : stats ? (
               <>
                 <KPICard
                   label="Total Devices"
-                  value={overview.totalDevices.toLocaleString()}
+                  value={stats.totalDevices.toLocaleString()}
                   icon={<Server className="w-5 h-5" style={{ color: GOLD }} />}
                 />
                 <KPICard
-                  label="Active Alerts"
-                  value={overview.activeAlerts.toLocaleString()}
+                  label="Active Devices"
+                  value={stats.activeDevices.toLocaleString()}
+                  icon={<MonitorDot className="w-5 h-5" style={{ color: GREEN }} />}
+                />
+                <KPICard
+                  label="Critical Devices"
+                  value={stats.criticalDevices.toLocaleString()}
                   icon={<AlertTriangle className="w-5 h-5" style={{ color: RED }} />}
                 />
                 <KPICard
-                  label="Interfaces Up"
-                  value={overview.interfacesUp.toLocaleString()}
-                  icon={<Network className="w-5 h-5" style={{ color: GREEN }} />}
+                  label="Watchlist"
+                  value={stats.watchlistDevices.toLocaleString()}
+                  icon={<Eye className="w-5 h-5" style={{ color: CYAN }} />}
                 />
                 <KPICard
-                  label="Interfaces Down"
-                  value={overview.interfacesDown.toLocaleString()}
-                  icon={<Wifi className="w-5 h-5" style={{ color: RED }} />}
+                  label="Alerts"
+                  value={stats.totalAlerts.toLocaleString()}
+                  icon={<Shield className="w-5 h-5" style={{ color: ORANGE }} />}
                 />
                 <KPICard
-                  label="Avg Latency"
-                  value={overview.avgLatency != null ? `${overview.avgLatency.toFixed(1)} ms` : "--"}
-                  icon={<Activity className="w-5 h-5" style={{ color: CYAN }} />}
+                  label="Appliances"
+                  value={stats.totalAppliances.toLocaleString()}
+                  icon={<Cpu className="w-5 h-5" style={{ color: PURPLE }} />}
                 />
                 <KPICard
-                  label="Avg Throughput"
-                  value={overview.avgThroughput != null ? formatThroughput(overview.avgThroughput) : "--"}
-                  icon={<HardDrive className="w-5 h-5" style={{ color: GOLD }} />}
+                  label="Networks"
+                  value={stats.totalNetworks.toLocaleString()}
+                  icon={<Network className="w-5 h-5" style={{ color: CYAN }} />}
+                />
+                <KPICard
+                  label="Detections"
+                  value={stats.totalDetections.toLocaleString()}
+                  icon={<Radio className="w-5 h-5" style={{ color: RED }} />}
                 />
               </>
             ) : (
@@ -84,7 +118,7 @@ export default function Home() {
                   <div className="text-center py-8">
                     <Server className="w-8 h-8 mx-auto mb-3" style={{ color: MUTED }} />
                     <p className="text-sm" style={{ color: MUTED }}>
-                      No data available. Connect your database and populate network data to begin monitoring.
+                      No data available. Connect your ExtraHop appliance and populate the database to begin monitoring.
                     </p>
                   </div>
                 </GlassCard>
@@ -93,7 +127,7 @@ export default function Home() {
           </div>
         </StaggerItem>
 
-        {/* Alert Summary + Recent Alerts */}
+        {/* Alert Severity + Device Class Breakdown */}
         <StaggerItem>
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
             {/* Alert Severity Breakdown */}
@@ -102,7 +136,7 @@ export default function Home() {
                 className="text-xs font-bold uppercase tracking-wider mb-4"
                 style={{ color: MUTED }}
               >
-                Alert Severity Breakdown
+                Alert Severity Distribution
               </h3>
               {isLoading ? (
                 <div className="space-y-3">
@@ -110,44 +144,36 @@ export default function Home() {
                     <Skeleton key={i} className="h-8 w-full" />
                   ))}
                 </div>
-              ) : overview && overview.alertsBySeverity ? (
+              ) : alertsBySeverity && alertsBySeverity.length > 0 ? (
                 <div className="space-y-3">
-                  {(["critical", "high", "medium", "low"] as const).map((level) => {
-                    const count = overview.alertsBySeverity[level] ?? 0;
-                    const total = Object.values(overview.alertsBySeverity).reduce<number>(
-                      (a, b) => a + (b as number),
-                      0
-                    );
-                    const pct = total > 0 ? (count / total) * 100 : 0;
+                  {alertsBySeverity.map((item) => {
+                    const total = alertsBySeverity.reduce((a, b) => a + b.count, 0);
+                    const pct = total > 0 ? (item.count / total) * 100 : 0;
                     return (
-                      <div key={level} className="flex items-center gap-3">
-                        <SeverityBadge level={level} />
-                        <div className="flex-1">
+                      <div key={item.severity} className="flex items-center gap-3">
+                        <span
+                          className="text-[11px] font-semibold uppercase tracking-wider w-16"
+                          style={{ color: severityColor(item.severity) }}
+                        >
+                          {severityLabel(item.severity)}
+                        </span>
+                        <div
+                          className="flex-1 h-2 rounded-full overflow-hidden"
+                          style={{ background: "oklch(1 0 0 / 5%)" }}
+                        >
                           <div
-                            className="h-2 rounded-full overflow-hidden"
-                            style={{ background: "oklch(1 0 0 / 5%)" }}
-                          >
-                            <div
-                              className="h-full rounded-full transition-all duration-500"
-                              style={{
-                                width: `${pct}%`,
-                                background:
-                                  level === "critical"
-                                    ? RED
-                                    : level === "high"
-                                    ? "oklch(0.705 0.213 47.604)"
-                                    : level === "medium"
-                                    ? "oklch(0.769 0.188 70.08)"
-                                    : GREEN,
-                              }}
-                            />
-                          </div>
+                            className="h-full rounded-full transition-all duration-500"
+                            style={{
+                              width: `${pct}%`,
+                              background: severityColor(item.severity),
+                            }}
+                          />
                         </div>
                         <span
-                          className="text-sm font-bold tabular-nums"
+                          className="text-sm font-bold tabular-nums w-10 text-right"
                           style={{ fontFamily: "var(--font-mono)", color: BRIGHT }}
                         >
-                          {count}
+                          {item.count}
                         </span>
                       </div>
                     );
@@ -160,57 +186,73 @@ export default function Home() {
               )}
             </GlassCard>
 
-            {/* Recent Alerts */}
+            {/* Device Class Breakdown */}
             <GlassCard>
               <h3
                 className="text-xs font-bold uppercase tracking-wider mb-4"
                 style={{ color: MUTED }}
               >
-                Recent Alerts
+                Device Class Distribution
               </h3>
               {isLoading ? (
                 <div className="space-y-3">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Skeleton key={i} className="h-10 w-full" />
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <Skeleton key={i} className="h-8 w-full" />
                   ))}
                 </div>
-              ) : overview && overview.recentAlerts && overview.recentAlerts.length > 0 ? (
-                <div className="space-y-2">
-                  {overview.recentAlerts.map((alert: any) => (
-                    <div
-                      key={alert.id}
-                      className="flex items-center gap-3 p-2 rounded-lg transition-colors"
-                      style={{ background: "oklch(1 0 0 / 2%)" }}
-                    >
-                      <SeverityBadge level={alert.severity} />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[13px] truncate" style={{ color: BRIGHT }}>
-                          {alert.message}
-                        </p>
-                        <p className="text-[10px]" style={{ color: MUTED }}>
-                          {alert.deviceName} — {new Date(alert.createdAt).toLocaleString()}
-                        </p>
+              ) : devicesByClass && devicesByClass.length > 0 ? (
+                <div className="space-y-3">
+                  {devicesByClass.slice(0, 8).map((item, idx) => {
+                    const total = devicesByClass.reduce((a, b) => a + b.count, 0);
+                    const pct = total > 0 ? (item.count / total) * 100 : 0;
+                    const colors = [GOLD, CYAN, GREEN, PURPLE, ORANGE, AMBER, RED, MUTED];
+                    return (
+                      <div key={item.deviceClass} className="flex items-center gap-3">
+                        <span
+                          className="text-[11px] font-semibold uppercase tracking-wider w-20 truncate"
+                          style={{ color: colors[idx % colors.length] }}
+                        >
+                          {item.deviceClass || "unknown"}
+                        </span>
+                        <div
+                          className="flex-1 h-2 rounded-full overflow-hidden"
+                          style={{ background: "oklch(1 0 0 / 5%)" }}
+                        >
+                          <div
+                            className="h-full rounded-full transition-all duration-500"
+                            style={{
+                              width: `${pct}%`,
+                              background: colors[idx % colors.length],
+                            }}
+                          />
+                        </div>
+                        <span
+                          className="text-sm font-bold tabular-nums w-10 text-right"
+                          style={{ fontFamily: "var(--font-mono)", color: BRIGHT }}
+                        >
+                          {item.count}
+                        </span>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <p className="text-sm" style={{ color: MUTED }}>
-                  No recent alerts
+                  No device data available
                 </p>
               )}
             </GlassCard>
           </div>
         </StaggerItem>
 
-        {/* Device Status Summary */}
+        {/* Device Role Breakdown */}
         <StaggerItem>
           <GlassCard>
             <h3
               className="text-xs font-bold uppercase tracking-wider mb-4"
               style={{ color: MUTED }}
             >
-              Device Status Overview
+              Device Role Overview
             </h3>
             {isLoading ? (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -218,70 +260,35 @@ export default function Home() {
                   <Skeleton key={i} className="h-20 w-full" />
                 ))}
               </div>
-            ) : overview && overview.devicesByStatus ? (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {Object.entries(overview.devicesByStatus).map(([status, count]) => (
+            ) : devicesByRole && devicesByRole.length > 0 ? (
+              <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-4">
+                {devicesByRole.slice(0, 12).map((item) => (
                   <div
-                    key={status}
+                    key={item.role}
                     className="p-3 rounded-lg"
                     style={{
-                      background:
-                        status === "online"
-                          ? `${GREEN}08`
-                          : status === "offline"
-                          ? `${RED}08`
-                          : status === "warning"
-                          ? "oklch(0.769 0.188 70.08 / 8%)"
-                          : `${MUTED}08`,
-                      border: `1px solid ${
-                        status === "online"
-                          ? `${GREEN}20`
-                          : status === "offline"
-                          ? `${RED}20`
-                          : status === "warning"
-                          ? "oklch(0.769 0.188 70.08 / 20%)"
-                          : `${MUTED}20`
-                      }`,
+                      background: "oklch(1 0 0 / 3%)",
+                      border: "1px solid oklch(1 0 0 / 6%)",
                     }}
                   >
-                    <div className="flex items-center gap-2 mb-1">
-                      <span
-                        className={`status-dot ${
-                          status === "online"
-                            ? "status-connected"
-                            : status === "offline"
-                            ? "status-disconnected"
-                            : "status-pending"
-                        }`}
-                      />
-                      <span
-                        className="text-[9px] font-bold uppercase tracking-wider"
-                        style={{
-                          color:
-                            status === "online"
-                              ? GREEN
-                              : status === "offline"
-                              ? RED
-                              : status === "warning"
-                              ? "oklch(0.769 0.188 70.08)"
-                              : MUTED,
-                        }}
-                      >
-                        {status}
-                      </span>
-                    </div>
+                    <p
+                      className="text-[10px] font-bold uppercase tracking-wider mb-1 truncate"
+                      style={{ color: CYAN }}
+                    >
+                      {item.role || "unclassified"}
+                    </p>
                     <p
                       className="text-xl font-bold tabular-nums"
                       style={{ fontFamily: "var(--font-mono)", color: BRIGHT }}
                     >
-                      {(count as number).toLocaleString()}
+                      {item.count.toLocaleString()}
                     </p>
                   </div>
                 ))}
               </div>
             ) : (
               <p className="text-sm" style={{ color: MUTED }}>
-                No device data available
+                No device role data available
               </p>
             )}
           </GlassCard>
@@ -289,11 +296,4 @@ export default function Home() {
       </StaggerContainer>
     </div>
   );
-}
-
-function formatThroughput(bps: number): string {
-  if (bps >= 1_000_000_000) return `${(bps / 1_000_000_000).toFixed(1)} Gbps`;
-  if (bps >= 1_000_000) return `${(bps / 1_000_000).toFixed(1)} Mbps`;
-  if (bps >= 1_000) return `${(bps / 1_000).toFixed(1)} Kbps`;
-  return `${bps} bps`;
 }

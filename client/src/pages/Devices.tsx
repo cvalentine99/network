@@ -21,45 +21,42 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Server, Search, ArrowUpDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Server, Search, ArrowUpDown, ChevronLeft, ChevronRight, Eye, AlertTriangle } from "lucide-react";
 
-type SortField = "name" | "ipAddress" | "status" | "deviceType";
+type SortField = "displayName" | "ipaddr4" | "deviceClass" | "role" | "vendor" | "analysis" | "lastSeenTime";
 type SortDir = "asc" | "desc";
 
+const PAGE_SIZE = 50;
+
 export default function Devices() {
-  const { data: devices, isLoading } = trpc.network.devices.useQuery();
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [sortField, setSortField] = useState<SortField>("name");
+  const [deviceClassFilter, setDeviceClassFilter] = useState<string>("all");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [sortField, setSortField] = useState<SortField>("displayName");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
+  const [page, setPage] = useState(0);
 
-  const filtered = useMemo(() => {
-    if (!devices) return [];
-    let result = [...devices];
+  // Debounced search
+  const [debouncedSearch] = useState(() => search);
 
-    if (search) {
-      const q = search.toLowerCase();
-      result = result.filter(
-        (d) =>
-          d.name.toLowerCase().includes(q) ||
-          d.ipAddress.toLowerCase().includes(q) ||
-          (d.deviceType && d.deviceType.toLowerCase().includes(q))
-      );
-    }
+  const queryInput = useMemo(() => ({
+    limit: PAGE_SIZE,
+    offset: page * PAGE_SIZE,
+    search: search || undefined,
+    deviceClass: deviceClassFilter !== "all" ? deviceClassFilter : undefined,
+    role: roleFilter !== "all" ? roleFilter : undefined,
+    sortBy: sortField,
+    sortDir,
+  }), [search, deviceClassFilter, roleFilter, sortField, sortDir, page]);
 
-    if (statusFilter !== "all") {
-      result = result.filter((d) => d.status === statusFilter);
-    }
+  const { data, isLoading } = trpc.devices.list.useQuery(queryInput);
+  const { data: classCounts } = trpc.dashboard.devicesByClass.useQuery();
+  const { data: roleCounts } = trpc.dashboard.devicesByRole.useQuery();
 
-    result.sort((a, b) => {
-      const aVal = (a[sortField] ?? "").toString().toLowerCase();
-      const bVal = (b[sortField] ?? "").toString().toLowerCase();
-      const cmp = aVal.localeCompare(bVal);
-      return sortDir === "asc" ? cmp : -cmp;
-    });
-
-    return result;
-  }, [devices, search, statusFilter, sortField, sortDir]);
+  const devices = data?.rows ?? [];
+  const total = data?.total ?? 0;
+  const totalPages = Math.ceil(total / PAGE_SIZE);
 
   const toggleSort = (field: SortField) => {
     if (sortField === field) {
@@ -68,6 +65,7 @@ export default function Devices() {
       setSortField(field);
       setSortDir("asc");
     }
+    setPage(0);
   };
 
   const SortHeader = ({ field, label }: { field: SortField; label: string }) => (
@@ -83,11 +81,16 @@ export default function Devices() {
     </th>
   );
 
+  const formatEpoch = (epoch: number | null) => {
+    if (!epoch) return "--";
+    return new Date(epoch).toLocaleString();
+  };
+
   return (
     <div>
       <PageHeader
         title="Network Devices"
-        subtitle="Inventory and status of all monitored network devices"
+        subtitle="ExtraHop discovered devices — inventory, classification, and analysis levels"
       />
 
       <StaggerContainer className="space-y-4">
@@ -101,26 +104,74 @@ export default function Devices() {
                   style={{ color: MUTED }}
                 />
                 <Input
-                  placeholder="Search devices by name, IP, or type..."
+                  placeholder="Search by name, IP, MAC, DNS, or vendor..."
                   value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  onChange={(e) => { setSearch(e.target.value); setPage(0); }}
                   className="pl-9 bg-transparent border-border"
                 />
               </div>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <Select value={deviceClassFilter} onValueChange={(v) => { setDeviceClassFilter(v); setPage(0); }}>
                 <SelectTrigger className="w-full sm:w-[180px] bg-transparent border-border">
-                  <SelectValue placeholder="Filter by status" />
+                  <SelectValue placeholder="Device Class" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="online">Online</SelectItem>
-                  <SelectItem value="offline">Offline</SelectItem>
-                  <SelectItem value="warning">Warning</SelectItem>
-                  <SelectItem value="maintenance">Maintenance</SelectItem>
+                  <SelectItem value="all">All Classes</SelectItem>
+                  {classCounts?.map((c) => (
+                    <SelectItem key={c.deviceClass} value={c.deviceClass}>
+                      {c.deviceClass} ({c.count})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={roleFilter} onValueChange={(v) => { setRoleFilter(v); setPage(0); }}>
+                <SelectTrigger className="w-full sm:w-[180px] bg-transparent border-border">
+                  <SelectValue placeholder="Role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Roles</SelectItem>
+                  {roleCounts?.map((r) => (
+                    <SelectItem key={r.role} value={r.role}>
+                      {r.role} ({r.count})
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
           </GlassCard>
+        </StaggerItem>
+
+        {/* Results count */}
+        <StaggerItem>
+          <div className="flex items-center justify-between px-1">
+            <p className="text-xs" style={{ color: MUTED }}>
+              {total.toLocaleString()} device{total !== 1 ? "s" : ""} found
+            </p>
+            {totalPages > 1 && (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page === 0}
+                  onClick={() => setPage((p) => Math.max(0, p - 1))}
+                  className="h-7 px-2 bg-transparent"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <span className="text-xs tabular-nums" style={{ fontFamily: "var(--font-mono)", color: BRIGHT }}>
+                  {page + 1} / {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page >= totalPages - 1}
+                  onClick={() => setPage((p) => p + 1)}
+                  className="h-7 px-2 bg-transparent"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            )}
+          </div>
         </StaggerItem>
 
         {/* Table */}
@@ -132,92 +183,88 @@ export default function Devices() {
                   <Skeleton key={i} className="h-10 w-full" />
                 ))}
               </div>
-            ) : filtered.length > 0 ? (
+            ) : devices.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr style={{ borderBottom: "1px solid oklch(1 0 0 / 8%)" }}>
-                      <SortHeader field="name" label="Device Name" />
-                      <SortHeader field="ipAddress" label="IP Address" />
-                      <SortHeader field="status" label="Status" />
-                      <SortHeader field="deviceType" label="Type" />
-                      <th
-                        className="text-left py-2 px-3 text-[11px] font-semibold uppercase tracking-wider"
-                        style={{ color: MUTED }}
-                      >
-                        Location
+                      <SortHeader field="displayName" label="Device Name" />
+                      <SortHeader field="ipaddr4" label="IPv4" />
+                      <SortHeader field="deviceClass" label="Class" />
+                      <SortHeader field="role" label="Role" />
+                      <SortHeader field="vendor" label="Vendor" />
+                      <SortHeader field="analysis" label="Analysis" />
+                      <th className="text-left py-2 px-3 text-[11px] font-semibold uppercase tracking-wider" style={{ color: MUTED }}>
+                        Flags
                       </th>
-                      <th
-                        className="text-left py-2 px-3 text-[11px] font-semibold uppercase tracking-wider"
-                        style={{ color: MUTED }}
-                      >
-                        Last Seen
-                      </th>
+                      <SortHeader field="lastSeenTime" label="Last Seen" />
                     </tr>
                   </thead>
                   <tbody>
-                    {filtered.map((device) => (
+                    {devices.map((device) => (
                       <tr
                         key={device.id}
                         className="transition-colors"
                         style={{ borderBottom: "1px solid oklch(1 0 0 / 4%)" }}
-                        onMouseEnter={(e) =>
-                          (e.currentTarget.style.background = "oklch(1 0 0 / 3%)")
-                        }
-                        onMouseLeave={(e) =>
-                          (e.currentTarget.style.background = "transparent")
-                        }
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "oklch(1 0 0 / 3%)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                       >
                         <td className="py-2.5 px-3">
                           <div className="flex items-center gap-2">
-                            <Server className="w-4 h-4" style={{ color: CYAN }} />
-                            <span className="text-[13px] font-medium" style={{ color: BRIGHT }}>
-                              {device.name}
-                            </span>
+                            <Server className="w-4 h-4 shrink-0" style={{ color: CYAN }} />
+                            <div className="min-w-0">
+                              <span className="text-[13px] font-medium block truncate" style={{ color: BRIGHT }}>
+                                {device.displayName}
+                              </span>
+                              {device.macaddr && device.macaddr !== "00:00:00:00:00:00" && (
+                                <span className="text-[10px] tabular-nums" style={{ fontFamily: "var(--font-mono)", color: MUTED }}>
+                                  {device.macaddr}
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </td>
                         <td
                           className="py-2.5 px-3 text-[13px] tabular-nums"
                           style={{ fontFamily: "var(--font-mono)", color: CYAN }}
                         >
-                          {device.ipAddress}
-                        </td>
-                        <td className="py-2.5 px-3">
-                          <div className="flex items-center gap-2">
-                            <span
-                              className={`status-dot ${
-                                device.status === "online"
-                                  ? "status-connected"
-                                  : device.status === "offline"
-                                  ? "status-disconnected"
-                                  : "status-pending"
-                              }`}
-                            />
-                            <span
-                              className="text-[13px] capitalize"
-                              style={{
-                                color:
-                                  device.status === "online"
-                                    ? GREEN
-                                    : device.status === "offline"
-                                    ? RED
-                                    : GOLD,
-                              }}
-                            >
-                              {device.status}
-                            </span>
-                          </div>
+                          {device.ipaddr4 || "--"}
                         </td>
                         <td className="py-2.5 px-3 text-[13px]" style={{ color: "oklch(0.85 0.005 85)" }}>
-                          {device.deviceType || "--"}
+                          {device.deviceClass || "--"}
+                        </td>
+                        <td className="py-2.5 px-3 text-[13px]" style={{ color: GOLD }}>
+                          {device.role || "--"}
                         </td>
                         <td className="py-2.5 px-3 text-[13px]" style={{ color: MUTED }}>
-                          {device.location || "--"}
+                          {device.vendor || "--"}
+                        </td>
+                        <td className="py-2.5 px-3">
+                          <span
+                            className="text-[11px] font-semibold uppercase px-2 py-0.5 rounded"
+                            style={{
+                              background: device.analysis === "advanced" ? `${GREEN}15` : device.analysis === "standard" ? `${CYAN}15` : `${MUTED}10`,
+                              color: device.analysis === "advanced" ? GREEN : device.analysis === "standard" ? CYAN : MUTED,
+                            }}
+                          >
+                            {device.analysis}
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3">
+                          <div className="flex items-center gap-1.5">
+                            {device.critical && (
+                              <AlertTriangle className="w-3.5 h-3.5" style={{ color: RED }} aria-label="Critical" />
+                            )}
+                            {device.onWatchlist && (
+                              <Eye className="w-3.5 h-3.5" style={{ color: GOLD }} aria-label="Watchlist" />
+                            )}
+                            {!device.critical && !device.onWatchlist && (
+                              <span className="text-[11px]" style={{ color: MUTED }}>--</span>
+                            )}
+                          </div>
                         </td>
                         <td className="py-2.5 px-3 text-[13px] tabular-nums" style={{ color: MUTED }}>
-                          {device.lastSeen
-                            ? new Date(device.lastSeen).toLocaleString()
-                            : "--"}
+                          {formatEpoch(device.lastSeenTime)}
                         </td>
                       </tr>
                     ))}
@@ -228,8 +275,8 @@ export default function Devices() {
               <div className="text-center py-12">
                 <Server className="w-8 h-8 mx-auto mb-3" style={{ color: MUTED }} />
                 <p className="text-sm" style={{ color: MUTED }}>
-                  {devices && devices.length === 0
-                    ? "No devices found. Add devices to your database to begin monitoring."
+                  {total === 0
+                    ? "No devices found. Populate the dim_device table from your ExtraHop appliance."
                     : "No devices match your search criteria."}
                 </p>
               </div>

@@ -8,8 +8,9 @@ import DashboardLayout from "./components/DashboardLayout";
 import Home from "./pages/Home";
 import Devices from "./pages/Devices";
 import Alerts from "./pages/Alerts";
-import Interfaces from "./pages/Interfaces";
-import Performance from "./pages/Performance";
+import Networks from "./pages/Interfaces";
+import Detections from "./pages/Performance";
+import Appliances from "./pages/Appliances";
 
 function Router() {
   return (
@@ -18,8 +19,9 @@ function Router() {
         <Route path="/" component={Home} />
         <Route path="/devices" component={Devices} />
         <Route path="/alerts" component={Alerts} />
-        <Route path="/interfaces" component={Interfaces} />
-        <Route path="/performance" component={Performance} />
+        <Route path="/networks" component={Networks} />
+        <Route path="/detections" component={Detections} />
+        <Route path="/appliances" component={Appliances} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>

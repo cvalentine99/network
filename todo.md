@@ -19,3 +19,17 @@
 - [x] Optimize layout for ultrawide monitors (max-width: 1920px)
 - [x] Write vitest tests (6 passing)
 - [x] Final polish and checkpoint
+
+## Schema Migration — ExtraHop Data Model
+
+- [x] Drop placeholder tables (devices, alerts, interfaces, performance_metrics)
+- [x] Apply ExtraHop DDL — raw layer + dimension tables + bridge tables
+- [x] Apply ExtraHop DDL — fact tables + snapshot tables + topology tables
+- [x] Apply ExtraHop DDL — schema management + detection tables
+- [x] Create application views (008_app_views.sql)
+- [x] Create convenience views + indexes (006_indexes_views.sql)
+- [x] Update Drizzle schema.ts to match ExtraHop data model
+- [x] Update server/db.ts query helpers for ExtraHop views
+- [x] Update server/routers.ts tRPC procedures for ExtraHop data
+- [x] Update frontend pages for ExtraHop data shapes (Dashboard, Devices, Alerts, Networks, Detections, Appliances)
+- [x] Write/update vitest tests (19 passing, 0 failures)

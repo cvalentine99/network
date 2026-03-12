@@ -17,9 +17,9 @@ import {
   Server,
   AlertTriangle,
   Network,
-  Activity,
-  PanelLeft,
   Radio,
+  Cpu,
+  PanelLeft,
 } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
@@ -29,8 +29,9 @@ const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
   { icon: Server, label: "Devices", path: "/devices" },
   { icon: AlertTriangle, label: "Alerts", path: "/alerts" },
-  { icon: Network, label: "Interfaces", path: "/interfaces" },
-  { icon: Activity, label: "Performance", path: "/performance" },
+  { icon: Network, label: "Networks", path: "/networks" },
+  { icon: Radio, label: "Detections", path: "/detections" },
+  { icon: Cpu, label: "Appliances", path: "/appliances" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
@@ -214,7 +215,7 @@ function DashboardLayoutContent({
                   className="text-[10px]"
                   style={{ color: MUTED }}
                 >
-                  Awaiting database connection
+                  ExtraHop Connected
                 </p>
               </div>
             )}

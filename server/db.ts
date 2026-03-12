@@ -1,12 +1,38 @@
-import { eq, sql, desc, and } from "drizzle-orm";
+import { eq, sql, desc, asc, count, and, like, or, isNotNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   InsertUser,
   users,
-  devices,
-  alerts,
-  interfaces,
-  performanceMetrics,
+  dimDevice,
+  dimAlert,
+  dimAppliance,
+  dimNetwork,
+  dimDeviceGroup,
+  dimApplication,
+  dimDetection,
+  dimDetectionFormat,
+  dimTag,
+  dimVlan,
+  dimNetworkLocality,
+  dimActivityMap,
+  factMetricResponse,
+  factMetricStat,
+  factRecordSearch,
+  factRecord,
+  factDeviceActivity,
+  snapDeviceIpaddr,
+  snapDeviceDnsname,
+  snapDeviceSoftware,
+  snapTopology,
+  snapTopologyNode,
+  snapTopologyEdge,
+  bridgeDeviceTag,
+  bridgeDeviceDeviceGroup,
+  bridgeAlertDevice,
+  bridgeAlertDeviceGroup,
+  bridgeAlertApplication,
+  bridgeAlertNetwork,
+  schemaDriftLog,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -24,26 +50,17 @@ export async function getDb() {
   return _db;
 }
 
-// ─── User Helpers ────────────────────────────────────────────────────────────
+/* ─────────────────────────── User helpers (kept for framework) ─────────────────────────── */
 
 export async function upsertUser(user: InsertUser): Promise<void> {
-  if (!user.openId) {
-    throw new Error("User openId is required for upsert");
-  }
-
+  if (!user.openId) throw new Error("User openId is required for upsert");
   const db = await getDb();
-  if (!db) {
-    console.warn("[Database] Cannot upsert user: database not available");
-    return;
-  }
-
+  if (!db) { console.warn("[Database] Cannot upsert user: database not available"); return; }
   try {
     const values: InsertUser = { openId: user.openId };
     const updateSet: Record<string, unknown> = {};
-
     const textFields = ["name", "email", "loginMethod"] as const;
     type TextField = (typeof textFields)[number];
-
     const assignNullable = (field: TextField) => {
       const value = user[field];
       if (value === undefined) return;
@@ -51,230 +68,468 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       values[field] = normalized;
       updateSet[field] = normalized;
     };
-
     textFields.forEach(assignNullable);
-
-    if (user.lastSignedIn !== undefined) {
-      values.lastSignedIn = user.lastSignedIn;
-      updateSet.lastSignedIn = user.lastSignedIn;
-    }
-    if (user.role !== undefined) {
-      values.role = user.role;
-      updateSet.role = user.role;
-    } else if (user.openId === ENV.ownerOpenId) {
-      values.role = "admin";
-      updateSet.role = "admin";
-    }
-
-    if (!values.lastSignedIn) {
-      values.lastSignedIn = new Date();
-    }
-
-    if (Object.keys(updateSet).length === 0) {
-      updateSet.lastSignedIn = new Date();
-    }
-
-    await db
-      .insert(users)
-      .values(values)
-      .onDuplicateKeyUpdate({ set: updateSet });
-  } catch (error) {
-    console.error("[Database] Failed to upsert user:", error);
-    throw error;
-  }
+    if (user.lastSignedIn !== undefined) { values.lastSignedIn = user.lastSignedIn; updateSet.lastSignedIn = user.lastSignedIn; }
+    if (user.role !== undefined) { values.role = user.role; updateSet.role = user.role; }
+    else if (user.openId === ENV.ownerOpenId) { values.role = "admin"; updateSet.role = "admin"; }
+    if (!values.lastSignedIn) values.lastSignedIn = new Date();
+    if (Object.keys(updateSet).length === 0) updateSet.lastSignedIn = new Date();
+    await db.insert(users).values(values).onDuplicateKeyUpdate({ set: updateSet });
+  } catch (error) { console.error("[Database] Failed to upsert user:", error); throw error; }
 }
 
 export async function getUserByOpenId(openId: string) {
   const db = await getDb();
-  if (!db) {
-    console.warn("[Database] Cannot get user: database not available");
-    return undefined;
-  }
-
-  const result = await db
-    .select()
-    .from(users)
-    .where(eq(users.openId, openId))
-    .limit(1);
+  if (!db) { console.warn("[Database] Cannot get user: database not available"); return undefined; }
+  const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
   return result.length > 0 ? result[0] : undefined;
 }
 
-// ─── Device Helpers ──────────────────────────────────────────────────────────
+/* ─────────────────────────── Dashboard Overview ─────────────────────────── */
 
-export async function getAllDevices() {
+export async function getDashboardStats() {
   const db = await getDb();
-  if (!db) return [];
-  return db.select().from(devices).orderBy(devices.name);
-}
+  if (!db) return null;
 
-export async function getDeviceCount() {
-  const db = await getDb();
-  if (!db) return 0;
-  const result = await db
-    .select({ count: sql<number>`count(*)` })
-    .from(devices);
-  return result[0]?.count ?? 0;
-}
+  const [deviceCount] = await db.select({ count: count() }).from(dimDevice);
+  const [alertCount] = await db.select({ count: count() }).from(dimAlert);
+  const [applianceCount] = await db.select({ count: count() }).from(dimAppliance);
+  const [networkCount] = await db.select({ count: count() }).from(dimNetwork);
+  const [detectionCount] = await db.select({ count: count() }).from(dimDetection);
+  const [activeDeviceCount] = await db.select({ count: count() }).from(dimDevice).where(isNotNull(dimDevice.lastSeenTime));
+  const [criticalDeviceCount] = await db.select({ count: count() }).from(dimDevice).where(eq(dimDevice.critical, true));
+  const [watchlistCount] = await db.select({ count: count() }).from(dimDevice).where(eq(dimDevice.onWatchlist, true));
 
-export async function getDevicesByStatus() {
-  const db = await getDb();
-  if (!db) return {};
-  const result = await db
-    .select({
-      status: devices.status,
-      count: sql<number>`count(*)`,
-    })
-    .from(devices)
-    .groupBy(devices.status);
-  const map: Record<string, number> = {};
-  for (const row of result) {
-    map[row.status] = row.count;
-  }
-  return map;
-}
-
-// ─── Alert Helpers ───────────────────────────────────────────────────────────
-
-export async function getAllAlerts() {
-  const db = await getDb();
-  if (!db) return [];
-  const result = await db
-    .select({
-      id: alerts.id,
-      deviceId: alerts.deviceId,
-      severity: alerts.severity,
-      message: alerts.message,
-      source: alerts.source,
-      acknowledged: alerts.acknowledged,
-      resolvedAt: alerts.resolvedAt,
-      createdAt: alerts.createdAt,
-      deviceName: devices.name,
-    })
-    .from(alerts)
-    .leftJoin(devices, eq(alerts.deviceId, devices.id))
-    .orderBy(desc(alerts.createdAt));
-  return result;
-}
-
-export async function getActiveAlertCount() {
-  const db = await getDb();
-  if (!db) return 0;
-  const result = await db
-    .select({ count: sql<number>`count(*)` })
-    .from(alerts)
-    .where(sql`${alerts.resolvedAt} IS NULL`);
-  return result[0]?.count ?? 0;
+  return {
+    totalDevices: deviceCount?.count ?? 0,
+    activeDevices: activeDeviceCount?.count ?? 0,
+    criticalDevices: criticalDeviceCount?.count ?? 0,
+    watchlistDevices: watchlistCount?.count ?? 0,
+    totalAlerts: alertCount?.count ?? 0,
+    totalAppliances: applianceCount?.count ?? 0,
+    totalNetworks: networkCount?.count ?? 0,
+    totalDetections: detectionCount?.count ?? 0,
+  };
 }
 
 export async function getAlertsBySeverity() {
   const db = await getDb();
-  if (!db) return { critical: 0, high: 0, medium: 0, low: 0 };
-  const result = await db
-    .select({
-      severity: alerts.severity,
-      count: sql<number>`count(*)`,
-    })
-    .from(alerts)
-    .where(sql`${alerts.resolvedAt} IS NULL`)
-    .groupBy(alerts.severity);
-  const map: Record<string, number> = { critical: 0, high: 0, medium: 0, low: 0 };
-  for (const row of result) {
-    map[row.severity] = row.count;
-  }
-  return map;
+  if (!db) return [];
+  const results = await db
+    .select({ severity: dimAlert.severity, count: count() })
+    .from(dimAlert)
+    .groupBy(dimAlert.severity)
+    .orderBy(asc(dimAlert.severity));
+  return results;
 }
 
-export async function getRecentAlerts(limit = 10) {
+export async function getDevicesByClass() {
   const db = await getDb();
   if (!db) return [];
-  const result = await db
-    .select({
-      id: alerts.id,
-      severity: alerts.severity,
-      message: alerts.message,
-      createdAt: alerts.createdAt,
-      deviceName: devices.name,
-    })
-    .from(alerts)
-    .leftJoin(devices, eq(alerts.deviceId, devices.id))
-    .orderBy(desc(alerts.createdAt))
-    .limit(limit);
-  return result;
+  const cnt = count();
+  const results = await db
+    .select({ deviceClass: dimDevice.deviceClass, count: cnt })
+    .from(dimDevice)
+    .groupBy(dimDevice.deviceClass)
+    .orderBy(desc(cnt));
+  return results;
 }
 
-// ─── Interface Helpers ───────────────────────────────────────────────────────
-
-export async function getAllInterfaces() {
+export async function getDevicesByRole() {
   const db = await getDb();
   if (!db) return [];
-  const result = await db
-    .select({
-      id: interfaces.id,
-      deviceId: interfaces.deviceId,
-      name: interfaces.name,
-      interfaceType: interfaces.interfaceType,
-      status: interfaces.status,
-      speed: interfaces.speed,
-      inTraffic: interfaces.inTraffic,
-      outTraffic: interfaces.outTraffic,
-      mtu: interfaces.mtu,
-      deviceName: devices.name,
-    })
-    .from(interfaces)
-    .leftJoin(devices, eq(interfaces.deviceId, devices.id))
-    .orderBy(interfaces.name);
-  return result;
+  const cnt = count();
+  const results = await db
+    .select({ role: dimDevice.role, count: cnt })
+    .from(dimDevice)
+    .groupBy(dimDevice.role)
+    .orderBy(desc(cnt));
+  return results;
 }
 
-export async function getInterfaceCountByStatus() {
+export async function getDevicesByAnalysis() {
   const db = await getDb();
-  if (!db) return { up: 0, down: 0, degraded: 0 };
-  const result = await db
-    .select({
-      status: interfaces.status,
-      count: sql<number>`count(*)`,
-    })
-    .from(interfaces)
-    .groupBy(interfaces.status);
-  const map: Record<string, number> = { up: 0, down: 0, degraded: 0 };
-  for (const row of result) {
-    map[row.status] = row.count;
-  }
-  return map;
+  if (!db) return [];
+  const cnt = count();
+  const results = await db
+    .select({ analysis: dimDevice.analysis, count: cnt })
+    .from(dimDevice)
+    .groupBy(dimDevice.analysis)
+    .orderBy(desc(cnt));
+  return results;
 }
 
-// ─── Performance Helpers ─────────────────────────────────────────────────────
+/* ─────────────────────────── Devices ─────────────────────────── */
 
-export async function getAveragePerformanceMetrics() {
+export async function getDevices(opts?: {
+  limit?: number;
+  offset?: number;
+  search?: string;
+  deviceClass?: string;
+  role?: string;
+  analysis?: string;
+  critical?: boolean;
+  onWatchlist?: boolean;
+  sortBy?: string;
+  sortDir?: "asc" | "desc";
+}) {
+  const db = await getDb();
+  if (!db) return { rows: [], total: 0 };
+
+  const conditions = [];
+  if (opts?.search) {
+    const s = `%${opts.search}%`;
+    conditions.push(
+      or(
+        like(dimDevice.displayName, s),
+        like(dimDevice.ipaddr4, s),
+        like(dimDevice.macaddr, s),
+        like(dimDevice.dnsName, s),
+        like(dimDevice.vendor, s),
+      )
+    );
+  }
+  if (opts?.deviceClass) conditions.push(eq(dimDevice.deviceClass, opts.deviceClass));
+  if (opts?.role) conditions.push(eq(dimDevice.role, opts.role));
+  if (opts?.analysis) conditions.push(eq(dimDevice.analysis, opts.analysis));
+  if (opts?.critical !== undefined) conditions.push(eq(dimDevice.critical, opts.critical));
+  if (opts?.onWatchlist !== undefined) conditions.push(eq(dimDevice.onWatchlist, opts.onWatchlist));
+
+  const where = conditions.length > 0 ? and(...conditions) : undefined;
+
+  const sortCol = (() => {
+    switch (opts?.sortBy) {
+      case "displayName": return dimDevice.displayName;
+      case "ipaddr4": return dimDevice.ipaddr4;
+      case "deviceClass": return dimDevice.deviceClass;
+      case "role": return dimDevice.role;
+      case "vendor": return dimDevice.vendor;
+      case "analysis": return dimDevice.analysis;
+      case "lastSeenTime": return dimDevice.lastSeenTime;
+      case "discoverTime": return dimDevice.discoverTime;
+      default: return dimDevice.displayName;
+    }
+  })();
+  const orderDir = opts?.sortDir === "desc" ? desc(sortCol) : asc(sortCol);
+
+  const [totalResult] = await db.select({ count: count() }).from(dimDevice).where(where);
+  const rows = await db
+    .select()
+    .from(dimDevice)
+    .where(where)
+    .orderBy(orderDir)
+    .limit(opts?.limit ?? 50)
+    .offset(opts?.offset ?? 0);
+
+  return { rows, total: totalResult?.count ?? 0 };
+}
+
+export async function getDeviceById(id: number) {
   const db = await getDb();
   if (!db) return null;
-  const result = await db
-    .select({
-      avgLatency: sql<number>`AVG(${performanceMetrics.latency})`,
-      avgThroughput: sql<number>`AVG(${performanceMetrics.throughput})`,
-      avgPacketLoss: sql<number>`AVG(${performanceMetrics.packetLoss})`,
-      avgJitter: sql<number>`AVG(${performanceMetrics.jitter})`,
-      avgUptime: sql<number>`AVG(${performanceMetrics.uptime})`,
-    })
-    .from(performanceMetrics);
-  return result[0] ?? null;
+  const [device] = await db.select().from(dimDevice).where(eq(dimDevice.id, id)).limit(1);
+  return device ?? null;
 }
 
-export async function getPerDevicePerformance() {
+export async function getDeviceIps(deviceId: number) {
   const db = await getDb();
   if (!db) return [];
-  const result = await db
-    .select({
-      deviceId: performanceMetrics.deviceId,
-      deviceName: devices.name,
-      latency: sql<number>`AVG(${performanceMetrics.latency})`,
-      throughput: sql<number>`AVG(${performanceMetrics.throughput})`,
-      packetLoss: sql<number>`AVG(${performanceMetrics.packetLoss})`,
-      jitter: sql<number>`AVG(${performanceMetrics.jitter})`,
-      uptime: sql<number>`AVG(${performanceMetrics.uptime})`,
-    })
-    .from(performanceMetrics)
-    .leftJoin(devices, eq(performanceMetrics.deviceId, devices.id))
-    .groupBy(performanceMetrics.deviceId, devices.name);
-  return result;
+  return db.select().from(snapDeviceIpaddr).where(and(eq(snapDeviceIpaddr.deviceId, deviceId), eq(snapDeviceIpaddr.isCurrent, true)));
+}
+
+export async function getDeviceDnsNames(deviceId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(snapDeviceDnsname).where(and(eq(snapDeviceDnsname.deviceId, deviceId), eq(snapDeviceDnsname.isCurrent, true)));
+}
+
+export async function getDeviceSoftware(deviceId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(snapDeviceSoftware).where(and(eq(snapDeviceSoftware.deviceId, deviceId), eq(snapDeviceSoftware.isCurrent, true)));
+}
+
+export async function getDeviceTags(deviceId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select({ tagId: bridgeDeviceTag.tagId, tagName: dimTag.name })
+    .from(bridgeDeviceTag)
+    .innerJoin(dimTag, eq(dimTag.id, bridgeDeviceTag.tagId))
+    .where(eq(bridgeDeviceTag.deviceId, deviceId));
+}
+
+export async function getDeviceGroups(deviceId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select({ groupId: bridgeDeviceDeviceGroup.deviceGroupId, groupName: dimDeviceGroup.name })
+    .from(bridgeDeviceDeviceGroup)
+    .innerJoin(dimDeviceGroup, eq(dimDeviceGroup.id, bridgeDeviceDeviceGroup.deviceGroupId))
+    .where(eq(bridgeDeviceDeviceGroup.deviceId, deviceId));
+}
+
+export async function getDeviceActivity(deviceId: number, limit = 20) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select()
+    .from(factDeviceActivity)
+    .where(eq(factDeviceActivity.deviceId, deviceId))
+    .orderBy(desc(factDeviceActivity.fromTime))
+    .limit(limit);
+}
+
+/* ─────────────────────────── Alerts ─────────────────────────── */
+
+export async function getAlerts(opts?: {
+  limit?: number;
+  offset?: number;
+  search?: string;
+  severity?: number;
+  type?: string;
+  disabled?: boolean;
+  sortBy?: string;
+  sortDir?: "asc" | "desc";
+}) {
+  const db = await getDb();
+  if (!db) return { rows: [], total: 0 };
+
+  const conditions = [];
+  if (opts?.search) {
+    const s = `%${opts.search}%`;
+    conditions.push(or(like(dimAlert.name, s), like(dimAlert.statName, s)));
+  }
+  if (opts?.severity !== undefined) conditions.push(eq(dimAlert.severity, opts.severity));
+  if (opts?.type) conditions.push(eq(dimAlert.type, opts.type));
+  if (opts?.disabled !== undefined) conditions.push(eq(dimAlert.disabled, opts.disabled));
+
+  const where = conditions.length > 0 ? and(...conditions) : undefined;
+
+  const sortCol = (() => {
+    switch (opts?.sortBy) {
+      case "name": return dimAlert.name;
+      case "severity": return dimAlert.severity;
+      case "type": return dimAlert.type;
+      case "statName": return dimAlert.statName;
+      default: return dimAlert.severity;
+    }
+  })();
+  const orderDir = opts?.sortDir === "desc" ? desc(sortCol) : asc(sortCol);
+
+  const [totalResult] = await db.select({ count: count() }).from(dimAlert).where(where);
+  const rows = await db.select().from(dimAlert).where(where).orderBy(orderDir).limit(opts?.limit ?? 50).offset(opts?.offset ?? 0);
+
+  return { rows, total: totalResult?.count ?? 0 };
+}
+
+export async function getAlertById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const [alert] = await db.select().from(dimAlert).where(eq(dimAlert.id, id)).limit(1);
+  return alert ?? null;
+}
+
+/* ─────────────────────────── Appliances ─────────────────────────── */
+
+export async function getAppliances() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(dimAppliance).orderBy(asc(dimAppliance.displayName));
+}
+
+export async function getApplianceById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const [appliance] = await db.select().from(dimAppliance).where(eq(dimAppliance.id, id)).limit(1);
+  return appliance ?? null;
+}
+
+/* ─────────────────────────── Networks ─────────────────────────── */
+
+export async function getNetworks() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(dimNetwork).orderBy(asc(dimNetwork.name));
+}
+
+/* ─────────────────────────── Device Groups ─────────────────────────── */
+
+export async function getDeviceGroupsList() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(dimDeviceGroup).orderBy(asc(dimDeviceGroup.name));
+}
+
+/* ─────────────────────────── Applications ─────────────────────────── */
+
+export async function getApplications() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(dimApplication).orderBy(asc(dimApplication.displayName));
+}
+
+/* ─────────────────────────── Detections ─────────────────────────── */
+
+export async function getDetections(opts?: {
+  limit?: number;
+  offset?: number;
+  search?: string;
+  status?: string;
+  sortBy?: string;
+  sortDir?: "asc" | "desc";
+}) {
+  const db = await getDb();
+  if (!db) return { rows: [], total: 0 };
+
+  const conditions = [];
+  if (opts?.search) {
+    const s = `%${opts.search}%`;
+    conditions.push(or(like(dimDetection.title, s), like(dimDetection.type, s)));
+  }
+  if (opts?.status) conditions.push(eq(dimDetection.status, opts.status));
+
+  const where = conditions.length > 0 ? and(...conditions) : undefined;
+
+  const sortCol = (() => {
+    switch (opts?.sortBy) {
+      case "title": return dimDetection.title;
+      case "riskScore": return dimDetection.riskScore;
+      case "status": return dimDetection.status;
+      case "startTime": return dimDetection.startTime;
+      case "createTime": return dimDetection.createTime;
+      default: return dimDetection.riskScore;
+    }
+  })();
+  const orderDir = opts?.sortDir === "desc" ? desc(sortCol) : asc(sortCol);
+
+  const [totalResult] = await db.select({ count: count() }).from(dimDetection).where(where);
+  const rows = await db.select().from(dimDetection).where(where).orderBy(orderDir).limit(opts?.limit ?? 50).offset(opts?.offset ?? 0);
+
+  return { rows, total: totalResult?.count ?? 0 };
+}
+
+/* ─────────────────────────── Metrics ─────────────────────────── */
+
+export async function getMetricResponses(opts?: {
+  limit?: number;
+  offset?: number;
+  category?: string;
+  objectType?: string;
+}) {
+  const db = await getDb();
+  if (!db) return { rows: [], total: 0 };
+
+  const conditions = [];
+  if (opts?.category) conditions.push(eq(factMetricResponse.metricCategory, opts.category));
+  if (opts?.objectType) conditions.push(eq(factMetricResponse.objectType, opts.objectType));
+
+  const where = conditions.length > 0 ? and(...conditions) : undefined;
+
+  const [totalResult] = await db.select({ count: count() }).from(factMetricResponse).where(where);
+  const rows = await db
+    .select()
+    .from(factMetricResponse)
+    .where(where)
+    .orderBy(desc(factMetricResponse.polledAt))
+    .limit(opts?.limit ?? 50)
+    .offset(opts?.offset ?? 0);
+
+  return { rows, total: totalResult?.count ?? 0 };
+}
+
+export async function getMetricStats(metricResponseId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select()
+    .from(factMetricStat)
+    .where(eq(factMetricStat.metricResponseId, metricResponseId))
+    .orderBy(desc(factMetricStat.statTime));
+}
+
+export async function getMetricCategories() {
+  const db = await getDb();
+  if (!db) return [];
+  const cnt = count();
+  const results = await db
+    .select({ category: factMetricResponse.metricCategory, count: cnt })
+    .from(factMetricResponse)
+    .groupBy(factMetricResponse.metricCategory)
+    .orderBy(desc(cnt));
+  return results;
+}
+
+/* ─────────────────────────── Topology───────────────────────── */
+
+export async function getVlans() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(dimVlan).orderBy(asc(dimVlan.vlanid));
+}
+
+/* ─────────────────────────── Tags ─────────────────────────── */
+
+export async function getTags() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(dimTag).orderBy(asc(dimTag.name));
+}
+
+/* ─────────────────────────── Network Localities ─────────────────────────── */
+
+export async function getNetworkLocalities() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(dimNetworkLocality).orderBy(asc(dimNetworkLocality.name));
+}
+
+/* ─────────────────────────── Activity Maps ─────────────────────────── */
+
+export async function getActivityMaps() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(dimActivityMap).orderBy(asc(dimActivityMap.name));
+}
+
+/* ─────────────────────────── Topology ─────────────────────────── */
+
+export async function getLatestTopology() {
+  const db = await getDb();
+  if (!db) return null;
+  const [latest] = await db.select().from(snapTopology).orderBy(desc(snapTopology.polledAt)).limit(1);
+  if (!latest) return null;
+  const nodes = await db.select().from(snapTopologyNode).where(eq(snapTopologyNode.topologyId, latest.id));
+  const edges = await db.select().from(snapTopologyEdge).where(eq(snapTopologyEdge.topologyId, latest.id));
+  return { topology: latest, nodes, edges };
+}
+
+/* ─────────────────────────── Records ─────────────────────────── */
+
+export async function getRecordSearches(opts?: { limit?: number; offset?: number }) {
+  const db = await getDb();
+  if (!db) return { rows: [], total: 0 };
+  const [totalResult] = await db.select({ count: count() }).from(factRecordSearch);
+  const rows = await db
+    .select()
+    .from(factRecordSearch)
+    .orderBy(desc(factRecordSearch.polledAt))
+    .limit(opts?.limit ?? 50)
+    .offset(opts?.offset ?? 0);
+  return { rows, total: totalResult?.count ?? 0 };
+}
+
+export async function getRecordsBySearch(searchId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(factRecord).where(eq(factRecord.searchId, searchId));
+}
+
+/* ─────────────────────────── Schema Health ─────────────────────────── */
+
+export async function getLatestDriftLog() {
+  const db = await getDb();
+  if (!db) return null;
+  const [latest] = await db.select().from(schemaDriftLog).orderBy(desc(schemaDriftLog.runAt)).limit(1);
+  return latest ?? null;
 }

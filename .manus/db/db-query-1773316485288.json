@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS raw_api_response (\n    id              BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,\n    capture_time    DATETIME(3)   NOT NULL DEFAULT CURRENT_TIMESTAMP(3),\n    capture_epoch_ms BIGINT       NOT NULL,\n    method          VARCHAR(10)   NOT NULL,\n    url             VARCHAR(2048) NOT NULL,\n    request_body    JSON          DEFAULT NULL,\n    http_status     SMALLINT      NOT NULL,\n    response_body   LONGTEXT      NOT NULL,\n    response_hash   CHAR(64)      DEFAULT NULL,\n    eh_host         VARCHAR(255)  NOT NULL,\n    endpoint_name   VARCHAR(100)  NOT NULL,\n    INDEX idx_raw_capture_time (capture_time),\n    INDEX idx_raw_endpoint (endpoint_name),\n    INDEX idx_raw_hash (response_hash)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3xenzgJ3NGNThF2.e615124e9d05 --database FAgcVHDa53BkVwvRfvbPzh --execute CREATE TABLE IF NOT EXISTS raw_api_response (\n    id              BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,\n    capture_time    DATETIME(3)   NOT NULL DEFAULT CURRENT_TIMESTAMP(3),\n    capture_epoch_ms BIGINT       NOT NULL,\n    method          VARCHAR(10)   NOT NULL,\n    url             VARCHAR(2048) NOT NULL,\n    request_body    JSON          DEFAULT NULL,\n    http_status     SMALLINT      NOT NULL,\n    response_body   LONGTEXT      NOT NULL,\n    response_hash   CHAR(64)      DEFAULT NULL,\n    eh_host         VARCHAR(255)  NOT NULL,\n    endpoint_name   VARCHAR(100)  NOT NULL,\n    INDEX idx_raw_capture_time (capture_time),\n    INDEX idx_raw_endpoint (endpoint_name),\n    INDEX idx_raw_hash (response_hash)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 124
+}

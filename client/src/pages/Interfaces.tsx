@@ -13,62 +13,45 @@ import {
   BRIGHT,
 } from "@/components/DashboardWidgets";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Network, Search, ArrowUpDown } from "lucide-react";
 
-type SortField = "name" | "deviceName" | "status" | "speed";
+type SortField = "name" | "description" | "idle";
 type SortDir = "asc" | "desc";
 
-export default function Interfaces() {
-  const { data: interfaces, isLoading } = trpc.network.interfaces.useQuery();
+export default function Networks() {
+  const { data: networks, isLoading } = trpc.networks.list.useQuery();
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortField, setSortField] = useState<SortField>("name");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
 
   const filtered = useMemo(() => {
-    if (!interfaces) return [];
-    let result = [...interfaces];
+    if (!networks) return [];
+    let result = [...networks];
 
     if (search) {
       const q = search.toLowerCase();
       result = result.filter(
-        (iface) =>
-          iface.name.toLowerCase().includes(q) ||
-          (iface.deviceName && iface.deviceName.toLowerCase().includes(q)) ||
-          (iface.interfaceType && iface.interfaceType.toLowerCase().includes(q))
+        (n) =>
+          n.name.toLowerCase().includes(q) ||
+          (n.description && n.description.toLowerCase().includes(q))
       );
     }
 
-    if (statusFilter !== "all") {
-      result = result.filter((iface) => iface.status === statusFilter);
-    }
-
     result.sort((a, b) => {
-      let aVal: string | number = "";
-      let bVal: string | number = "";
-
-      if (sortField === "speed") {
-        aVal = a.speed ?? 0;
-        bVal = b.speed ?? 0;
-        return sortDir === "asc" ? (aVal as number) - (bVal as number) : (bVal as number) - (aVal as number);
+      if (sortField === "idle") {
+        const aVal = a.idle ? 1 : 0;
+        const bVal = b.idle ? 1 : 0;
+        return sortDir === "asc" ? aVal - bVal : bVal - aVal;
       }
-
-      aVal = (a[sortField] ?? "").toString().toLowerCase();
-      bVal = (b[sortField] ?? "").toString().toLowerCase();
-      const cmp = (aVal as string).localeCompare(bVal as string);
+      const aVal = (a[sortField] ?? "").toString().toLowerCase();
+      const bVal = (b[sortField] ?? "").toString().toLowerCase();
+      const cmp = aVal.localeCompare(bVal);
       return sortDir === "asc" ? cmp : -cmp;
     });
 
     return result;
-  }, [interfaces, search, statusFilter, sortField, sortDir]);
+  }, [networks, search, sortField, sortDir]);
 
   const toggleSort = (field: SortField) => {
     if (sortField === field) {
@@ -95,11 +78,12 @@ export default function Interfaces() {
   return (
     <div>
       <PageHeader
-        title="Network Interfaces"
-        subtitle="Interface status, throughput, and utilization across all devices"
+        title="Networks"
+        subtitle="ExtraHop discovered networks — VLANs, localities, and activity status"
       />
 
       <StaggerContainer className="space-y-4">
+        {/* Filters */}
         <StaggerItem>
           <GlassCard accent={false} className="!p-4">
             <div className="flex flex-col sm:flex-row gap-3">
@@ -109,27 +93,26 @@ export default function Interfaces() {
                   style={{ color: MUTED }}
                 />
                 <Input
-                  placeholder="Search interfaces by name, device, or type..."
+                  placeholder="Search networks by name or description..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="pl-9 bg-transparent border-border"
                 />
               </div>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full sm:w-[180px] bg-transparent border-border">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="up">Up</SelectItem>
-                  <SelectItem value="down">Down</SelectItem>
-                  <SelectItem value="degraded">Degraded</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </GlassCard>
         </StaggerItem>
 
+        {/* Results count */}
+        <StaggerItem>
+          <div className="flex items-center justify-between px-1">
+            <p className="text-xs" style={{ color: MUTED }}>
+              {filtered.length.toLocaleString()} network{filtered.length !== 1 ? "s" : ""} found
+            </p>
+          </div>
+        </StaggerItem>
+
+        {/* Table */}
         <StaggerItem>
           <GlassCard accent={false}>
             {isLoading ? (
@@ -143,100 +126,56 @@ export default function Interfaces() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr style={{ borderBottom: "1px solid oklch(1 0 0 / 8%)" }}>
-                      <SortHeader field="name" label="Interface" />
-                      <SortHeader field="deviceName" label="Device" />
-                      <SortHeader field="status" label="Status" />
-                      <SortHeader field="speed" label="Speed" />
-                      <th
-                        className="text-left py-2 px-3 text-[11px] font-semibold uppercase tracking-wider"
-                        style={{ color: MUTED }}
-                      >
-                        Type
+                      <SortHeader field="name" label="Network Name" />
+                      <SortHeader field="description" label="Description" />
+                      <th className="text-left py-2 px-3 text-[11px] font-semibold uppercase tracking-wider" style={{ color: MUTED }}>
+                        Appliance UUID
                       </th>
-                      <th
-                        className="text-left py-2 px-3 text-[11px] font-semibold uppercase tracking-wider"
-                        style={{ color: MUTED }}
-                      >
-                        In Traffic
+                      <th className="text-left py-2 px-3 text-[11px] font-semibold uppercase tracking-wider" style={{ color: MUTED }}>
+                        Node ID
                       </th>
-                      <th
-                        className="text-left py-2 px-3 text-[11px] font-semibold uppercase tracking-wider"
-                        style={{ color: MUTED }}
-                      >
-                        Out Traffic
+                      <th className="text-left py-2 px-3 text-[11px] font-semibold uppercase tracking-wider" style={{ color: MUTED }}>
+                        Last Modified
                       </th>
+                      <SortHeader field="idle" label="Status" />
                     </tr>
                   </thead>
                   <tbody>
-                    {filtered.map((iface) => (
+                    {filtered.map((net) => (
                       <tr
-                        key={iface.id}
+                        key={net.id}
                         className="transition-colors"
                         style={{ borderBottom: "1px solid oklch(1 0 0 / 4%)" }}
-                        onMouseEnter={(e) =>
-                          (e.currentTarget.style.background = "oklch(1 0 0 / 3%)")
-                        }
-                        onMouseLeave={(e) =>
-                          (e.currentTarget.style.background = "transparent")
-                        }
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "oklch(1 0 0 / 3%)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                       >
                         <td className="py-2.5 px-3">
                           <div className="flex items-center gap-2">
-                            <Network className="w-4 h-4" style={{ color: CYAN }} />
+                            <Network className="w-4 h-4 shrink-0" style={{ color: CYAN }} />
                             <span className="text-[13px] font-medium" style={{ color: BRIGHT }}>
-                              {iface.name}
+                              {net.name || `Network ${net.id}`}
                             </span>
                           </div>
                         </td>
-                        <td className="py-2.5 px-3 text-[13px]" style={{ color: "oklch(0.85 0.005 85)" }}>
-                          {iface.deviceName || "--"}
+                        <td className="py-2.5 px-3 text-[13px]" style={{ color: MUTED }}>
+                          {net.description || "--"}
+                        </td>
+                        <td className="py-2.5 px-3 text-[11px] tabular-nums" style={{ fontFamily: "var(--font-mono)", color: MUTED }}>
+                          {net.applianceUuid}
+                        </td>
+                        <td className="py-2.5 px-3 text-[13px] tabular-nums" style={{ fontFamily: "var(--font-mono)", color: GOLD }}>
+                          {net.nodeId ?? "--"}
+                        </td>
+                        <td className="py-2.5 px-3 text-[13px] tabular-nums" style={{ fontFamily: "var(--font-mono)", color: MUTED }}>
+                          {net.modTime ? new Date(net.modTime).toLocaleString() : "--"}
                         </td>
                         <td className="py-2.5 px-3">
                           <div className="flex items-center gap-2">
-                            <span
-                              className={`status-dot ${
-                                iface.status === "up"
-                                  ? "status-connected"
-                                  : iface.status === "down"
-                                  ? "status-disconnected"
-                                  : "status-pending"
-                              }`}
-                            />
-                            <span
-                              className="text-[13px] capitalize"
-                              style={{
-                                color:
-                                  iface.status === "up"
-                                    ? GREEN
-                                    : iface.status === "down"
-                                    ? RED
-                                    : GOLD,
-                              }}
-                            >
-                              {iface.status}
+                            <span className={`status-dot ${net.idle ? "status-disconnected" : "status-connected"}`} />
+                            <span className="text-[13px]" style={{ color: net.idle ? RED : GREEN }}>
+                              {net.idle ? "Idle" : "Active"}
                             </span>
                           </div>
-                        </td>
-                        <td
-                          className="py-2.5 px-3 text-[13px] tabular-nums"
-                          style={{ fontFamily: "var(--font-mono)", color: BRIGHT }}
-                        >
-                          {iface.speed ? formatSpeed(iface.speed) : "--"}
-                        </td>
-                        <td className="py-2.5 px-3 text-[13px]" style={{ color: MUTED }}>
-                          {iface.interfaceType || "--"}
-                        </td>
-                        <td
-                          className="py-2.5 px-3 text-[13px] tabular-nums"
-                          style={{ fontFamily: "var(--font-mono)", color: GREEN }}
-                        >
-                          {iface.inTraffic != null ? formatTraffic(iface.inTraffic) : "--"}
-                        </td>
-                        <td
-                          className="py-2.5 px-3 text-[13px] tabular-nums"
-                          style={{ fontFamily: "var(--font-mono)", color: CYAN }}
-                        >
-                          {iface.outTraffic != null ? formatTraffic(iface.outTraffic) : "--"}
                         </td>
                       </tr>
                     ))}
@@ -247,9 +186,9 @@ export default function Interfaces() {
               <div className="text-center py-12">
                 <Network className="w-8 h-8 mx-auto mb-3" style={{ color: MUTED }} />
                 <p className="text-sm" style={{ color: MUTED }}>
-                  {interfaces && interfaces.length === 0
-                    ? "No interfaces found. Add interface data to your database to begin monitoring."
-                    : "No interfaces match your search criteria."}
+                  {networks && networks.length === 0
+                    ? "No networks found. Populate the dim_network table from your ExtraHop appliance."
+                    : "No networks match your search criteria."}
                 </p>
               </div>
             )}
@@ -258,18 +197,4 @@ export default function Interfaces() {
       </StaggerContainer>
     </div>
   );
-}
-
-function formatSpeed(bps: number): string {
-  if (bps >= 1_000_000_000) return `${(bps / 1_000_000_000).toFixed(0)} Gbps`;
-  if (bps >= 1_000_000) return `${(bps / 1_000_000).toFixed(0)} Mbps`;
-  if (bps >= 1_000) return `${(bps / 1_000).toFixed(0)} Kbps`;
-  return `${bps} bps`;
-}
-
-function formatTraffic(bytes: number): string {
-  if (bytes >= 1_000_000_000) return `${(bytes / 1_000_000_000).toFixed(2)} GB`;
-  if (bytes >= 1_000_000) return `${(bytes / 1_000_000).toFixed(2)} MB`;
-  if (bytes >= 1_000) return `${(bytes / 1_000).toFixed(2)} KB`;
-  return `${bytes} B`;
 }

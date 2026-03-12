@@ -1,88 +1,12 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { describe, expect, it } from "vitest";
 import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
 
-// Mock the db module
-vi.mock("./db", () => ({
-  upsertUser: vi.fn(),
-  getUserByOpenId: vi.fn(),
-  getDeviceCount: vi.fn().mockResolvedValue(42),
-  getActiveAlertCount: vi.fn().mockResolvedValue(7),
-  getInterfaceCountByStatus: vi.fn().mockResolvedValue({ up: 120, down: 3, degraded: 2 }),
-  getAlertsBySeverity: vi.fn().mockResolvedValue({ critical: 2, high: 3, medium: 1, low: 1 }),
-  getRecentAlerts: vi.fn().mockResolvedValue([
-    {
-      id: 1,
-      severity: "critical",
-      message: "High CPU usage on core-switch-01",
-      createdAt: new Date("2026-03-07T10:00:00Z"),
-      deviceName: "core-switch-01",
-    },
-  ]),
-  getDevicesByStatus: vi.fn().mockResolvedValue({ online: 35, offline: 4, warning: 3 }),
-  getAveragePerformanceMetrics: vi.fn().mockResolvedValue({
-    avgLatency: 12.5,
-    avgThroughput: 500000000,
-    avgPacketLoss: 0.02,
-    avgJitter: 1.3,
-    avgUptime: 99.95,
-  }),
-  getAllDevices: vi.fn().mockResolvedValue([
-    {
-      id: 1,
-      name: "core-switch-01",
-      ipAddress: "10.0.1.1",
-      macAddress: "AA:BB:CC:DD:EE:01",
-      deviceType: "switch",
-      manufacturer: "Cisco",
-      model: "Catalyst 9300",
-      osVersion: "IOS-XE 17.6",
-      location: "DC1-Rack-A1",
-      status: "online",
-      lastSeen: new Date("2026-03-07T10:00:00Z"),
-      createdAt: new Date("2026-01-01T00:00:00Z"),
-      updatedAt: new Date("2026-03-07T10:00:00Z"),
-    },
-  ]),
-  getAllAlerts: vi.fn().mockResolvedValue([
-    {
-      id: 1,
-      deviceId: 1,
-      severity: "critical",
-      message: "High CPU usage on core-switch-01",
-      source: "SNMP",
-      acknowledged: 0,
-      resolvedAt: null,
-      createdAt: new Date("2026-03-07T10:00:00Z"),
-      deviceName: "core-switch-01",
-    },
-  ]),
-  getAllInterfaces: vi.fn().mockResolvedValue([
-    {
-      id: 1,
-      deviceId: 1,
-      name: "GigabitEthernet0/1",
-      interfaceType: "ethernet",
-      status: "up",
-      speed: 1000000000,
-      inTraffic: 500000000,
-      outTraffic: 300000000,
-      mtu: 1500,
-      deviceName: "core-switch-01",
-    },
-  ]),
-  getPerDevicePerformance: vi.fn().mockResolvedValue([
-    {
-      deviceId: 1,
-      deviceName: "core-switch-01",
-      latency: 8.2,
-      throughput: 750000000,
-      packetLoss: 0.01,
-      jitter: 0.8,
-      uptime: 99.99,
-    },
-  ]),
-}));
+/**
+ * Unit tests for ExtraHop network monitoring tRPC procedures.
+ * These test the procedure definitions, input validation, and return shapes.
+ * Since there's no mock data, queries return empty results from the real DB.
+ */
 
 function createPublicContext(): TrpcContext {
   return {
@@ -92,89 +16,178 @@ function createPublicContext(): TrpcContext {
       headers: {},
     } as TrpcContext["req"],
     res: {
-      clearCookie: vi.fn(),
+      clearCookie: () => {},
     } as unknown as TrpcContext["res"],
   };
 }
 
-describe("network.overview", () => {
-  it("returns aggregated overview data", async () => {
+describe("dashboard procedures", () => {
+  it("dashboard.stats returns numeric counts", async () => {
     const ctx = createPublicContext();
     const caller = appRouter.createCaller(ctx);
+    const result = await caller.dashboard.stats();
+    expect(result).toHaveProperty("totalDevices");
+    expect(result).toHaveProperty("activeDevices");
+    expect(result).toHaveProperty("criticalDevices");
+    expect(result).toHaveProperty("watchlistDevices");
+    expect(result).toHaveProperty("totalAlerts");
+    expect(result).toHaveProperty("totalAppliances");
+    expect(result).toHaveProperty("totalNetworks");
+    expect(result).toHaveProperty("totalDetections");
+    expect(typeof result.totalDevices).toBe("number");
+    expect(typeof result.totalAlerts).toBe("number");
+  });
 
-    const result = await caller.network.overview();
+  it("dashboard.alertsBySeverity returns severity breakdown array", async () => {
+    const ctx = createPublicContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.dashboard.alertsBySeverity();
+    expect(Array.isArray(result)).toBe(true);
+  });
 
-    expect(result).toBeDefined();
-    expect(result.totalDevices).toBe(42);
-    expect(result.activeAlerts).toBe(7);
-    expect(result.interfacesUp).toBe(120);
-    expect(result.interfacesDown).toBe(5); // down + degraded
-    expect(result.avgLatency).toBe(12.5);
-    expect(result.avgThroughput).toBe(500000000);
-    expect(result.alertsBySeverity).toEqual({ critical: 2, high: 3, medium: 1, low: 1 });
-    expect(result.recentAlerts).toHaveLength(1);
-    expect(result.recentAlerts[0].severity).toBe("critical");
-    expect(result.devicesByStatus).toEqual({ online: 35, offline: 4, warning: 3 });
+  it("dashboard.devicesByClass returns class breakdown array", async () => {
+    const ctx = createPublicContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.dashboard.devicesByClass();
+    expect(Array.isArray(result)).toBe(true);
+  });
+
+  it("dashboard.devicesByRole returns role breakdown array", async () => {
+    const ctx = createPublicContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.dashboard.devicesByRole();
+    expect(Array.isArray(result)).toBe(true);
   });
 });
 
-describe("network.devices", () => {
-  it("returns device list", async () => {
+describe("devices procedures", () => {
+  it("devices.list returns rows and total with default input", async () => {
     const ctx = createPublicContext();
     const caller = appRouter.createCaller(ctx);
+    const result = await caller.devices.list();
+    expect(result).toHaveProperty("rows");
+    expect(result).toHaveProperty("total");
+    expect(Array.isArray(result.rows)).toBe(true);
+    expect(typeof result.total).toBe("number");
+  });
 
-    const result = await caller.network.devices();
+  it("devices.list accepts filter parameters", async () => {
+    const ctx = createPublicContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.devices.list({
+      limit: 10,
+      offset: 0,
+      search: "test",
+      deviceClass: "node",
+      sortBy: "displayName",
+      sortDir: "desc",
+    });
+    expect(result).toHaveProperty("rows");
+    expect(result).toHaveProperty("total");
+  });
 
-    expect(result).toHaveLength(1);
-    expect(result[0].name).toBe("core-switch-01");
-    expect(result[0].ipAddress).toBe("10.0.1.1");
-    expect(result[0].status).toBe("online");
+  it("devices.byId returns null for non-existent device", async () => {
+    const ctx = createPublicContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.devices.byId({ id: 999999 });
+    expect(result).toBeNull();
   });
 });
 
-describe("network.alerts", () => {
-  it("returns alert list with device names", async () => {
+describe("alerts procedures", () => {
+  it("alerts.list returns rows and total", async () => {
     const ctx = createPublicContext();
     const caller = appRouter.createCaller(ctx);
+    const result = await caller.alerts.list();
+    expect(result).toHaveProperty("rows");
+    expect(result).toHaveProperty("total");
+    expect(Array.isArray(result.rows)).toBe(true);
+  });
 
-    const result = await caller.network.alerts();
-
-    expect(result).toHaveLength(1);
-    expect(result[0].severity).toBe("critical");
-    expect(result[0].deviceName).toBe("core-switch-01");
-    expect(result[0].source).toBe("SNMP");
+  it("alerts.list accepts severity filter", async () => {
+    const ctx = createPublicContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.alerts.list({
+      severity: 7,
+      sortBy: "name",
+      sortDir: "asc",
+    });
+    expect(result).toHaveProperty("rows");
   });
 });
 
-describe("network.interfaces", () => {
-  it("returns interface list with device names", async () => {
+describe("networks procedures", () => {
+  it("networks.list returns an array", async () => {
     const ctx = createPublicContext();
     const caller = appRouter.createCaller(ctx);
-
-    const result = await caller.network.interfaces();
-
-    expect(result).toHaveLength(1);
-    expect(result[0].name).toBe("GigabitEthernet0/1");
-    expect(result[0].status).toBe("up");
-    expect(result[0].speed).toBe(1000000000);
-    expect(result[0].deviceName).toBe("core-switch-01");
+    const result = await caller.networks.list();
+    expect(Array.isArray(result)).toBe(true);
   });
 });
 
-describe("network.performanceMetrics", () => {
-  it("returns aggregated and per-device metrics", async () => {
+describe("appliances procedures", () => {
+  it("appliances.list returns an array", async () => {
     const ctx = createPublicContext();
     const caller = appRouter.createCaller(ctx);
+    const result = await caller.appliances.list();
+    expect(Array.isArray(result)).toBe(true);
+  });
+});
 
-    const result = await caller.network.performanceMetrics();
+describe("detections procedures", () => {
+  it("detections.list returns rows and total", async () => {
+    const ctx = createPublicContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.detections.list();
+    expect(result).toHaveProperty("rows");
+    expect(result).toHaveProperty("total");
+    expect(Array.isArray(result.rows)).toBe(true);
+  });
+});
 
-    expect(result.avgLatency).toBe(12.5);
-    expect(result.avgThroughput).toBe(500000000);
-    expect(result.avgPacketLoss).toBe(0.02);
-    expect(result.avgUptime).toBe(99.95);
-    expect(result.avgJitter).toBe(1.3);
-    expect(result.deviceMetrics).toHaveLength(1);
-    expect(result.deviceMetrics[0].deviceName).toBe("core-switch-01");
-    expect(result.deviceMetrics[0].latency).toBe(8.2);
+describe("metrics procedures", () => {
+  it("metrics.responses returns rows and total", async () => {
+    const ctx = createPublicContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.metrics.responses();
+    expect(result).toHaveProperty("rows");
+    expect(result).toHaveProperty("total");
+  });
+
+  it("metrics.categories returns an array", async () => {
+    const ctx = createPublicContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.metrics.categories();
+    expect(Array.isArray(result)).toBe(true);
+  });
+});
+
+describe("reference data procedures", () => {
+  it("reference.deviceGroups returns an array", async () => {
+    const ctx = createPublicContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.reference.deviceGroups();
+    expect(Array.isArray(result)).toBe(true);
+  });
+
+  it("reference.applications returns an array", async () => {
+    const ctx = createPublicContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.reference.applications();
+    expect(Array.isArray(result)).toBe(true);
+  });
+
+  it("reference.vlans returns an array", async () => {
+    const ctx = createPublicContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.reference.vlans();
+    expect(Array.isArray(result)).toBe(true);
+  });
+
+  it("reference.tags returns an array", async () => {
+    const ctx = createPublicContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.reference.tags();
+    expect(Array.isArray(result)).toBe(true);
   });
 });
