@@ -157,3 +157,128 @@ Not attempted. Deferred by contract.
 Passed. 50 tests in slice00.test.ts pass, including 4 that require a live local dev server response (no fixture fallback). 11 Zod schemas exported. 8 fixture files present and schema-valid. Static audit confirms no ExtraHop direct access from client code. Inspector opens and closes without breaking layout. Time window is globally shared via React Context. Receipt corrected after review to reflect verified counts and to eliminate the health-route fixture fallback.
 
 ---
+
+## Slice 01 — Metrics Normalization Core
+
+# TRUTH RECEIPT
+
+Slice: 01 — Metrics Normalization Core
+Status: Passed
+Commit: pending checkpoint
+
+## Scope Contract
+
+### In Scope
+
+Five pure functions implemented in shared/normalize.ts, each with full test and fixture coverage:
+
+| Function | Purpose | Contract rule enforced |
+|---|---|---|
+| resolveTimeWindow | Resolve relative or absolute time boundaries into concrete epoch-ms TimeWindow with auto-cycle selection | All panels on a surface share one time window; cycle selection is deterministic from duration |
+| bindMetricValues | Positionally bind a raw values[] array to its metric_specs[] array | values[] bind positionally to metric_specs[]; never infer by name; null/NaN/Infinity/undefined sanitized to null |
+| computeRate | Convert a bucket total to a per-second rate by dividing by bucket duration | Bucket totals are not rates; throughput = total / durationSeconds; zero/negative duration returns null not Infinity |
+| buildMetricSeries | Transform raw stat rows into a normalized MetricSeries with SeriesPoint[] | Output sorted by time; every point schema-validated; empty stats = valid quiet state with points: [] |
+| computeActualCoverage | Compute ratio of actual data coverage vs. requested time window | 0 = no data (quiet), 1.0 = full coverage; clamped to 1.0; points outside window excluded |
+
+One exported interface: RawStatRow (input shape for buildMetricSeries).
+
+### Out of Scope
+
+UI components, BFF routes, live ExtraHop metric collection, appliance authentication, visual dashboard composition, chart rendering, and any React code are excluded from this slice. This slice is pure TypeScript with zero DOM or network dependencies.
+
+## Data Contract
+
+### Input Shapes
+
+resolveTimeWindow accepts: from (number, negative = relative), until (number, optional), cycle (MetricCycle, optional), now (number, optional anchor for deterministic testing).
+
+bindMetricValues accepts: specs (MetricSpec[]), values (array of number, null, or undefined).
+
+computeRate accepts: total (number or null), durationMs (number).
+
+buildMetricSeries accepts: objectType, objectId, cycle, fromMs, untilMs, specs (MetricSpec[]), stats (RawStatRow[]).
+
+computeActualCoverage accepts: series (MetricSeries).
+
+### Output Shapes
+
+resolveTimeWindow returns TimeWindow (fromMs, untilMs, durationMs, cycle). Invalid windows (from > until) return durationMs: 0.
+
+bindMetricValues returns Record<string, number | null>. Keys are spec.key1 if present, otherwise spec.name.
+
+computeRate returns number or null. Never NaN. Never Infinity.
+
+buildMetricSeries returns MetricSeries with points sorted ascending by time. Each point passes SeriesPointSchema.
+
+computeActualCoverage returns number between 0 and 1.0 inclusive.
+
+### Quiet-State Behavior
+
+Empty stats array → buildMetricSeries returns points: [] (valid quiet state, not error). computeActualCoverage returns 0 for empty points. computeRate returns null for null total. bindMetricValues returns all-null record for all-null values.
+
+### Error-State Behavior
+
+NaN, Infinity, -Infinity, and undefined in values[] are sanitized to null by bindMetricValues. Zero or negative durationMs causes computeRate to return null. Invalid time windows (from > until) produce durationMs: 0 from resolveTimeWindow.
+
+## UI Contract
+
+Not applicable to this slice. These are pure functions with no UI. No loading, quiet, populated, or error states render visually. The behavioral equivalents (quiet = empty output, error = null/sanitized output) are proven through tests.
+
+## Screenshots
+
+Not applicable. This slice contains no visual components. All five functions are pure TypeScript with no DOM interaction. Screenshot evidence is replaced by test evidence for this slice.
+
+## Evidence
+
+### Tests
+
+65 tests in server/slice01.test.ts, all passing. Breakdown by describe block:
+
+| Block | Count | What it proves |
+|---|---|---|
+| Fixture files exist and parse | 18 | 9 fixture files verified for existence and valid JSON parse |
+| resolveTimeWindow | 10 | 8 fixture-driven cases (relative, absolute, all auto-cycle boundaries, explicit override, invalid window) plus NaN guard and shape validation |
+| bindMetricValues | 11 | Populated binding, null preservation, short array fill, extra value drop, key1 override, NaN/Infinity/-Infinity/undefined sanitization, empty inputs |
+| computeRate | 10 | 7 fixture-driven cases (30sec/1sec/5min buckets, null total, zero/negative duration, zero total) plus NaN guard, Infinity guard, zero-total confirmation |
+| buildMetricSeries | 7 | Populated fixture, quiet fixture (empty stats), NaN/Infinity/undefined sanitization, sort order, tIso validity, SeriesPointSchema validation per point, no-poison-values sweep |
+| computeActualCoverage | 9 | 5 fixture-driven cases (full/half/zero/zero-width/outside-window) plus negative window, overlap clamping, integration with populated buildMetricSeries, integration with quiet buildMetricSeries |
+
+Total across all test files in the repository: 134 tests (65 slice01 + 50 slice00 + 18 network + 1 auth.logout), all passing.
+
+### Fixtures
+
+9 fixture files in fixtures/normalization/:
+
+| File | Purpose |
+|---|---|
+| resolve-time-window.fixture.json | 8 deterministic test cases with fixed anchor epoch |
+| bind-values.populated.fixture.json | 4 specs, 4 values, all present |
+| bind-values.nulls.fixture.json | Null, short, and extra value scenarios |
+| bind-values.key1-override.fixture.json | Specs with key1 override |
+| compute-rate.fixture.json | 7 rate conversion cases including edge cases |
+| build-series.populated.fixture.json | 5 stat rows for network object |
+| build-series.quiet.fixture.json | Empty stats array (valid quiet state) |
+| build-series.poison-values.fixture.json | NaN/Infinity/undefined injection description |
+| coverage.fixture.json | 5 coverage ratio cases |
+
+### Validators Used
+
+SeriesPointSchema from cockpit-validators.ts is used in tests to validate every output point from buildMetricSeries. No new validators were added in this slice; the existing shared validators are consumed.
+
+## Not Proven
+
+These functions have not been tested against live ExtraHop metric API responses. The fixture data is structurally representative of the ExtraHop metric response format (positional values[], metric_specs[], stat_time, duration) but has not been validated against a live appliance payload capture. The resolveTimeWindow function in shared/normalize.ts duplicates logic from client/src/lib/useTimeWindow.ts; the two implementations have not been formally proven equivalent beyond matching behavior in overlapping test cases.
+
+## Deferred by Contract
+
+Live hardware, appliance, packet store, and environment validation is not part of the current frontend phase. Live ExtraHop metric API replay is deferred. Validation against real appliance payload captures is deferred. Performance benchmarking of normalization functions under production data volumes is deferred.
+
+## Live Integration Status
+
+Not attempted. Deferred by contract.
+
+## Verdict
+
+Passed. 65 tests in slice01.test.ts, all passing. 5 exported pure functions, 1 exported interface, 9 deterministic fixture files. Every function enforces the sprint doc's non-negotiable rules: positional binding (never infer by name), rate conversion (never pass bucket totals as rates), NaN/Infinity sanitization (never reaches output), empty data as valid quiet state (never collapsed into error). No UI components, no network calls, no DOM dependencies. Screenshots not applicable — replaced by test evidence for pure functions.
+
+---

@@ -1,0 +1,12 @@
+{
+  "description": "Positional binding test — specs with key1 override, output keyed by key1 not name",
+  "specs": [
+    { "name": "bytes", "key1": "net_bytes" },
+    { "name": "pkts", "key1": "net_pkts" }
+  ],
+  "values": [2097152, 24000],
+  "expected": {
+    "net_bytes": 2097152,
+    "net_pkts": 24000
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "description": "Rate conversion test cases — total / durationSeconds = rate",
+  "cases": [
+    {
+      "label": "30sec bucket, 1048576 bytes → 34952.533... bytes/sec",
+      "total": 1048576,
+      "durationMs": 30000,
+      "expectedRate": 34952.53333333333
+    },
+    {
+      "label": "1sec bucket, 500 bytes → 500 bytes/sec",
+      "total": 500,
+      "durationMs": 1000,
+      "expectedRate": 500
+    },
+    {
+      "label": "5min bucket, 15000000 bytes → 50000 bytes/sec",
+      "total": 15000000,
+      "durationMs": 300000,
+      "expectedRate": 50000
+    },
+    {
+      "label": "null total → null rate",
+      "total": null,
+      "durationMs": 30000,
+      "expectedRate": null
+    },
+    {
+      "label": "zero duration → null rate (not Infinity)",
+      "total": 1048576,
+      "durationMs": 0,
+      "expectedRate": null
+    },
+    {
+      "label": "negative duration → null rate",
+      "total": 1048576,
+      "durationMs": -1000,
+      "expectedRate": null
+    },
+    {
+      "label": "zero total, valid duration → 0 rate",
+      "total": 0,
+      "durationMs": 30000,
+      "expectedRate": 0
+    }
+  ]
+}
