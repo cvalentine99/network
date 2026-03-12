@@ -1,0 +1,13 @@
+{
+  "status": "degraded",
+  "bff": {
+    "uptime": 120.8,
+    "memoryMB": 55,
+    "cache": {
+      "size": 3,
+      "maxSize": 500
+    }
+  },
+  "appliance": null,
+  "timestamp": "2026-03-12T17:00:00.000Z"
+}
