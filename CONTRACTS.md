@@ -164,7 +164,7 @@ Passed. 50 tests in slice00.test.ts pass, including 4 that require a live local 
 
 Slice: 01 — Metrics Normalization Core
 Status: Passed
-Commit: pending checkpoint
+Commit: 6b73a133
 
 ## Scope Contract
 
@@ -232,18 +232,29 @@ Not applicable. This slice contains no visual components. All five functions are
 
 ### Tests
 
-65 tests in server/slice01.test.ts, all passing. Breakdown by describe block:
+server/slice01.test.ts contains **32 it() call sites** in source code. Vitest reports **65 test executions** because 4 of those call sites use `for` loops over fixture arrays, dynamically generating additional test cases at runtime. Both numbers are correct at their respective level of measurement.
 
-| Block | Count | What it proves |
+Breakdown by describe block (it() call sites / vitest-reported executions):
+
+| Block | it() call sites | Vitest executions | How | What it proves |
+|---|---|---|---|---|
+| Fixture files exist and parse | 2 | 18 | `for` loop over 9 fixture files × 2 tests each | 9 fixture files verified for existence and valid JSON parse |
+| resolveTimeWindow | 3 | 10 | `for` loop over 8 fixture cases + 2 static tests | 8 fixture-driven cases (relative, absolute, all auto-cycle boundaries, explicit override, invalid window) plus NaN guard and shape validation |
+| bindMetricValues | 11 | 11 | All static | Populated binding, null preservation, short array fill, extra value drop, key1 override, NaN/Infinity/-Infinity/undefined sanitization, empty inputs |
+| computeRate | 4 | 10 | `for` loop over 7 fixture cases + 3 static tests | 7 fixture-driven cases (30sec/1sec/5min buckets, null total, zero/negative duration, zero total) plus NaN guard, Infinity guard, zero-total confirmation |
+| buildMetricSeries | 7 | 7 | All static | Populated fixture, quiet fixture (empty stats), NaN/Infinity/undefined sanitization, sort order, tIso validity, SeriesPointSchema validation per point, no-poison-values sweep |
+| computeActualCoverage | 5 | 9 | `for` loop over 5 fixture cases + 4 static tests | 5 fixture-driven cases (full/half/zero/zero-width/outside-window) plus negative window, overlap clamping, integration with populated buildMetricSeries, integration with quiet buildMetricSeries |
+| **Totals** | **32** | **65** | | |
+
+Total across all test files in the repository by the same two measures:
+
+| File | it() call sites | Vitest executions |
 |---|---|---|
-| Fixture files exist and parse | 18 | 9 fixture files verified for existence and valid JSON parse |
-| resolveTimeWindow | 10 | 8 fixture-driven cases (relative, absolute, all auto-cycle boundaries, explicit override, invalid window) plus NaN guard and shape validation |
-| bindMetricValues | 11 | Populated binding, null preservation, short array fill, extra value drop, key1 override, NaN/Infinity/-Infinity/undefined sanitization, empty inputs |
-| computeRate | 10 | 7 fixture-driven cases (30sec/1sec/5min buckets, null total, zero/negative duration, zero total) plus NaN guard, Infinity guard, zero-total confirmation |
-| buildMetricSeries | 7 | Populated fixture, quiet fixture (empty stats), NaN/Infinity/undefined sanitization, sort order, tIso validity, SeriesPointSchema validation per point, no-poison-values sweep |
-| computeActualCoverage | 9 | 5 fixture-driven cases (full/half/zero/zero-width/outside-window) plus negative window, overlap clamping, integration with populated buildMetricSeries, integration with quiet buildMetricSeries |
-
-Total across all test files in the repository: 134 tests (65 slice01 + 50 slice00 + 18 network + 1 auth.logout), all passing.
+| server/slice01.test.ts | 32 | 65 |
+| server/slice00.test.ts | 36 | 50 |
+| server/network.test.ts | 18 | 18 |
+| server/auth.logout.test.ts | 1 | 1 |
+| **Totals** | **87** | **134** |
 
 ### Fixtures
 
@@ -279,6 +290,8 @@ Not attempted. Deferred by contract.
 
 ## Verdict
 
-Passed. 65 tests in slice01.test.ts, all passing. 5 exported pure functions, 1 exported interface, 9 deterministic fixture files. Every function enforces the sprint doc's non-negotiable rules: positional binding (never infer by name), rate conversion (never pass bucket totals as rates), NaN/Infinity sanitization (never reaches output), empty data as valid quiet state (never collapsed into error). No UI components, no network calls, no DOM dependencies. Screenshots not applicable — replaced by test evidence for pure functions.
+Passed. 32 it() call sites in slice01.test.ts expand to 65 vitest-reported test executions via fixture-driven for loops, all passing. 87 it() call sites across the full repo expand to 134 vitest-reported executions, all passing. 5 exported pure functions, 1 exported interface, 9 deterministic fixture files. Every function enforces the sprint doc's non-negotiable rules: positional binding (never infer by name), rate conversion (never pass bucket totals as rates), NaN/Infinity sanitization (never reaches output), empty data as valid quiet state (never collapsed into error). No UI components, no network calls, no DOM dependencies. Screenshots not applicable — replaced by test evidence for pure functions.
+
+Receipt correction note: The original receipt (commit 6b73a133) stated "65 tests" and "134 tests" without distinguishing between source-level it() call sites and vitest-reported dynamic test executions. This was misleading when compared against a grep of it() in the source file, which returns 32. Both numbers are factually correct at their respective level of measurement, but the receipt failed to make this distinction. Corrected in this revision.
 
 ---
