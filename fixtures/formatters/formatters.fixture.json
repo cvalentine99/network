@@ -1,0 +1,46 @@
+{
+  "formatBytes": [
+    { "input": null, "expected": "—" },
+    { "input": 0, "expected": "0 B" },
+    { "input": 512, "expected": "512 B" },
+    { "input": 1023, "expected": "1,023 B" },
+    { "input": 1024, "expected": "1.00 KB" },
+    { "input": 1048576, "expected": "1.00 MB" },
+    { "input": 1073741824, "expected": "1.00 GB" },
+    { "input": 8547321600, "expected": "7.96 GB" },
+    { "input": -1, "expected": "—" }
+  ],
+  "formatBytesPerSec": [
+    { "input": null, "expected": "—" },
+    { "input": 0, "expected": "0 B/s" },
+    { "input": 512, "expected": "512 B/s" },
+    { "input": 1024, "expected": "1.00 KB/s" },
+    { "input": 28491072, "expected": "27.17 MB/s" },
+    { "input": -1, "expected": "—" }
+  ],
+  "formatPackets": [
+    { "input": null, "expected": "—" },
+    { "input": 0, "expected": "0 pkts" },
+    { "input": 999, "expected": "999 pkts" },
+    { "input": 1000, "expected": "1.00K pkts" },
+    { "input": 12450000, "expected": "12.45M pkts" },
+    { "input": 1500000000, "expected": "1.50B pkts" },
+    { "input": -1, "expected": "—" }
+  ],
+  "formatPacketsPerSec": [
+    { "input": null, "expected": "—" },
+    { "input": 0, "expected": "0 pps" },
+    { "input": 500, "expected": "500 pps" },
+    { "input": 41500, "expected": "41.50K pps" },
+    { "input": 2500000, "expected": "2.50M pps" },
+    { "input": -1, "expected": "—" }
+  ],
+  "formatPercent": [
+    { "input": null, "expected": "—" },
+    { "input": 0, "expected": "0.0%" },
+    { "input": 12.3, "expected": "+12.3%" },
+    { "input": -5.7, "expected": "-5.7%" },
+    { "input": 100, "expected": "+100.0%" },
+    { "input": -100, "expected": "-100.0%" }
+  ]
+}

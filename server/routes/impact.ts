@@ -1,0 +1,131 @@
+/**
+ * BFF Impact Routes — /api/bff/impact/*
+ *
+ * Slice 02: GET /api/bff/impact/headline
+ * Returns the KPI headline data for the Impact Deck.
+ *
+ * In fixture mode (no live appliance), returns fixture data.
+ * Shape conforms to ImpactOverviewPayload.headline from shared/cockpit-types.ts.
+ *
+ * Contract: browser calls /api/bff/impact/headline, never ExtraHop directly.
+ * The BFF is responsible for:
+ *   1. Accepting a time window query (from, until, cycle)
+ *   2. Validating the query via TimeWindowQuerySchema
+ *   3. Resolving the time window via resolveTimeWindow
+ *   4. Returning headline data validated via ImpactHeadlineSchema
+ *   5. Returning proper error shapes for transport failures and malformed data
+ */
+import { Router } from 'express';
+import { TimeWindowQuerySchema, ImpactHeadlineSchema } from '../../shared/cockpit-validators';
+import { resolveTimeWindow } from '../../shared/normalize';
+import type { ImpactOverviewPayload } from '../../shared/cockpit-types';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+const impactRouter = Router();
+
+/**
+ * Determine if we are in fixture mode.
+ */
+function isFixtureMode(): boolean {
+  const host = process.env.EH_HOST;
+  const key = process.env.EH_API_KEY;
+  return !host || !key || host === '' || key === '' || key === 'REPLACE_ME';
+}
+
+/**
+ * Load a fixture file from the fixtures/impact directory.
+ * Returns null if the file cannot be read or parsed.
+ */
+function loadImpactFixture(name: string): ImpactOverviewPayload | null {
+  try {
+    const fixturePath = join(process.cwd(), 'fixtures', 'impact', name);
+    const raw = readFileSync(fixturePath, 'utf-8');
+    return JSON.parse(raw) as ImpactOverviewPayload;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * GET /api/bff/impact/headline
+ *
+ * Query params: from, until, cycle (all optional, validated by TimeWindowQuerySchema)
+ *
+ * Response shape on success:
+ *   { headline: ImpactHeadline, timeWindow: TimeWindow }
+ *
+ * Response shape on quiet (no data):
+ *   { headline: { totalBytes: 0, totalPackets: 0, bytesPerSecond: 0, packetsPerSecond: 0, baselineDeltaPct: null }, timeWindow: TimeWindow }
+ *
+ * Response shape on error:
+ *   { error: string, message: string }
+ */
+impactRouter.get('/headline', (req, res) => {
+  try {
+    // 1. Validate query params
+    const queryResult = TimeWindowQuerySchema.safeParse(req.query);
+    if (!queryResult.success) {
+      return res.status(400).json({
+        error: 'Invalid time window query',
+        message: queryResult.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('; '),
+      });
+    }
+
+    const { from, until, cycle } = queryResult.data;
+
+    // 2. Resolve time window
+    const timeWindow = resolveTimeWindow(from, until, cycle);
+
+    // 3. In fixture mode, return fixture data
+    if (isFixtureMode()) {
+      // Determine which fixture to use based on whether the window is valid
+      const fixtureName = timeWindow.durationMs > 0
+        ? 'impact-overview.populated.fixture.json'
+        : 'impact-overview.quiet.fixture.json';
+
+      const fixture = loadImpactFixture(fixtureName);
+      if (!fixture) {
+        return res.status(500).json({
+          error: 'Fixture load failed',
+          message: `Could not load fixture: ${fixtureName}`,
+        });
+      }
+
+      // Validate headline before sending
+      const headlineResult = ImpactHeadlineSchema.safeParse(fixture.headline);
+      if (!headlineResult.success) {
+        return res.status(502).json({
+          error: 'Malformed headline data',
+          message: 'Headline data from source failed schema validation',
+          details: headlineResult.error.issues,
+        });
+      }
+
+      return res.json({
+        headline: headlineResult.data,
+        timeWindow,
+      });
+    }
+
+    // 4. Live mode — placeholder for future ExtraHop integration
+    // For now, return quiet state since we have no live connection
+    return res.json({
+      headline: {
+        totalBytes: 0,
+        totalPackets: 0,
+        bytesPerSecond: 0,
+        packetsPerSecond: 0,
+        baselineDeltaPct: null,
+      },
+      timeWindow,
+    });
+  } catch (err: any) {
+    return res.status(500).json({
+      error: 'Impact headline fetch failed',
+      message: err.message || 'Unknown error',
+    });
+  }
+});
+
+export { impactRouter };

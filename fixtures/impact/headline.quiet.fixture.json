@@ -1,0 +1,15 @@
+{
+  "headline": {
+    "totalBytes": 0,
+    "totalPackets": 0,
+    "bytesPerSecond": 0,
+    "packetsPerSecond": 0,
+    "baselineDeltaPct": null
+  },
+  "timeWindow": {
+    "fromMs": 1741795200000,
+    "untilMs": 1741795500000,
+    "durationMs": 300000,
+    "cycle": "1sec"
+  }
+}

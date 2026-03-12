@@ -6,6 +6,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { healthRouter } from "../routes/health";
+import { impactRouter } from "../routes/impact";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 
@@ -38,6 +39,7 @@ async function startServer() {
   registerOAuthRoutes(app);
   // BFF routes (browser → BFF → ExtraHop; browser never contacts ExtraHop directly)
   app.use('/api/bff/health', healthRouter);
+  app.use('/api/bff/impact', impactRouter);
 
   // tRPC API
   app.use(

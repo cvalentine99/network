@@ -1,0 +1,15 @@
+{
+  "headline": {
+    "totalBytes": "not_a_number",
+    "totalPackets": -1,
+    "bytesPerSecond": null,
+    "packetsPerSecond": "NaN",
+    "baselineDeltaPct": "invalid"
+  },
+  "timeWindow": {
+    "fromMs": 1741795200000,
+    "untilMs": 1741795500000,
+    "durationMs": 300000,
+    "cycle": "1sec"
+  }
+}
