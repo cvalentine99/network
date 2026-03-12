@@ -333,21 +333,42 @@ describe('Static audit: no ExtraHop direct access from client', () => {
 });
 
 // ─── 6. BFF Health Route Integration Test ────────────────────────────────
+// This test requires the dev server to be running on localhost.
+// It does NOT fall back to fixture validation — that would hide a real failure.
 
-describe('BFF health route', () => {
-  it('GET /api/bff/health returns valid BffHealthResponse', async () => {
+describe('BFF health route (live local server)', () => {
+  it('GET /api/bff/health returns HTTP 200', async () => {
     const port = process.env.PORT || 3000;
-    try {
-      const res = await fetch(`http://localhost:${port}/api/bff/health`);
-      expect(res.status).toBe(200);
-      const body = await res.json();
-      const validated = BffHealthResponseSchema.safeParse(body);
-      expect(validated.success).toBe(true);
-    } catch {
-      // Server may not be running during CI — test fixture validation instead
-      const fixture = loadFixture('health/health.not-configured.fixture.json');
-      const validated = BffHealthResponseSchema.safeParse(fixture);
-      expect(validated.success).toBe(true);
+    const res = await fetch(`http://localhost:${port}/api/bff/health`);
+    expect(res.status).toBe(200);
+  });
+
+  it('GET /api/bff/health response passes BffHealthResponseSchema', async () => {
+    const port = process.env.PORT || 3000;
+    const res = await fetch(`http://localhost:${port}/api/bff/health`);
+    const body = await res.json();
+    const validated = BffHealthResponseSchema.safeParse(body);
+    if (!validated.success) {
+      // Surface the actual validation errors for debugging
+      throw new Error(
+        `Schema validation failed: ${JSON.stringify(validated.error.issues, null, 2)}`
+      );
     }
+    expect(validated.success).toBe(true);
+  });
+
+  it('GET /api/bff/health response contains expected status field', async () => {
+    const port = process.env.PORT || 3000;
+    const res = await fetch(`http://localhost:${port}/api/bff/health`);
+    const body = await res.json();
+    expect(['ok', 'degraded', 'not_configured']).toContain(body.status);
+  });
+
+  it('GET /api/bff/health response contains bff.uptime as a number', async () => {
+    const port = process.env.PORT || 3000;
+    const res = await fetch(`http://localhost:${port}/api/bff/health`);
+    const body = await res.json();
+    expect(typeof body.bff.uptime).toBe('number');
+    expect(body.bff.uptime).toBeGreaterThan(0);
   });
 });
