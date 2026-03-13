@@ -1,0 +1,169 @@
+{
+  "description": "Inspector history fixture \u2014 single entry. User selected device, then navigated to detection. Back button leads to device.",
+  "history": [
+    {
+      "selection": {
+        "kind": "device",
+        "device": {
+          "id": 1042,
+          "displayName": "dc01.lab.local",
+          "extrahopId": "0242ac110002",
+          "discoveryId": "0242ac110002",
+          "ipaddr4": "10.10.1.50",
+          "ipaddr6": null,
+          "macaddr": "02:42:AC:11:00:02",
+          "deviceClass": "node",
+          "role": "domain_controller",
+          "autoRole": "domain_controller",
+          "vendor": "Microsoft",
+          "isL3": true,
+          "vlanid": null,
+          "parentId": null,
+          "nodeId": null,
+          "analysis": "advanced",
+          "analysisLevel": 2,
+          "lastSeenTime": 1741795470000,
+          "lastSeenIso": "2026-03-12T16:04:30.000Z",
+          "modTime": 1741795200000,
+          "discoverTime": 1741000000000,
+          "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+          "onWatchlist": true,
+          "critical": true,
+          "customCriticality": null,
+          "isCustomDevice": false,
+          "customType": null,
+          "userModTime": null,
+          "description": null,
+          "cdp_name": null,
+          "dhcp_name": null,
+          "dns_name": "dc01.lab.local",
+          "netbios_name": "DC01",
+          "custom_name": null,
+          "default_name": "DC01",
+          "model": null,
+          "modelOverride": null,
+          "software": "Windows Server 2022"
+        },
+        "topTalkerRow": {
+          "device": {
+            "id": 1042,
+            "displayName": "dc01.lab.local",
+            "extrahopId": "0242ac110002",
+            "discoveryId": "0242ac110002",
+            "ipaddr4": "10.10.1.50",
+            "ipaddr6": null,
+            "macaddr": "02:42:AC:11:00:02",
+            "deviceClass": "node",
+            "role": "domain_controller",
+            "autoRole": "domain_controller",
+            "vendor": "Microsoft",
+            "isL3": true,
+            "vlanid": null,
+            "parentId": null,
+            "nodeId": null,
+            "analysis": "advanced",
+            "analysisLevel": 2,
+            "lastSeenTime": 1741795470000,
+            "lastSeenIso": "2026-03-12T16:04:30.000Z",
+            "modTime": 1741795200000,
+            "discoverTime": 1741000000000,
+            "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+            "onWatchlist": true,
+            "critical": true,
+            "customCriticality": null,
+            "isCustomDevice": false,
+            "customType": null,
+            "userModTime": null,
+            "description": null,
+            "cdp_name": null,
+            "dhcp_name": null,
+            "dns_name": "dc01.lab.local",
+            "netbios_name": "DC01",
+            "custom_name": null,
+            "default_name": "DC01",
+            "model": null,
+            "modelOverride": null,
+            "software": "Windows Server 2022"
+          },
+          "bytesIn": 1245678900,
+          "bytesOut": 987654321,
+          "totalBytes": 2233333221,
+          "pktsIn": 1890000,
+          "pktsOut": 1456000,
+          "sparkline": [
+            {
+              "t": 1741795200000,
+              "tIso": "2026-03-12T16:00:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 223333322
+              }
+            },
+            {
+              "t": 1741795230000,
+              "tIso": "2026-03-12T16:00:30.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 245000000
+              }
+            },
+            {
+              "t": 1741795260000,
+              "tIso": "2026-03-12T16:01:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 210000000
+              }
+            }
+          ]
+        }
+      },
+      "label": "dc01.lab.local",
+      "timestamp": 1710000000000
+    }
+  ],
+  "currentSelection": {
+    "kind": "detection",
+    "detection": {
+      "id": 4001,
+      "title": "Lateral Movement via SMB",
+      "type": "lateral_movement",
+      "displayName": "Lateral Movement via SMB",
+      "categories": [
+        "sec.lateral"
+      ],
+      "participants": [
+        {
+          "object_type": "device",
+          "object_id": 101,
+          "role": "offender"
+        },
+        {
+          "object_type": "device",
+          "object_id": 205,
+          "role": "victim"
+        }
+      ],
+      "riskScore": 92,
+      "startTime": 1710200000000,
+      "startTimeIso": "2024-03-11T22:13:20.000Z",
+      "endTime": 1710203600000,
+      "endTimeIso": "2024-03-11T23:13:20.000Z",
+      "createTime": 1710200100000,
+      "createTimeIso": "2024-03-11T22:15:00.000Z",
+      "status": "new",
+      "resolution": null,
+      "assignee": null,
+      "ticketId": null,
+      "mitreTactics": [
+        "Lateral Movement"
+      ],
+      "mitreTechniques": [
+        "T1021.002"
+      ],
+      "isUserCreated": false,
+      "properties": {},
+      "url": null
+    }
+  }
+}

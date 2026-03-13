@@ -19,3 +19,4 @@
 - [x] Slice 12 — Cross-Entity Navigation: clickable related devices in DetectionDetailPane/AlertDetailPane, clickable associated detections/alerts in DeviceDetailPane, InspectorContext navigation helpers, fixtures, tests, screenshot, truth receipt
 - [ ] Below-fold screenshots for Slices 04-06
 - [ ] Responsive breakpoint audit for 5-column KPI grid
+- [x] Slice 13 — Navigation Breadcrumb / Inspector History: back-stack tracking inspector navigation, clickable breadcrumb trail, retrace cross-entity navigation steps, types, validators, fixtures, tests, screenshots, truth receipt

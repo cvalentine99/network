@@ -283,6 +283,29 @@ export const AlertDetailSchema = z.object({
   associatedDetections: z.array(NormalizedDetectionSchema),
 });
 
+// ─── Inspector History Entry (Slice 13) ─────────────────────────────────
+export const InspectorSelectionSchema = z.discriminatedUnion('kind', [
+  z.object({
+    kind: z.literal('device'),
+    device: DeviceIdentitySchema,
+    topTalkerRow: TopTalkerRowSchema,
+  }),
+  z.object({
+    kind: z.literal('detection'),
+    detection: NormalizedDetectionSchema,
+  }),
+  z.object({
+    kind: z.literal('alert'),
+    alert: NormalizedAlertSchema,
+  }),
+]);
+
+export const InspectorHistoryEntrySchema = z.object({
+  selection: InspectorSelectionSchema,
+  label: z.string().min(1),
+  timestamp: z.number().int().positive(),
+});
+
 // ─── Impact Overview Payload (full) ───────────────────────────────────────
 export const ImpactOverviewPayloadSchema = z.object({
   headline: ImpactHeadlineSchema,

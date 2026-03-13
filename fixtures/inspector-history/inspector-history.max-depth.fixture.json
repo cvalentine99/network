@@ -1,0 +1,2449 @@
+{
+  "description": "Inspector history fixture \u2014 20 entries at INSPECTOR_HISTORY_MAX_DEPTH. Adding one more entry should evict the oldest (FIFO). All entries are device selections with incrementing IDs and timestamps.",
+  "history": [
+    {
+      "selection": {
+        "kind": "device",
+        "device": {
+          "id": 1000,
+          "displayName": "device-000.lab.local",
+          "extrahopId": "0242ac110002",
+          "discoveryId": "0242ac110002",
+          "ipaddr4": "10.10.1.50",
+          "ipaddr6": null,
+          "macaddr": "02:42:AC:11:00:02",
+          "deviceClass": "node",
+          "role": "domain_controller",
+          "autoRole": "domain_controller",
+          "vendor": "Microsoft",
+          "isL3": true,
+          "vlanid": null,
+          "parentId": null,
+          "nodeId": null,
+          "analysis": "advanced",
+          "analysisLevel": 2,
+          "lastSeenTime": 1741795470000,
+          "lastSeenIso": "2026-03-12T16:04:30.000Z",
+          "modTime": 1741795200000,
+          "discoverTime": 1741000000000,
+          "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+          "onWatchlist": true,
+          "critical": true,
+          "customCriticality": null,
+          "isCustomDevice": false,
+          "customType": null,
+          "userModTime": null,
+          "description": null,
+          "cdp_name": null,
+          "dhcp_name": null,
+          "dns_name": "dc01.lab.local",
+          "netbios_name": "DC01",
+          "custom_name": null,
+          "default_name": "DC01",
+          "model": null,
+          "modelOverride": null,
+          "software": "Windows Server 2022"
+        },
+        "topTalkerRow": {
+          "device": {
+            "id": 1000,
+            "displayName": "device-000.lab.local",
+            "extrahopId": "0242ac110002",
+            "discoveryId": "0242ac110002",
+            "ipaddr4": "10.10.1.50",
+            "ipaddr6": null,
+            "macaddr": "02:42:AC:11:00:02",
+            "deviceClass": "node",
+            "role": "domain_controller",
+            "autoRole": "domain_controller",
+            "vendor": "Microsoft",
+            "isL3": true,
+            "vlanid": null,
+            "parentId": null,
+            "nodeId": null,
+            "analysis": "advanced",
+            "analysisLevel": 2,
+            "lastSeenTime": 1741795470000,
+            "lastSeenIso": "2026-03-12T16:04:30.000Z",
+            "modTime": 1741795200000,
+            "discoverTime": 1741000000000,
+            "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+            "onWatchlist": true,
+            "critical": true,
+            "customCriticality": null,
+            "isCustomDevice": false,
+            "customType": null,
+            "userModTime": null,
+            "description": null,
+            "cdp_name": null,
+            "dhcp_name": null,
+            "dns_name": "dc01.lab.local",
+            "netbios_name": "DC01",
+            "custom_name": null,
+            "default_name": "DC01",
+            "model": null,
+            "modelOverride": null,
+            "software": "Windows Server 2022"
+          },
+          "bytesIn": 1245678900,
+          "bytesOut": 987654321,
+          "totalBytes": 2233333221,
+          "pktsIn": 1890000,
+          "pktsOut": 1456000,
+          "sparkline": [
+            {
+              "t": 1741795200000,
+              "tIso": "2026-03-12T16:00:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 223333322
+              }
+            },
+            {
+              "t": 1741795230000,
+              "tIso": "2026-03-12T16:00:30.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 245000000
+              }
+            },
+            {
+              "t": 1741795260000,
+              "tIso": "2026-03-12T16:01:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 210000000
+              }
+            }
+          ]
+        }
+      },
+      "label": "device-000.lab.local",
+      "timestamp": 1710000000000
+    },
+    {
+      "selection": {
+        "kind": "device",
+        "device": {
+          "id": 1001,
+          "displayName": "device-001.lab.local",
+          "extrahopId": "0242ac110002",
+          "discoveryId": "0242ac110002",
+          "ipaddr4": "10.10.1.50",
+          "ipaddr6": null,
+          "macaddr": "02:42:AC:11:00:02",
+          "deviceClass": "node",
+          "role": "domain_controller",
+          "autoRole": "domain_controller",
+          "vendor": "Microsoft",
+          "isL3": true,
+          "vlanid": null,
+          "parentId": null,
+          "nodeId": null,
+          "analysis": "advanced",
+          "analysisLevel": 2,
+          "lastSeenTime": 1741795470000,
+          "lastSeenIso": "2026-03-12T16:04:30.000Z",
+          "modTime": 1741795200000,
+          "discoverTime": 1741000000000,
+          "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+          "onWatchlist": true,
+          "critical": true,
+          "customCriticality": null,
+          "isCustomDevice": false,
+          "customType": null,
+          "userModTime": null,
+          "description": null,
+          "cdp_name": null,
+          "dhcp_name": null,
+          "dns_name": "dc01.lab.local",
+          "netbios_name": "DC01",
+          "custom_name": null,
+          "default_name": "DC01",
+          "model": null,
+          "modelOverride": null,
+          "software": "Windows Server 2022"
+        },
+        "topTalkerRow": {
+          "device": {
+            "id": 1001,
+            "displayName": "device-001.lab.local",
+            "extrahopId": "0242ac110002",
+            "discoveryId": "0242ac110002",
+            "ipaddr4": "10.10.1.50",
+            "ipaddr6": null,
+            "macaddr": "02:42:AC:11:00:02",
+            "deviceClass": "node",
+            "role": "domain_controller",
+            "autoRole": "domain_controller",
+            "vendor": "Microsoft",
+            "isL3": true,
+            "vlanid": null,
+            "parentId": null,
+            "nodeId": null,
+            "analysis": "advanced",
+            "analysisLevel": 2,
+            "lastSeenTime": 1741795470000,
+            "lastSeenIso": "2026-03-12T16:04:30.000Z",
+            "modTime": 1741795200000,
+            "discoverTime": 1741000000000,
+            "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+            "onWatchlist": true,
+            "critical": true,
+            "customCriticality": null,
+            "isCustomDevice": false,
+            "customType": null,
+            "userModTime": null,
+            "description": null,
+            "cdp_name": null,
+            "dhcp_name": null,
+            "dns_name": "dc01.lab.local",
+            "netbios_name": "DC01",
+            "custom_name": null,
+            "default_name": "DC01",
+            "model": null,
+            "modelOverride": null,
+            "software": "Windows Server 2022"
+          },
+          "bytesIn": 1245678900,
+          "bytesOut": 987654321,
+          "totalBytes": 2233333221,
+          "pktsIn": 1890000,
+          "pktsOut": 1456000,
+          "sparkline": [
+            {
+              "t": 1741795200000,
+              "tIso": "2026-03-12T16:00:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 223333322
+              }
+            },
+            {
+              "t": 1741795230000,
+              "tIso": "2026-03-12T16:00:30.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 245000000
+              }
+            },
+            {
+              "t": 1741795260000,
+              "tIso": "2026-03-12T16:01:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 210000000
+              }
+            }
+          ]
+        }
+      },
+      "label": "device-001.lab.local",
+      "timestamp": 1710000001000
+    },
+    {
+      "selection": {
+        "kind": "device",
+        "device": {
+          "id": 1002,
+          "displayName": "device-002.lab.local",
+          "extrahopId": "0242ac110002",
+          "discoveryId": "0242ac110002",
+          "ipaddr4": "10.10.1.50",
+          "ipaddr6": null,
+          "macaddr": "02:42:AC:11:00:02",
+          "deviceClass": "node",
+          "role": "domain_controller",
+          "autoRole": "domain_controller",
+          "vendor": "Microsoft",
+          "isL3": true,
+          "vlanid": null,
+          "parentId": null,
+          "nodeId": null,
+          "analysis": "advanced",
+          "analysisLevel": 2,
+          "lastSeenTime": 1741795470000,
+          "lastSeenIso": "2026-03-12T16:04:30.000Z",
+          "modTime": 1741795200000,
+          "discoverTime": 1741000000000,
+          "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+          "onWatchlist": true,
+          "critical": true,
+          "customCriticality": null,
+          "isCustomDevice": false,
+          "customType": null,
+          "userModTime": null,
+          "description": null,
+          "cdp_name": null,
+          "dhcp_name": null,
+          "dns_name": "dc01.lab.local",
+          "netbios_name": "DC01",
+          "custom_name": null,
+          "default_name": "DC01",
+          "model": null,
+          "modelOverride": null,
+          "software": "Windows Server 2022"
+        },
+        "topTalkerRow": {
+          "device": {
+            "id": 1002,
+            "displayName": "device-002.lab.local",
+            "extrahopId": "0242ac110002",
+            "discoveryId": "0242ac110002",
+            "ipaddr4": "10.10.1.50",
+            "ipaddr6": null,
+            "macaddr": "02:42:AC:11:00:02",
+            "deviceClass": "node",
+            "role": "domain_controller",
+            "autoRole": "domain_controller",
+            "vendor": "Microsoft",
+            "isL3": true,
+            "vlanid": null,
+            "parentId": null,
+            "nodeId": null,
+            "analysis": "advanced",
+            "analysisLevel": 2,
+            "lastSeenTime": 1741795470000,
+            "lastSeenIso": "2026-03-12T16:04:30.000Z",
+            "modTime": 1741795200000,
+            "discoverTime": 1741000000000,
+            "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+            "onWatchlist": true,
+            "critical": true,
+            "customCriticality": null,
+            "isCustomDevice": false,
+            "customType": null,
+            "userModTime": null,
+            "description": null,
+            "cdp_name": null,
+            "dhcp_name": null,
+            "dns_name": "dc01.lab.local",
+            "netbios_name": "DC01",
+            "custom_name": null,
+            "default_name": "DC01",
+            "model": null,
+            "modelOverride": null,
+            "software": "Windows Server 2022"
+          },
+          "bytesIn": 1245678900,
+          "bytesOut": 987654321,
+          "totalBytes": 2233333221,
+          "pktsIn": 1890000,
+          "pktsOut": 1456000,
+          "sparkline": [
+            {
+              "t": 1741795200000,
+              "tIso": "2026-03-12T16:00:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 223333322
+              }
+            },
+            {
+              "t": 1741795230000,
+              "tIso": "2026-03-12T16:00:30.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 245000000
+              }
+            },
+            {
+              "t": 1741795260000,
+              "tIso": "2026-03-12T16:01:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 210000000
+              }
+            }
+          ]
+        }
+      },
+      "label": "device-002.lab.local",
+      "timestamp": 1710000002000
+    },
+    {
+      "selection": {
+        "kind": "device",
+        "device": {
+          "id": 1003,
+          "displayName": "device-003.lab.local",
+          "extrahopId": "0242ac110002",
+          "discoveryId": "0242ac110002",
+          "ipaddr4": "10.10.1.50",
+          "ipaddr6": null,
+          "macaddr": "02:42:AC:11:00:02",
+          "deviceClass": "node",
+          "role": "domain_controller",
+          "autoRole": "domain_controller",
+          "vendor": "Microsoft",
+          "isL3": true,
+          "vlanid": null,
+          "parentId": null,
+          "nodeId": null,
+          "analysis": "advanced",
+          "analysisLevel": 2,
+          "lastSeenTime": 1741795470000,
+          "lastSeenIso": "2026-03-12T16:04:30.000Z",
+          "modTime": 1741795200000,
+          "discoverTime": 1741000000000,
+          "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+          "onWatchlist": true,
+          "critical": true,
+          "customCriticality": null,
+          "isCustomDevice": false,
+          "customType": null,
+          "userModTime": null,
+          "description": null,
+          "cdp_name": null,
+          "dhcp_name": null,
+          "dns_name": "dc01.lab.local",
+          "netbios_name": "DC01",
+          "custom_name": null,
+          "default_name": "DC01",
+          "model": null,
+          "modelOverride": null,
+          "software": "Windows Server 2022"
+        },
+        "topTalkerRow": {
+          "device": {
+            "id": 1003,
+            "displayName": "device-003.lab.local",
+            "extrahopId": "0242ac110002",
+            "discoveryId": "0242ac110002",
+            "ipaddr4": "10.10.1.50",
+            "ipaddr6": null,
+            "macaddr": "02:42:AC:11:00:02",
+            "deviceClass": "node",
+            "role": "domain_controller",
+            "autoRole": "domain_controller",
+            "vendor": "Microsoft",
+            "isL3": true,
+            "vlanid": null,
+            "parentId": null,
+            "nodeId": null,
+            "analysis": "advanced",
+            "analysisLevel": 2,
+            "lastSeenTime": 1741795470000,
+            "lastSeenIso": "2026-03-12T16:04:30.000Z",
+            "modTime": 1741795200000,
+            "discoverTime": 1741000000000,
+            "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+            "onWatchlist": true,
+            "critical": true,
+            "customCriticality": null,
+            "isCustomDevice": false,
+            "customType": null,
+            "userModTime": null,
+            "description": null,
+            "cdp_name": null,
+            "dhcp_name": null,
+            "dns_name": "dc01.lab.local",
+            "netbios_name": "DC01",
+            "custom_name": null,
+            "default_name": "DC01",
+            "model": null,
+            "modelOverride": null,
+            "software": "Windows Server 2022"
+          },
+          "bytesIn": 1245678900,
+          "bytesOut": 987654321,
+          "totalBytes": 2233333221,
+          "pktsIn": 1890000,
+          "pktsOut": 1456000,
+          "sparkline": [
+            {
+              "t": 1741795200000,
+              "tIso": "2026-03-12T16:00:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 223333322
+              }
+            },
+            {
+              "t": 1741795230000,
+              "tIso": "2026-03-12T16:00:30.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 245000000
+              }
+            },
+            {
+              "t": 1741795260000,
+              "tIso": "2026-03-12T16:01:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 210000000
+              }
+            }
+          ]
+        }
+      },
+      "label": "device-003.lab.local",
+      "timestamp": 1710000003000
+    },
+    {
+      "selection": {
+        "kind": "device",
+        "device": {
+          "id": 1004,
+          "displayName": "device-004.lab.local",
+          "extrahopId": "0242ac110002",
+          "discoveryId": "0242ac110002",
+          "ipaddr4": "10.10.1.50",
+          "ipaddr6": null,
+          "macaddr": "02:42:AC:11:00:02",
+          "deviceClass": "node",
+          "role": "domain_controller",
+          "autoRole": "domain_controller",
+          "vendor": "Microsoft",
+          "isL3": true,
+          "vlanid": null,
+          "parentId": null,
+          "nodeId": null,
+          "analysis": "advanced",
+          "analysisLevel": 2,
+          "lastSeenTime": 1741795470000,
+          "lastSeenIso": "2026-03-12T16:04:30.000Z",
+          "modTime": 1741795200000,
+          "discoverTime": 1741000000000,
+          "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+          "onWatchlist": true,
+          "critical": true,
+          "customCriticality": null,
+          "isCustomDevice": false,
+          "customType": null,
+          "userModTime": null,
+          "description": null,
+          "cdp_name": null,
+          "dhcp_name": null,
+          "dns_name": "dc01.lab.local",
+          "netbios_name": "DC01",
+          "custom_name": null,
+          "default_name": "DC01",
+          "model": null,
+          "modelOverride": null,
+          "software": "Windows Server 2022"
+        },
+        "topTalkerRow": {
+          "device": {
+            "id": 1004,
+            "displayName": "device-004.lab.local",
+            "extrahopId": "0242ac110002",
+            "discoveryId": "0242ac110002",
+            "ipaddr4": "10.10.1.50",
+            "ipaddr6": null,
+            "macaddr": "02:42:AC:11:00:02",
+            "deviceClass": "node",
+            "role": "domain_controller",
+            "autoRole": "domain_controller",
+            "vendor": "Microsoft",
+            "isL3": true,
+            "vlanid": null,
+            "parentId": null,
+            "nodeId": null,
+            "analysis": "advanced",
+            "analysisLevel": 2,
+            "lastSeenTime": 1741795470000,
+            "lastSeenIso": "2026-03-12T16:04:30.000Z",
+            "modTime": 1741795200000,
+            "discoverTime": 1741000000000,
+            "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+            "onWatchlist": true,
+            "critical": true,
+            "customCriticality": null,
+            "isCustomDevice": false,
+            "customType": null,
+            "userModTime": null,
+            "description": null,
+            "cdp_name": null,
+            "dhcp_name": null,
+            "dns_name": "dc01.lab.local",
+            "netbios_name": "DC01",
+            "custom_name": null,
+            "default_name": "DC01",
+            "model": null,
+            "modelOverride": null,
+            "software": "Windows Server 2022"
+          },
+          "bytesIn": 1245678900,
+          "bytesOut": 987654321,
+          "totalBytes": 2233333221,
+          "pktsIn": 1890000,
+          "pktsOut": 1456000,
+          "sparkline": [
+            {
+              "t": 1741795200000,
+              "tIso": "2026-03-12T16:00:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 223333322
+              }
+            },
+            {
+              "t": 1741795230000,
+              "tIso": "2026-03-12T16:00:30.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 245000000
+              }
+            },
+            {
+              "t": 1741795260000,
+              "tIso": "2026-03-12T16:01:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 210000000
+              }
+            }
+          ]
+        }
+      },
+      "label": "device-004.lab.local",
+      "timestamp": 1710000004000
+    },
+    {
+      "selection": {
+        "kind": "device",
+        "device": {
+          "id": 1005,
+          "displayName": "device-005.lab.local",
+          "extrahopId": "0242ac110002",
+          "discoveryId": "0242ac110002",
+          "ipaddr4": "10.10.1.50",
+          "ipaddr6": null,
+          "macaddr": "02:42:AC:11:00:02",
+          "deviceClass": "node",
+          "role": "domain_controller",
+          "autoRole": "domain_controller",
+          "vendor": "Microsoft",
+          "isL3": true,
+          "vlanid": null,
+          "parentId": null,
+          "nodeId": null,
+          "analysis": "advanced",
+          "analysisLevel": 2,
+          "lastSeenTime": 1741795470000,
+          "lastSeenIso": "2026-03-12T16:04:30.000Z",
+          "modTime": 1741795200000,
+          "discoverTime": 1741000000000,
+          "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+          "onWatchlist": true,
+          "critical": true,
+          "customCriticality": null,
+          "isCustomDevice": false,
+          "customType": null,
+          "userModTime": null,
+          "description": null,
+          "cdp_name": null,
+          "dhcp_name": null,
+          "dns_name": "dc01.lab.local",
+          "netbios_name": "DC01",
+          "custom_name": null,
+          "default_name": "DC01",
+          "model": null,
+          "modelOverride": null,
+          "software": "Windows Server 2022"
+        },
+        "topTalkerRow": {
+          "device": {
+            "id": 1005,
+            "displayName": "device-005.lab.local",
+            "extrahopId": "0242ac110002",
+            "discoveryId": "0242ac110002",
+            "ipaddr4": "10.10.1.50",
+            "ipaddr6": null,
+            "macaddr": "02:42:AC:11:00:02",
+            "deviceClass": "node",
+            "role": "domain_controller",
+            "autoRole": "domain_controller",
+            "vendor": "Microsoft",
+            "isL3": true,
+            "vlanid": null,
+            "parentId": null,
+            "nodeId": null,
+            "analysis": "advanced",
+            "analysisLevel": 2,
+            "lastSeenTime": 1741795470000,
+            "lastSeenIso": "2026-03-12T16:04:30.000Z",
+            "modTime": 1741795200000,
+            "discoverTime": 1741000000000,
+            "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+            "onWatchlist": true,
+            "critical": true,
+            "customCriticality": null,
+            "isCustomDevice": false,
+            "customType": null,
+            "userModTime": null,
+            "description": null,
+            "cdp_name": null,
+            "dhcp_name": null,
+            "dns_name": "dc01.lab.local",
+            "netbios_name": "DC01",
+            "custom_name": null,
+            "default_name": "DC01",
+            "model": null,
+            "modelOverride": null,
+            "software": "Windows Server 2022"
+          },
+          "bytesIn": 1245678900,
+          "bytesOut": 987654321,
+          "totalBytes": 2233333221,
+          "pktsIn": 1890000,
+          "pktsOut": 1456000,
+          "sparkline": [
+            {
+              "t": 1741795200000,
+              "tIso": "2026-03-12T16:00:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 223333322
+              }
+            },
+            {
+              "t": 1741795230000,
+              "tIso": "2026-03-12T16:00:30.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 245000000
+              }
+            },
+            {
+              "t": 1741795260000,
+              "tIso": "2026-03-12T16:01:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 210000000
+              }
+            }
+          ]
+        }
+      },
+      "label": "device-005.lab.local",
+      "timestamp": 1710000005000
+    },
+    {
+      "selection": {
+        "kind": "device",
+        "device": {
+          "id": 1006,
+          "displayName": "device-006.lab.local",
+          "extrahopId": "0242ac110002",
+          "discoveryId": "0242ac110002",
+          "ipaddr4": "10.10.1.50",
+          "ipaddr6": null,
+          "macaddr": "02:42:AC:11:00:02",
+          "deviceClass": "node",
+          "role": "domain_controller",
+          "autoRole": "domain_controller",
+          "vendor": "Microsoft",
+          "isL3": true,
+          "vlanid": null,
+          "parentId": null,
+          "nodeId": null,
+          "analysis": "advanced",
+          "analysisLevel": 2,
+          "lastSeenTime": 1741795470000,
+          "lastSeenIso": "2026-03-12T16:04:30.000Z",
+          "modTime": 1741795200000,
+          "discoverTime": 1741000000000,
+          "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+          "onWatchlist": true,
+          "critical": true,
+          "customCriticality": null,
+          "isCustomDevice": false,
+          "customType": null,
+          "userModTime": null,
+          "description": null,
+          "cdp_name": null,
+          "dhcp_name": null,
+          "dns_name": "dc01.lab.local",
+          "netbios_name": "DC01",
+          "custom_name": null,
+          "default_name": "DC01",
+          "model": null,
+          "modelOverride": null,
+          "software": "Windows Server 2022"
+        },
+        "topTalkerRow": {
+          "device": {
+            "id": 1006,
+            "displayName": "device-006.lab.local",
+            "extrahopId": "0242ac110002",
+            "discoveryId": "0242ac110002",
+            "ipaddr4": "10.10.1.50",
+            "ipaddr6": null,
+            "macaddr": "02:42:AC:11:00:02",
+            "deviceClass": "node",
+            "role": "domain_controller",
+            "autoRole": "domain_controller",
+            "vendor": "Microsoft",
+            "isL3": true,
+            "vlanid": null,
+            "parentId": null,
+            "nodeId": null,
+            "analysis": "advanced",
+            "analysisLevel": 2,
+            "lastSeenTime": 1741795470000,
+            "lastSeenIso": "2026-03-12T16:04:30.000Z",
+            "modTime": 1741795200000,
+            "discoverTime": 1741000000000,
+            "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+            "onWatchlist": true,
+            "critical": true,
+            "customCriticality": null,
+            "isCustomDevice": false,
+            "customType": null,
+            "userModTime": null,
+            "description": null,
+            "cdp_name": null,
+            "dhcp_name": null,
+            "dns_name": "dc01.lab.local",
+            "netbios_name": "DC01",
+            "custom_name": null,
+            "default_name": "DC01",
+            "model": null,
+            "modelOverride": null,
+            "software": "Windows Server 2022"
+          },
+          "bytesIn": 1245678900,
+          "bytesOut": 987654321,
+          "totalBytes": 2233333221,
+          "pktsIn": 1890000,
+          "pktsOut": 1456000,
+          "sparkline": [
+            {
+              "t": 1741795200000,
+              "tIso": "2026-03-12T16:00:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 223333322
+              }
+            },
+            {
+              "t": 1741795230000,
+              "tIso": "2026-03-12T16:00:30.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 245000000
+              }
+            },
+            {
+              "t": 1741795260000,
+              "tIso": "2026-03-12T16:01:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 210000000
+              }
+            }
+          ]
+        }
+      },
+      "label": "device-006.lab.local",
+      "timestamp": 1710000006000
+    },
+    {
+      "selection": {
+        "kind": "device",
+        "device": {
+          "id": 1007,
+          "displayName": "device-007.lab.local",
+          "extrahopId": "0242ac110002",
+          "discoveryId": "0242ac110002",
+          "ipaddr4": "10.10.1.50",
+          "ipaddr6": null,
+          "macaddr": "02:42:AC:11:00:02",
+          "deviceClass": "node",
+          "role": "domain_controller",
+          "autoRole": "domain_controller",
+          "vendor": "Microsoft",
+          "isL3": true,
+          "vlanid": null,
+          "parentId": null,
+          "nodeId": null,
+          "analysis": "advanced",
+          "analysisLevel": 2,
+          "lastSeenTime": 1741795470000,
+          "lastSeenIso": "2026-03-12T16:04:30.000Z",
+          "modTime": 1741795200000,
+          "discoverTime": 1741000000000,
+          "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+          "onWatchlist": true,
+          "critical": true,
+          "customCriticality": null,
+          "isCustomDevice": false,
+          "customType": null,
+          "userModTime": null,
+          "description": null,
+          "cdp_name": null,
+          "dhcp_name": null,
+          "dns_name": "dc01.lab.local",
+          "netbios_name": "DC01",
+          "custom_name": null,
+          "default_name": "DC01",
+          "model": null,
+          "modelOverride": null,
+          "software": "Windows Server 2022"
+        },
+        "topTalkerRow": {
+          "device": {
+            "id": 1007,
+            "displayName": "device-007.lab.local",
+            "extrahopId": "0242ac110002",
+            "discoveryId": "0242ac110002",
+            "ipaddr4": "10.10.1.50",
+            "ipaddr6": null,
+            "macaddr": "02:42:AC:11:00:02",
+            "deviceClass": "node",
+            "role": "domain_controller",
+            "autoRole": "domain_controller",
+            "vendor": "Microsoft",
+            "isL3": true,
+            "vlanid": null,
+            "parentId": null,
+            "nodeId": null,
+            "analysis": "advanced",
+            "analysisLevel": 2,
+            "lastSeenTime": 1741795470000,
+            "lastSeenIso": "2026-03-12T16:04:30.000Z",
+            "modTime": 1741795200000,
+            "discoverTime": 1741000000000,
+            "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+            "onWatchlist": true,
+            "critical": true,
+            "customCriticality": null,
+            "isCustomDevice": false,
+            "customType": null,
+            "userModTime": null,
+            "description": null,
+            "cdp_name": null,
+            "dhcp_name": null,
+            "dns_name": "dc01.lab.local",
+            "netbios_name": "DC01",
+            "custom_name": null,
+            "default_name": "DC01",
+            "model": null,
+            "modelOverride": null,
+            "software": "Windows Server 2022"
+          },
+          "bytesIn": 1245678900,
+          "bytesOut": 987654321,
+          "totalBytes": 2233333221,
+          "pktsIn": 1890000,
+          "pktsOut": 1456000,
+          "sparkline": [
+            {
+              "t": 1741795200000,
+              "tIso": "2026-03-12T16:00:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 223333322
+              }
+            },
+            {
+              "t": 1741795230000,
+              "tIso": "2026-03-12T16:00:30.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 245000000
+              }
+            },
+            {
+              "t": 1741795260000,
+              "tIso": "2026-03-12T16:01:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 210000000
+              }
+            }
+          ]
+        }
+      },
+      "label": "device-007.lab.local",
+      "timestamp": 1710000007000
+    },
+    {
+      "selection": {
+        "kind": "device",
+        "device": {
+          "id": 1008,
+          "displayName": "device-008.lab.local",
+          "extrahopId": "0242ac110002",
+          "discoveryId": "0242ac110002",
+          "ipaddr4": "10.10.1.50",
+          "ipaddr6": null,
+          "macaddr": "02:42:AC:11:00:02",
+          "deviceClass": "node",
+          "role": "domain_controller",
+          "autoRole": "domain_controller",
+          "vendor": "Microsoft",
+          "isL3": true,
+          "vlanid": null,
+          "parentId": null,
+          "nodeId": null,
+          "analysis": "advanced",
+          "analysisLevel": 2,
+          "lastSeenTime": 1741795470000,
+          "lastSeenIso": "2026-03-12T16:04:30.000Z",
+          "modTime": 1741795200000,
+          "discoverTime": 1741000000000,
+          "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+          "onWatchlist": true,
+          "critical": true,
+          "customCriticality": null,
+          "isCustomDevice": false,
+          "customType": null,
+          "userModTime": null,
+          "description": null,
+          "cdp_name": null,
+          "dhcp_name": null,
+          "dns_name": "dc01.lab.local",
+          "netbios_name": "DC01",
+          "custom_name": null,
+          "default_name": "DC01",
+          "model": null,
+          "modelOverride": null,
+          "software": "Windows Server 2022"
+        },
+        "topTalkerRow": {
+          "device": {
+            "id": 1008,
+            "displayName": "device-008.lab.local",
+            "extrahopId": "0242ac110002",
+            "discoveryId": "0242ac110002",
+            "ipaddr4": "10.10.1.50",
+            "ipaddr6": null,
+            "macaddr": "02:42:AC:11:00:02",
+            "deviceClass": "node",
+            "role": "domain_controller",
+            "autoRole": "domain_controller",
+            "vendor": "Microsoft",
+            "isL3": true,
+            "vlanid": null,
+            "parentId": null,
+            "nodeId": null,
+            "analysis": "advanced",
+            "analysisLevel": 2,
+            "lastSeenTime": 1741795470000,
+            "lastSeenIso": "2026-03-12T16:04:30.000Z",
+            "modTime": 1741795200000,
+            "discoverTime": 1741000000000,
+            "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+            "onWatchlist": true,
+            "critical": true,
+            "customCriticality": null,
+            "isCustomDevice": false,
+            "customType": null,
+            "userModTime": null,
+            "description": null,
+            "cdp_name": null,
+            "dhcp_name": null,
+            "dns_name": "dc01.lab.local",
+            "netbios_name": "DC01",
+            "custom_name": null,
+            "default_name": "DC01",
+            "model": null,
+            "modelOverride": null,
+            "software": "Windows Server 2022"
+          },
+          "bytesIn": 1245678900,
+          "bytesOut": 987654321,
+          "totalBytes": 2233333221,
+          "pktsIn": 1890000,
+          "pktsOut": 1456000,
+          "sparkline": [
+            {
+              "t": 1741795200000,
+              "tIso": "2026-03-12T16:00:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 223333322
+              }
+            },
+            {
+              "t": 1741795230000,
+              "tIso": "2026-03-12T16:00:30.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 245000000
+              }
+            },
+            {
+              "t": 1741795260000,
+              "tIso": "2026-03-12T16:01:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 210000000
+              }
+            }
+          ]
+        }
+      },
+      "label": "device-008.lab.local",
+      "timestamp": 1710000008000
+    },
+    {
+      "selection": {
+        "kind": "device",
+        "device": {
+          "id": 1009,
+          "displayName": "device-009.lab.local",
+          "extrahopId": "0242ac110002",
+          "discoveryId": "0242ac110002",
+          "ipaddr4": "10.10.1.50",
+          "ipaddr6": null,
+          "macaddr": "02:42:AC:11:00:02",
+          "deviceClass": "node",
+          "role": "domain_controller",
+          "autoRole": "domain_controller",
+          "vendor": "Microsoft",
+          "isL3": true,
+          "vlanid": null,
+          "parentId": null,
+          "nodeId": null,
+          "analysis": "advanced",
+          "analysisLevel": 2,
+          "lastSeenTime": 1741795470000,
+          "lastSeenIso": "2026-03-12T16:04:30.000Z",
+          "modTime": 1741795200000,
+          "discoverTime": 1741000000000,
+          "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+          "onWatchlist": true,
+          "critical": true,
+          "customCriticality": null,
+          "isCustomDevice": false,
+          "customType": null,
+          "userModTime": null,
+          "description": null,
+          "cdp_name": null,
+          "dhcp_name": null,
+          "dns_name": "dc01.lab.local",
+          "netbios_name": "DC01",
+          "custom_name": null,
+          "default_name": "DC01",
+          "model": null,
+          "modelOverride": null,
+          "software": "Windows Server 2022"
+        },
+        "topTalkerRow": {
+          "device": {
+            "id": 1009,
+            "displayName": "device-009.lab.local",
+            "extrahopId": "0242ac110002",
+            "discoveryId": "0242ac110002",
+            "ipaddr4": "10.10.1.50",
+            "ipaddr6": null,
+            "macaddr": "02:42:AC:11:00:02",
+            "deviceClass": "node",
+            "role": "domain_controller",
+            "autoRole": "domain_controller",
+            "vendor": "Microsoft",
+            "isL3": true,
+            "vlanid": null,
+            "parentId": null,
+            "nodeId": null,
+            "analysis": "advanced",
+            "analysisLevel": 2,
+            "lastSeenTime": 1741795470000,
+            "lastSeenIso": "2026-03-12T16:04:30.000Z",
+            "modTime": 1741795200000,
+            "discoverTime": 1741000000000,
+            "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+            "onWatchlist": true,
+            "critical": true,
+            "customCriticality": null,
+            "isCustomDevice": false,
+            "customType": null,
+            "userModTime": null,
+            "description": null,
+            "cdp_name": null,
+            "dhcp_name": null,
+            "dns_name": "dc01.lab.local",
+            "netbios_name": "DC01",
+            "custom_name": null,
+            "default_name": "DC01",
+            "model": null,
+            "modelOverride": null,
+            "software": "Windows Server 2022"
+          },
+          "bytesIn": 1245678900,
+          "bytesOut": 987654321,
+          "totalBytes": 2233333221,
+          "pktsIn": 1890000,
+          "pktsOut": 1456000,
+          "sparkline": [
+            {
+              "t": 1741795200000,
+              "tIso": "2026-03-12T16:00:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 223333322
+              }
+            },
+            {
+              "t": 1741795230000,
+              "tIso": "2026-03-12T16:00:30.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 245000000
+              }
+            },
+            {
+              "t": 1741795260000,
+              "tIso": "2026-03-12T16:01:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 210000000
+              }
+            }
+          ]
+        }
+      },
+      "label": "device-009.lab.local",
+      "timestamp": 1710000009000
+    },
+    {
+      "selection": {
+        "kind": "device",
+        "device": {
+          "id": 1010,
+          "displayName": "device-010.lab.local",
+          "extrahopId": "0242ac110002",
+          "discoveryId": "0242ac110002",
+          "ipaddr4": "10.10.1.50",
+          "ipaddr6": null,
+          "macaddr": "02:42:AC:11:00:02",
+          "deviceClass": "node",
+          "role": "domain_controller",
+          "autoRole": "domain_controller",
+          "vendor": "Microsoft",
+          "isL3": true,
+          "vlanid": null,
+          "parentId": null,
+          "nodeId": null,
+          "analysis": "advanced",
+          "analysisLevel": 2,
+          "lastSeenTime": 1741795470000,
+          "lastSeenIso": "2026-03-12T16:04:30.000Z",
+          "modTime": 1741795200000,
+          "discoverTime": 1741000000000,
+          "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+          "onWatchlist": true,
+          "critical": true,
+          "customCriticality": null,
+          "isCustomDevice": false,
+          "customType": null,
+          "userModTime": null,
+          "description": null,
+          "cdp_name": null,
+          "dhcp_name": null,
+          "dns_name": "dc01.lab.local",
+          "netbios_name": "DC01",
+          "custom_name": null,
+          "default_name": "DC01",
+          "model": null,
+          "modelOverride": null,
+          "software": "Windows Server 2022"
+        },
+        "topTalkerRow": {
+          "device": {
+            "id": 1010,
+            "displayName": "device-010.lab.local",
+            "extrahopId": "0242ac110002",
+            "discoveryId": "0242ac110002",
+            "ipaddr4": "10.10.1.50",
+            "ipaddr6": null,
+            "macaddr": "02:42:AC:11:00:02",
+            "deviceClass": "node",
+            "role": "domain_controller",
+            "autoRole": "domain_controller",
+            "vendor": "Microsoft",
+            "isL3": true,
+            "vlanid": null,
+            "parentId": null,
+            "nodeId": null,
+            "analysis": "advanced",
+            "analysisLevel": 2,
+            "lastSeenTime": 1741795470000,
+            "lastSeenIso": "2026-03-12T16:04:30.000Z",
+            "modTime": 1741795200000,
+            "discoverTime": 1741000000000,
+            "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+            "onWatchlist": true,
+            "critical": true,
+            "customCriticality": null,
+            "isCustomDevice": false,
+            "customType": null,
+            "userModTime": null,
+            "description": null,
+            "cdp_name": null,
+            "dhcp_name": null,
+            "dns_name": "dc01.lab.local",
+            "netbios_name": "DC01",
+            "custom_name": null,
+            "default_name": "DC01",
+            "model": null,
+            "modelOverride": null,
+            "software": "Windows Server 2022"
+          },
+          "bytesIn": 1245678900,
+          "bytesOut": 987654321,
+          "totalBytes": 2233333221,
+          "pktsIn": 1890000,
+          "pktsOut": 1456000,
+          "sparkline": [
+            {
+              "t": 1741795200000,
+              "tIso": "2026-03-12T16:00:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 223333322
+              }
+            },
+            {
+              "t": 1741795230000,
+              "tIso": "2026-03-12T16:00:30.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 245000000
+              }
+            },
+            {
+              "t": 1741795260000,
+              "tIso": "2026-03-12T16:01:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 210000000
+              }
+            }
+          ]
+        }
+      },
+      "label": "device-010.lab.local",
+      "timestamp": 1710000010000
+    },
+    {
+      "selection": {
+        "kind": "device",
+        "device": {
+          "id": 1011,
+          "displayName": "device-011.lab.local",
+          "extrahopId": "0242ac110002",
+          "discoveryId": "0242ac110002",
+          "ipaddr4": "10.10.1.50",
+          "ipaddr6": null,
+          "macaddr": "02:42:AC:11:00:02",
+          "deviceClass": "node",
+          "role": "domain_controller",
+          "autoRole": "domain_controller",
+          "vendor": "Microsoft",
+          "isL3": true,
+          "vlanid": null,
+          "parentId": null,
+          "nodeId": null,
+          "analysis": "advanced",
+          "analysisLevel": 2,
+          "lastSeenTime": 1741795470000,
+          "lastSeenIso": "2026-03-12T16:04:30.000Z",
+          "modTime": 1741795200000,
+          "discoverTime": 1741000000000,
+          "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+          "onWatchlist": true,
+          "critical": true,
+          "customCriticality": null,
+          "isCustomDevice": false,
+          "customType": null,
+          "userModTime": null,
+          "description": null,
+          "cdp_name": null,
+          "dhcp_name": null,
+          "dns_name": "dc01.lab.local",
+          "netbios_name": "DC01",
+          "custom_name": null,
+          "default_name": "DC01",
+          "model": null,
+          "modelOverride": null,
+          "software": "Windows Server 2022"
+        },
+        "topTalkerRow": {
+          "device": {
+            "id": 1011,
+            "displayName": "device-011.lab.local",
+            "extrahopId": "0242ac110002",
+            "discoveryId": "0242ac110002",
+            "ipaddr4": "10.10.1.50",
+            "ipaddr6": null,
+            "macaddr": "02:42:AC:11:00:02",
+            "deviceClass": "node",
+            "role": "domain_controller",
+            "autoRole": "domain_controller",
+            "vendor": "Microsoft",
+            "isL3": true,
+            "vlanid": null,
+            "parentId": null,
+            "nodeId": null,
+            "analysis": "advanced",
+            "analysisLevel": 2,
+            "lastSeenTime": 1741795470000,
+            "lastSeenIso": "2026-03-12T16:04:30.000Z",
+            "modTime": 1741795200000,
+            "discoverTime": 1741000000000,
+            "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+            "onWatchlist": true,
+            "critical": true,
+            "customCriticality": null,
+            "isCustomDevice": false,
+            "customType": null,
+            "userModTime": null,
+            "description": null,
+            "cdp_name": null,
+            "dhcp_name": null,
+            "dns_name": "dc01.lab.local",
+            "netbios_name": "DC01",
+            "custom_name": null,
+            "default_name": "DC01",
+            "model": null,
+            "modelOverride": null,
+            "software": "Windows Server 2022"
+          },
+          "bytesIn": 1245678900,
+          "bytesOut": 987654321,
+          "totalBytes": 2233333221,
+          "pktsIn": 1890000,
+          "pktsOut": 1456000,
+          "sparkline": [
+            {
+              "t": 1741795200000,
+              "tIso": "2026-03-12T16:00:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 223333322
+              }
+            },
+            {
+              "t": 1741795230000,
+              "tIso": "2026-03-12T16:00:30.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 245000000
+              }
+            },
+            {
+              "t": 1741795260000,
+              "tIso": "2026-03-12T16:01:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 210000000
+              }
+            }
+          ]
+        }
+      },
+      "label": "device-011.lab.local",
+      "timestamp": 1710000011000
+    },
+    {
+      "selection": {
+        "kind": "device",
+        "device": {
+          "id": 1012,
+          "displayName": "device-012.lab.local",
+          "extrahopId": "0242ac110002",
+          "discoveryId": "0242ac110002",
+          "ipaddr4": "10.10.1.50",
+          "ipaddr6": null,
+          "macaddr": "02:42:AC:11:00:02",
+          "deviceClass": "node",
+          "role": "domain_controller",
+          "autoRole": "domain_controller",
+          "vendor": "Microsoft",
+          "isL3": true,
+          "vlanid": null,
+          "parentId": null,
+          "nodeId": null,
+          "analysis": "advanced",
+          "analysisLevel": 2,
+          "lastSeenTime": 1741795470000,
+          "lastSeenIso": "2026-03-12T16:04:30.000Z",
+          "modTime": 1741795200000,
+          "discoverTime": 1741000000000,
+          "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+          "onWatchlist": true,
+          "critical": true,
+          "customCriticality": null,
+          "isCustomDevice": false,
+          "customType": null,
+          "userModTime": null,
+          "description": null,
+          "cdp_name": null,
+          "dhcp_name": null,
+          "dns_name": "dc01.lab.local",
+          "netbios_name": "DC01",
+          "custom_name": null,
+          "default_name": "DC01",
+          "model": null,
+          "modelOverride": null,
+          "software": "Windows Server 2022"
+        },
+        "topTalkerRow": {
+          "device": {
+            "id": 1012,
+            "displayName": "device-012.lab.local",
+            "extrahopId": "0242ac110002",
+            "discoveryId": "0242ac110002",
+            "ipaddr4": "10.10.1.50",
+            "ipaddr6": null,
+            "macaddr": "02:42:AC:11:00:02",
+            "deviceClass": "node",
+            "role": "domain_controller",
+            "autoRole": "domain_controller",
+            "vendor": "Microsoft",
+            "isL3": true,
+            "vlanid": null,
+            "parentId": null,
+            "nodeId": null,
+            "analysis": "advanced",
+            "analysisLevel": 2,
+            "lastSeenTime": 1741795470000,
+            "lastSeenIso": "2026-03-12T16:04:30.000Z",
+            "modTime": 1741795200000,
+            "discoverTime": 1741000000000,
+            "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+            "onWatchlist": true,
+            "critical": true,
+            "customCriticality": null,
+            "isCustomDevice": false,
+            "customType": null,
+            "userModTime": null,
+            "description": null,
+            "cdp_name": null,
+            "dhcp_name": null,
+            "dns_name": "dc01.lab.local",
+            "netbios_name": "DC01",
+            "custom_name": null,
+            "default_name": "DC01",
+            "model": null,
+            "modelOverride": null,
+            "software": "Windows Server 2022"
+          },
+          "bytesIn": 1245678900,
+          "bytesOut": 987654321,
+          "totalBytes": 2233333221,
+          "pktsIn": 1890000,
+          "pktsOut": 1456000,
+          "sparkline": [
+            {
+              "t": 1741795200000,
+              "tIso": "2026-03-12T16:00:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 223333322
+              }
+            },
+            {
+              "t": 1741795230000,
+              "tIso": "2026-03-12T16:00:30.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 245000000
+              }
+            },
+            {
+              "t": 1741795260000,
+              "tIso": "2026-03-12T16:01:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 210000000
+              }
+            }
+          ]
+        }
+      },
+      "label": "device-012.lab.local",
+      "timestamp": 1710000012000
+    },
+    {
+      "selection": {
+        "kind": "device",
+        "device": {
+          "id": 1013,
+          "displayName": "device-013.lab.local",
+          "extrahopId": "0242ac110002",
+          "discoveryId": "0242ac110002",
+          "ipaddr4": "10.10.1.50",
+          "ipaddr6": null,
+          "macaddr": "02:42:AC:11:00:02",
+          "deviceClass": "node",
+          "role": "domain_controller",
+          "autoRole": "domain_controller",
+          "vendor": "Microsoft",
+          "isL3": true,
+          "vlanid": null,
+          "parentId": null,
+          "nodeId": null,
+          "analysis": "advanced",
+          "analysisLevel": 2,
+          "lastSeenTime": 1741795470000,
+          "lastSeenIso": "2026-03-12T16:04:30.000Z",
+          "modTime": 1741795200000,
+          "discoverTime": 1741000000000,
+          "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+          "onWatchlist": true,
+          "critical": true,
+          "customCriticality": null,
+          "isCustomDevice": false,
+          "customType": null,
+          "userModTime": null,
+          "description": null,
+          "cdp_name": null,
+          "dhcp_name": null,
+          "dns_name": "dc01.lab.local",
+          "netbios_name": "DC01",
+          "custom_name": null,
+          "default_name": "DC01",
+          "model": null,
+          "modelOverride": null,
+          "software": "Windows Server 2022"
+        },
+        "topTalkerRow": {
+          "device": {
+            "id": 1013,
+            "displayName": "device-013.lab.local",
+            "extrahopId": "0242ac110002",
+            "discoveryId": "0242ac110002",
+            "ipaddr4": "10.10.1.50",
+            "ipaddr6": null,
+            "macaddr": "02:42:AC:11:00:02",
+            "deviceClass": "node",
+            "role": "domain_controller",
+            "autoRole": "domain_controller",
+            "vendor": "Microsoft",
+            "isL3": true,
+            "vlanid": null,
+            "parentId": null,
+            "nodeId": null,
+            "analysis": "advanced",
+            "analysisLevel": 2,
+            "lastSeenTime": 1741795470000,
+            "lastSeenIso": "2026-03-12T16:04:30.000Z",
+            "modTime": 1741795200000,
+            "discoverTime": 1741000000000,
+            "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+            "onWatchlist": true,
+            "critical": true,
+            "customCriticality": null,
+            "isCustomDevice": false,
+            "customType": null,
+            "userModTime": null,
+            "description": null,
+            "cdp_name": null,
+            "dhcp_name": null,
+            "dns_name": "dc01.lab.local",
+            "netbios_name": "DC01",
+            "custom_name": null,
+            "default_name": "DC01",
+            "model": null,
+            "modelOverride": null,
+            "software": "Windows Server 2022"
+          },
+          "bytesIn": 1245678900,
+          "bytesOut": 987654321,
+          "totalBytes": 2233333221,
+          "pktsIn": 1890000,
+          "pktsOut": 1456000,
+          "sparkline": [
+            {
+              "t": 1741795200000,
+              "tIso": "2026-03-12T16:00:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 223333322
+              }
+            },
+            {
+              "t": 1741795230000,
+              "tIso": "2026-03-12T16:00:30.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 245000000
+              }
+            },
+            {
+              "t": 1741795260000,
+              "tIso": "2026-03-12T16:01:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 210000000
+              }
+            }
+          ]
+        }
+      },
+      "label": "device-013.lab.local",
+      "timestamp": 1710000013000
+    },
+    {
+      "selection": {
+        "kind": "device",
+        "device": {
+          "id": 1014,
+          "displayName": "device-014.lab.local",
+          "extrahopId": "0242ac110002",
+          "discoveryId": "0242ac110002",
+          "ipaddr4": "10.10.1.50",
+          "ipaddr6": null,
+          "macaddr": "02:42:AC:11:00:02",
+          "deviceClass": "node",
+          "role": "domain_controller",
+          "autoRole": "domain_controller",
+          "vendor": "Microsoft",
+          "isL3": true,
+          "vlanid": null,
+          "parentId": null,
+          "nodeId": null,
+          "analysis": "advanced",
+          "analysisLevel": 2,
+          "lastSeenTime": 1741795470000,
+          "lastSeenIso": "2026-03-12T16:04:30.000Z",
+          "modTime": 1741795200000,
+          "discoverTime": 1741000000000,
+          "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+          "onWatchlist": true,
+          "critical": true,
+          "customCriticality": null,
+          "isCustomDevice": false,
+          "customType": null,
+          "userModTime": null,
+          "description": null,
+          "cdp_name": null,
+          "dhcp_name": null,
+          "dns_name": "dc01.lab.local",
+          "netbios_name": "DC01",
+          "custom_name": null,
+          "default_name": "DC01",
+          "model": null,
+          "modelOverride": null,
+          "software": "Windows Server 2022"
+        },
+        "topTalkerRow": {
+          "device": {
+            "id": 1014,
+            "displayName": "device-014.lab.local",
+            "extrahopId": "0242ac110002",
+            "discoveryId": "0242ac110002",
+            "ipaddr4": "10.10.1.50",
+            "ipaddr6": null,
+            "macaddr": "02:42:AC:11:00:02",
+            "deviceClass": "node",
+            "role": "domain_controller",
+            "autoRole": "domain_controller",
+            "vendor": "Microsoft",
+            "isL3": true,
+            "vlanid": null,
+            "parentId": null,
+            "nodeId": null,
+            "analysis": "advanced",
+            "analysisLevel": 2,
+            "lastSeenTime": 1741795470000,
+            "lastSeenIso": "2026-03-12T16:04:30.000Z",
+            "modTime": 1741795200000,
+            "discoverTime": 1741000000000,
+            "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+            "onWatchlist": true,
+            "critical": true,
+            "customCriticality": null,
+            "isCustomDevice": false,
+            "customType": null,
+            "userModTime": null,
+            "description": null,
+            "cdp_name": null,
+            "dhcp_name": null,
+            "dns_name": "dc01.lab.local",
+            "netbios_name": "DC01",
+            "custom_name": null,
+            "default_name": "DC01",
+            "model": null,
+            "modelOverride": null,
+            "software": "Windows Server 2022"
+          },
+          "bytesIn": 1245678900,
+          "bytesOut": 987654321,
+          "totalBytes": 2233333221,
+          "pktsIn": 1890000,
+          "pktsOut": 1456000,
+          "sparkline": [
+            {
+              "t": 1741795200000,
+              "tIso": "2026-03-12T16:00:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 223333322
+              }
+            },
+            {
+              "t": 1741795230000,
+              "tIso": "2026-03-12T16:00:30.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 245000000
+              }
+            },
+            {
+              "t": 1741795260000,
+              "tIso": "2026-03-12T16:01:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 210000000
+              }
+            }
+          ]
+        }
+      },
+      "label": "device-014.lab.local",
+      "timestamp": 1710000014000
+    },
+    {
+      "selection": {
+        "kind": "device",
+        "device": {
+          "id": 1015,
+          "displayName": "device-015.lab.local",
+          "extrahopId": "0242ac110002",
+          "discoveryId": "0242ac110002",
+          "ipaddr4": "10.10.1.50",
+          "ipaddr6": null,
+          "macaddr": "02:42:AC:11:00:02",
+          "deviceClass": "node",
+          "role": "domain_controller",
+          "autoRole": "domain_controller",
+          "vendor": "Microsoft",
+          "isL3": true,
+          "vlanid": null,
+          "parentId": null,
+          "nodeId": null,
+          "analysis": "advanced",
+          "analysisLevel": 2,
+          "lastSeenTime": 1741795470000,
+          "lastSeenIso": "2026-03-12T16:04:30.000Z",
+          "modTime": 1741795200000,
+          "discoverTime": 1741000000000,
+          "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+          "onWatchlist": true,
+          "critical": true,
+          "customCriticality": null,
+          "isCustomDevice": false,
+          "customType": null,
+          "userModTime": null,
+          "description": null,
+          "cdp_name": null,
+          "dhcp_name": null,
+          "dns_name": "dc01.lab.local",
+          "netbios_name": "DC01",
+          "custom_name": null,
+          "default_name": "DC01",
+          "model": null,
+          "modelOverride": null,
+          "software": "Windows Server 2022"
+        },
+        "topTalkerRow": {
+          "device": {
+            "id": 1015,
+            "displayName": "device-015.lab.local",
+            "extrahopId": "0242ac110002",
+            "discoveryId": "0242ac110002",
+            "ipaddr4": "10.10.1.50",
+            "ipaddr6": null,
+            "macaddr": "02:42:AC:11:00:02",
+            "deviceClass": "node",
+            "role": "domain_controller",
+            "autoRole": "domain_controller",
+            "vendor": "Microsoft",
+            "isL3": true,
+            "vlanid": null,
+            "parentId": null,
+            "nodeId": null,
+            "analysis": "advanced",
+            "analysisLevel": 2,
+            "lastSeenTime": 1741795470000,
+            "lastSeenIso": "2026-03-12T16:04:30.000Z",
+            "modTime": 1741795200000,
+            "discoverTime": 1741000000000,
+            "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+            "onWatchlist": true,
+            "critical": true,
+            "customCriticality": null,
+            "isCustomDevice": false,
+            "customType": null,
+            "userModTime": null,
+            "description": null,
+            "cdp_name": null,
+            "dhcp_name": null,
+            "dns_name": "dc01.lab.local",
+            "netbios_name": "DC01",
+            "custom_name": null,
+            "default_name": "DC01",
+            "model": null,
+            "modelOverride": null,
+            "software": "Windows Server 2022"
+          },
+          "bytesIn": 1245678900,
+          "bytesOut": 987654321,
+          "totalBytes": 2233333221,
+          "pktsIn": 1890000,
+          "pktsOut": 1456000,
+          "sparkline": [
+            {
+              "t": 1741795200000,
+              "tIso": "2026-03-12T16:00:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 223333322
+              }
+            },
+            {
+              "t": 1741795230000,
+              "tIso": "2026-03-12T16:00:30.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 245000000
+              }
+            },
+            {
+              "t": 1741795260000,
+              "tIso": "2026-03-12T16:01:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 210000000
+              }
+            }
+          ]
+        }
+      },
+      "label": "device-015.lab.local",
+      "timestamp": 1710000015000
+    },
+    {
+      "selection": {
+        "kind": "device",
+        "device": {
+          "id": 1016,
+          "displayName": "device-016.lab.local",
+          "extrahopId": "0242ac110002",
+          "discoveryId": "0242ac110002",
+          "ipaddr4": "10.10.1.50",
+          "ipaddr6": null,
+          "macaddr": "02:42:AC:11:00:02",
+          "deviceClass": "node",
+          "role": "domain_controller",
+          "autoRole": "domain_controller",
+          "vendor": "Microsoft",
+          "isL3": true,
+          "vlanid": null,
+          "parentId": null,
+          "nodeId": null,
+          "analysis": "advanced",
+          "analysisLevel": 2,
+          "lastSeenTime": 1741795470000,
+          "lastSeenIso": "2026-03-12T16:04:30.000Z",
+          "modTime": 1741795200000,
+          "discoverTime": 1741000000000,
+          "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+          "onWatchlist": true,
+          "critical": true,
+          "customCriticality": null,
+          "isCustomDevice": false,
+          "customType": null,
+          "userModTime": null,
+          "description": null,
+          "cdp_name": null,
+          "dhcp_name": null,
+          "dns_name": "dc01.lab.local",
+          "netbios_name": "DC01",
+          "custom_name": null,
+          "default_name": "DC01",
+          "model": null,
+          "modelOverride": null,
+          "software": "Windows Server 2022"
+        },
+        "topTalkerRow": {
+          "device": {
+            "id": 1016,
+            "displayName": "device-016.lab.local",
+            "extrahopId": "0242ac110002",
+            "discoveryId": "0242ac110002",
+            "ipaddr4": "10.10.1.50",
+            "ipaddr6": null,
+            "macaddr": "02:42:AC:11:00:02",
+            "deviceClass": "node",
+            "role": "domain_controller",
+            "autoRole": "domain_controller",
+            "vendor": "Microsoft",
+            "isL3": true,
+            "vlanid": null,
+            "parentId": null,
+            "nodeId": null,
+            "analysis": "advanced",
+            "analysisLevel": 2,
+            "lastSeenTime": 1741795470000,
+            "lastSeenIso": "2026-03-12T16:04:30.000Z",
+            "modTime": 1741795200000,
+            "discoverTime": 1741000000000,
+            "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+            "onWatchlist": true,
+            "critical": true,
+            "customCriticality": null,
+            "isCustomDevice": false,
+            "customType": null,
+            "userModTime": null,
+            "description": null,
+            "cdp_name": null,
+            "dhcp_name": null,
+            "dns_name": "dc01.lab.local",
+            "netbios_name": "DC01",
+            "custom_name": null,
+            "default_name": "DC01",
+            "model": null,
+            "modelOverride": null,
+            "software": "Windows Server 2022"
+          },
+          "bytesIn": 1245678900,
+          "bytesOut": 987654321,
+          "totalBytes": 2233333221,
+          "pktsIn": 1890000,
+          "pktsOut": 1456000,
+          "sparkline": [
+            {
+              "t": 1741795200000,
+              "tIso": "2026-03-12T16:00:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 223333322
+              }
+            },
+            {
+              "t": 1741795230000,
+              "tIso": "2026-03-12T16:00:30.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 245000000
+              }
+            },
+            {
+              "t": 1741795260000,
+              "tIso": "2026-03-12T16:01:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 210000000
+              }
+            }
+          ]
+        }
+      },
+      "label": "device-016.lab.local",
+      "timestamp": 1710000016000
+    },
+    {
+      "selection": {
+        "kind": "device",
+        "device": {
+          "id": 1017,
+          "displayName": "device-017.lab.local",
+          "extrahopId": "0242ac110002",
+          "discoveryId": "0242ac110002",
+          "ipaddr4": "10.10.1.50",
+          "ipaddr6": null,
+          "macaddr": "02:42:AC:11:00:02",
+          "deviceClass": "node",
+          "role": "domain_controller",
+          "autoRole": "domain_controller",
+          "vendor": "Microsoft",
+          "isL3": true,
+          "vlanid": null,
+          "parentId": null,
+          "nodeId": null,
+          "analysis": "advanced",
+          "analysisLevel": 2,
+          "lastSeenTime": 1741795470000,
+          "lastSeenIso": "2026-03-12T16:04:30.000Z",
+          "modTime": 1741795200000,
+          "discoverTime": 1741000000000,
+          "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+          "onWatchlist": true,
+          "critical": true,
+          "customCriticality": null,
+          "isCustomDevice": false,
+          "customType": null,
+          "userModTime": null,
+          "description": null,
+          "cdp_name": null,
+          "dhcp_name": null,
+          "dns_name": "dc01.lab.local",
+          "netbios_name": "DC01",
+          "custom_name": null,
+          "default_name": "DC01",
+          "model": null,
+          "modelOverride": null,
+          "software": "Windows Server 2022"
+        },
+        "topTalkerRow": {
+          "device": {
+            "id": 1017,
+            "displayName": "device-017.lab.local",
+            "extrahopId": "0242ac110002",
+            "discoveryId": "0242ac110002",
+            "ipaddr4": "10.10.1.50",
+            "ipaddr6": null,
+            "macaddr": "02:42:AC:11:00:02",
+            "deviceClass": "node",
+            "role": "domain_controller",
+            "autoRole": "domain_controller",
+            "vendor": "Microsoft",
+            "isL3": true,
+            "vlanid": null,
+            "parentId": null,
+            "nodeId": null,
+            "analysis": "advanced",
+            "analysisLevel": 2,
+            "lastSeenTime": 1741795470000,
+            "lastSeenIso": "2026-03-12T16:04:30.000Z",
+            "modTime": 1741795200000,
+            "discoverTime": 1741000000000,
+            "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+            "onWatchlist": true,
+            "critical": true,
+            "customCriticality": null,
+            "isCustomDevice": false,
+            "customType": null,
+            "userModTime": null,
+            "description": null,
+            "cdp_name": null,
+            "dhcp_name": null,
+            "dns_name": "dc01.lab.local",
+            "netbios_name": "DC01",
+            "custom_name": null,
+            "default_name": "DC01",
+            "model": null,
+            "modelOverride": null,
+            "software": "Windows Server 2022"
+          },
+          "bytesIn": 1245678900,
+          "bytesOut": 987654321,
+          "totalBytes": 2233333221,
+          "pktsIn": 1890000,
+          "pktsOut": 1456000,
+          "sparkline": [
+            {
+              "t": 1741795200000,
+              "tIso": "2026-03-12T16:00:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 223333322
+              }
+            },
+            {
+              "t": 1741795230000,
+              "tIso": "2026-03-12T16:00:30.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 245000000
+              }
+            },
+            {
+              "t": 1741795260000,
+              "tIso": "2026-03-12T16:01:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 210000000
+              }
+            }
+          ]
+        }
+      },
+      "label": "device-017.lab.local",
+      "timestamp": 1710000017000
+    },
+    {
+      "selection": {
+        "kind": "device",
+        "device": {
+          "id": 1018,
+          "displayName": "device-018.lab.local",
+          "extrahopId": "0242ac110002",
+          "discoveryId": "0242ac110002",
+          "ipaddr4": "10.10.1.50",
+          "ipaddr6": null,
+          "macaddr": "02:42:AC:11:00:02",
+          "deviceClass": "node",
+          "role": "domain_controller",
+          "autoRole": "domain_controller",
+          "vendor": "Microsoft",
+          "isL3": true,
+          "vlanid": null,
+          "parentId": null,
+          "nodeId": null,
+          "analysis": "advanced",
+          "analysisLevel": 2,
+          "lastSeenTime": 1741795470000,
+          "lastSeenIso": "2026-03-12T16:04:30.000Z",
+          "modTime": 1741795200000,
+          "discoverTime": 1741000000000,
+          "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+          "onWatchlist": true,
+          "critical": true,
+          "customCriticality": null,
+          "isCustomDevice": false,
+          "customType": null,
+          "userModTime": null,
+          "description": null,
+          "cdp_name": null,
+          "dhcp_name": null,
+          "dns_name": "dc01.lab.local",
+          "netbios_name": "DC01",
+          "custom_name": null,
+          "default_name": "DC01",
+          "model": null,
+          "modelOverride": null,
+          "software": "Windows Server 2022"
+        },
+        "topTalkerRow": {
+          "device": {
+            "id": 1018,
+            "displayName": "device-018.lab.local",
+            "extrahopId": "0242ac110002",
+            "discoveryId": "0242ac110002",
+            "ipaddr4": "10.10.1.50",
+            "ipaddr6": null,
+            "macaddr": "02:42:AC:11:00:02",
+            "deviceClass": "node",
+            "role": "domain_controller",
+            "autoRole": "domain_controller",
+            "vendor": "Microsoft",
+            "isL3": true,
+            "vlanid": null,
+            "parentId": null,
+            "nodeId": null,
+            "analysis": "advanced",
+            "analysisLevel": 2,
+            "lastSeenTime": 1741795470000,
+            "lastSeenIso": "2026-03-12T16:04:30.000Z",
+            "modTime": 1741795200000,
+            "discoverTime": 1741000000000,
+            "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+            "onWatchlist": true,
+            "critical": true,
+            "customCriticality": null,
+            "isCustomDevice": false,
+            "customType": null,
+            "userModTime": null,
+            "description": null,
+            "cdp_name": null,
+            "dhcp_name": null,
+            "dns_name": "dc01.lab.local",
+            "netbios_name": "DC01",
+            "custom_name": null,
+            "default_name": "DC01",
+            "model": null,
+            "modelOverride": null,
+            "software": "Windows Server 2022"
+          },
+          "bytesIn": 1245678900,
+          "bytesOut": 987654321,
+          "totalBytes": 2233333221,
+          "pktsIn": 1890000,
+          "pktsOut": 1456000,
+          "sparkline": [
+            {
+              "t": 1741795200000,
+              "tIso": "2026-03-12T16:00:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 223333322
+              }
+            },
+            {
+              "t": 1741795230000,
+              "tIso": "2026-03-12T16:00:30.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 245000000
+              }
+            },
+            {
+              "t": 1741795260000,
+              "tIso": "2026-03-12T16:01:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 210000000
+              }
+            }
+          ]
+        }
+      },
+      "label": "device-018.lab.local",
+      "timestamp": 1710000018000
+    },
+    {
+      "selection": {
+        "kind": "device",
+        "device": {
+          "id": 1019,
+          "displayName": "device-019.lab.local",
+          "extrahopId": "0242ac110002",
+          "discoveryId": "0242ac110002",
+          "ipaddr4": "10.10.1.50",
+          "ipaddr6": null,
+          "macaddr": "02:42:AC:11:00:02",
+          "deviceClass": "node",
+          "role": "domain_controller",
+          "autoRole": "domain_controller",
+          "vendor": "Microsoft",
+          "isL3": true,
+          "vlanid": null,
+          "parentId": null,
+          "nodeId": null,
+          "analysis": "advanced",
+          "analysisLevel": 2,
+          "lastSeenTime": 1741795470000,
+          "lastSeenIso": "2026-03-12T16:04:30.000Z",
+          "modTime": 1741795200000,
+          "discoverTime": 1741000000000,
+          "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+          "onWatchlist": true,
+          "critical": true,
+          "customCriticality": null,
+          "isCustomDevice": false,
+          "customType": null,
+          "userModTime": null,
+          "description": null,
+          "cdp_name": null,
+          "dhcp_name": null,
+          "dns_name": "dc01.lab.local",
+          "netbios_name": "DC01",
+          "custom_name": null,
+          "default_name": "DC01",
+          "model": null,
+          "modelOverride": null,
+          "software": "Windows Server 2022"
+        },
+        "topTalkerRow": {
+          "device": {
+            "id": 1019,
+            "displayName": "device-019.lab.local",
+            "extrahopId": "0242ac110002",
+            "discoveryId": "0242ac110002",
+            "ipaddr4": "10.10.1.50",
+            "ipaddr6": null,
+            "macaddr": "02:42:AC:11:00:02",
+            "deviceClass": "node",
+            "role": "domain_controller",
+            "autoRole": "domain_controller",
+            "vendor": "Microsoft",
+            "isL3": true,
+            "vlanid": null,
+            "parentId": null,
+            "nodeId": null,
+            "analysis": "advanced",
+            "analysisLevel": 2,
+            "lastSeenTime": 1741795470000,
+            "lastSeenIso": "2026-03-12T16:04:30.000Z",
+            "modTime": 1741795200000,
+            "discoverTime": 1741000000000,
+            "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+            "onWatchlist": true,
+            "critical": true,
+            "customCriticality": null,
+            "isCustomDevice": false,
+            "customType": null,
+            "userModTime": null,
+            "description": null,
+            "cdp_name": null,
+            "dhcp_name": null,
+            "dns_name": "dc01.lab.local",
+            "netbios_name": "DC01",
+            "custom_name": null,
+            "default_name": "DC01",
+            "model": null,
+            "modelOverride": null,
+            "software": "Windows Server 2022"
+          },
+          "bytesIn": 1245678900,
+          "bytesOut": 987654321,
+          "totalBytes": 2233333221,
+          "pktsIn": 1890000,
+          "pktsOut": 1456000,
+          "sparkline": [
+            {
+              "t": 1741795200000,
+              "tIso": "2026-03-12T16:00:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 223333322
+              }
+            },
+            {
+              "t": 1741795230000,
+              "tIso": "2026-03-12T16:00:30.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 245000000
+              }
+            },
+            {
+              "t": 1741795260000,
+              "tIso": "2026-03-12T16:01:00.000Z",
+              "durationMs": 30000,
+              "values": {
+                "bytes": 210000000
+              }
+            }
+          ]
+        }
+      },
+      "label": "device-019.lab.local",
+      "timestamp": 1710000019000
+    }
+  ],
+  "currentSelection": {
+    "kind": "detection",
+    "detection": {
+      "id": 4001,
+      "title": "Lateral Movement via SMB",
+      "type": "lateral_movement",
+      "displayName": "Lateral Movement via SMB",
+      "categories": [
+        "sec.lateral"
+      ],
+      "participants": [
+        {
+          "object_type": "device",
+          "object_id": 101,
+          "role": "offender"
+        },
+        {
+          "object_type": "device",
+          "object_id": 205,
+          "role": "victim"
+        }
+      ],
+      "riskScore": 92,
+      "startTime": 1710200000000,
+      "startTimeIso": "2024-03-11T22:13:20.000Z",
+      "endTime": 1710203600000,
+      "endTimeIso": "2024-03-11T23:13:20.000Z",
+      "createTime": 1710200100000,
+      "createTimeIso": "2024-03-11T22:15:00.000Z",
+      "status": "new",
+      "resolution": null,
+      "assignee": null,
+      "ticketId": null,
+      "mitreTactics": [
+        "Lateral Movement"
+      ],
+      "mitreTechniques": [
+        "T1021.002"
+      ],
+      "isUserCreated": false,
+      "properties": {},
+      "url": null
+    }
+  }
+}

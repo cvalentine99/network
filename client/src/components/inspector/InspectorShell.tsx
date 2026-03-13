@@ -1,11 +1,12 @@
 /**
  * InspectorShell — Right-side collapsible detail panel.
  *
- * Opens/closes without breaking layout. In Slice 00 this is a placeholder shell.
- * Later slices will populate it with device detail, detection detail, etc.
+ * Opens/closes without breaking layout. In Slice 00 this was a placeholder shell.
+ * Slice 13 adds InspectorBreadcrumb between the header and content area.
  */
 import { X } from 'lucide-react';
 import { GOLD, MUTED, BRIGHT } from '@/components/DashboardWidgets';
+import { InspectorBreadcrumb } from './InspectorBreadcrumb';
 
 export interface InspectorShellProps {
   isOpen: boolean;
@@ -43,6 +44,9 @@ export function InspectorShell({ isOpen, onClose, title, children }: InspectorSh
           <X className="h-4 w-4" style={{ color: MUTED }} />
         </button>
       </div>
+
+      {/* Breadcrumb trail (Slice 13) — only renders when history exists */}
+      <InspectorBreadcrumb />
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-5">

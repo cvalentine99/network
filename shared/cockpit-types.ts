@@ -414,6 +414,25 @@ export interface AlertDetail {
   associatedDetections: NormalizedDetection[];
 }
 
+// ─── Inspector History (Slice 13) ───────────────────────────────────────
+/**
+ * A single entry in the inspector navigation history stack.
+ * Each entry captures the selection that was active at that point,
+ * plus a human-readable label for breadcrumb display.
+ *
+ * Invariants:
+ *   - label is derived from the entity at push time and never changes
+ *   - timestamp is epoch-ms at push time (for ordering verification)
+ *   - The stack is append-only during forward navigation;
+ *     goBack pops entries off the top
+ *   - Maximum depth is enforced by INSPECTOR_HISTORY_MAX_DEPTH
+ */
+export interface InspectorHistoryEntry {
+  selection: InspectorSelection;
+  label: string;
+  timestamp: EpochMs;
+}
+
 // ─── BFF Health Response ──────────────────────────────────────────────────
 export interface BffHealthResponse {
   status: 'ok' | 'degraded' | 'not_configured';

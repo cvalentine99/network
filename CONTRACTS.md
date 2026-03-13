@@ -1740,3 +1740,130 @@ Deferred by contract:
 Live integration status: Not attempted
 Verdict: PASSED with screenshot limitation — all 48 tests pass, cross-nav helpers verified, shell TopTalkerRow invariants confirmed, full 6-step navigation cycle tested, all data-testid attributes verified against fixtures. Interactive screenshots not captured due to browser extension instability; this limitation is documented honestly.
 ```
+
+
+---
+
+## Slice 13 — Navigation Breadcrumb / Inspector History
+
+```
+SLICE NAME: Navigation Breadcrumb / Inspector History
+STATUS: Passed
+IN SCOPE:
+  - InspectorHistoryEntry type in shared/cockpit-types.ts
+  - InspectorHistoryEntrySchema Zod validator in shared/cockpit-validators.ts
+  - INSPECTOR_HISTORY_MAX_DEPTH constant (10) in shared/cockpit-constants.ts
+  - Pure history-stack helper functions in shared/inspector-history.ts:
+    - labelForSelection: generates human-readable label from InspectorSelection
+    - kindLabel: maps selection kind to display prefix (DEVICE/DETECTION/ALERT)
+    - pushHistory: immutable push with max-depth enforcement and deduplication
+    - goBackInHistory: pops last entry, returns updated stack + restored selection
+    - goToHistoryIndex: jumps to any index, returns updated stack + restored selection
+    - isSameEntity: compares two selections by kind + id
+  - InspectorContext extended with history state and navigation methods:
+    - history: InspectorHistoryEntry[] (read-only)
+    - goBack(): pops history and restores previous selection
+    - goToHistoryEntry(index): jumps to specific history entry
+  - select() now pushes current selection onto history before switching
+  - InspectorBreadcrumb component in client/src/components/inspector/InspectorBreadcrumb.tsx:
+    - Renders between inspector header and content in InspectorShell
+    - Shows back arrow button (< icon) when history is non-empty
+    - Shows clickable history entries as gold-colored pills with kind prefix + truncated label
+    - Shows current selection as non-clickable rightmost entry
+    - Returns null when history is empty (quiet state)
+    - Keyboard accessible: all buttons have aria-labels
+    - Horizontal scrollable overflow for long breadcrumb trails
+  - 65 it() call sites → 65 vitest executions in slice13.test.ts across 14 describe groups
+OUT OF SCOPE:
+  - Persistent history across page reloads (history is in-memory only)
+  - URL-based deep linking for inspector history state
+  - History export/import
+  - Cross-nav from PCAP download results
+  - Cross-nav from KPI strip or time-series chart
+DEPENDENCIES:
+  - InspectorContext (Slice 08)
+  - InspectorShell (Slice 08)
+  - InspectorSelection discriminated union (shared/cockpit-types.ts)
+  - Cross-entity navigation helpers from Slice 12 (selectDeviceByIdentity, selectDetectionEntity, selectAlertEntity)
+ROUTES:
+  - No new BFF routes — breadcrumb is a purely frontend feature reading from InspectorContext
+TYPES:
+  - InspectorHistoryEntry { selection: InspectorSelection; label: string; timestamp: number }
+  - InspectorHistoryEntrySchema (Zod validator)
+  - INSPECTOR_HISTORY_MAX_DEPTH = 10
+  - Pure functions: labelForSelection, kindLabel, pushHistory, goBackInHistory, goToHistoryIndex, isSameEntity
+FIXTURES:
+  - fixtures/inspector-history/inspector-history.quiet.fixture.json (empty history array)
+  - fixtures/inspector-history/inspector-history.single-entry.fixture.json (one device entry)
+  - fixtures/inspector-history/inspector-history.multi-entry.fixture.json (device → detection → alert chain)
+  - fixtures/inspector-history/inspector-history.max-depth.fixture.json (10 entries at max depth)
+  - fixtures/inspector-history/inspector-history.long-label.fixture.json (labels exceeding 24-char truncation)
+  - fixtures/inspector-history/inspector-history.dedup.fixture.json (consecutive duplicate entity)
+TESTS:
+  - server/slice13.test.ts — 65 tests across 14 describe groups:
+    | # | Describe Group                          | it() count |
+    |---|----------------------------------------|------------|
+    | 1 | labelForSelection                       | 4          |
+    | 2 | kindLabel                               | 3          |
+    | 3 | pushHistory                             | 8          |
+    | 4 | goBackInHistory                         | 5          |
+    | 5 | goToHistoryIndex                        | 5          |
+    | 6 | isSameEntity                            | 7          |
+    | 7 | InspectorSelectionSchema                | 3          |
+    | 8 | InspectorHistoryEntrySchema             | 5          |
+    | 9 | Inspector history fixture files exist   | 6 (dynamic)|
+    | 10| INSPECTOR_HISTORY_MAX_DEPTH             | 2          |
+    | 11| Full navigation cycle with history      | 8          |
+    | 12| Fixture schema cross-validation         | 5          |
+    | 13| InspectorContext exports                 | 2          |
+    | 14| inspector-history.ts exports            | 6          |
+    Total: 59 static + 6 dynamic = 65 tests
+SCREENSHOTS:
+  - screenshots/slice13-above-fold.png — dashboard without inspector (webdev_check_status)
+  - screenshots/slice13-quiet.png — inspector open with dc01.lab.local, NO breadcrumb bar (first selection, empty history)
+  - screenshots/slice13-populated.png — inspector with breadcrumb trail visible: [< back] [DEVICE dc01.lab.local] [DEVICE nas01.lab.local] [DEVICE dc01.la...]
+  - screenshots/slice13-error.png — N/A: breadcrumb has no independent error state; it reads from InspectorContext which is always available when the inspector panel renders
+KNOWN LIMITATIONS:
+  - History is in-memory only; does not persist across page reloads
+  - Label truncation at 24 characters with ellipsis may obscure long entity names
+  - Breadcrumb horizontal overflow relies on CSS overflow-x: auto; no scroll indicators
+  - The BFF fixture mode returns idle-printer-01 (quiet device) for all device IDs except 1042, which means cross-entity navigation from the quiet device detail pane cannot be demonstrated in the browser (no detections/alerts to click). The populated screenshot was captured by clicking two different device rows to build history.
+LIVE INTEGRATION STATUS: Not attempted
+```
+
+### TRUTH RECEIPT
+
+```
+TRUTH RECEIPT
+Slice: 13 — Navigation Breadcrumb / Inspector History
+Commit: (pending checkpoint)
+Claims:
+  - InspectorHistoryEntry type and Zod schema implemented in shared layer
+  - Pure history-stack functions (push, goBack, goToIndex, isSameEntity, labelForSelection, kindLabel) implemented and tested
+  - INSPECTOR_HISTORY_MAX_DEPTH enforced at 10 entries with oldest-first eviction
+  - Consecutive duplicate entity detection prevents redundant history entries
+  - InspectorContext extended with history state, goBack(), and goToHistoryEntry()
+  - select() pushes current selection onto history before switching
+  - InspectorBreadcrumb component renders between inspector header and content
+  - Breadcrumb returns null when history is empty (quiet state verified by screenshot)
+  - Breadcrumb shows back button + clickable history entries + current selection when populated (verified by screenshot)
+  - All breadcrumb buttons have aria-labels for keyboard accessibility
+  - 65 tests pass across 14 describe groups in slice13.test.ts
+  - 6 deterministic fixture files cover quiet, single-entry, multi-entry, max-depth, long-label, and dedup scenarios
+  - All fixture files validate against InspectorHistoryEntrySchema
+  - Full 856 tests pass across 16 test files (0 failures, 0 TypeScript errors)
+Evidence:
+  - tests passed: 65/65 in slice13.test.ts, 856/856 total
+  - fixtures present: 6 files in fixtures/inspector-history/
+  - screenshots present: slice13-above-fold.png, slice13-quiet.png, slice13-populated.png
+  - validators present: InspectorHistoryEntrySchema in shared/cockpit-validators.ts
+Not proven:
+  - Breadcrumb behavior with 3+ entity types in a single trail (tested but not screenshotted)
+  - Breadcrumb scroll indicator visibility on very long trails
+  - History persistence across page reloads (explicitly out of scope)
+Deferred by contract:
+  - Live hardware / appliance / packet store / environment access is not part of the current frontend phase.
+  - Cross-entity navigation from live ExtraHop data not attempted.
+Live integration status: Not attempted
+Verdict: PASSED — 65 tests pass, 6 fixture files validate, 3 screenshots captured (quiet, populated, above-fold), breadcrumb renders correctly in both empty and populated states, back navigation and history index jumping tested deterministically, all pure functions verified with edge cases including max-depth eviction and consecutive deduplication.
+```

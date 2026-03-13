@@ -54,6 +54,12 @@ export const TIME_WINDOW_PRESETS = [
   { label: 'Last 7 days', value: -604_800_000 },
 ] as const;
 
+// ─── Inspector History (Slice 13) ────────────────────────────────────────
+// Maximum depth for the inspector navigation back-stack.
+// Prevents unbounded memory growth from deep cross-entity navigation chains.
+// When the stack exceeds this depth, the oldest entry is dropped (FIFO eviction).
+export const INSPECTOR_HISTORY_MAX_DEPTH = 20;
+
 // ─── Detection risk score → severity mapping ─────────────────────────────
 export function riskScoreToSeverity(riskScore: number): Severity {
   if (riskScore >= 80) return 'critical';

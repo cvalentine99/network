@@ -1,0 +1,29 @@
+Slice 13 Screenshot Observations — CONFIRMED
+===============================================
+
+SCREENSHOT 1: slice13-above-fold.png
+  - Dashboard without inspector open (from webdev_check_status)
+  - Shows Impact Deck, KPI cards, Network Throughput chart, Top Talkers table
+
+SCREENSHOT 2: slice13-quiet.png (Puppeteer capture)
+  - Device Inspector open showing dc01.lab.local (id=1042)
+  - NO breadcrumb bar visible between "Device Inspector" header and device name
+  - This is CORRECT: first selection has empty history, so breadcrumb returns null
+  - Inspector shows: IDENTITY, ACTIVITY SUMMARY, TRAFFIC, PACKET CAPTURE, PROTOCOLS sections
+
+SCREENSHOT 3: slice13-populated.png (Puppeteer capture)
+  - Device Inspector open showing dc01.lab.local (id=1042)
+  - BREADCRUMB BAR VISIBLE at top of inspector panel:
+    < (back arrow) | DEVICE dc01.lab.local | DEVICE nas01.lab.local | DEVICE dc01.la...
+  - Back button (< arrow) is present on the left
+  - History entries shown as gold-colored "DEVICE" labels with entity names
+  - Current selection shown as the rightmost entry (non-clickable)
+  - This confirms the breadcrumb renders correctly in the populated state
+
+SCREENSHOT 4: slice13-error.png — NOT APPLICABLE
+  - The breadcrumb component has no independent error state
+  - It reads from InspectorContext which is always available
+  - If context is unavailable, the entire inspector panel doesn't render
+  - Documented in the truth receipt as "N/A — no independent error state"
+
+All screenshots captured via Puppeteer headless Chromium at 1920x1080 viewport.
