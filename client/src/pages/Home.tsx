@@ -1,5 +1,5 @@
 /**
- * Impact Deck — Landing page (Slice 00 shell + Slice 02 KPI Strip + Slice 03 Timeseries + Slice 04 Top Talkers)
+ * Impact Deck — Landing page (Slice 00-05)
  *
  * CONTRACT:
  * - Global time window is wired and readable
@@ -7,20 +7,23 @@
  * - KPI Strip fetches from /api/bff/impact/headline (never ExtraHop directly)
  * - GhostedTimeline fetches from /api/bff/impact/timeseries (never ExtraHop directly)
  * - TopTalkersTable fetches from /api/bff/impact/top-talkers (never ExtraHop directly)
+ * - DetectionsTable fetches from /api/bff/impact/detections (never ExtraHop directly)
  * - All 5 UI states are reachable per panel: loading, quiet, populated, error, malformed
  * - No direct ExtraHop calls from this component
  */
 import { useState } from 'react';
-import { PageHeader, GlassCard, MUTED, GOLD } from '@/components/DashboardWidgets';
+import { PageHeader, GlassCard, MUTED, GOLD, RED, GREEN } from '@/components/DashboardWidgets';
 import { TimeWindowSelector } from '@/components/shared/TimeWindowSelector';
 import { InspectorShell } from '@/components/inspector/InspectorShell';
 import { KPIStrip } from '@/components/impact/KPIStrip';
 import { GhostedTimeline } from '@/components/charts/GhostedTimeline';
 import { TopTalkersTable } from '@/components/tables/TopTalkersTable';
+import { DetectionsTable } from '@/components/tables/DetectionsTable';
 import { useTimeWindow } from '@/lib/useTimeWindow';
 import { useImpactHeadline } from '@/hooks/useImpactHeadline';
 import { useImpactTimeseries } from '@/hooks/useImpactTimeseries';
 import { useTopTalkers } from '@/hooks/useTopTalkers';
+import { useDetections } from '@/hooks/useDetections';
 import { PanelRightOpen } from 'lucide-react';
 
 export default function Home() {
@@ -29,6 +32,11 @@ export default function Home() {
   const { state: kpiState } = useImpactHeadline();
   const { state: timeseriesState } = useImpactTimeseries();
   const topTalkersState = useTopTalkers();
+  const detectionsState = useDetections();
+
+  // Detection count badge color
+  const detectionCount = detectionsState.kind === 'populated' ? detectionsState.detections.length : 0;
+  const detectionBadgeColor = detectionCount > 0 ? RED : GREEN;
 
   return (
     <div className="relative">
@@ -71,17 +79,44 @@ export default function Home() {
         <GhostedTimeline state={timeseriesState} />
       </div>
 
-      {/* Top Talkers table — ranked by total bytes */}
-      <div className="mb-6">
-        <GlassCard>
-          <p
-            className="text-xs font-bold uppercase tracking-wider mb-4"
-            style={{ color: MUTED }}
-          >
-            Top Talkers — By Total Bytes
-          </p>
-          <TopTalkersTable state={topTalkersState} />
-        </GlassCard>
+      {/* Two-column: Top Talkers (2/3) + Detections (1/3) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        {/* Top Talkers — 2/3 width */}
+        <div className="lg:col-span-2">
+          <GlassCard>
+            <p
+              className="text-xs font-bold uppercase tracking-wider mb-4"
+              style={{ color: MUTED }}
+            >
+              Top Talkers — By Total Bytes
+            </p>
+            <TopTalkersTable state={topTalkersState} />
+          </GlassCard>
+        </div>
+
+        {/* Recent Detections — 1/3 width */}
+        <div className="lg:col-span-1">
+          <GlassCard>
+            <div className="flex items-center gap-2 mb-4">
+              <p
+                className="text-xs font-bold uppercase tracking-wider"
+                style={{ color: MUTED }}
+              >
+                Recent Detections
+              </p>
+              <span
+                className="inline-flex items-center justify-center px-1.5 py-0.5 rounded text-[10px] font-bold tabular-nums"
+                style={{
+                  background: `${detectionBadgeColor}20`,
+                  color: detectionBadgeColor,
+                }}
+              >
+                {detectionCount}
+              </span>
+            </div>
+            <DetectionsTable state={detectionsState} />
+          </GlassCard>
+        </div>
       </div>
 
       {/* Dashboard content area — placeholder for future slices */}

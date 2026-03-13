@@ -1,0 +1,17 @@
+{
+  "description": "Malformed detections — data that should fail NormalizedDetectionSchema validation. Missing required fields, wrong types.",
+  "detections": [
+    {
+      "id": "not-a-number",
+      "title": 12345,
+      "riskScore": -5,
+      "participants": "not-an-array",
+      "mitreTactics": "should-be-array"
+    },
+    {
+      "id": 9999,
+      "type": "missing_title_field",
+      "riskScore": 50
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "description": "Edge case — single detection with zero risk score, empty MITRE arrays, null resolution/assignee/ticketId, and ipaddr-only participant (no object_id).",
+  "detections": [
+    {
+      "id": 4099,
+      "title": "Low Confidence Network Scan",
+      "type": "network_scan",
+      "displayName": "Low Confidence Network Scan",
+      "categories": [],
+      "participants": [
+        { "object_type": "ipaddr", "ipaddr": "172.16.0.99", "role": "offender" }
+      ],
+      "riskScore": 0,
+      "startTime": 1710200000000,
+      "startTimeIso": "2024-03-11T22:13:20.000Z",
+      "endTime": 1710200000000,
+      "endTimeIso": "2024-03-11T22:13:20.000Z",
+      "createTime": 1710200000000,
+      "createTimeIso": "2024-03-11T22:13:20.000Z",
+      "status": "new",
+      "resolution": null,
+      "assignee": null,
+      "ticketId": null,
+      "mitreTactics": [],
+      "mitreTechniques": [],
+      "isUserCreated": false,
+      "properties": {},
+      "url": null
+    }
+  ]
+}

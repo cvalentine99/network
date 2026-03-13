@@ -1,0 +1,4 @@
+{
+  "description": "Quiet state — no detections in the time window. Valid empty response.",
+  "detections": []
+}

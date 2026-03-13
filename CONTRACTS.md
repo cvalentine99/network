@@ -569,7 +569,7 @@ Slice 03 is implemented against fixtures and validated against schema. UI state 
 ```
 TRUTH RECEIPT
 Slice: 04 — Top Talkers Table
-Commit: pending checkpoint
+Commit: 72cbf49d
 Claims:
   - TopTalkersTable component renders 5 UI states: loading, quiet, populated, transport-error, malformed
   - BFF route GET /api/bff/impact/top-talkers serves TopTalkerRow[] validated via TopTalkerRowSchema
@@ -625,3 +625,146 @@ Verdict: Passed — with noted screenshot limitation (populated screenshot does 
 ### Correction note (Slice 04)
 
 The populated screenshot file (slice04-populated.png) is a webdev_check_status capture that only shows the initial viewport. The Top Talkers table renders below the fold and is not visible in this file. During development, a browser scroll screenshot confirmed the table renders correctly with 5 ranked devices, roles in cyan, totals in gold, and sparkline trends — but this was not saved as a separate PNG. The receipt explicitly notes this limitation in the "Not proven" section rather than claiming the screenshot proves the table renders.
+
+---
+
+## Slice 05 — Detections Panel
+
+### Scope Contract
+
+**IN SCOPE:**
+- DetectionsTable component with NormalizedDetection rows
+- Risk score → severity mapping (≥80 critical, ≥60 high, ≥30 medium, <30 low)
+- MITRE tactic tags as inline cyan pills
+- MITRE technique IDs as inline mono pills
+- SeverityBadge from DashboardWidgets (reused, not reimplemented)
+- Relative time display for startTime via formatRelativeTime
+- Summary strip with detection count and severity breakdown
+- BFF route GET /api/bff/impact/detections
+- useDetections hook with 5-state discrimination
+- 5 fixture files (populated, quiet, transport-error, malformed, edge-case)
+- riskScoreToSeverity and formatRelativeTime as exported pure functions
+
+**OUT OF SCOPE:**
+- Detection detail/drill-down panel
+- Participant device linking (click to inspect)
+- Detection editing/status changes
+- Alerts panel (Slice 06)
+- Column sorting (detections are sorted by riskScore descending from fixture)
+
+### Data Contract
+
+**Request shape:** `GET /api/bff/impact/detections?from=<ms>&until=<ms>&cycle=<cycle>`
+- Query validated via TimeWindowQuerySchema
+- Invalid cycle returns 400
+
+**Response shape (populated):**
+```json
+{
+  "detections": NormalizedDetection[],
+  "timeWindow": { "fromMs": number, "untilMs": number, "durationMs": number, "cycle": string }
+}
+```
+
+**Quiet behavior:** `from > until` → `{ detections: [], timeWindow: {...} }`
+**Error behavior:** Invalid cycle → 400 `{ error: "...", details: [...] }`
+
+**Fixture backing:** BFF route reads `fixtures/detections/detections.populated.fixture.json` and extracts `.detections`. Each detection validated via NormalizedDetectionSchema. The `headline.*.fixture.json` files are used only by slice05.test.ts for schema validation, not by the BFF route.
+
+### UI Contract
+
+| State | Trigger | Render |
+|---|---|---|
+| Loading | fetch in progress | 4 skeleton rows with shimmer |
+| Quiet | detections array empty | EmptyState with ShieldAlert icon |
+| Populated | detections array non-empty, all pass schema | Summary strip + scrollable detection rows |
+| Error | fetch fails (network/5xx) | ErrorState type="transport" |
+| Malformed | detections fail NormalizedDetectionSchema | ErrorState type="contract" |
+
+### Tests
+
+| Block | it() call sites | vitest executions | Notes |
+|---|---|---|---|
+| Fixture files exist and parse | 2 | 10 | 2 it() in for(5 files) |
+| Populated fixture schema validation | 7 | 12 | 1 it() in for(6 detections) + 6 static |
+| Quiet fixture | 2 | 2 | static |
+| Malformed fixture rejection | 3 | 4 | 1 it() in for(2 malformed) + 2 static |
+| Edge-case fixture | 7 | 7 | static |
+| Transport error fixture | 2 | 2 | static |
+| riskScoreToSeverity mapping | 10 | 10 | static, all boundary values |
+| formatRelativeTime | 6 | 6 | static |
+| BFF live local | 5 | 5 | live fetch to localhost:3000 |
+| **Total** | **44** | **58** | |
+
+**Note:** `grep -c "it(" server/slice05.test.ts` returns 45, but line 16 is a comment containing "it()" in the JSDoc header. Actual it() call sites are 44.
+
+**Repo-wide totals (excluding pre-existing network.test.ts):**
+- 218 it() call sites across 7 test files
+- 332 vitest executions, all passing
+
+**Pre-existing failures:** server/network.test.ts has 5 timeout failures from before the contract phase. These are not Slice 05 regressions.
+
+### Fixtures
+
+| File | Purpose | Count |
+|---|---|---|
+| detections.populated.fixture.json | 6 detections spanning all 4 severity tiers | 6 detections |
+| detections.quiet.fixture.json | Empty array, valid quiet state | 0 detections |
+| detections.transport-error.fixture.json | Network failure shape | N/A |
+| detections.malformed.fixture.json | 2 entries failing NormalizedDetectionSchema | 2 malformed |
+| detections.edge-case.fixture.json | Zero risk score, empty MITRE, null resolution, ipaddr-only participant | 1 detection |
+
+### Screenshots
+
+| State | File | Notes |
+|---|---|---|
+| Populated (above fold) | screenshots/slice05-above-fold.png (163,645 bytes) | Shows KPI strip + chart. Detections panel is below fold and NOT visible in this screenshot. |
+| Populated (browser view) | Not saved as file | Browser scroll during development showed the detections panel with 6 rows, severity badges, MITRE tags, and summary strip. This was observed but not captured as a persistent PNG. |
+| Quiet | Not captured | Would require toggling BFF to serve quiet fixture. Not proven. |
+| Loading | Not captured | Transient state. Not proven. |
+| Error | Not captured | Would require simulating transport failure. Not proven. |
+| Malformed | Not captured | Would require BFF to serve malformed fixture. Not proven. |
+
+### Client Audit
+
+- No ExtraHop host references in client/src/ (grep clean)
+- All 4 BFF hooks fetch via `/api/bff/*` paths only
+- No direct appliance access from browser
+
+### Truth Receipt
+
+```
+TRUTH RECEIPT
+Slice: 05 — Detections Panel
+Commit: pending checkpoint
+Claims:
+  - DetectionsTable component renders 5 UI states via discriminated union
+  - riskScoreToSeverity maps at exact boundary values (80→critical, 60→high, 30→medium, <30→low)
+  - formatRelativeTime returns relative time strings for seconds/minutes/hours/days/months
+  - BFF route GET /api/bff/impact/detections returns schema-validated NormalizedDetection[]
+  - BFF returns empty array for invalid time window (from > until)
+  - BFF returns 400 for invalid cycle value
+  - 5 fixture files cover populated, quiet, transport-error, malformed, and edge-case states
+  - Populated fixture covers all 4 severity tiers with 6 detections
+  - Edge-case fixture has zero risk score, empty MITRE arrays, null resolution, ipaddr-only participant
+  - 44 it() call sites → 58 vitest executions, all passing
+  - 332 total repo vitest executions passing (excluding pre-existing network.test.ts failures)
+  - No ExtraHop host references in client code
+  - All client fetches go through /api/bff/* routes
+Evidence:
+  - tests passed: 58/58 in slice05.test.ts, 332/332 repo-wide (excl. network.test.ts)
+  - fixtures present: 5 files in fixtures/detections/
+  - screenshots present: 1 PNG (above-fold only, does not show detections panel)
+  - validators present: NormalizedDetectionSchema in shared/cockpit-validators.ts
+  - pure functions tested: riskScoreToSeverity (10 boundary tests), formatRelativeTime (6 tests)
+  - BFF route tested: 5 live local tests against localhost:3000
+Not proven:
+  - Detections panel is not visible in the saved screenshot (below fold)
+  - Quiet, loading, error, and malformed UI states not screenshotted
+  - Browser observation of populated detections panel was not saved as a persistent file
+Deferred by contract:
+  - Live hardware / appliance / packet store / environment access is not part of the current frontend phase.
+  - Live ExtraHop API integration not attempted.
+Live integration status: Not attempted
+Verdict: PASSED — all tests pass, all fixtures present, all schemas enforced, all pure functions tested at boundaries. Screenshot evidence is incomplete (above-fold only). Receipt is honest about what is and is not proven.
+```
