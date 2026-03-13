@@ -1182,7 +1182,7 @@ No new BFF routes. This slice is purely client-side interaction wiring.
 
 ### Tests
 
-50 vitest executions from 38 it() call sites in server/slice08.test.ts:
+50 vitest executions from 44 it() call sites in server/slice08.test.ts:
 
 | Describe block | it() sites | Vitest executions |
 |---|---|---|
@@ -1221,7 +1221,7 @@ Alert inspector screenshot: not captured separately. The alert click path uses t
 ```
 TRUTH RECEIPT
 Slice: 08 — Inspector Shell Wiring
-Commit: (pending checkpoint)
+Commit: c7dd1466
 Claims:
   - InspectorSelection discriminated union type defined in shared/cockpit-types.ts
   - InspectorContext React context with selectDevice/selectDetection/selectAlert/clear/toggle
@@ -1229,10 +1229,10 @@ Claims:
   - InspectorContent routes selection.kind to DevicePreview/DetectionPreview/AlertPreview
   - inspectorTitle returns kind-specific titles
   - 4 fixture files: device, detection, alert, empty
-  - 38 it() call sites → 50 vitest executions in slice08.test.ts
+  - 44 it() call sites → 50 vitest executions in slice08.test.ts
   - 528 total repo vitest executions passing across 11 test files (all slices)
 Evidence:
-  - tests passed: 38 it() call sites → 50/50 vitest executions in slice08.test.ts; 528/528 repo-wide
+  - tests passed: 44 it() call sites → 50/50 vitest executions in slice08.test.ts; 528/528 repo-wide
   - fixtures present: 4 files in fixtures/inspector-selection/
   - screenshots present: 3 PNGs (dashboard default, device inspector, detection inspector)
   - validators present: DeviceIdentitySchema, TopTalkerRowSchema, NormalizedDetectionSchema, NormalizedAlertSchema (reused from prior slices)
