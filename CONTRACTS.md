@@ -1836,7 +1836,7 @@ LIVE INTEGRATION STATUS: Not attempted
 ```
 TRUTH RECEIPT
 Slice: 13 — Navigation Breadcrumb / Inspector History
-Commit: (pending checkpoint)
+Commit: ffba4db8
 Claims:
   - InspectorHistoryEntry type and Zod schema implemented in shared layer
   - Pure history-stack functions (push, goBack, goToIndex, isSameEntity, labelForSelection, kindLabel) implemented and tested
