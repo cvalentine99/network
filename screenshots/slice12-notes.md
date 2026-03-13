@@ -1,6 +1,6 @@
 # Slice 12 — Cross-Entity Navigation — Screenshot Notes
 
-## Above-fold screenshot (webdev-preview-1773435774.png)
+## Above-fold screenshot (slice12-above-fold.png)
 - Dashboard renders correctly with KPI strip, time-series chart
 - No TypeScript errors, no build errors
 - Cross-entity navigation is wired in all three detail panes but requires

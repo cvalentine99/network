@@ -1684,24 +1684,25 @@ FIXTURES:
   - alert-detail.populated.fixture.json (associatedDevices, associatedDetections arrays)
   - device-detail.populated.fixture.json (associatedDetections, associatedAlerts arrays)
 TESTS:
-  48 it() call sites → 48 vitest executions across 10 describe groups:
+  48 it() call sites → 48 vitest executions across 11 describe groups:
 
   | Group | it() sites | vitest execs |
-  |-------|-----------||--------------|
-  | InspectorContext cross-nav helpers exist | 3 | 3 |
+  |-------|------------|--------------|
+  | Cross-nav API surface | 3 | 3 |
   | selectDeviceByIdentity shape | 6 | 6 |
   | selectDetectionEntity shape | 4 | 4 |
   | selectAlertEntity shape | 4 | 4 |
   | DetectionDetail cross-nav targets | 4 | 4 |
   | AlertDetail cross-nav targets | 4 | 4 |
   | DeviceDetail cross-nav targets | 4 | 4 |
-  | Cross-nav entity schema validation | 8 | 8 |
-  | Shell TopTalkerRow invariants | 5 | 5 |
-  | Full navigation cycle | 6 | 6 |
+  | Cross-fixture device ID consistency | 4 | 4 |
+  | Cross-fixture detection/alert ID consistency | 4 | 4 |
+  | Shell TopTalkerRow invariant | 5 | 5 |
+  | Kind preservation round-trip | 6 | 6 |
   | **Total** | **48** | **48** |
 
 SCREENSHOTS:
-  - Above-fold dashboard screenshot captured (webdev-preview-1773435774.png)
+  - Above-fold dashboard screenshot captured (slice12-above-fold.png)
   - Interactive cross-nav screenshots NOT captured — browser extension instability prevents reliable click-through testing
 KNOWN LIMITATIONS:
   - No navigation breadcrumb or back-stack — inspector shows only the current selection
@@ -1714,7 +1715,7 @@ TRUTH VERDICT: PASSED with screenshot limitation
 ### TRUTH RECEIPT
 ```
 Slice: 12 — Cross-Entity Navigation
-Commit: (pending checkpoint)
+Commit: 3439701f
 Claims:
   - 3 new InspectorContext helpers: selectDeviceByIdentity, selectDetectionEntity, selectAlertEntity
   - DetectionDetailPane: MiniDeviceRow and MiniAlertRow are clickable with cross-nav wiring
@@ -1728,7 +1729,7 @@ Claims:
 Evidence:
   - tests passed: 48/48 in slice12.test.ts, 791/791 total
   - fixtures present: reuses existing detection-detail, alert-detail, device-detail populated fixtures
-  - screenshots present: above-fold dashboard (webdev-preview-1773435774.png); interactive cross-nav screenshots not captured
+  - screenshots present: above-fold dashboard (slice12-above-fold.png); interactive cross-nav screenshots not captured
   - validators present: DeviceIdentitySchema, NormalizedDetectionSchema, NormalizedAlertSchema used in cross-nav entity validation tests
 Not proven:
   - Interactive browser screenshot of cross-entity navigation in action (clicking related device in detection inspector → device inspector opens)
