@@ -23,6 +23,7 @@ import {
   Loader2, AlertTriangle, Search, Wifi, WifiOff, Download
 } from 'lucide-react';
 import { PcapDownloadButton } from './PcapDownloadButton';
+import { useTimeWindow } from '@/lib/useTimeWindow';
 
 // ─── Shared field row (reused from InspectorContent pattern) ─────────────
 function FieldRow({ label, value, mono }: { label: string; value: string | null | undefined; mono?: boolean }) {
@@ -225,6 +226,7 @@ function DeviceIdentityFields({ device }: { device: DeviceDetail['device'] }) {
 
 // ─── Populated state ─────────────────────────────────────────────────────
 function PopulatedState({ detail }: { detail: DeviceDetail }) {
+  const { window: tw } = useTimeWindow();
   return (
     <div data-testid="device-detail-populated">
       {/* Identity header */}
@@ -277,8 +279,8 @@ function PopulatedState({ detail }: { detail: DeviceDetail }) {
           <SectionHeader icon={<Download className="h-3.5 w-3.5" />} label="Packet Capture" />
           <PcapDownloadButton
             deviceIp={detail.device.ipaddr4}
-            fromMs={Date.now() - 300000}
-            untilMs={Date.now()}
+            fromMs={tw.fromMs}
+            untilMs={tw.untilMs}
           />
         </>
       )}

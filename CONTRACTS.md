@@ -1459,13 +1459,13 @@ KNOWN LIMITATIONS:
   - No download progress indicator
   - triggerBlobDownload not tested (requires DOM/anchor element)
   - Component DOM render tests not written (would require jsdom/happy-dom)
-  - PcapDownloadButton uses Date.now() for time window — in production should use shared TimeWindowContext
+  - PcapDownloadButton uses shared TimeWindowContext (fixed in commit post-4f5d0970)
 LIVE INTEGRATION STATUS: Not attempted
 TRUTH VERDICT:
 
 TRUTH RECEIPT
 Slice: 10 — PCAP Download Contract
-Commit: (pending checkpoint)
+Commit: 4f5d0970
 Claims:
   - PcapRequest type with 6 fields, PcapMetadata type with 8 fields
   - PcapRequestSchema enforces min(1) on ip, int() on timestamps, default limitBytes 10MB, min(1) on limits
@@ -1477,6 +1477,7 @@ Claims:
   - extractMetadataFromHeaders extracts PcapMetadata from response headers with fallback logic
   - isBinaryPcapResponse validates Content-Type for binary PCAP
   - PcapDownloadButton renders 4 visual states with BPF filter toggle
+  - PcapDownloadButton reads fromMs/untilMs from shared TimeWindowContext (no panel-local Date.now())
   - 10 fixture files (8 JSON + 2 binary PCAP) with deterministic content
   - Binary PCAP fixtures have valid libpcap 2.4 headers with Ethernet network type
   - 51 it() call sites → 58 vitest executions in server/slice10.test.ts
@@ -1496,7 +1497,7 @@ Not proven:
   - triggerBlobDownload not tested (requires DOM anchor element)
   - Streaming/chunked transfer for large PCAP files
   - Download progress indicator
-  - Time window integration with shared TimeWindowContext
+  - Time window integration with shared TimeWindowContext — RESOLVED: PcapDownloadButton now reads tw.fromMs/tw.untilMs from useTimeWindow()
 Deferred by contract:
   - Live hardware / appliance / packet store / environment access is not part of the current frontend phase.
   - Live ExtraHop POST /api/v1/packets/search proxy not implemented.
