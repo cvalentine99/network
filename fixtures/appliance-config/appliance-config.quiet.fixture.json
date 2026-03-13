@@ -1,0 +1,5 @@
+{
+  "_fixture": "appliance-config.quiet",
+  "_description": "No appliance configuration exists in the database. The settings page shows empty form, footer shows not_configured.",
+  "config": null
+}

@@ -1,0 +1,8 @@
+{
+  "_fixture": "appliance-config.transport-error",
+  "_description": "The tRPC call to applianceConfig.get fails with a transport error. Settings page shows error state.",
+  "error": {
+    "code": "INTERNAL_SERVER_ERROR",
+    "message": "Database connection failed"
+  }
+}

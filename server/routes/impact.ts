@@ -22,6 +22,7 @@ import { resolveTimeWindow } from '../../shared/normalize';
 import type { ImpactOverviewPayload } from '../../shared/cockpit-types';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { getApplianceConfig } from '../db';
 
 const impactRouter = Router();
 
@@ -519,9 +520,48 @@ function loadApplianceStatusFixture(name: string): any | null {
  *   - In fixture mode, connectionStatus = 'not_configured'
  *   - In live mode (future), connectionStatus = 'connected' or 'error'
  */
-impactRouter.get('/appliance-status', (_req, res) => {
+impactRouter.get('/appliance-status', async (_req, res) => {
   try {
-    // In fixture mode, return the appropriate fixture
+    // Check if there's a persisted appliance config in the database (Slice 14)
+    const dbConfig = await getApplianceConfig().catch(() => null);
+
+    // If DB config exists and has a hostname, use it to determine fixture vs quiet
+    if (dbConfig && dbConfig.hostname) {
+      // Appliance is configured — determine fixture based on test result
+      const fixtureFile = dbConfig.lastTestResult === 'success'
+        ? 'appliance-status.populated.fixture.json'
+        : 'appliance-status.quiet.fixture.json';
+      const fixture = loadApplianceStatusFixture(fixtureFile);
+
+      if (fixture) {
+        const status = {
+          ...fixture.applianceStatus,
+          hostname: dbConfig.hostname.split('.')[0],
+          displayHost: dbConfig.hostname,
+          uptimeSeconds: Math.round(process.uptime()),
+          lastChecked: new Date().toISOString(),
+          connectionStatus: dbConfig.lastTestResult === 'success' ? 'connected' as const
+            : dbConfig.lastTestResult === 'failure' ? 'error' as const
+            : 'not_configured' as const,
+        };
+
+        if (dbConfig.nickname) {
+          status.displayHost = `${dbConfig.hostname} (${dbConfig.nickname})`;
+        }
+
+        const validation = ApplianceStatusSchema.safeParse(status);
+        if (!validation.success) {
+          return res.status(502).json({
+            error: 'Malformed appliance status data',
+            message: 'Appliance status data from DB config failed schema validation',
+            details: validation.error.issues,
+          });
+        }
+        return res.json({ applianceStatus: validation.data });
+      }
+    }
+
+    // In fixture mode (no DB config or no EH env vars), return the appropriate fixture
     if (isFixtureMode()) {
       // When not configured, return quiet fixture
       const fixture = loadApplianceStatusFixture('appliance-status.quiet.fixture.json');

@@ -1,0 +1,24 @@
+{
+  "_fixture": "appliance-config.test-failure",
+  "_description": "Appliance configuration exists but last connectivity test failed. Footer shows error.",
+  "config": {
+    "id": 1,
+    "hostname": "eda01.lab.local",
+    "apiKeyHint": "ExHo••••3f2a",
+    "apiKeyConfigured": true,
+    "verifySsl": false,
+    "cloudServicesEnabled": false,
+    "nickname": "Lab EDA",
+    "createdAt": "2026-03-12T17:00:00.000Z",
+    "updatedAt": "2026-03-12T17:30:00.000Z",
+    "lastTestedAt": "2026-03-12T17:30:00.000Z",
+    "lastTestResult": "failure",
+    "lastTestMessage": "Connection timed out (10s)"
+  },
+  "testResult": {
+    "success": false,
+    "message": "Connection timed out (10s)",
+    "latencyMs": 10002,
+    "testedAt": "2026-03-12T17:30:00.000Z"
+  }
+}

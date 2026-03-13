@@ -33,6 +33,7 @@ import {
   bridgeAlertApplication,
   bridgeAlertNetwork,
   schemaDriftLog,
+  applianceConfig,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -523,6 +524,98 @@ export async function getRecordsBySearch(searchId: number) {
   const db = await getDb();
   if (!db) return [];
   return db.select().from(factRecord).where(eq(factRecord.searchId, searchId));
+}
+
+/* ─────────────────────────── Appliance Configuration (Slice 14) ─────────────────────────── */
+
+/**
+ * Get the current appliance configuration (only one row expected).
+ * Returns null if no configuration exists.
+ */
+export async function getApplianceConfig() {
+  const db = await getDb();
+  if (!db) return null;
+  const [row] = await db.select().from(applianceConfig).limit(1);
+  return row ?? null;
+}
+
+/**
+ * Upsert the appliance configuration.
+ * If a row exists, update it. If not, insert a new one.
+ * Returns the saved row.
+ */
+export async function upsertApplianceConfig(input: {
+  hostname: string;
+  apiKey: string;
+  verifySsl: boolean;
+  cloudServicesEnabled: boolean;
+  nickname: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  const existing = await getApplianceConfig();
+
+  if (existing) {
+    await db
+      .update(applianceConfig)
+      .set({
+        hostname: input.hostname,
+        apiKey: input.apiKey,
+        verifySsl: input.verifySsl,
+        cloudServicesEnabled: input.cloudServicesEnabled,
+        nickname: input.nickname,
+        lastTestResult: 'untested',
+        lastTestMessage: '',
+        lastTestedAt: null,
+      })
+      .where(eq(applianceConfig.id, existing.id));
+    const [updated] = await db.select().from(applianceConfig).where(eq(applianceConfig.id, existing.id)).limit(1);
+    return updated;
+  } else {
+    await db.insert(applianceConfig).values({
+      hostname: input.hostname,
+      apiKey: input.apiKey,
+      verifySsl: input.verifySsl,
+      cloudServicesEnabled: input.cloudServicesEnabled,
+      nickname: input.nickname,
+    });
+    const [inserted] = await db.select().from(applianceConfig).orderBy(desc(applianceConfig.id)).limit(1);
+    return inserted;
+  }
+}
+
+/**
+ * Update the test result fields after a connectivity test.
+ */
+export async function updateApplianceTestResult(input: {
+  id: number;
+  lastTestResult: 'success' | 'failure';
+  lastTestMessage: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  await db
+    .update(applianceConfig)
+    .set({
+      lastTestResult: input.lastTestResult,
+      lastTestMessage: input.lastTestMessage,
+      lastTestedAt: new Date(),
+    })
+    .where(eq(applianceConfig.id, input.id));
+
+  const [updated] = await db.select().from(applianceConfig).where(eq(applianceConfig.id, input.id)).limit(1);
+  return updated;
+}
+
+/**
+ * Delete the appliance configuration (reset to unconfigured state).
+ */
+export async function deleteApplianceConfig(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  await db.delete(applianceConfig).where(eq(applianceConfig.id, id));
 }
 
 /* ─────────────────────────── Schema Health ─────────────────────────── */

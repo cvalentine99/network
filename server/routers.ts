@@ -207,6 +207,138 @@ const schemaRouter = router({
   }),
 });
 
+/* ─────────────────────────── Appliance Config (Slice 14) ─────────────────────────── */
+
+import { ApplianceConfigInputSchema, maskApiKey } from '../shared/appliance-config-validators';
+
+const applianceConfigRouter = router({
+  /** Get current appliance config (API key masked) */
+  get: publicProcedure.query(async () => {
+    const row = await db.getApplianceConfig();
+    if (!row) return null;
+    return {
+      id: row.id,
+      hostname: row.hostname,
+      apiKeyHint: maskApiKey(row.apiKey),
+      apiKeyConfigured: row.apiKey.length > 0,
+      verifySsl: row.verifySsl,
+      cloudServicesEnabled: row.cloudServicesEnabled,
+      nickname: row.nickname,
+      createdAt: row.createdAt?.toISOString() ?? new Date().toISOString(),
+      updatedAt: row.updatedAt?.toISOString() ?? new Date().toISOString(),
+      lastTestedAt: row.lastTestedAt?.toISOString() ?? null,
+      lastTestResult: row.lastTestResult,
+      lastTestMessage: row.lastTestMessage,
+    };
+  }),
+
+  /** Save (upsert) appliance config */
+  save: publicProcedure
+    .input(ApplianceConfigInputSchema)
+    .mutation(async ({ input }) => {
+      const row = await db.upsertApplianceConfig(input);
+      if (!row) throw new Error('Failed to save appliance config');
+      return {
+        id: row.id,
+        hostname: row.hostname,
+        apiKeyHint: maskApiKey(row.apiKey),
+        apiKeyConfigured: row.apiKey.length > 0,
+        verifySsl: row.verifySsl,
+        cloudServicesEnabled: row.cloudServicesEnabled,
+        nickname: row.nickname,
+        createdAt: row.createdAt?.toISOString() ?? new Date().toISOString(),
+        updatedAt: row.updatedAt?.toISOString() ?? new Date().toISOString(),
+        lastTestedAt: row.lastTestedAt?.toISOString() ?? null,
+        lastTestResult: row.lastTestResult,
+        lastTestMessage: row.lastTestMessage,
+      };
+    }),
+
+  /** Test connection to the configured appliance */
+  testConnection: publicProcedure.mutation(async () => {
+    const config = await db.getApplianceConfig();
+    if (!config) {
+      return {
+        success: false,
+        message: 'No appliance configured. Save a configuration first.',
+        latencyMs: null,
+        testedAt: new Date().toISOString(),
+      };
+    }
+
+    // In the current frontend phase, we simulate the test.
+    // Live integration will replace this with an actual HTTPS call to the ExtraHop REST API.
+    // For now, we record the test attempt in the database.
+    const testedAt = new Date().toISOString();
+
+    // Attempt a basic connectivity check using the configured hostname
+    const start = Date.now();
+    try {
+      const protocol = config.verifySsl ? 'https' : 'https';
+      const url = `${protocol}://${config.hostname}/api/v1/extrahop`;
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
+
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': `ExtraHop apikey=${config.apiKey}`,
+          'Accept': 'application/json',
+        },
+        signal: controller.signal,
+        // @ts-ignore - Node fetch supports rejectUnauthorized via agent
+      }).catch((err: Error) => {
+        clearTimeout(timeout);
+        throw err;
+      });
+
+      clearTimeout(timeout);
+      const latencyMs = Date.now() - start;
+
+      if (res.ok) {
+        await db.updateApplianceTestResult({
+          id: config.id,
+          lastTestResult: 'success',
+          lastTestMessage: `Connected successfully (${latencyMs}ms)`,
+        });
+        return {
+          success: true,
+          message: `Connected successfully (${latencyMs}ms)`,
+          latencyMs,
+          testedAt,
+        };
+      } else {
+        const msg = `HTTP ${res.status}: ${res.statusText}`;
+        await db.updateApplianceTestResult({
+          id: config.id,
+          lastTestResult: 'failure',
+          lastTestMessage: msg,
+        });
+        return { success: false, message: msg, latencyMs, testedAt };
+      }
+    } catch (err: any) {
+      const latencyMs = Date.now() - start;
+      const msg = err.name === 'AbortError'
+        ? 'Connection timed out (10s)'
+        : `Connection failed: ${err.message || 'Unknown error'}`;
+      await db.updateApplianceTestResult({
+        id: config.id,
+        lastTestResult: 'failure',
+        lastTestMessage: msg,
+      });
+      return { success: false, message: msg, latencyMs, testedAt };
+    }
+  }),
+
+  /** Delete appliance config (reset to unconfigured) */
+  delete: publicProcedure
+    .input(z.object({ id: z.number().int().positive() }))
+    .mutation(async ({ input }) => {
+      await db.deleteApplianceConfig(input.id);
+      return { success: true };
+    }),
+});
+
 /* ─────────────────────────── App Router ─────────────────────────── */
 
 export const appRouter = router({
@@ -229,6 +361,7 @@ export const appRouter = router({
   topology: topologyRouter,
   reference: referenceRouter,
   schema: schemaRouter,
+  applianceConfig: applianceConfigRouter,
 });
 
 export type AppRouter = typeof appRouter;

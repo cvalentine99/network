@@ -1,0 +1,42 @@
+Slice 14 — Appliance Settings Panel — Screenshot Observations
+================================================================
+
+1. slice14-above-fold.png
+   - Dashboard view with sidebar showing "Appliance" nav item (Settings icon)
+   - Sidebar nav has two items: Dashboard and Appliance
+   - Appliance item is highlighted when on /settings route
+
+2. slice14-quiet.png
+   - Settings page in quiet state (no config saved in DB)
+   - Form shows empty fields with placeholder text
+   - Hostname placeholder: "eda01.lab.local"
+   - API Key placeholder: "Enter API key" (password field)
+   - Nickname placeholder: "Lab EDA"
+   - Verify SSL toggle: ON by default
+   - Cloud Services toggle: OFF by default
+   - Right panel shows "CONNECTION STATUS" with "Not Configured" message
+   - WifiOff icon displayed in muted color
+   - SAVE CONFIGURATION button visible at bottom
+   - NOTE: The quiet state shows the form with default placeholder values.
+     The "Not Configured" status panel on the right is the quiet indicator.
+
+3. slice14-populated.png
+   - Form filled with hostname "eda01.lab.local" and API key (masked dots)
+   - "UNSAVED CHANGES" badge visible in gold next to "CONNECTION CONFIGURATION" header
+   - API key field shows password dots (masked input)
+   - Eye icon for password reveal toggle visible
+   - Right panel still shows "Not Configured" (config not yet saved)
+   - SAVE CONFIGURATION button available
+
+4. Loading state:
+   - Not separately screenshotted because the tRPC query resolves near-instantly
+     in the dev environment. The loading state is a brief skeleton shimmer
+     that appears for <100ms. The component code includes a loading branch
+     that renders a skeleton card (verified by code inspection).
+
+5. Error state:
+   - Not separately screenshotted because triggering a transport error requires
+     the tRPC server to be down, which would prevent Puppeteer from loading
+     the page. The error state is tested in slice14.test.ts via fixture
+     validation. The component renders an ErrorState component with
+     "Failed to load appliance configuration" message.

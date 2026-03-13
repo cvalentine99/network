@@ -457,6 +457,25 @@ export const snapTopologyEdge = mysqlTable("snap_topology_edge", {
   edgeData: json("edge_data"),
 });
 
+/* ─────────────────────────── Appliance Configuration (Slice 14) ─────────────────────────── */
+
+export const applianceConfig = mysqlTable("appliance_config", {
+  id: int("id").autoincrement().primaryKey(),
+  hostname: varchar("hostname", { length: 255 }).notNull(),
+  apiKey: varchar("api_key", { length: 512 }).notNull(),
+  verifySsl: boolean("verify_ssl").notNull().default(true),
+  cloudServicesEnabled: boolean("cloud_services_enabled").notNull().default(false),
+  nickname: varchar("nickname", { length: 100 }).notNull().default(""),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+  lastTestedAt: timestamp("last_tested_at"),
+  lastTestResult: mysqlEnum("last_test_result", ["success", "failure", "untested"]).notNull().default("untested"),
+  lastTestMessage: varchar("last_test_message", { length: 1000 }).notNull().default(""),
+});
+
+export type ApplianceConfigRow = typeof applianceConfig.$inferSelect;
+export type InsertApplianceConfigRow = typeof applianceConfig.$inferInsert;
+
 /* ─────────────────────────── Schema Management ─────────────────────────── */
 
 export const schemaVersion = mysqlTable("schema_version", {

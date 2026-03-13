@@ -7,12 +7,14 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import DashboardLayout from "./components/DashboardLayout";
 import { TimeWindowProvider } from "./providers/TimeWindowProvider";
 import Home from "./pages/Home";
+import ApplianceSettings from "./pages/ApplianceSettings";
 
 function Router() {
   return (
     <DashboardLayout>
       <Switch>
         <Route path="/" component={Home} />
+        <Route path="/settings" component={ApplianceSettings} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>

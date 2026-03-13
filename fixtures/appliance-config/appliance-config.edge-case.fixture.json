@@ -1,0 +1,18 @@
+{
+  "_fixture": "appliance-config.edge-case",
+  "_description": "Edge case: SSL verification enabled, cloud services enabled, long hostname, empty nickname, short API key hint.",
+  "config": {
+    "id": 1,
+    "hostname": "extrahop-sensor-prod-east-01.datacenter.corp.example.com",
+    "apiKeyHint": "Ab••••Zz",
+    "apiKeyConfigured": true,
+    "verifySsl": true,
+    "cloudServicesEnabled": true,
+    "nickname": "",
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-03-12T23:59:59.999Z",
+    "lastTestedAt": "2026-03-12T23:59:59.999Z",
+    "lastTestResult": "success",
+    "lastTestMessage": "Connected successfully (187ms)"
+  }
+}

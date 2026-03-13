@@ -1,0 +1,18 @@
+{
+  "_fixture": "appliance-config.malformed",
+  "_description": "The BFF returns a response that fails ApplianceConfigResponseSchema validation. Tests should reject this.",
+  "config": {
+    "id": "not-a-number",
+    "hostname": "",
+    "apiKeyHint": 12345,
+    "apiKeyConfigured": "yes",
+    "verifySsl": "true",
+    "cloudServicesEnabled": null,
+    "nickname": 42,
+    "createdAt": "not-a-date",
+    "updatedAt": null,
+    "lastTestedAt": 12345,
+    "lastTestResult": "maybe",
+    "lastTestMessage": null
+  }
+}

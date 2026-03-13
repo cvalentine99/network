@@ -16,6 +16,7 @@ import {
   LayoutDashboard,
   PanelLeft,
   Radio,
+  Settings,
 } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
@@ -23,6 +24,7 @@ import { GOLD, MUTED, BRIGHT, CYAN } from "./DashboardWidgets";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
+  { icon: Settings, label: "Appliance", path: "/settings" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";

@@ -22,3 +22,4 @@
 - [x] Slice 13 — Navigation Breadcrumb / Inspector History: back-stack tracking inspector navigation, clickable breadcrumb trail, retrace cross-entity navigation steps, types, validators, fixtures, tests, screenshots, truth receipt
 - [x] Slice 13 receipt correction: commit hash in receipt is ffba4db8, bundle summary incorrectly stated bd327a1e
 - [x] Slice 13 receipt correction: test count must distinguish 59 static it() + 6 dynamic (fixture loop) = 65 runtime executions
+- [x] Slice 14 — Appliance Settings Panel: configuration form for ExtraHop appliance connection (hostname, API key, verify toggle), validation, DB persistence, wired to footer status indicator, types, validators, fixtures, tests, screenshots, truth receipt
