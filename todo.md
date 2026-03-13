@@ -23,3 +23,4 @@
 - [x] Slice 13 receipt correction: commit hash in receipt is ffba4db8, bundle summary incorrectly stated bd327a1e
 - [x] Slice 13 receipt correction: test count must distinguish 59 static it() + 6 dynamic (fixture loop) = 65 runtime executions
 - [x] Slice 14 — Appliance Settings Panel: configuration form for ExtraHop appliance connection (hostname, API key, verify toggle), validation, DB persistence, wired to footer status indicator, types, validators, fixtures, tests, screenshots, truth receipt
+- [x] Slice 14 receipt correction: test math — 64 source-level it() call sites (61 static + 3 in for-loops), 29 dynamic expansions (7+10+12), 90 runtime total. Fixed ConnectionTestResultSchema from 4→5, Hostname regex from 21→22 (12 invalid, not 11)

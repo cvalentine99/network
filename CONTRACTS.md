@@ -1888,7 +1888,7 @@ Verdict: PASSED — 65 runtime executions (59 static it() + 6 dynamic fixture-lo
 - Route: `/settings` added to App.tsx
 - Hostname validation regex: FQDN, IPv4, short hostname; rejects leading/trailing hyphens, spaces, special chars, protocol prefixes
 - API key masking: `maskApiKey()` shows first 4 + last 4 chars with `••••` for keys >= 8 chars; `••••` for shorter keys
-- 7 deterministic fixtures, 90 runtime test executions (58 static it() + 32 dynamic from 4 for-loops), 12 describe groups
+- 7 deterministic fixtures, 90 runtime test executions (61 static it() + 29 dynamic from 3 for-loops), 12 describe groups
 - 3 Puppeteer-captured screenshots + observations text file
 
 ### OUT OF SCOPE
@@ -1953,17 +1953,17 @@ Verdict: PASSED — 65 runtime executions (59 static it() + 6 dynamic fixture-lo
 | Fixture files exist | 7 (dynamic) | All 7 fixture files exist on disk |
 | ApplianceConfigInputSchema | 13 | Valid/invalid hostname, apiKey, defaults, length limits |
 | ApplianceConfigResponseSchema | 10 | Fixture validation, null rejection, missing fields, invalid enum, id bounds |
-| ConnectionTestResultSchema | 4 | Success/failure fixtures, nullable latencyMs, missing fields |
+| ConnectionTestResultSchema | 5 | Success/failure fixtures, nullable latencyMs, rejects missing success, rejects missing testedAt |
 | maskApiKey | 7 | Normal, 8-char, 7-char, empty, single-char, 9-char, 512-char |
-| Hostname regex edge cases | 21 (10 valid + 11 invalid, dynamic) | FQDN, IPv4, short, leading/trailing hyphen, spaces, special chars, protocol prefix |
+| Hostname regex edge cases | 22 (10 valid + 12 invalid, dynamic) | FQDN, IPv4, short, leading/trailing hyphen, spaces, special chars, protocol prefix |
 | Quiet fixture structure | 3 | Null config, _fixture metadata, _description |
 | Transport error fixture structure | 2 | Error object present, no config |
 | Malformed data rejection | 4 | Schema failure, 3+ validation errors, type checks |
 | Edge case fixture | 5 | Long hostname, SSL on, cloud on, empty nickname, schema pass |
 | Cross-fixture consistency | 8 | Shared hostname, testResult/lastTestResult alignment, untested state |
-| Input to Response mapping contract | 4 (1 dynamic over 4 fixtures) | No raw apiKey, masked hint, boolean apiKeyConfigured, ISO timestamps |
+| Input to Response mapping contract | 4 | No raw apiKey, masked hint, boolean apiKeyConfigured, ISO timestamps (4th test iterates 4 fixtures internally via for-loop inside it body) |
 
-**Total: 12 describe groups, 58 static it() + 32 dynamic (4 for-loops: 7 + 10 + 11 + 4) = 90 runtime executions**
+**Total: 12 describe groups, 64 source-level it() call sites. 61 static + 3 inside for-loops. Dynamic expansions: 7 (FIXTURE_FILES) + 10 (validHostnames) + 12 (invalidHostnames) = 29. Runtime total: 61 + 29 = 90 executions. Note: line 588 it() contains a for-loop inside its body (4 fixture iterations) but registers as 1 runtime test, not 4.**
 
 ### SCREENSHOTS
 
@@ -2006,7 +2006,7 @@ Claims:
   - Sidebar nav includes Appliance item linking to /settings
   - Hostname validation: FQDN, IPv4, short hostname; rejects invalid patterns
   - 7 deterministic fixtures covering quiet, populated, test-success, test-failure, transport-error, malformed, edge-case
-  - 90 runtime test executions (58 static it() + 32 dynamic from 4 for-loops) across 12 describe groups
+  - 90 runtime test executions (64 source-level it() call sites: 61 static + 29 dynamic from 3 for-loops) across 12 describe groups
   - 3 Puppeteer-captured screenshots (above-fold, quiet, populated)
   - No ExtraHop direct access from browser (Slice 00 invariant preserved)
 Evidence:
