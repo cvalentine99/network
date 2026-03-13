@@ -1,0 +1,14 @@
+{
+  "description": "Malformed detection detail — schema-violating data to test validation rejection.",
+  "detectionDetail": {
+    "detection": {
+      "id": "not-a-number",
+      "title": 12345,
+      "riskScore": -5
+    },
+    "relatedDevices": "should-be-array",
+    "relatedAlerts": null,
+    "notes": [{ "missing": "required fields" }],
+    "timeline": "not-an-array"
+  }
+}

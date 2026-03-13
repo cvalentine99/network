@@ -348,6 +348,72 @@ export interface PcapMetadata {
   packetStoreId: number | null;
 }
 
+// ─── Detection Detail (Slice 11) ────────────────────────────────────────
+/**
+ * A timestamped investigation note attached to a detection.
+ */
+export interface DetectionNote {
+  timestamp: IsoString;
+  author: string;
+  text: string;
+}
+
+/**
+ * A lifecycle event in the detection timeline.
+ */
+export interface DetectionTimelineEvent {
+  timestamp: IsoString;
+  event: 'created' | 'updated' | 'assigned' | 'status_changed' | 'resolved' | 'reopened';
+  detail: string;
+}
+
+/**
+ * Full detection detail for the inspector pane.
+ * Extends the compact DetectionPreview (Slice 08) with:
+ *   - Related devices (participants resolved to DeviceIdentity)
+ *   - Related alerts (alerts on same devices during detection window)
+ *   - Investigation notes
+ *   - Detection lifecycle timeline
+ *
+ * This is the BFF response shape for GET /api/bff/impact/detection-detail?id=<detectionId>
+ */
+export interface DetectionDetail {
+  detection: NormalizedDetection;
+  relatedDevices: DeviceIdentity[];
+  relatedAlerts: NormalizedAlert[];
+  notes: DetectionNote[];
+  timeline: DetectionTimelineEvent[];
+}
+
+// ─── Alert Detail (Slice 11) ────────────────────────────────────────────
+/**
+ * A single trigger event in the alert's recent history.
+ */
+export interface AlertTriggerEvent {
+  timestamp: IsoString;
+  deviceId: number;
+  deviceName: string;
+  value: number;
+  threshold: number | string;
+  exceeded: boolean;
+}
+
+/**
+ * Full alert detail for the inspector pane.
+ * Extends the compact AlertPreview (Slice 08) with:
+ *   - Trigger history (recent trigger events)
+ *   - Associated devices (devices that triggered this alert)
+ *   - Associated detections (detections on the same devices)
+ *
+ * This is the BFF response shape for GET /api/bff/impact/alert-detail?id=<alertId>
+ */
+export interface AlertDetail {
+  alert: NormalizedAlert;
+  triggerHistory: AlertTriggerEvent[];
+  associatedDevices: DeviceIdentity[];
+  associatedDetections: NormalizedDetection[];
+}
+
 // ─── BFF Health Response ──────────────────────────────────────────────────
 export interface BffHealthResponse {
   status: 'ok' | 'degraded' | 'not_configured';

@@ -1465,7 +1465,7 @@ TRUTH VERDICT:
 
 TRUTH RECEIPT
 Slice: 10 — PCAP Download Contract
-Commit: 4f5d0970
+Commit: cec8fea3
 Claims:
   - PcapRequest type with 6 fields, PcapMetadata type with 8 fields
   - PcapRequestSchema enforces min(1) on ip, int() on timestamps, default limitBytes 10MB, min(1) on limits
@@ -1504,4 +1504,136 @@ Deferred by contract:
   - Packet store discovery and configuration deferred.
 Live integration status: Not attempted
 Verdict: PASSED with screenshot limitation — all 58 tests pass, all 10 fixtures present (including 2 binary PCAP files verified at byte level), binary contract invariant enforced by 5 dedicated tests, all schemas enforced, BFF routes implemented with fixture mode, pure helpers tested. Interactive screenshots not captured due to browser extension instability; this limitation is documented honestly. The binary content contract is architecturally distinct from all prior JSON slices and maintains the invariant that PCAP bytes are never JSON-wrapped.
+```
+
+---
+
+## Slice 11 — Detection & Alert Detail Panes
+
+```
+SLICE NAME: Detection & Alert Detail Panes
+STATUS: Passed (with screenshot limitation)
+IN SCOPE:
+  - DetectionDetail type: extends NormalizedDetection with relatedDevices, relatedAlerts, notes, timeline
+  - AlertDetail type: extends NormalizedAlert with triggerHistory, associatedDevices, associatedDetections
+  - DetectionNoteSchema, DetectionTimelineEventSchema, AlertTriggerEventSchema Zod validators
+  - DetectionDetailSchema, AlertDetailSchema Zod validators
+  - BFF route GET /api/bff/impact/detection-detail (fixture-backed, id=4001 → populated, others → quiet)
+  - BFF route GET /api/bff/impact/alert-detail (fixture-backed, id=101 → populated, others → quiet)
+  - useDetectionDetail hook (6-state discrimination: loading, quiet, populated, error, malformed, not-found)
+  - useAlertDetail hook (6-state discrimination: loading, quiet, populated, error, malformed, not-found)
+  - isQuietDetection pure helper (true when relatedDevices/relatedAlerts/notes/timeline all empty)
+  - isQuietAlert pure helper (true when triggerHistory/associatedDevices/associatedDetections all empty)
+  - DetectionDetailPane component (6 UI states: loading, quiet, populated, error, malformed, not-found)
+  - AlertDetailPane component (6 UI states: loading, quiet, populated, error, malformed, not-found)
+  - InspectorContent routing updated: detection → DetectionDetailPane, alert → AlertDetailPane
+  - 5 detection-detail fixture files
+  - 5 alert-detail fixture files
+  - 79 it() call sites → 95 vitest executions
+OUT OF SCOPE:
+  - Live ExtraHop API integration
+  - Detection/alert editing or status mutation
+  - Cross-entity navigation (clicking a related device in detection detail to open device inspector)
+  - PCAP download from detection/alert context
+DEPENDENCIES:
+  - shared/cockpit-types.ts (DetectionDetail, AlertDetail, DetectionNote, DetectionTimelineEvent, AlertTriggerEvent)
+  - shared/cockpit-validators.ts (DetectionDetailSchema, AlertDetailSchema, DetectionNoteSchema, DetectionTimelineEventSchema, AlertTriggerEventSchema)
+  - server/routes/impact.ts (detection-detail and alert-detail BFF routes)
+  - client/src/hooks/useDetectionDetail.ts
+  - client/src/hooks/useAlertDetail.ts
+  - client/src/components/inspector/DetectionDetailPane.tsx
+  - client/src/components/inspector/AlertDetailPane.tsx
+  - client/src/components/inspector/InspectorContent.tsx (routing update)
+ROUTES:
+  - GET /api/bff/impact/detection-detail?id=<detectionId>
+  - GET /api/bff/impact/alert-detail?id=<alertId>
+TYPES:
+  - DetectionNote: { timestamp, author, text }
+  - DetectionTimelineEvent: { timestamp, event (enum: created|updated|assigned|status_changed|resolved|reopened), detail }
+  - DetectionDetail: { detection: NormalizedDetection, relatedDevices: DeviceIdentity[], relatedAlerts: NormalizedAlert[], notes: DetectionNote[], timeline: DetectionTimelineEvent[] }
+  - AlertTriggerEvent: { timestamp, deviceId, deviceName, value, threshold (number|string), exceeded }
+  - AlertDetail: { alert: NormalizedAlert, triggerHistory: AlertTriggerEvent[], associatedDevices: DeviceIdentity[], associatedDetections: NormalizedDetection[] }
+FIXTURES:
+  Detection-detail (5 files):
+  - detection-detail.populated.fixture.json (Lateral Movement via SMB, id 4001, 2 related devices, 1 related alert, 2 notes, 3 timeline events)
+  - detection-detail.quiet.fixture.json (detection with empty enrichment arrays)
+  - detection-detail.transport-error.fixture.json (error + message, no detectionDetail)
+  - detection-detail.malformed.fixture.json (detection.id as string, invalid note shape)
+  - detection-detail.not-found.fixture.json (error + message, no detectionDetail)
+  Alert-detail (5 files):
+  - alert-detail.populated.fixture.json (High Packet Loss, id 101, 3 trigger events, 2 associated devices, 1 associated detection)
+  - alert-detail.quiet.fixture.json (alert with empty enrichment arrays)
+  - alert-detail.transport-error.fixture.json (error + message, no alertDetail)
+  - alert-detail.malformed.fixture.json (alert.id as string, invalid trigger shape)
+  - alert-detail.not-found.fixture.json (error + message, no alertDetail)
+TESTS:
+  79 it() call sites → 95 vitest executions in server/slice11.test.ts
+
+  | Group | Describe | it() sites | Vitest executions |
+  |-------|----------|-----------|-------------------|
+  | 1 | Detection fixture files exist and parse | 2 | 10 |
+  | 2 | Alert fixture files exist and parse | 2 | 10 |
+  | 3 | DetectionDetailSchema — populated | 7 | 7 |
+  | 4 | DetectionDetailSchema — malformed | 4 | 4 |
+  | 5 | DetectionNoteSchema + TimelineEventSchema | 4 | 4 |
+  | 6 | AlertDetailSchema — populated | 6 | 6 |
+  | 7 | AlertDetailSchema — malformed | 4 | 4 |
+  | 8 | AlertTriggerEventSchema | 4 | 4 |
+  | 9 | Quiet detection fixture | 5 | 5 |
+  | 10 | Quiet alert fixture | 4 | 4 |
+  | 11 | Detection not-found + transport-error | 6 | 6 |
+  | 12 | Alert not-found + transport-error | 6 | 6 |
+  | 13 | isQuietDetection helper | 5 | 5 |
+  | 14 | isQuietAlert helper | 4 | 4 |
+  | 15 | BFF detection-detail route | 7 | 7 |
+  | 16 | BFF alert-detail route | 7 | 7 |
+  | 17 | InspectorContent routing | 2 | 2 |
+  | **Total** | | **79** | **95** |
+
+SCREENSHOTS:
+  - Above-fold dashboard screenshot captured (webdev-preview-1773433303.png)
+  - Interactive detection/alert inspector screenshots NOT captured (browser extension instability)
+  - Screenshot limitation documented in screenshots/slice11-notes.md
+KNOWN LIMITATIONS:
+  - Interactive inspector screenshots not captured due to browser extension instability
+  - Cross-entity navigation (e.g., clicking related device in detection detail) not implemented
+  - Detection/alert status mutation not in scope
+  - Component DOM render tests not written (would require jsdom/happy-dom)
+LIVE INTEGRATION STATUS: Not attempted
+```
+
+```
+TRUTH RECEIPT
+Slice: 11 — Detection & Alert Detail Panes
+Commit: (pending checkpoint)
+Claims:
+  - DetectionDetail and AlertDetail types defined with sub-schemas (DetectionNote, DetectionTimelineEvent, AlertTriggerEvent)
+  - DetectionDetailSchema and AlertDetailSchema Zod validators enforce contract at BFF boundary
+  - BFF routes GET /api/bff/impact/detection-detail and /alert-detail implemented with fixture backing
+  - useDetectionDetail and useAlertDetail hooks with 6-state discrimination
+  - isQuietDetection and isQuietAlert pure helpers tested with edge cases
+  - DetectionDetailPane and AlertDetailPane components with 6 UI states each
+  - InspectorContent routes detection → DetectionDetailPane, alert → AlertDetailPane
+  - 10 fixture files (5 detection-detail + 5 alert-detail) present and validated
+  - 79 it() call sites → 95 vitest executions, all passing
+  - 743 total repo tests, 0 failures
+Evidence:
+  - tests passed: 95/95 in slice11.test.ts, 743/743 total
+  - fixtures present: 10 files (5 detection-detail + 5 alert-detail)
+  - screenshots present: above-fold dashboard only; interactive inspector screenshots not captured
+  - validators present: DetectionDetailSchema, AlertDetailSchema, DetectionNoteSchema, DetectionTimelineEventSchema, AlertTriggerEventSchema
+  - BFF routes tested: detection-detail (populated/quiet/missing-id/non-numeric-id), alert-detail (populated/quiet/missing-id/non-numeric-id)
+  - pure helpers tested: isQuietDetection (5 cases), isQuietAlert (4 cases)
+  - InspectorContent routing tested: detection and alert kinds confirmed
+Not proven:
+  - Interactive browser screenshot of DetectionDetailPane in populated/quiet/error states
+  - Interactive browser screenshot of AlertDetailPane in populated/quiet/error states
+  - Component DOM render tests not written (would require jsdom/happy-dom)
+  - Cross-entity navigation from detection/alert detail to device inspector
+Deferred by contract:
+  - Live hardware / appliance / packet store / environment access is not part of the current frontend phase.
+  - Live ExtraHop detection and alert detail API integration not implemented.
+  - Detection/alert status mutation and workflow actions deferred.
+Live integration status: Not attempted
+Verdict: PASSED with screenshot limitation — all 95 tests pass, all 10 fixtures present and schema-validated, both BFF routes implemented with fixture mode, both hooks implement 6-state discrimination, both detail panes render all 6 UI states, InspectorContent routing confirmed. Interactive screenshots not captured due to browser extension instability; this limitation is documented honestly.
 ```

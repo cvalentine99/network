@@ -1,0 +1,163 @@
+{
+  "description": "Populated detection detail — Lateral Movement via SMB (id 4001) with related devices, related alerts, investigation notes, and lifecycle timeline.",
+  "detectionDetail": {
+    "detection": {
+      "id": 4001,
+      "title": "Lateral Movement via SMB",
+      "type": "lateral_movement",
+      "displayName": "Lateral Movement via SMB",
+      "categories": ["sec.lateral"],
+      "participants": [
+        { "object_type": "device", "object_id": 101, "role": "offender" },
+        { "object_type": "device", "object_id": 205, "role": "victim" }
+      ],
+      "riskScore": 92,
+      "startTime": 1710200000000,
+      "startTimeIso": "2024-03-11T22:13:20.000Z",
+      "endTime": 1710203600000,
+      "endTimeIso": "2024-03-11T23:13:20.000Z",
+      "createTime": 1710200100000,
+      "createTimeIso": "2024-03-11T22:15:00.000Z",
+      "status": "new",
+      "resolution": null,
+      "assignee": null,
+      "ticketId": null,
+      "mitreTactics": ["Lateral Movement"],
+      "mitreTechniques": ["T1021.002"],
+      "isUserCreated": false,
+      "properties": {},
+      "url": null
+    },
+    "relatedDevices": [
+      {
+        "id": 101,
+        "displayName": "dc01.lab.local",
+        "extrahopId": "eh-device-101",
+        "discoveryId": "disc-101",
+        "ipaddr4": "10.1.0.10",
+        "ipaddr6": null,
+        "macaddr": "00:50:56:A1:B2:C3",
+        "deviceClass": "node",
+        "role": "domain_controller",
+        "autoRole": "domain_controller",
+        "vendor": "VMware",
+        "isL3": true,
+        "vlanid": 100,
+        "parentId": null,
+        "nodeId": null,
+        "analysis": "advanced",
+        "analysisLevel": 2,
+        "lastSeenTime": 1710203600000,
+        "lastSeenIso": "2024-03-11T23:13:20.000Z",
+        "modTime": 1710200000000,
+        "discoverTime": 1700000000000,
+        "discoverTimeIso": "2023-11-14T22:13:20.000Z",
+        "onWatchlist": true,
+        "critical": true,
+        "customCriticality": null,
+        "isCustomDevice": false,
+        "customType": null,
+        "userModTime": null,
+        "description": "Primary domain controller",
+        "cdp_name": null,
+        "dhcp_name": null,
+        "dns_name": "dc01.lab.local",
+        "netbios_name": "DC01",
+        "custom_name": null,
+        "default_name": "DC01",
+        "model": null,
+        "modelOverride": null,
+        "software": "Windows Server 2022"
+      },
+      {
+        "id": 205,
+        "displayName": "ws-finance-02",
+        "extrahopId": "eh-device-205",
+        "discoveryId": "disc-205",
+        "ipaddr4": "10.1.2.55",
+        "ipaddr6": null,
+        "macaddr": "00:50:56:D4:E5:F6",
+        "deviceClass": "node",
+        "role": "workstation",
+        "autoRole": "workstation",
+        "vendor": "Dell",
+        "isL3": true,
+        "vlanid": 200,
+        "parentId": null,
+        "nodeId": null,
+        "analysis": "standard",
+        "analysisLevel": 1,
+        "lastSeenTime": 1710203600000,
+        "lastSeenIso": "2024-03-11T23:13:20.000Z",
+        "modTime": 1710200000000,
+        "discoverTime": 1705000000000,
+        "discoverTimeIso": "2024-01-11T22:26:40.000Z",
+        "onWatchlist": false,
+        "critical": false,
+        "customCriticality": null,
+        "isCustomDevice": false,
+        "customType": null,
+        "userModTime": null,
+        "description": "Finance workstation",
+        "cdp_name": null,
+        "dhcp_name": "ws-finance-02",
+        "dns_name": "ws-finance-02.lab.local",
+        "netbios_name": "WS-FINANCE-02",
+        "custom_name": null,
+        "default_name": "ws-finance-02",
+        "model": "OptiPlex 7090",
+        "modelOverride": null,
+        "software": "Windows 11 Enterprise"
+      }
+    ],
+    "relatedAlerts": [
+      {
+        "id": 101,
+        "name": "High Packet Loss Detected",
+        "author": "ExtraHop",
+        "statName": "extrahop.device.net",
+        "fieldName": "pkts_dropped",
+        "fieldOp": null,
+        "fieldName2": null,
+        "operator": ">",
+        "operand": 500,
+        "severity": 0,
+        "severityLabel": "critical",
+        "type": "threshold",
+        "disabled": false,
+        "description": "Triggers when packet drops exceed 500 per interval on any device.",
+        "intervalLength": 30,
+        "refireInterval": 300
+      }
+    ],
+    "notes": [
+      {
+        "timestamp": "2024-03-11T22:20:00.000Z",
+        "author": "system",
+        "text": "Detection auto-created from ExtraHop Reveal(x) analysis."
+      },
+      {
+        "timestamp": "2024-03-11T22:35:00.000Z",
+        "author": "chase",
+        "text": "Investigating SMB lateral movement from dc01 to ws-finance-02. Checking for credential reuse."
+      }
+    ],
+    "timeline": [
+      {
+        "timestamp": "2024-03-11T22:15:00.000Z",
+        "event": "created",
+        "detail": "Detection created by ExtraHop analysis engine."
+      },
+      {
+        "timestamp": "2024-03-11T22:20:00.000Z",
+        "event": "updated",
+        "detail": "Risk score updated from 85 to 92 based on participant analysis."
+      },
+      {
+        "timestamp": "2024-03-11T22:35:00.000Z",
+        "event": "assigned",
+        "detail": "Auto-assigned to chase based on detection routing rules."
+      }
+    ]
+  }
+}

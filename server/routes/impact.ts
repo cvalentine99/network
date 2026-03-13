@@ -16,7 +16,7 @@
  *   5. Returning proper error shapes for transport failures and malformed data
  */
 import { Router } from 'express';
-import { TimeWindowQuerySchema, ImpactHeadlineSchema, SeriesPointSchema, TopTalkerRowSchema, NormalizedDetectionSchema, NormalizedAlertSchema, ApplianceStatusSchema, DeviceDetailSchema } from '../../shared/cockpit-validators';
+import { TimeWindowQuerySchema, ImpactHeadlineSchema, SeriesPointSchema, TopTalkerRowSchema, NormalizedDetectionSchema, NormalizedAlertSchema, ApplianceStatusSchema, DeviceDetailSchema, DetectionDetailSchema, AlertDetailSchema } from '../../shared/cockpit-validators';
 import { z } from 'zod';
 import { resolveTimeWindow } from '../../shared/normalize';
 import type { ImpactOverviewPayload } from '../../shared/cockpit-types';
@@ -664,6 +664,188 @@ impactRouter.get('/device-detail', (req, res) => {
   } catch (err: any) {
     return res.status(500).json({
       error: 'Device detail fetch failed',
+      message: err.message || 'Unknown error',
+    });
+  }
+});
+
+/**
+ * Load a fixture file from the fixtures/detection-detail directory.
+ * Returns null if the file cannot be read or parsed.
+ */
+function loadDetectionDetailFixture(name: string): any | null {
+  try {
+    const fixturePath = join(process.cwd(), 'fixtures', 'detection-detail', name);
+    const raw = readFileSync(fixturePath, 'utf-8');
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * GET /api/bff/impact/detection-detail
+ *
+ * Query params: id (required, detection ID)
+ *
+ * Response shape on success:
+ *   { detectionDetail: DetectionDetail }
+ *
+ * Response shape on not found:
+ *   { error: string, message: string } (404)
+ *
+ * Response shape on error:
+ *   { error: string, message: string } (500/502)
+ *
+ * Fixture backing: loads from fixtures/detection-detail/detection-detail.populated.fixture.json
+ * In fixture mode, only detection id 4001 returns populated data; all others return quiet.
+ *
+ * Contract:
+ *   - Accepts detection ID as query param
+ *   - Returns full DetectionDetail validated via DetectionDetailSchema
+ *   - Browser calls this route, never ExtraHop directly
+ *   - Empty relatedDevices/relatedAlerts/notes/timeline arrays are valid (quiet detection)
+ */
+impactRouter.get('/detection-detail', (req, res) => {
+  try {
+    // 1. Validate detection ID
+    const idParam = req.query.id;
+    if (!idParam || isNaN(Number(idParam))) {
+      return res.status(400).json({
+        error: 'Invalid detection ID',
+        message: 'Query param "id" must be a numeric detection ID',
+      });
+    }
+
+    const detectionId = Number(idParam);
+
+    // 2. In fixture mode, return fixture data
+    if (isFixtureMode()) {
+      // Only detection 4001 has a populated fixture; others get quiet
+      const fixtureName = detectionId === 4001
+        ? 'detection-detail.populated.fixture.json'
+        : 'detection-detail.quiet.fixture.json';
+
+      const fixture = loadDetectionDetailFixture(fixtureName);
+      if (!fixture) {
+        return res.status(500).json({
+          error: 'Fixture load failed',
+          message: `Could not load fixture: ${fixtureName}`,
+        });
+      }
+
+      // Validate before sending
+      const validation = DetectionDetailSchema.safeParse(fixture.detectionDetail);
+      if (!validation.success) {
+        return res.status(502).json({
+          error: 'Malformed detection detail data',
+          message: 'Detection detail data from source failed schema validation',
+          details: validation.error.issues,
+        });
+      }
+
+      return res.json({ detectionDetail: validation.data });
+    }
+
+    // 3. Live mode — placeholder for future ExtraHop integration
+    return res.status(404).json({
+      error: 'Detection not found',
+      message: `No detection with id ${detectionId} exists (live mode not yet integrated)`,
+    });
+  } catch (err: any) {
+    return res.status(500).json({
+      error: 'Detection detail fetch failed',
+      message: err.message || 'Unknown error',
+    });
+  }
+});
+
+/**
+ * Load a fixture file from the fixtures/alert-detail directory.
+ * Returns null if the file cannot be read or parsed.
+ */
+function loadAlertDetailFixture(name: string): any | null {
+  try {
+    const fixturePath = join(process.cwd(), 'fixtures', 'alert-detail', name);
+    const raw = readFileSync(fixturePath, 'utf-8');
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * GET /api/bff/impact/alert-detail
+ *
+ * Query params: id (required, alert ID)
+ *
+ * Response shape on success:
+ *   { alertDetail: AlertDetail }
+ *
+ * Response shape on not found:
+ *   { error: string, message: string } (404)
+ *
+ * Response shape on error:
+ *   { error: string, message: string } (500/502)
+ *
+ * Fixture backing: loads from fixtures/alert-detail/alert-detail.populated.fixture.json
+ * In fixture mode, only alert id 101 returns populated data; all others return quiet.
+ *
+ * Contract:
+ *   - Accepts alert ID as query param
+ *   - Returns full AlertDetail validated via AlertDetailSchema
+ *   - Browser calls this route, never ExtraHop directly
+ *   - Empty triggerHistory/associatedDevices/associatedDetections arrays are valid (quiet alert)
+ */
+impactRouter.get('/alert-detail', (req, res) => {
+  try {
+    // 1. Validate alert ID
+    const idParam = req.query.id;
+    if (!idParam || isNaN(Number(idParam))) {
+      return res.status(400).json({
+        error: 'Invalid alert ID',
+        message: 'Query param "id" must be a numeric alert ID',
+      });
+    }
+
+    const alertId = Number(idParam);
+
+    // 2. In fixture mode, return fixture data
+    if (isFixtureMode()) {
+      // Only alert 101 has a populated fixture; others get quiet
+      const fixtureName = alertId === 101
+        ? 'alert-detail.populated.fixture.json'
+        : 'alert-detail.quiet.fixture.json';
+
+      const fixture = loadAlertDetailFixture(fixtureName);
+      if (!fixture) {
+        return res.status(500).json({
+          error: 'Fixture load failed',
+          message: `Could not load fixture: ${fixtureName}`,
+        });
+      }
+
+      // Validate before sending
+      const validation = AlertDetailSchema.safeParse(fixture.alertDetail);
+      if (!validation.success) {
+        return res.status(502).json({
+          error: 'Malformed alert detail data',
+          message: 'Alert detail data from source failed schema validation',
+          details: validation.error.issues,
+        });
+      }
+
+      return res.json({ alertDetail: validation.data });
+    }
+
+    // 3. Live mode — placeholder for future ExtraHop integration
+    return res.status(404).json({
+      error: 'Alert not found',
+      message: `No alert with id ${alertId} exists (live mode not yet integrated)`,
+    });
+  } catch (err: any) {
+    return res.status(500).json({
+      error: 'Alert detail fetch failed',
       message: err.message || 'Unknown error',
     });
   }

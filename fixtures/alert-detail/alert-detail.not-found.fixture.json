@@ -1,0 +1,5 @@
+{
+  "description": "Not-found fixture — alert ID does not exist.",
+  "error": "Alert not found",
+  "message": "No alert with id 99999 exists"
+}

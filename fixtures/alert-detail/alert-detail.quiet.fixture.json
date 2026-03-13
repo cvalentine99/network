@@ -1,0 +1,26 @@
+{
+  "description": "Quiet alert detail — alert exists but has no trigger history, associated devices, or associated detections.",
+  "alertDetail": {
+    "alert": {
+      "id": 106,
+      "name": "Low Traffic Warning",
+      "author": "admin",
+      "statName": "extrahop.device.net",
+      "fieldName": "bytes_in",
+      "fieldOp": null,
+      "fieldName2": null,
+      "operator": "<",
+      "operand": 1024,
+      "severity": 7,
+      "severityLabel": "low",
+      "type": "threshold",
+      "disabled": false,
+      "description": "Fires when inbound traffic drops below 1 KB per interval.",
+      "intervalLength": 300,
+      "refireInterval": 1800
+    },
+    "triggerHistory": [],
+    "associatedDevices": [],
+    "associatedDetections": []
+  }
+}

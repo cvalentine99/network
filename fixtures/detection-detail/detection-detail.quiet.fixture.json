@@ -1,0 +1,35 @@
+{
+  "description": "Quiet detection detail — detection exists but has no related devices, alerts, notes, or timeline events.",
+  "detectionDetail": {
+    "detection": {
+      "id": 4006,
+      "title": "DHCP Lease Renewal Spike",
+      "type": "dhcp_anomaly",
+      "displayName": "DHCP Lease Renewal Spike",
+      "categories": ["perf.network"],
+      "participants": [
+        { "object_type": "device", "object_id": 120, "role": "offender" }
+      ],
+      "riskScore": 15,
+      "startTime": 1710182000000,
+      "startTimeIso": "2024-03-11T17:13:20.000Z",
+      "endTime": 1710185600000,
+      "endTimeIso": "2024-03-11T18:13:20.000Z",
+      "createTime": 1710182100000,
+      "createTimeIso": "2024-03-11T17:15:00.000Z",
+      "status": "closed",
+      "resolution": "no_action",
+      "assignee": null,
+      "ticketId": null,
+      "mitreTactics": [],
+      "mitreTechniques": [],
+      "isUserCreated": false,
+      "properties": {},
+      "url": null
+    },
+    "relatedDevices": [],
+    "relatedAlerts": [],
+    "notes": [],
+    "timeline": []
+  }
+}

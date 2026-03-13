@@ -245,6 +245,44 @@ export const PcapMetadataSchema = z.object({
   packetStoreId: z.number().int().nullable(),
 });
 
+// ─── Detection Detail (Slice 11) ────────────────────────────────────────
+export const DetectionNoteSchema = z.object({
+  timestamp: z.string(),
+  author: z.string(),
+  text: z.string(),
+});
+
+export const DetectionTimelineEventSchema = z.object({
+  timestamp: z.string(),
+  event: z.enum(['created', 'updated', 'assigned', 'status_changed', 'resolved', 'reopened']),
+  detail: z.string(),
+});
+
+export const DetectionDetailSchema = z.object({
+  detection: NormalizedDetectionSchema,
+  relatedDevices: z.array(DeviceIdentitySchema),
+  relatedAlerts: z.array(NormalizedAlertSchema),
+  notes: z.array(DetectionNoteSchema),
+  timeline: z.array(DetectionTimelineEventSchema),
+});
+
+// ─── Alert Detail (Slice 11) ────────────────────────────────────────────
+export const AlertTriggerEventSchema = z.object({
+  timestamp: z.string(),
+  deviceId: z.number(),
+  deviceName: z.string(),
+  value: z.number(),
+  threshold: z.union([z.number(), z.string()]),
+  exceeded: z.boolean(),
+});
+
+export const AlertDetailSchema = z.object({
+  alert: NormalizedAlertSchema,
+  triggerHistory: z.array(AlertTriggerEventSchema),
+  associatedDevices: z.array(DeviceIdentitySchema),
+  associatedDetections: z.array(NormalizedDetectionSchema),
+});
+
 // ─── Impact Overview Payload (full) ───────────────────────────────────────
 export const ImpactOverviewPayloadSchema = z.object({
   headline: ImpactHeadlineSchema,
