@@ -1995,7 +1995,7 @@ Deferred by contract: live hardware / appliance / packet store / environment acc
 ```
 TRUTH RECEIPT
 Slice: 14 — Appliance Settings Panel
-Commit: PENDING
+Commit: 4a82bc8e
 Claims:
   - appliance_config table created in database
   - ApplianceConfigInput/Response/ConnectionTestResult types defined with Zod validators
