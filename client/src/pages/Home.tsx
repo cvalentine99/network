@@ -1,5 +1,5 @@
 /**
- * Impact Deck — Landing page (Slice 00-06)
+ * Impact Deck — Landing page (Slice 00-07)
  *
  * CONTRACT:
  * - Global time window is wired and readable
@@ -9,6 +9,7 @@
  * - TopTalkersTable fetches from /api/bff/impact/top-talkers (never ExtraHop directly)
  * - DetectionsTable fetches from /api/bff/impact/detections (never ExtraHop directly)
  * - AlertsPanel fetches from /api/bff/impact/alerts (never ExtraHop directly)
+ * - ApplianceFooter fetches from /api/bff/impact/appliance-status (never ExtraHop directly)
  * - All 5 UI states are reachable per panel: loading, quiet, populated, error, malformed
  * - No direct ExtraHop calls from this component
  */
@@ -21,12 +22,14 @@ import { GhostedTimeline } from '@/components/charts/GhostedTimeline';
 import { TopTalkersTable } from '@/components/tables/TopTalkersTable';
 import { DetectionsTable } from '@/components/tables/DetectionsTable';
 import { AlertsPanel } from '@/components/tables/AlertsPanel';
+import { ApplianceFooter } from '@/components/impact/ApplianceFooter';
 import { useTimeWindow } from '@/lib/useTimeWindow';
 import { useImpactHeadline } from '@/hooks/useImpactHeadline';
 import { useImpactTimeseries } from '@/hooks/useImpactTimeseries';
 import { useTopTalkers } from '@/hooks/useTopTalkers';
 import { useDetections } from '@/hooks/useDetections';
 import { useAlerts } from '@/hooks/useAlerts';
+import { useApplianceStatus } from '@/hooks/useApplianceStatus';
 import { PanelRightOpen } from 'lucide-react';
 
 export default function Home() {
@@ -37,6 +40,7 @@ export default function Home() {
   const topTalkersState = useTopTalkers();
   const detectionsState = useDetections();
   const alertsState = useAlerts();
+  const applianceState = useApplianceStatus();
 
   // Detection count badge color
   const detectionCount = detectionsState.kind === 'populated' ? detectionsState.detections.length : 0;
@@ -128,18 +132,9 @@ export default function Home() {
         <AlertsPanel state={alertsState} />
       </div>
 
-      {/* Dashboard content area — placeholder for future slices */}
-      <div
-        className="rounded-xl p-8 flex items-center justify-center"
-        style={{
-          minHeight: 200,
-          background: 'oklch(0.08 0.005 260 / 50%)',
-          border: '1px solid oklch(1 0 0 / 6%)',
-        }}
-      >
-        <p className="text-xs" style={{ color: MUTED }}>
-          Additional Impact Deck panels will be built in subsequent slices
-        </p>
+      {/* Appliance Status Footer — Slice 07 */}
+      <div className="mb-6">
+        <ApplianceFooter state={applianceState} />
       </div>
 
       {/* Inspector shell */}

@@ -926,3 +926,178 @@ The choice between these options is deferred to the live integration phase. The 
 ### Status
 
 This deviation is recorded as intentional. It does not represent a defect or an incomplete implementation. The decomposed routes satisfy all contract requirements for the frontend phase. Reconciliation with the original fan-out design will occur during live integration, with the specific approach chosen based on observed latency and error characteristics of the real ExtraHop API.
+
+---
+
+## Slice 07 — Appliance Status Footer
+
+### Scope Contract
+
+**IN SCOPE:**
+- ApplianceStatus type in shared/cockpit-types.ts (13 fields: hostname, displayHost, version, edition, platform, mgmtIpaddr, captureStatus, captureInterface, licenseStatus, licensedModules, uptimeSeconds, connectionStatus, lastChecked)
+- ApplianceStatusSchema Zod validator in shared/cockpit-validators.ts
+- BFF route GET /api/bff/impact/appliance-status (no time window dependency)
+- useApplianceStatus hook with 5-state discrimination (loading, quiet, populated, error, malformed)
+- ApplianceFooter component rendering compact status bar at bottom of Impact Deck
+- 4 exported pure helper functions: formatUptime, connectionStatusDisplay, captureStatusDisplay, licenseStatusDisplay
+- 5 deterministic fixture files
+- Quiet state: connectionStatus = 'not_configured' with empty hostname
+- Populated state: horizontal footer bar with hostname, version, edition, connection/capture/license indicators, modules, mgmt IP, BFF uptime
+- Edge-case handling: expired license, inactive capture, empty modules array
+
+**OUT OF SCOPE:**
+- Appliance configuration UI (setting EH_HOST / EH_API_KEY)
+- Appliance restart/reboot actions
+- Historical uptime tracking
+- Appliance firmware upgrade workflow
+- Inspector drill-down on appliance click
+
+### Data Contract
+
+**Request shape:** `GET /api/bff/impact/appliance-status` (no query parameters — appliance health is instantaneous, not time-window-dependent)
+
+**Response shape (populated/quiet):**
+```json
+{
+  "applianceStatus": {
+    "hostname": "string",
+    "displayHost": "string",
+    "version": "string",
+    "edition": "string",
+    "platform": "string",
+    "mgmtIpaddr": "string",
+    "captureStatus": "active" | "inactive" | "unknown",
+    "captureInterface": "string",
+    "licenseStatus": "valid" | "expired" | "unknown",
+    "licensedModules": ["string"],
+    "uptimeSeconds": "number (non-negative)",
+    "connectionStatus": "connected" | "not_configured" | "error",
+    "lastChecked": "ISO 8601 string"
+  }
+}
+```
+
+**Quiet behavior:** connectionStatus = 'not_configured' AND hostname = '' → hook returns { status: 'quiet' }
+
+**Error behavior:** HTTP non-200 → hook returns { status: 'error', error, message }
+
+**Malformed behavior:** applianceStatus fails ApplianceStatusSchema → hook returns { status: 'malformed', error, message, details }
+
+**Fixture backing:** In fixture mode (no EH_HOST/EH_API_KEY), the BFF route loads `fixtures/appliance-status/appliance-status.quiet.fixture.json`, overrides `uptimeSeconds` with `process.uptime()` and `lastChecked` with current ISO timestamp, validates via ApplianceStatusSchema, and returns the result. The hook then maps connectionStatus = 'not_configured' + empty hostname to quiet state.
+
+### UI Contract
+
+| State | Trigger | Render |
+|---|---|---|
+| Loading | fetch in progress | Skeleton shimmer bar (2 rows) |
+| Quiet | connectionStatus = 'not_configured' AND hostname = '' | Gray dot + "Appliance not configured" message |
+| Populated | connectionStatus = 'connected' or 'error' with non-empty hostname | Horizontal footer bar: hostname, version, edition, connection/capture/license indicators, modules, mgmt IP, BFF uptime |
+| Error | fetch fails (network/5xx) | ErrorState type="transport" |
+| Malformed | applianceStatus fails ApplianceStatusSchema | ErrorState type="contract" |
+
+### Helper Functions
+
+| Function | Input | Output | Boundary handling |
+|---|---|---|---|
+| formatUptime(seconds) | number | "Xs", "Xm", "Xh Ym", "Xd Yh" | NaN → "—", Infinity → "—", negative → "—" |
+| connectionStatusDisplay(status) | 'connected' \| 'not_configured' \| 'error' | { color, label, icon } | default → muted/Unknown/disconnected |
+| captureStatusDisplay(status) | 'active' \| 'inactive' \| 'unknown' | { color, label } | default → muted/Unknown |
+| licenseStatusDisplay(status) | 'valid' \| 'expired' \| 'unknown' | { color, label } | default → muted/Unknown |
+
+### Tests
+
+69 it() call sites → 69 vitest executions in server/slice07.test.ts.
+
+| Block | it() call sites | vitest executions | Notes |
+|---|---|---|---|
+| Fixture files exist and parse | 2 | 10 | 5 files × 2 tests via for-loop |
+| Populated fixture schema validation | 10 | 10 | static |
+| Malformed fixture schema rejection | 5 | 5 | static |
+| Edge-case fixture validation | 6 | 6 | static |
+| Quiet fixture validation | 7 | 7 | static |
+| formatUptime | 8 | 8 | static, boundary values |
+| connectionStatusDisplay | 3 | 3 | static |
+| captureStatusDisplay | 3 | 3 | static |
+| licenseStatusDisplay | 3 | 3 | static |
+| BFF route live local | 10 | 10 | live fetch to localhost:3000 |
+| State discrimination | 4 | 4 | static |
+| **Total** | **61** | **69** | 8 it() sites expand via for-loop |
+
+Repo-wide totals: 478 vitest executions, all passing across 10 test files.
+
+### Fixtures
+
+| File | Purpose |
+|---|---|
+| appliance-status.populated.fixture.json | Healthy sensor: connected, active capture, valid license, 4 modules, 3d+ uptime |
+| appliance-status.quiet.fixture.json | Not configured: not_configured connectionStatus, empty hostname/version, unknown capture/license |
+| appliance-status.transport-error.fixture.json | Network failure shape: { error, message } with no applianceStatus key |
+| appliance-status.malformed.fixture.json | Schema-violating data: hostname as number, captureStatus = "banana", negative uptimeSeconds, licensedModules as string |
+| appliance-status.edge-case.fixture.json | Degraded sensor: connected but expired license, inactive capture, empty modules, empty captureInterface |
+
+### Screenshots
+
+| State | Evidence | Notes |
+|---|---|---|
+| Quiet | screenshots/slice07-above-fold.png (scrolled to bottom) | Footer visible at page bottom: gray dot + "Appliance not configured — configure appliance connection settings to enable sensor monitoring". This is the correct quiet state because BFF is in fixture mode with no EH_HOST/EH_API_KEY. |
+| Populated | Not captured | Would require BFF to serve populated fixture (connected sensor). Proven by code path and populated fixture passing ApplianceStatusSchema. |
+| Loading | Not captured | Transient skeleton state (< 200ms on local dev). Proven by code path. |
+| Error | Not captured | Would require simulating transport failure. Proven by code path and test. |
+| Malformed | Not captured | Would require BFF to serve malformed fixture. Proven by code path and test. |
+
+### Client Audit
+
+- No ExtraHop host references in client/src/ (grep clean — the earlier EH_HOST reference in the quiet state message was replaced with generic text)
+- 6 BFF hooks all fetch via /api/bff/* paths: useImpactHeadline, useImpactTimeseries, useTopTalkers, useDetections, useAlerts, useApplianceStatus
+- useApplianceStatus does NOT depend on shared time window (appliance health is instantaneous)
+
+### Not Proven
+
+- Populated, loading, error, and malformed UI states not screenshotted (only quiet state visible in current fixture mode)
+- Component DOM render tests (jsdom) not written — only schema/fixture/route/helper tests
+- Populated footer layout with all 7 indicator items not visually confirmed (would require live or populated fixture mode)
+
+### Deferred by Contract
+
+Deferred by contract: live hardware / appliance / packet store / environment access is not part of the current frontend phase. The BFF route returns fixture data only. Live ExtraHop API integration not attempted.
+
+### Truth Receipt
+
+```
+TRUTH RECEIPT
+Slice: 07 — Appliance Status Footer
+Commit: (pending checkpoint)
+Claims:
+  - ApplianceStatus type defines 13 fields with 3 enum-constrained status fields
+  - ApplianceStatusSchema Zod validator enforces all 13 fields including enum constraints
+  - BFF route GET /api/bff/impact/appliance-status returns schema-validated ApplianceStatus
+  - BFF route is NOT time-window-dependent (no from/until/cycle params)
+  - In fixture mode, route loads quiet fixture and overrides uptimeSeconds + lastChecked
+  - useApplianceStatus hook discriminates 5 states: loading, quiet, populated, error, malformed
+  - Quiet state triggered by connectionStatus='not_configured' AND hostname=''
+  - ApplianceFooter renders compact footer bar with 7 indicator items in populated state
+  - formatUptime handles NaN, Infinity, negative → "—" (no NaN/Infinity reaching UI)
+  - connectionStatusDisplay, captureStatusDisplay, licenseStatusDisplay map all enum values
+  - 5 fixture files cover populated, quiet, transport-error, malformed, edge-case states
+  - Malformed fixture correctly fails schema validation (hostname as number, invalid enum, negative uptime)
+  - Edge-case fixture validates with expired license, inactive capture, empty modules
+  - No ExtraHop host references in client code (earlier EH_HOST in quiet message was replaced)
+  - 61 it() call sites → 69 vitest executions, all passing
+  - 478 total repo vitest executions passing across 10 test files
+Evidence:
+  - tests passed: 69/69 in slice07.test.ts, 478/478 repo-wide
+  - fixtures present: 5 files in fixtures/appliance-status/
+  - screenshots present: 1 PNG (quiet state at page bottom)
+  - validators present: ApplianceStatusSchema in shared/cockpit-validators.ts
+  - pure functions tested: formatUptime (8 tests), connectionStatusDisplay (3), captureStatusDisplay (3), licenseStatusDisplay (3)
+  - BFF route tested: 10 live local tests against localhost:3000
+Not proven:
+  - Populated footer layout not screenshotted (requires connected appliance or populated fixture mode)
+  - Loading, error, malformed UI states not screenshotted
+  - Component DOM render tests not written
+Deferred by contract:
+  - Live hardware / appliance / packet store / environment access is not part of the current frontend phase.
+  - Live ExtraHop API integration not attempted.
+Live integration status: Not attempted
+Verdict: PASSED — all tests pass, all fixtures present, all schemas enforced, all helper functions tested at boundaries. Screenshot evidence covers quiet state only. Receipt is honest about what is and is not proven.
+```

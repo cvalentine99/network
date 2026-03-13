@@ -16,7 +16,7 @@
  *   5. Returning proper error shapes for transport failures and malformed data
  */
 import { Router } from 'express';
-import { TimeWindowQuerySchema, ImpactHeadlineSchema, SeriesPointSchema, TopTalkerRowSchema, NormalizedDetectionSchema, NormalizedAlertSchema } from '../../shared/cockpit-validators';
+import { TimeWindowQuerySchema, ImpactHeadlineSchema, SeriesPointSchema, TopTalkerRowSchema, NormalizedDetectionSchema, NormalizedAlertSchema, ApplianceStatusSchema } from '../../shared/cockpit-validators';
 import { z } from 'zod';
 import { resolveTimeWindow } from '../../shared/normalize';
 import type { ImpactOverviewPayload } from '../../shared/cockpit-types';
@@ -478,6 +478,101 @@ impactRouter.get('/alerts', (req, res) => {
   } catch (err: any) {
     return res.status(500).json({
       error: 'Impact alerts fetch failed',
+      message: err.message || 'Unknown error',
+    });
+  }
+});
+
+/**
+ * Load a fixture file from the fixtures/appliance-status directory.
+ * Returns null if the file cannot be read or parsed.
+ */
+function loadApplianceStatusFixture(name: string): any | null {
+  try {
+    const fixturePath = join(process.cwd(), 'fixtures', 'appliance-status', name);
+    const raw = readFileSync(fixturePath, 'utf-8');
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * GET /api/bff/impact/appliance-status
+ *
+ * No query params required (appliance status is not time-window-dependent).
+ *
+ * Response shape on success:
+ *   { applianceStatus: ApplianceStatus }
+ *
+ * Response shape on quiet (not configured):
+ *   { applianceStatus: ApplianceStatus } where connectionStatus = 'not_configured'
+ *
+ * Response shape on error:
+ *   { error: string, message: string }
+ *
+ * Fixture backing: loads from fixtures/appliance-status/appliance-status.populated.fixture.json
+ * (or appliance-status.quiet.fixture.json when not configured).
+ *
+ * Contract:
+ *   - This route does NOT depend on time window (appliance health is instantaneous)
+ *   - In fixture mode, connectionStatus = 'not_configured'
+ *   - In live mode (future), connectionStatus = 'connected' or 'error'
+ */
+impactRouter.get('/appliance-status', (_req, res) => {
+  try {
+    // In fixture mode, return the appropriate fixture
+    if (isFixtureMode()) {
+      // When not configured, return quiet fixture
+      const fixture = loadApplianceStatusFixture('appliance-status.quiet.fixture.json');
+      if (!fixture) {
+        return res.status(500).json({
+          error: 'Fixture load failed',
+          message: 'Could not load fixture: appliance-status.quiet.fixture.json',
+        });
+      }
+
+      // Override lastChecked with current timestamp and uptimeSeconds with BFF uptime
+      const status = {
+        ...fixture.applianceStatus,
+        uptimeSeconds: Math.round(process.uptime()),
+        lastChecked: new Date().toISOString(),
+      };
+
+      const validation = ApplianceStatusSchema.safeParse(status);
+      if (!validation.success) {
+        return res.status(502).json({
+          error: 'Malformed appliance status data',
+          message: 'Appliance status data from source failed schema validation',
+          details: validation.error.issues,
+        });
+      }
+
+      return res.json({ applianceStatus: validation.data });
+    }
+
+    // Live mode — construct from health check (future integration)
+    // For now, return not_configured since we have no live connection
+    const status = {
+      hostname: '',
+      displayHost: '',
+      version: '',
+      edition: '',
+      platform: '',
+      mgmtIpaddr: '',
+      captureStatus: 'unknown' as const,
+      captureInterface: '',
+      licenseStatus: 'unknown' as const,
+      licensedModules: [] as string[],
+      uptimeSeconds: Math.round(process.uptime()),
+      connectionStatus: 'not_configured' as const,
+      lastChecked: new Date().toISOString(),
+    };
+
+    return res.json({ applianceStatus: status });
+  } catch (err: any) {
+    return res.status(500).json({
+      error: 'Appliance status fetch failed',
       message: err.message || 'Unknown error',
     });
   }

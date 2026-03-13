@@ -175,6 +175,23 @@ export const TopTalkerRowSchema = z.object({
   sparkline: z.array(SeriesPointSchema),
 });
 
+// ─── Appliance Status (Slice 07) ─────────────────────────────────────────
+export const ApplianceStatusSchema = z.object({
+  hostname: z.string(),
+  displayHost: z.string(),
+  version: z.string(),
+  edition: z.string(),
+  platform: z.string(),
+  mgmtIpaddr: z.string(),
+  captureStatus: z.enum(['active', 'inactive', 'unknown']),
+  captureInterface: z.string(),
+  licenseStatus: z.enum(['valid', 'expired', 'unknown']),
+  licensedModules: z.array(z.string()),
+  uptimeSeconds: z.number().nonnegative(),
+  connectionStatus: z.enum(['connected', 'not_configured', 'error']),
+  lastChecked: z.string(),
+});
+
 // ─── Impact Overview Payload (full) ───────────────────────────────────────
 export const ImpactOverviewPayloadSchema = z.object({
   headline: ImpactHeadlineSchema,

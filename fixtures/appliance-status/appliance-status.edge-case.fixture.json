@@ -1,0 +1,17 @@
+{
+  "applianceStatus": {
+    "hostname": "eda02",
+    "displayHost": "eda02.lab.local",
+    "version": "25.0.0.1000",
+    "edition": "Reveal(x) 360",
+    "platform": "cloud",
+    "mgmtIpaddr": "10.0.0.50",
+    "captureStatus": "inactive",
+    "captureInterface": "",
+    "licenseStatus": "expired",
+    "licensedModules": [],
+    "uptimeSeconds": 86400,
+    "connectionStatus": "connected",
+    "lastChecked": "2026-03-12T17:00:00.000Z"
+  }
+}

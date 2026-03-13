@@ -141,6 +141,42 @@ export interface NormalizedAlert {
   refireInterval: number | null;
 }
 
+// ─── Appliance Status (Slice 07) ─────────────────────────────────────────
+/**
+ * Normalized appliance status for the footer bar.
+ * Answers: "Is my sensor healthy?"
+ *
+ * Fields:
+ *   hostname        — appliance hostname (e.g. "eda01")
+ *   displayHost     — FQDN or display name (e.g. "eda01.lab.local")
+ *   version         — firmware version string (e.g. "26.1.4.2814")
+ *   edition         — product edition (e.g. "Reveal(x) Enterprise")
+ *   platform        — platform identifier (e.g. "extrahop")
+ *   mgmtIpaddr      — management IP address
+ *   captureStatus   — "active" | "inactive" | "unknown"
+ *   captureInterface— capture interface name (e.g. "Capture 00:1a:8c:10:00:01")
+ *   licenseStatus   — "valid" | "expired" | "unknown"
+ *   licensedModules — list of licensed module names
+ *   uptimeSeconds   — BFF uptime in seconds (not appliance uptime — that requires live query)
+ *   connectionStatus— "connected" | "not_configured" | "error"
+ *   lastChecked     — ISO timestamp of last health check
+ */
+export interface ApplianceStatus {
+  hostname: string;
+  displayHost: string;
+  version: string;
+  edition: string;
+  platform: string;
+  mgmtIpaddr: string;
+  captureStatus: 'active' | 'inactive' | 'unknown';
+  captureInterface: string;
+  licenseStatus: 'valid' | 'expired' | 'unknown';
+  licensedModules: string[];
+  uptimeSeconds: number;
+  connectionStatus: 'connected' | 'not_configured' | 'error';
+  lastChecked: IsoString;
+}
+
 // ─── Impact Deck Payload ─────────────────────────────────────────────────
 export interface ImpactOverviewPayload {
   headline: {

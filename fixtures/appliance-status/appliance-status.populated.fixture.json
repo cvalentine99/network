@@ -1,0 +1,17 @@
+{
+  "applianceStatus": {
+    "hostname": "eda01",
+    "displayHost": "eda01.lab.local",
+    "version": "26.1.4.2814",
+    "edition": "Reveal(x) Enterprise",
+    "platform": "extrahop",
+    "mgmtIpaddr": "192.168.50.157",
+    "captureStatus": "active",
+    "captureInterface": "Capture 00:1a:8c:10:00:01",
+    "licenseStatus": "valid",
+    "licensedModules": ["wire_data", "eca", "ndr"],
+    "uptimeSeconds": 3600.5,
+    "connectionStatus": "connected",
+    "lastChecked": "2026-03-12T17:00:00.000Z"
+  }
+}
