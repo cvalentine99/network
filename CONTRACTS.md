@@ -1715,7 +1715,7 @@ TRUTH VERDICT: PASSED with screenshot limitation
 ### TRUTH RECEIPT
 ```
 Slice: 12 — Cross-Entity Navigation
-Commit: 3439701f
+Commit: 5023cdfd
 Claims:
   - 3 new InspectorContext helpers: selectDeviceByIdentity, selectDetectionEntity, selectAlertEntity
   - DetectionDetailPane: MiniDeviceRow and MiniAlertRow are clickable with cross-nav wiring
