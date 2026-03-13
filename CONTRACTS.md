@@ -777,7 +777,7 @@ Verdict: PASSED — all tests pass, all fixtures present, all schemas enforced, 
 
 Slice: 06 — Alerts Panel
 Status: Passed
-Commit: (pending checkpoint)
+Commit: be636f1b
 
 ## Scope Contract
 
@@ -877,3 +877,52 @@ Deferred by contract: live hardware / appliance / packet store / environment acc
 ## Verdict
 
 Passed. 43 it() call sites expanding to 59 vitest executions, all passing. 5 fixture files. BFF route live-tested against local dev server. alertSeverityToLabel boundary values verified for all 10 test points. Metric expression construction verified for 4 representative alerts. Receipt is honest about screenshot limitations: above-fold PNG does not show the alerts panel, and browser scroll confirmation is not persisted as a file.
+
+---
+
+## Architectural Drift Record: BFF Route Decomposition
+
+### Original Sprint Guide Specification
+
+Phase 3 of the original sprint guide specified a single fan-out BFF route at `GET /api/bff/impact/overview` that would answer the first two operational questions ("What is the current network posture?" and "What changed recently?") in one request. That route was designed to issue five parallel calls to the ExtraHop REST API, normalize the combined results, and return a unified response containing headline KPIs, time-series data, top talkers, detections, and alerts in a single JSON payload.
+
+### Current Implementation
+
+The contract-first frontend phase decomposed this into six independent BFF routes:
+
+| Route | Slice | Purpose |
+|---|---|---|
+| `GET /api/bff/health` | 00 | BFF liveness and configuration status |
+| `GET /api/bff/impact/headline` | 02 | KPI headline metrics (5 cards) |
+| `GET /api/bff/impact/timeseries` | 03 | Time-series chart data (bytes + packets) |
+| `GET /api/bff/impact/top-talkers` | 04 | Ranked device table |
+| `GET /api/bff/impact/detections` | 05 | Detection rows with MITRE mapping |
+| `GET /api/bff/impact/alerts` | 06 | Alert rows with severity mapping |
+
+### Why This Deviation Is Intentional
+
+The decomposition was a deliberate choice for the contract-first frontend phase, not an oversight. The reasons are:
+
+1. **Slice isolation.** Each slice must be independently testable, independently reviewable, and independently provable. A single fan-out route would have forced all six slices to share a single data contract, making it impossible to prove one panel's behavior without dragging in the others.
+
+2. **Fixture determinism.** Each route has its own fixture set (populated, quiet, transport-error, malformed). A monolithic route would require combinatorial fixture coverage (e.g., headline populated + detections quiet + alerts error), which grows exponentially and defeats the purpose of deterministic testing.
+
+3. **Incremental delivery.** The contract model requires that each slice be accepted before the next begins. Decomposed routes allow each slice to stand alone with its own truth receipt.
+
+4. **Error isolation.** With decomposed routes, a transport failure in one panel (e.g., detections timing out) does not collapse the entire dashboard. Each panel independently handles its own loading, error, and quiet states.
+
+### Reconciliation Path
+
+When live integration begins, two options are available:
+
+**Option A — Keep decomposed routes.** The BFF server issues one ExtraHop API call per route. This preserves error isolation and simplifies debugging, at the cost of multiple round-trips from the browser to the BFF.
+
+**Option B — Reintroduce fan-out with BFF-side aggregation.** The BFF server exposes a single `/api/bff/impact/overview` route that issues parallel ExtraHop calls and returns a combined payload. The frontend hooks would be refactored to consume sub-fields of the unified response. This reduces browser-to-BFF round-trips but couples panel error handling.
+
+**Option C — Hybrid.** The BFF exposes both the decomposed routes (for independent panel refresh) and the fan-out route (for initial page load). The frontend uses the fan-out route on mount and falls back to per-panel routes for refresh or retry.
+
+The choice between these options is deferred to the live integration phase. The current decomposed architecture is structurally compatible with all three paths because the shared types (`HeadlineResponse`, `TimeseriesResponse`, `TopTalkersResponse`, `DetectionsResponse`, `AlertsResponse`) and Zod validators are already defined independently and can be composed into a unified response schema without breaking existing contracts.
+
+### Status
+
+This deviation is recorded as intentional. It does not represent a defect or an incomplete implementation. The decomposed routes satisfy all contract requirements for the frontend phase. Reconciliation with the original fan-out design will occur during live integration, with the specific approach chosen based on observed latency and error characteristics of the real ExtraHop API.
