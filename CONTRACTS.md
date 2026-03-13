@@ -1066,7 +1066,7 @@ Deferred by contract: live hardware / appliance / packet store / environment acc
 ```
 TRUTH RECEIPT
 Slice: 07 — Appliance Status Footer
-Commit: (pending checkpoint)
+Commit: 584d4b97
 Claims:
   - ApplianceStatus type defines 13 fields with 3 enum-constrained status fields
   - ApplianceStatusSchema Zod validator enforces all 13 fields including enum constraints
@@ -1082,10 +1082,10 @@ Claims:
   - Malformed fixture correctly fails schema validation (hostname as number, invalid enum, negative uptime)
   - Edge-case fixture validates with expired license, inactive capture, empty modules
   - No ExtraHop host references in client code (earlier EH_HOST in quiet message was replaced)
-  - 61 it() call sites → 69 vitest executions, all passing
-  - 478 total repo vitest executions passing across 10 test files
+  - 61 it() call sites → 69 vitest executions, all passing (slice07.test.ts)
+  - 478 total repo vitest executions passing across 10 test files (all slices)
 Evidence:
-  - tests passed: 69/69 in slice07.test.ts, 478/478 repo-wide
+  - tests passed: 61 it() call sites → 69/69 vitest executions in slice07.test.ts; 478/478 repo-wide
   - fixtures present: 5 files in fixtures/appliance-status/
   - screenshots present: 1 PNG (quiet state at page bottom)
   - validators present: ApplianceStatusSchema in shared/cockpit-validators.ts
