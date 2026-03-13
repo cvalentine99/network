@@ -224,6 +224,27 @@ export const DeviceDetailSchema = z.object({
   }),
 });
 
+// ─── PCAP Download (Slice 10) ───────────────────────────────────────────
+export const PcapRequestSchema = z.object({
+  ip: z.string().min(1, 'IP address is required'),
+  fromMs: z.number().int(),
+  untilMs: z.number().int(),
+  bpfFilter: z.string().optional(),
+  limitBytes: z.number().int().positive().optional().default(10_485_760), // 10 MB
+  limitPackets: z.number().int().positive().optional(),
+});
+
+export const PcapMetadataSchema = z.object({
+  filename: z.string().min(1),
+  contentType: z.literal('application/vnd.tcpdump.pcap'),
+  estimatedBytes: z.number().nonnegative().nullable(),
+  sourceIp: z.string().min(1),
+  fromMs: z.number().int(),
+  untilMs: z.number().int(),
+  bpfFilter: z.string().nullable(),
+  packetStoreId: z.number().int().nullable(),
+});
+
 // ─── Impact Overview Payload (full) ───────────────────────────────────────
 export const ImpactOverviewPayloadSchema = z.object({
   headline: ImpactHeadlineSchema,

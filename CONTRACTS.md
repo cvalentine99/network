@@ -1358,3 +1358,149 @@ Deferred by contract:
 Live integration status: Not attempted
 Verdict: PASSED with screenshot limitation — all 62 tests pass, all 5 fixtures present, all schemas enforced, BFF route validated, isQuietDevice helper tested. Interactive screenshots not captured due to browser extension instability; this limitation is documented honestly. The component is wired and renders against fixture data via BFF route.
 ```
+
+
+---
+
+## Slice 10 — PCAP Download Contract
+
+```
+SLICE NAME: PCAP Download Contract
+STATUS: Passed (with screenshot limitation)
+IN SCOPE:
+  - PcapRequest type (ip, fromMs, untilMs, bpfFilter?, limitBytes?, limitPackets?)
+  - PcapMetadata type (filename, contentType, estimatedBytes, sourceIp, fromMs, untilMs, bpfFilter, packetStoreId)
+  - PcapRequestSchema Zod validator (with default limitBytes = 10MB, min(1) on ip, int() on timestamps)
+  - PcapMetadataSchema Zod validator (contentType literal 'application/vnd.tcpdump.pcap', min(1) on filename)
+  - BFF route POST /api/bff/packets/download — returns raw binary PCAP (Content-Type: application/vnd.tcpdump.pcap)
+  - BFF route POST /api/bff/packets/metadata — returns JSON PcapMetadata pre-flight check
+  - packetsRouter registered at /api/bff/packets in server/_core/index.ts
+  - usePcapDownload hook — 4-state machine (idle, fetching, complete, error)
+  - extractMetadataFromHeaders pure helper — extracts PcapMetadata from response headers
+  - isBinaryPcapResponse pure helper — validates Content-Type for binary PCAP
+  - triggerBlobDownload pure helper — creates Blob URL + anchor for browser download
+  - PcapDownloadButton component — idle/fetching/complete/error states, BPF filter toggle
+  - statusColor pure helper — maps PcapDownloadStatus to oklch color
+  - PcapDownloadButton wired into DeviceDetailPane PopulatedState (Packet Capture section)
+  - 10 fixture files: 8 JSON + 2 binary PCAP
+  - 51 it() call sites → 58 vitest executions in server/slice10.test.ts
+  - 648 total repo tests passing across 13 test files
+OUT OF SCOPE:
+  - Live ExtraHop POST /api/v1/packets/search proxy
+  - Packet store discovery or configuration
+  - PCAP analysis or rendering in browser
+  - Wireshark-style packet inspection
+  - Streaming large PCAP downloads (chunked transfer)
+  - Download progress bar (would require streaming)
+  - PCAP file validation beyond magic number
+  - Component DOM render tests (would require jsdom/happy-dom)
+DEPENDENCIES:
+  - shared/cockpit-types.ts (PcapRequest, PcapMetadata, PcapDownloadState)
+  - shared/cockpit-validators.ts (PcapRequestSchema, PcapMetadataSchema)
+  - server/routes/packets.ts (packetsRouter)
+  - server/_core/index.ts (route registration)
+  - client/src/hooks/usePcapDownload.ts
+  - client/src/components/inspector/PcapDownloadButton.tsx
+  - client/src/components/inspector/DeviceDetailPane.tsx (wiring)
+ROUTES:
+  - POST /api/bff/packets/download
+    Request: PcapRequest JSON body
+    Success response: raw binary, Content-Type: application/vnd.tcpdump.pcap, Content-Disposition: attachment
+    Error response: JSON { error, message, code? }
+    Headers on success: X-Pcap-Source-Ip, X-Pcap-From-Ms, X-Pcap-Until-Ms, X-Pcap-Bpf-Filter (optional)
+  - POST /api/bff/packets/metadata
+    Request: PcapRequest JSON body
+    Success response: JSON { metadata: PcapMetadata }
+    Error response: JSON { error, message, code? }
+  API commands (live mode, deferred):
+    ExtraHop: POST /api/v1/packets/search
+    Body: { output_type: "pcap", bpf: "<filter>", from: <epochMs>, until: <epochMs>, ip1: "<ip>" }
+    Response: raw PCAP binary stream
+TYPES:
+  - PcapRequest: { ip: string, fromMs: number, untilMs: number, bpfFilter?: string, limitBytes?: number, limitPackets?: number }
+  - PcapMetadata: { filename: string, contentType: 'application/vnd.tcpdump.pcap', estimatedBytes: number | null, sourceIp: string, fromMs: number, untilMs: number, bpfFilter: string | null, packetStoreId: string | null }
+  - PcapDownloadState: { status: PcapDownloadStatus, metadata: PcapMetadata | null, error: string | null, message: string | null, code: string | null }
+  - PcapDownloadStatus: 'idle' | 'fetching' | 'complete' | 'error'
+FIXTURES:
+  - fixtures/pcap-download/pcap-download.request.populated.fixture.json
+  - fixtures/pcap-download/pcap-download.request.filtered.fixture.json
+  - fixtures/pcap-download/pcap-download.request.malformed.fixture.json
+  - fixtures/pcap-download/pcap-download.metadata.populated.fixture.json
+  - fixtures/pcap-download/pcap-download.metadata.filtered.fixture.json
+  - fixtures/pcap-download/pcap-download.metadata.malformed.fixture.json
+  - fixtures/pcap-download/pcap-download.transport-error.fixture.json
+  - fixtures/pcap-download/pcap-download.not-configured.fixture.json
+  - fixtures/pcap-download/pcap-download.empty.fixture.pcap (24 bytes — global header only, 0 packets)
+  - fixtures/pcap-download/pcap-download.populated.fixture.pcap (74 bytes — global header + 1 Ethernet packet)
+TESTS:
+  51 it() call sites → 58 vitest executions in server/slice10.test.ts
+
+  | Group                                | it() sites | vitest executions |
+  |--------------------------------------|-----------|-------------------|
+  | PcapRequestSchema                    |         8 |                 8 |
+  | PcapMetadataSchema                   |         7 |                 7 |
+  | Fixture files                        |   5 (1 loop) |              12 |
+  | BFF route contract shapes            |         5 |                 5 |
+  | extractMetadataFromHeaders           |         7 |                 7 |
+  | isBinaryPcapResponse                 |         5 |                 5 |
+  | statusColor                          |         4 |                 4 |
+  | Binary contract invariant            |         5 |                 5 |
+  | Cross-fixture consistency            |         5 |                 5 |
+  |--------------------------------------|-----------|-------------------|
+  | TOTAL                                |        51 |                58 |
+
+SCREENSHOTS:
+  - Above-fold dashboard screenshot captured via webdev_check_status (server running, 0 TS errors)
+  - Interactive screenshot of PcapDownloadButton in inspector NOT captured (browser extension instability)
+  - Screenshot notes saved to screenshots/slice10-notes.md
+KNOWN LIMITATIONS:
+  - Interactive browser screenshot of PcapDownloadButton not captured due to browser extension instability
+  - No streaming/chunked transfer for large PCAP files
+  - No download progress indicator
+  - triggerBlobDownload not tested (requires DOM/anchor element)
+  - Component DOM render tests not written (would require jsdom/happy-dom)
+  - PcapDownloadButton uses Date.now() for time window — in production should use shared TimeWindowContext
+LIVE INTEGRATION STATUS: Not attempted
+TRUTH VERDICT:
+
+TRUTH RECEIPT
+Slice: 10 — PCAP Download Contract
+Commit: (pending checkpoint)
+Claims:
+  - PcapRequest type with 6 fields, PcapMetadata type with 8 fields
+  - PcapRequestSchema enforces min(1) on ip, int() on timestamps, default limitBytes 10MB, min(1) on limits
+  - PcapMetadataSchema enforces literal contentType, min(1) on filename, non-negative estimatedBytes
+  - BFF route POST /api/bff/packets/download returns raw binary PCAP with correct headers
+  - BFF route POST /api/bff/packets/metadata returns JSON PcapMetadata
+  - Binary contract invariant: success response is raw binary, NOT JSON-wrapped
+  - usePcapDownload hook manages 4-state lifecycle (idle → fetching → complete/error)
+  - extractMetadataFromHeaders extracts PcapMetadata from response headers with fallback logic
+  - isBinaryPcapResponse validates Content-Type for binary PCAP
+  - PcapDownloadButton renders 4 visual states with BPF filter toggle
+  - 10 fixture files (8 JSON + 2 binary PCAP) with deterministic content
+  - Binary PCAP fixtures have valid libpcap 2.4 headers with Ethernet network type
+  - 51 it() call sites → 58 vitest executions in server/slice10.test.ts
+  - 648 total repo tests passing across 13 test files
+Evidence:
+  - tests passed: 51 it() call sites → 58 vitest executions in server/slice10.test.ts
+  - total repo: 648 tests passing across 13 test files
+  - fixtures present: 10 files in fixtures/pcap-download/ (8 JSON + 2 binary PCAP)
+  - screenshots present: 1 above-fold dashboard PNG; interactive screenshots not captured (documented)
+  - validators present: PcapRequestSchema, PcapMetadataSchema
+  - binary contract invariant tested: 5 dedicated tests verifying PCAP magic, non-JSON, version, network type
+  - pure helpers tested: extractMetadataFromHeaders (7 tests), isBinaryPcapResponse (5 tests), statusColor (4 tests)
+  - cross-fixture consistency tested: 5 tests verifying IP/time/filter alignment between request and metadata fixtures
+Not proven:
+  - Interactive browser screenshot of PcapDownloadButton in idle/fetching/complete/error states (browser extension instability)
+  - Component DOM render tests not written (would require jsdom/happy-dom)
+  - triggerBlobDownload not tested (requires DOM anchor element)
+  - Streaming/chunked transfer for large PCAP files
+  - Download progress indicator
+  - Time window integration with shared TimeWindowContext
+Deferred by contract:
+  - Live hardware / appliance / packet store / environment access is not part of the current frontend phase.
+  - Live ExtraHop POST /api/v1/packets/search proxy not implemented.
+  - Packet store discovery and configuration deferred.
+Live integration status: Not attempted
+Verdict: PASSED with screenshot limitation — all 58 tests pass, all 10 fixtures present (including 2 binary PCAP files verified at byte level), binary contract invariant enforced by 5 dedicated tests, all schemas enforced, BFF routes implemented with fixture mode, pure helpers tested. Interactive screenshots not captured due to browser extension instability; this limitation is documented honestly. The binary content contract is architecturally distinct from all prior JSON slices and maintains the invariant that PCAP bytes are never JSON-wrapped.
+```

@@ -294,6 +294,60 @@ export type InspectorSelection =
   | { kind: 'detection'; detection: NormalizedDetection }
   | { kind: 'alert'; alert: NormalizedAlert };
 
+// ─── PCAP Download (Slice 10) ───────────────────────────────────────────
+/**
+ * Request shape for PCAP download.
+ * Sent from frontend to BFF as JSON POST body.
+ *
+ * The BFF proxies this to ExtraHop POST /api/v1/packets/search
+ * and streams the raw binary PCAP response back to the browser.
+ *
+ * Fields:
+ *   ip           — target IP address to filter packets (required)
+ *   fromMs       — start of time window (epoch ms)
+ *   untilMs      — end of time window (epoch ms)
+ *   bpfFilter    — optional Berkeley Packet Filter expression (e.g. "tcp port 443")
+ *   limitBytes   — optional max bytes to capture (default: 10MB)
+ *   limitPackets — optional max packets to capture
+ *
+ * Binary contract invariant:
+ *   The BFF MUST NOT convert PCAP bytes to JSON.
+ *   The response is raw binary with Content-Type: application/vnd.tcpdump.pcap.
+ */
+export interface PcapRequest {
+  ip: string;
+  fromMs: EpochMs;
+  untilMs: EpochMs;
+  bpfFilter?: string;
+  limitBytes?: number;
+  limitPackets?: number;
+}
+
+/**
+ * Metadata returned as JSON headers or in a pre-flight metadata endpoint.
+ * This is NOT the PCAP payload itself — it describes the download.
+ *
+ * Fields:
+ *   filename       — suggested filename (e.g. "192.168.1.10_1710000000_1710003600.pcap")
+ *   contentType    — MIME type (always "application/vnd.tcpdump.pcap")
+ *   estimatedBytes — estimated size in bytes (null if unknown)
+ *   sourceIp       — the IP that was queried
+ *   fromMs         — start of the captured window
+ *   untilMs        — end of the captured window
+ *   bpfFilter      — the BPF filter applied (null if none)
+ *   packetStoreId  — ExtraHop packet store node ID (null in fixture mode)
+ */
+export interface PcapMetadata {
+  filename: string;
+  contentType: 'application/vnd.tcpdump.pcap';
+  estimatedBytes: number | null;
+  sourceIp: string;
+  fromMs: EpochMs;
+  untilMs: EpochMs;
+  bpfFilter: string | null;
+  packetStoreId: number | null;
+}
+
 // ─── BFF Health Response ──────────────────────────────────────────────────
 export interface BffHealthResponse {
   status: 'ok' | 'degraded' | 'not_configured';

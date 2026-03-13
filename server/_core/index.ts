@@ -7,6 +7,7 @@ import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { healthRouter } from "../routes/health";
 import { impactRouter } from "../routes/impact";
+import { packetsRouter } from "../routes/packets";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 
@@ -40,6 +41,7 @@ async function startServer() {
   // BFF routes (browser → BFF → ExtraHop; browser never contacts ExtraHop directly)
   app.use('/api/bff/health', healthRouter);
   app.use('/api/bff/impact', impactRouter);
+  app.use('/api/bff/packets', packetsRouter);
 
   // tRPC API
   app.use(

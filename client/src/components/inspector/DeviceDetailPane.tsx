@@ -20,8 +20,9 @@ import { riskScoreToSeverity } from '@/components/tables/DetectionsTable';
 import { alertSeverityToLabel } from '@/components/tables/AlertsPanel';
 import {
   Monitor, Server, Activity, Globe, Shield, Bell, Tag, Clock,
-  Loader2, AlertTriangle, Search, Wifi, WifiOff
+  Loader2, AlertTriangle, Search, Wifi, WifiOff, Download
 } from 'lucide-react';
+import { PcapDownloadButton } from './PcapDownloadButton';
 
 // ─── Shared field row (reused from InspectorContent pattern) ─────────────
 function FieldRow({ label, value, mono }: { label: string; value: string | null | undefined; mono?: boolean }) {
@@ -269,6 +270,18 @@ function PopulatedState({ detail }: { detail: DeviceDetail }) {
       <FieldRow label="Total" value={formatBytes(detail.traffic.totalBytes)} mono />
       <FieldRow label="Pkts In" value={detail.traffic.pktsIn.toLocaleString()} mono />
       <FieldRow label="Pkts Out" value={detail.traffic.pktsOut.toLocaleString()} mono />
+
+      {/* PCAP Download (Slice 10) */}
+      {detail.device.ipaddr4 && (
+        <>
+          <SectionHeader icon={<Download className="h-3.5 w-3.5" />} label="Packet Capture" />
+          <PcapDownloadButton
+            deviceIp={detail.device.ipaddr4}
+            fromMs={Date.now() - 300000}
+            untilMs={Date.now()}
+          />
+        </>
+      )}
 
       {/* Protocol breakdown */}
       {detail.protocols.length > 0 && (

@@ -1,0 +1,12 @@
+{
+  "metadata": {
+    "filename": "192.168.1.10_1710000000000_1710003600000.pcap",
+    "contentType": "application/vnd.tcpdump.pcap",
+    "estimatedBytes": 524288,
+    "sourceIp": "192.168.1.10",
+    "fromMs": 1710000000000,
+    "untilMs": 1710003600000,
+    "bpfFilter": null,
+    "packetStoreId": null
+  }
+}

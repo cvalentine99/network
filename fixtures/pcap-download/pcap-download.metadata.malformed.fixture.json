@@ -1,0 +1,12 @@
+{
+  "metadata": {
+    "filename": "",
+    "contentType": "text/plain",
+    "estimatedBytes": -100,
+    "sourceIp": "",
+    "fromMs": "not-a-number",
+    "untilMs": null,
+    "bpfFilter": 12345,
+    "packetStoreId": "not-a-number"
+  }
+}

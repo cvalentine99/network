@@ -1,0 +1,10 @@
+{
+  "request": {
+    "ip": "10.0.0.50",
+    "fromMs": 1710000000000,
+    "untilMs": 1710003600000,
+    "bpfFilter": "tcp port 443",
+    "limitBytes": 5242880,
+    "limitPackets": 10000
+  }
+}
