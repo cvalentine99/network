@@ -223,6 +223,23 @@ export interface ApplianceIdentity {
   services: Record<string, { enabled: boolean }>;
 }
 
+// ─── Inspector Selection (Slice 08) ─────────────────────────────────────
+/**
+ * Discriminated union representing what entity is currently selected in the inspector.
+ * Each variant carries the full normalized entity data — no re-fetching required.
+ * The inspector shell routes content based on the `kind` discriminant.
+ *
+ * Invariants:
+ *   - Only one entity can be selected at a time
+ *   - Selecting a new entity replaces the previous selection
+ *   - Clearing selection returns to the empty "Select an item" state
+ *   - The inspector auto-opens on selection and can be manually closed
+ */
+export type InspectorSelection =
+  | { kind: 'device'; device: DeviceIdentity; topTalkerRow: TopTalkerRow }
+  | { kind: 'detection'; detection: NormalizedDetection }
+  | { kind: 'alert'; alert: NormalizedAlert };
+
 // ─── BFF Health Response ──────────────────────────────────────────────────
 export interface BffHealthResponse {
   status: 'ok' | 'degraded' | 'not_configured';

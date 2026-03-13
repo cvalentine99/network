@@ -1,5 +1,5 @@
 /**
- * Impact Deck — Landing page (Slice 00-07)
+ * Impact Deck — Landing page (Slice 00-08)
  *
  * CONTRACT:
  * - Global time window is wired and readable
@@ -12,17 +12,27 @@
  * - ApplianceFooter fetches from /api/bff/impact/appliance-status (never ExtraHop directly)
  * - All 5 UI states are reachable per panel: loading, quiet, populated, error, malformed
  * - No direct ExtraHop calls from this component
+ *
+ * INTERACTION CONTRACT (Slice 08):
+ * - InspectorProvider wraps the entire page
+ * - Top Talkers rows call selectDevice on click
+ * - Detection rows call selectDetection on click
+ * - Alert cards call selectAlert on click
+ * - InspectorShell receives selection from InspectorContext
+ * - InspectorContent routes to kind-specific preview panels
+ * - Selected row/card is highlighted via selectedDeviceId/selectedDetectionId/selectedAlertId
  */
-import { useState } from 'react';
 import { PageHeader, GlassCard, MUTED, GOLD, RED, GREEN } from '@/components/DashboardWidgets';
 import { TimeWindowSelector } from '@/components/shared/TimeWindowSelector';
 import { InspectorShell } from '@/components/inspector/InspectorShell';
+import { InspectorContent, inspectorTitle } from '@/components/inspector/InspectorContent';
 import { KPIStrip } from '@/components/impact/KPIStrip';
 import { GhostedTimeline } from '@/components/charts/GhostedTimeline';
 import { TopTalkersTable } from '@/components/tables/TopTalkersTable';
 import { DetectionsTable } from '@/components/tables/DetectionsTable';
 import { AlertsPanel } from '@/components/tables/AlertsPanel';
 import { ApplianceFooter } from '@/components/impact/ApplianceFooter';
+import { InspectorProvider, useInspector } from '@/contexts/InspectorContext';
 import { useTimeWindow } from '@/lib/useTimeWindow';
 import { useImpactHeadline } from '@/hooks/useImpactHeadline';
 import { useImpactTimeseries } from '@/hooks/useImpactTimeseries';
@@ -32,9 +42,9 @@ import { useAlerts } from '@/hooks/useAlerts';
 import { useApplianceStatus } from '@/hooks/useApplianceStatus';
 import { PanelRightOpen } from 'lucide-react';
 
-export default function Home() {
+function ImpactDeckContent() {
   const { window: tw } = useTimeWindow();
-  const [inspectorOpen, setInspectorOpen] = useState(false);
+  const { selection, isOpen, selectDevice, selectDetection, selectAlert, clear, toggle } = useInspector();
   const { state: kpiState } = useImpactHeadline();
   const { state: timeseriesState } = useImpactTimeseries();
   const topTalkersState = useTopTalkers();
@@ -45,6 +55,11 @@ export default function Home() {
   // Detection count badge color
   const detectionCount = detectionsState.kind === 'populated' ? detectionsState.detections.length : 0;
   const detectionBadgeColor = detectionCount > 0 ? RED : GREEN;
+
+  // Derive selected IDs for row/card highlighting
+  const selectedDeviceId = selection?.kind === 'device' ? selection.device.id : null;
+  const selectedDetectionId = selection?.kind === 'detection' ? selection.detection.id : null;
+  const selectedAlertId = selection?.kind === 'alert' ? selection.alert.id : null;
 
   return (
     <div className="relative">
@@ -67,7 +82,7 @@ export default function Home() {
             {new Date(tw.fromMs).toLocaleTimeString()} — {new Date(tw.untilMs).toLocaleTimeString()} · {tw.cycle}
           </span>
           <button
-            onClick={() => setInspectorOpen(!inspectorOpen)}
+            onClick={toggle}
             className="h-8 w-8 flex items-center justify-center rounded-lg transition-colors hover:bg-white/5"
             aria-label="Toggle inspector"
             title="Toggle inspector panel"
@@ -98,7 +113,11 @@ export default function Home() {
             >
               Top Talkers — By Total Bytes
             </p>
-            <TopTalkersTable state={topTalkersState} />
+            <TopTalkersTable
+              state={topTalkersState}
+              onRowClick={selectDevice}
+              selectedDeviceId={selectedDeviceId}
+            />
           </GlassCard>
         </div>
 
@@ -122,14 +141,22 @@ export default function Home() {
                 {detectionCount}
               </span>
             </div>
-            <DetectionsTable state={detectionsState} />
+            <DetectionsTable
+              state={detectionsState}
+              onRowClick={selectDetection}
+              selectedDetectionId={selectedDetectionId}
+            />
           </GlassCard>
         </div>
       </div>
 
       {/* Alerts Panel — configured alert rules */}
       <div className="mb-6">
-        <AlertsPanel state={alertsState} />
+        <AlertsPanel
+          state={alertsState}
+          onCardClick={selectAlert}
+          selectedAlertId={selectedAlertId}
+        />
       </div>
 
       {/* Appliance Status Footer — Slice 07 */}
@@ -137,12 +164,22 @@ export default function Home() {
         <ApplianceFooter state={applianceState} />
       </div>
 
-      {/* Inspector shell */}
+      {/* Inspector shell with content routing */}
       <InspectorShell
-        isOpen={inspectorOpen}
-        onClose={() => setInspectorOpen(false)}
-        title="Inspector"
-      />
+        isOpen={isOpen}
+        onClose={clear}
+        title={inspectorTitle(selection)}
+      >
+        <InspectorContent selection={selection} />
+      </InspectorShell>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <InspectorProvider>
+      <ImpactDeckContent />
+    </InspectorProvider>
   );
 }

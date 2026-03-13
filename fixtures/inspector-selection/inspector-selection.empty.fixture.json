@@ -1,0 +1,4 @@
+{
+  "description": "Inspector selection fixture — no entity selected. Inspector is closed, selection is null. This is the default/quiet state.",
+  "selection": null
+}

@@ -2,6 +2,7 @@
  * TopTalkersTable — Ranked table of top devices by byte volume.
  *
  * Slice 04 — Contract-verified component.
+ * Slice 08 — Added onRowClick prop for inspector wiring.
  *
  * UI STATES:
  *   1. loading — skeleton rows
@@ -14,6 +15,12 @@
  *   Receives TopTalkerRow[] from shared/cockpit-types.ts.
  *   Uses formatBytes from shared/formatters.ts.
  *   Never interprets raw payloads — only normalized types.
+ *
+ * INTERACTION CONTRACT (Slice 08):
+ *   onRowClick?: (row: TopTalkerRow) => void
+ *   - Called when a populated row is clicked
+ *   - Caller (Home.tsx) wires this to InspectorContext.selectDevice
+ *   - selectedDeviceId?: number — highlights the currently selected row
  *
  * STYLING:
  *   Obsidian table: dark background, oklch(1 0 0 / 4%) row borders,
@@ -37,6 +44,10 @@ export type TopTalkersState =
 
 interface TopTalkersTableProps {
   state: TopTalkersState;
+  /** Slice 08: called when a populated row is clicked */
+  onRowClick?: (row: TopTalkerRow) => void;
+  /** Slice 08: highlights the currently selected device row */
+  selectedDeviceId?: number | null;
 }
 
 // ─── Loading skeleton ────────────────────────────────────────────────────
@@ -91,18 +102,43 @@ function TableSkeleton() {
 }
 
 // ─── Table row ───────────────────────────────────────────────────────────
-function TalkerRow({ row, rank }: { row: TopTalkerRow; rank: number }) {
+function TalkerRow({
+  row,
+  rank,
+  onClick,
+  isSelected,
+}: {
+  row: TopTalkerRow;
+  rank: number;
+  onClick?: (row: TopTalkerRow) => void;
+  isSelected?: boolean;
+}) {
   const sparkData = row.sparkline.map((p) => {
     const v = p.values?.bytes;
     return v != null && Number.isFinite(v) ? v : 0;
   });
 
+  const selectedBg = 'oklch(0.769 0.108 85.805 / 8%)';
+  const hoverBg = 'oklch(1 0 0 / 3%)';
+  const defaultBg = isSelected ? selectedBg : 'transparent';
+
   return (
     <tr
       className="transition-colors"
-      style={{ borderBottom: '1px solid oklch(1 0 0 / 4%)' }}
-      onMouseEnter={(e) => (e.currentTarget.style.background = 'oklch(1 0 0 / 3%)')}
-      onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+      style={{
+        borderBottom: '1px solid oklch(1 0 0 / 4%)',
+        cursor: onClick ? 'pointer' : 'default',
+        background: defaultBg,
+      }}
+      onClick={() => onClick?.(row)}
+      onMouseEnter={(e) => {
+        if (!isSelected) e.currentTarget.style.background = hoverBg;
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = defaultBg;
+      }}
+      data-testid={`top-talker-row-${row.device.id}`}
+      aria-selected={isSelected}
     >
       {/* Rank */}
       <td
@@ -171,7 +207,7 @@ function TalkerRow({ row, rank }: { row: TopTalkerRow; rank: number }) {
 }
 
 // ─── Main component ──────────────────────────────────────────────────────
-export function TopTalkersTable({ state }: TopTalkersTableProps) {
+export function TopTalkersTable({ state, onRowClick, selectedDeviceId }: TopTalkersTableProps) {
   if (state.status === 'loading') {
     return <TableSkeleton />;
   }
@@ -233,7 +269,13 @@ export function TopTalkersTable({ state }: TopTalkersTableProps) {
         </thead>
         <tbody>
           {state.topTalkers.map((row, i) => (
-            <TalkerRow key={row.device.id} row={row} rank={i + 1} />
+            <TalkerRow
+              key={row.device.id}
+              row={row}
+              rank={i + 1}
+              onClick={onRowClick}
+              isSelected={selectedDeviceId === row.device.id}
+            />
           ))}
         </tbody>
       </table>

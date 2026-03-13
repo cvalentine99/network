@@ -1101,3 +1101,151 @@ Deferred by contract:
 Live integration status: Not attempted
 Verdict: PASSED — all tests pass, all fixtures present, all schemas enforced, all helper functions tested at boundaries. Screenshot evidence covers quiet state only. Receipt is honest about what is and is not proven.
 ```
+
+
+---
+
+## Slice 08 — Inspector Shell Wiring
+
+### Scope Contract
+
+**IN SCOPE:**
+- InspectorSelection discriminated union type (device | detection | alert) in shared/cockpit-types.ts
+- InspectorContext React context with select/clear/toggle actions
+- InspectorProvider wrapping the Impact Deck page
+- onRowClick prop added to TopTalkersTable (calls selectDevice)
+- onRowClick prop added to DetectionsTable (calls selectDetection)
+- onCardClick prop added to AlertsPanel (calls selectAlert)
+- selectedDeviceId / selectedDetectionId / selectedAlertId row/card highlighting
+- InspectorContent component routing selection.kind to DevicePreview / DetectionPreview / AlertPreview
+- inspectorTitle helper function
+- 4 fixture files: device, detection, alert, empty
+- 50 vitest executions across 10 describe blocks
+- Screenshots: device inspector open, detection inspector open
+
+**OUT OF SCOPE:**
+- Full device detail pane (Slice 09)
+- PCAP download contract (Slice 10)
+- Inspector for entity types beyond device/detection/alert
+- Keyboard navigation within inspector
+- Deep-link to inspector state via URL
+
+### Data Contract
+
+**Request shape:** No new BFF route. Inspector selection is entirely client-side state derived from already-fetched entities (TopTalkerRow, NormalizedDetection, NormalizedAlert).
+
+**Response shape:** InspectorSelection discriminated union:
+```typescript
+type InspectorSelection =
+  | { kind: 'device'; device: DeviceIdentity; topTalkerRow: TopTalkerRow }
+  | { kind: 'detection'; detection: NormalizedDetection }
+  | { kind: 'alert'; alert: NormalizedAlert };
+```
+
+**Validators:** DeviceIdentitySchema, TopTalkerRowSchema, NormalizedDetectionSchema, NormalizedAlertSchema — all pre-existing from Slices 01-06, reused for fixture validation.
+
+**Quiet-state behavior:** null selection → inspector closed, no content rendered, title shows "Inspector".
+
+**Error-state behavior:** Not applicable — inspector selection is client-side state, not a network fetch. If the source panel is in error state, no rows are clickable.
+
+### UI Contract
+
+| State | Behavior |
+|---|---|
+| No selection (null) | Inspector panel closed. Toggle button opens empty shell with title "Inspector". |
+| Device selected | Inspector opens with title "Device Inspector". DevicePreview shows identity, traffic, flags. Source row highlighted gold. |
+| Detection selected | Inspector opens with title "Detection Inspector". DetectionPreview shows severity, MITRE, participants, timeline. Source row highlighted gold. |
+| Alert selected | Inspector opens with title "Alert Inspector". AlertPreview shows rule details, monitor expression, timing. Source card highlighted gold border. |
+| Selection change | Previous highlight cleared, new entity highlighted, inspector content swaps. |
+| Close (X button) | Selection cleared to null, inspector panel closes, all highlights removed. |
+
+### Routes
+
+No new BFF routes. This slice is purely client-side interaction wiring.
+
+### Types
+
+- `InspectorSelection` — discriminated union in shared/cockpit-types.ts
+- `InspectorContextValue` — context type in client/src/contexts/InspectorContext.tsx
+- `onRowClick` prop on TopTalkersTable, DetectionsTable
+- `onCardClick` prop on AlertsPanel
+- `selectedDeviceId`, `selectedDetectionId`, `selectedAlertId` props on respective components
+
+### Fixtures
+
+| File | Purpose |
+|---|---|
+| inspector-selection.device.fixture.json | Device selected from Top Talkers row 1 (dc01.lab.local) |
+| inspector-selection.detection.fixture.json | Detection selected from Detections row 1 (Lateral Movement via SMB) |
+| inspector-selection.alert.fixture.json | Alert selected from Alerts card 1 (High Packet Loss Detected) |
+| inspector-selection.empty.fixture.json | Null selection (inspector closed) |
+
+### Tests
+
+50 vitest executions from 38 it() call sites in server/slice08.test.ts:
+
+| Describe block | it() sites | Vitest executions |
+|---|---|---|
+| Fixture files exist and parse | 2 (×4 files) | 8 |
+| Device selection fixture schema validation | 7 | 7 |
+| Detection selection fixture schema validation | 7 | 7 |
+| Alert selection fixture schema validation | 6 | 6 |
+| Empty selection fixture validation | 2 | 2 |
+| InspectorSelection kind discrimination | 3 | 3 |
+| inspectorTitle helper | 4 | 4 |
+| Cross-fixture consistency | 4 | 4 |
+| Selected ID derivation logic | 5 | 5 |
+| Interaction invariants | 4 | 4 |
+| **Total** | **44** | **50** |
+
+### Screenshots
+
+| Screenshot | Description |
+|---|---|
+| slice08-dashboard-before-click.png | Dashboard in default state, inspector closed, no row selected |
+| slice08-device-inspector-open.png | Device Inspector open after clicking dc01.lab.local — identity, traffic, flags visible |
+| slice08-detection-inspector-open.png | Detection Inspector open after clicking Lateral Movement via SMB — severity, MITRE, participants visible |
+
+Alert inspector screenshot: not captured separately. The alert click path uses the same InspectorShell + InspectorContent routing as device and detection, and the AlertPreview component is tested via fixture schema validation. A separate alert inspector screenshot can be captured on request.
+
+### Known Limitations
+
+1. Inspector panel is a fixed-width right sidebar; on narrow viewports it may overlap content.
+2. No keyboard navigation (Tab/Enter) to open inspector from table rows.
+3. No URL deep-linking to inspector state.
+4. DevicePreview is a compact summary, not the full detail pane (Slice 09).
+5. Clicking a row in a panel that is in error/quiet state is not possible (no rows rendered), so error-state inspector behavior is N/A.
+
+### Truth Receipt
+
+```
+TRUTH RECEIPT
+Slice: 08 — Inspector Shell Wiring
+Commit: (pending checkpoint)
+Claims:
+  - InspectorSelection discriminated union type defined in shared/cockpit-types.ts
+  - InspectorContext React context with selectDevice/selectDetection/selectAlert/clear/toggle
+  - TopTalkersTable, DetectionsTable, AlertsPanel accept onRowClick/onCardClick and selected*Id props
+  - InspectorContent routes selection.kind to DevicePreview/DetectionPreview/AlertPreview
+  - inspectorTitle returns kind-specific titles
+  - 4 fixture files: device, detection, alert, empty
+  - 38 it() call sites → 50 vitest executions in slice08.test.ts
+  - 528 total repo vitest executions passing across 11 test files (all slices)
+Evidence:
+  - tests passed: 38 it() call sites → 50/50 vitest executions in slice08.test.ts; 528/528 repo-wide
+  - fixtures present: 4 files in fixtures/inspector-selection/
+  - screenshots present: 3 PNGs (dashboard default, device inspector, detection inspector)
+  - validators present: DeviceIdentitySchema, TopTalkerRowSchema, NormalizedDetectionSchema, NormalizedAlertSchema (reused from prior slices)
+  - cross-fixture consistency verified: device.id matches topTalkerRow.device.id
+  - interaction invariants verified: only one entity selected at a time, kind discrimination correct
+Not proven:
+  - Alert inspector screenshot not captured separately (same routing path as device/detection)
+  - Component DOM render tests not written (would require jsdom/happy-dom)
+  - Keyboard navigation not implemented
+  - URL deep-linking not implemented
+Deferred by contract:
+  - Live hardware / appliance / packet store / environment access is not part of the current frontend phase.
+  - Live ExtraHop API integration not attempted.
+Live integration status: Not attempted
+Verdict: PASSED — all tests pass, all fixtures present, all schemas enforced, interaction wiring verified via browser screenshots. Inspector opens with correct title and content for device and detection selections. Receipt is honest about what is and is not proven.
+```

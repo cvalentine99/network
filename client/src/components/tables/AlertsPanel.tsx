@@ -15,6 +15,12 @@
  *   4. error — ErrorState (transport failure)
  *   5. malformed — ErrorState (contract violation)
  *
+ * INTERACTION CONTRACT (Slice 08):
+ *   onCardClick?: (alert: NormalizedAlert) => void
+ *   - Called when a populated card is clicked
+ *   - Caller (Home.tsx) wires this to InspectorContext.selectAlert
+ *   - selectedAlertId?: number — highlights the currently selected card
+ *
  * Contract: this component never interprets raw payloads.
  * It receives NormalizedAlert[] from the hook, which is already schema-validated.
  */
@@ -58,7 +64,15 @@ function AlertCardSkeleton() {
 }
 
 // ─── Alert Card ──────────────────────────────────────────────────────────
-function AlertCard({ alert }: { alert: NormalizedAlert }) {
+function AlertCard({
+  alert,
+  onClick,
+  isSelected,
+}: {
+  alert: NormalizedAlert;
+  onClick?: (alert: NormalizedAlert) => void;
+  isSelected?: boolean;
+}) {
   const monitorLine = [
     alert.statName,
     alert.fieldName,
@@ -69,17 +83,23 @@ function AlertCard({ alert }: { alert: NormalizedAlert }) {
     .filter(Boolean)
     .join(' ');
 
+  const selectedBorder = 'oklch(0.769 0.108 85.805 / 40%)';
+  const defaultBorder = 'oklch(1 0 0 / 4%)';
+
   return (
     <div
       className="rounded-xl p-4 transition-colors"
       style={{
         background: alert.disabled ? 'oklch(0.10 0.005 260)' : 'oklch(0.12 0.005 260)',
-        border: '1px solid oklch(1 0 0 / 4%)',
+        border: `1px solid ${isSelected ? selectedBorder : defaultBorder}`,
         opacity: alert.disabled ? 0.6 : 1,
+        cursor: onClick ? 'pointer' : 'default',
       }}
+      onClick={() => onClick?.(alert)}
       onMouseEnter={(e) => { e.currentTarget.style.background = 'oklch(1 0 0 / 3%)'; }}
       onMouseLeave={(e) => { e.currentTarget.style.background = alert.disabled ? 'oklch(0.10 0.005 260)' : 'oklch(0.12 0.005 260)'; }}
       data-testid={`alert-card-${alert.id}`}
+      aria-selected={isSelected}
     >
       <div className="flex items-center gap-2 mb-2">
         <SeverityBadge level={alert.severityLabel} />
@@ -119,7 +139,15 @@ function AlertCard({ alert }: { alert: NormalizedAlert }) {
 }
 
 // ─── Main Component ──────────────────────────────────────────────────────
-export function AlertsPanel({ state }: { state: AlertsState }) {
+export function AlertsPanel({
+  state,
+  onCardClick,
+  selectedAlertId,
+}: {
+  state: AlertsState;
+  onCardClick?: (alert: NormalizedAlert) => void;
+  selectedAlertId?: number | null;
+}) {
   if (state.status === 'loading') {
     return (
       <GlassCard>
@@ -218,10 +246,20 @@ export function AlertsPanel({ state }: { state: AlertsState }) {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
         {activeAlerts.map((alert) => (
-          <AlertCard key={alert.id} alert={alert} />
+          <AlertCard
+            key={alert.id}
+            alert={alert}
+            onClick={onCardClick}
+            isSelected={selectedAlertId === alert.id}
+          />
         ))}
         {disabledAlerts.map((alert) => (
-          <AlertCard key={alert.id} alert={alert} />
+          <AlertCard
+            key={alert.id}
+            alert={alert}
+            onClick={onCardClick}
+            isSelected={selectedAlertId === alert.id}
+          />
         ))}
       </div>
     </GlassCard>

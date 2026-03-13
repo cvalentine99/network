@@ -12,6 +12,12 @@
  * - Max height ~400px with vertical scroll
  * - No direct ExtraHop calls
  * - All colors from DashboardWidgets constants (no hardcoded hex outside OKLCH system)
+ *
+ * INTERACTION CONTRACT (Slice 08):
+ *   onRowClick?: (detection: NormalizedDetection) => void
+ *   - Called when a populated row is clicked
+ *   - Caller (Home.tsx) wires this to InspectorContext.selectDetection
+ *   - selectedDetectionId?: number — highlights the currently selected row
  */
 import type { NormalizedDetection, Severity } from '../../../../shared/cockpit-types';
 import { SeverityBadge, MUTED, BRIGHT, CYAN, RED, GREEN } from '@/components/DashboardWidgets';
@@ -74,16 +80,37 @@ function DetectionRowSkeleton() {
 }
 
 // ─── Detection Row ──────────────────────────────────────────────────────────
-function DetectionRow({ detection }: { detection: NormalizedDetection }) {
+function DetectionRow({
+  detection,
+  onClick,
+  isSelected,
+}: {
+  detection: NormalizedDetection;
+  onClick?: (detection: NormalizedDetection) => void;
+  isSelected?: boolean;
+}) {
   const severity = riskScoreToSeverity(detection.riskScore);
+  const selectedBg = 'oklch(0.769 0.108 85.805 / 8%)';
+  const hoverBg = 'oklch(1 0 0 / 3%)';
+  const defaultBg = isSelected ? selectedBg : 'transparent';
 
   return (
     <div
-      className="flex items-start gap-3 py-3 px-3 transition-colors cursor-default"
-      style={{ borderBottom: '1px solid oklch(1 0 0 / 4%)' }}
-      onMouseEnter={(e) => (e.currentTarget.style.background = 'oklch(1 0 0 / 3%)')}
-      onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+      className="flex items-start gap-3 py-3 px-3 transition-colors"
+      style={{
+        borderBottom: '1px solid oklch(1 0 0 / 4%)',
+        cursor: onClick ? 'pointer' : 'default',
+        background: defaultBg,
+      }}
+      onClick={() => onClick?.(detection)}
+      onMouseEnter={(e) => {
+        if (!isSelected) e.currentTarget.style.background = hoverBg;
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = defaultBg;
+      }}
       data-testid={`detection-row-${detection.id}`}
+      aria-selected={isSelected}
     >
       {/* Severity badge */}
       <div className="flex-shrink-0 pt-0.5">
@@ -153,7 +180,15 @@ function DetectionRow({ detection }: { detection: NormalizedDetection }) {
 }
 
 // ─── Main Component ─────────────────────────────────────────────────────────
-export function DetectionsTable({ state }: { state: DetectionsState }) {
+export function DetectionsTable({
+  state,
+  onRowClick,
+  selectedDetectionId,
+}: {
+  state: DetectionsState;
+  onRowClick?: (detection: NormalizedDetection) => void;
+  selectedDetectionId?: number | null;
+}) {
   if (state.kind === 'loading') {
     return (
       <div data-testid="detections-loading">
@@ -242,7 +277,12 @@ export function DetectionsTable({ state }: { state: DetectionsState }) {
       {/* Scrollable detection rows */}
       <div className="overflow-y-auto" style={{ maxHeight: 400 }}>
         {state.detections.map((detection) => (
-          <DetectionRow key={detection.id} detection={detection} />
+          <DetectionRow
+            key={detection.id}
+            detection={detection}
+            onClick={onRowClick}
+            isSelected={selectedDetectionId === detection.id}
+          />
         ))}
       </div>
     </div>

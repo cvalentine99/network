@@ -11,7 +11,7 @@
 - [x] Document architectural drift (decomposed BFF routes vs single fan-out)
 - [x] Update CONTRACTS.md truncation note as superseded (9afe240e)
 - [x] Slice 07 — Appliance Status Footer (types, validators, fixtures, BFF route, hook, component, tests)
-- [ ] Slice 08 — Inspector Shell Wiring (click-to-inspect from rows)
+- [x] Slice 08 — Inspector Shell Wiring: shared inspector types, selection context, click handlers on Top Talkers/Detections/Alerts rows, InspectorShell content routing, fixtures, tests, screenshot, truth receipt
 - [ ] Slice 09 — Device Detail Inspector Pane
 - [ ] Slice 10 — PCAP Download Contract
 - [ ] Below-fold screenshots for Slices 04-06
