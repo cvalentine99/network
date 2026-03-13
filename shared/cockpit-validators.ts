@@ -192,6 +192,38 @@ export const ApplianceStatusSchema = z.object({
   lastChecked: z.string(),
 });
 
+// ─── Device Protocol Activity (Slice 09) ────────────────────────────────
+export const DeviceProtocolActivitySchema = z.object({
+  protocol: z.string().min(1),
+  bytesIn: z.number().nonnegative(),
+  bytesOut: z.number().nonnegative(),
+  totalBytes: z.number().nonnegative(),
+  connections: z.number().int().nonnegative(),
+  lastSeen: z.string(),
+});
+
+// ─── Device Detail (Slice 09) ───────────────────────────────────────────
+export const DeviceDetailSchema = z.object({
+  device: DeviceIdentitySchema,
+  traffic: z.object({
+    bytesIn: z.number().nonnegative(),
+    bytesOut: z.number().nonnegative(),
+    totalBytes: z.number().nonnegative(),
+    pktsIn: z.number().nonnegative(),
+    pktsOut: z.number().nonnegative(),
+  }),
+  protocols: z.array(DeviceProtocolActivitySchema),
+  associatedDetections: z.array(NormalizedDetectionSchema),
+  associatedAlerts: z.array(NormalizedAlertSchema),
+  activitySummary: z.object({
+    firstSeen: z.string().nullable(),
+    lastSeen: z.string().nullable(),
+    totalProtocols: z.number().int().nonnegative(),
+    totalConnections: z.number().int().nonnegative(),
+    peakThroughputBps: z.number().nullable(),
+  }),
+});
+
 // ─── Impact Overview Payload (full) ───────────────────────────────────────
 export const ImpactOverviewPayloadSchema = z.object({
   headline: ImpactHeadlineSchema,

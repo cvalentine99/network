@@ -1,0 +1,71 @@
+{
+  "description": "Malformed device detail fixture — intentionally violates DeviceDetailSchema. Used to test that the BFF and hook reject invalid data. Violations: traffic.bytesIn is negative, protocols has an entry with empty protocol name, activitySummary.totalProtocols is a string, device.id is a string.",
+  "deviceDetail": {
+    "device": {
+      "id": "not-a-number",
+      "displayName": "broken-device",
+      "extrahopId": "abc",
+      "discoveryId": "abc",
+      "ipaddr4": "10.10.1.1",
+      "ipaddr6": null,
+      "macaddr": "00:00:00:00:00:00",
+      "deviceClass": null,
+      "role": null,
+      "autoRole": null,
+      "vendor": null,
+      "isL3": false,
+      "vlanid": null,
+      "parentId": null,
+      "nodeId": null,
+      "analysis": null,
+      "analysisLevel": null,
+      "lastSeenTime": null,
+      "lastSeenIso": null,
+      "modTime": null,
+      "discoverTime": null,
+      "discoverTimeIso": null,
+      "onWatchlist": false,
+      "critical": false,
+      "customCriticality": null,
+      "isCustomDevice": false,
+      "customType": null,
+      "userModTime": null,
+      "description": null,
+      "cdp_name": null,
+      "dhcp_name": null,
+      "dns_name": null,
+      "netbios_name": null,
+      "custom_name": null,
+      "default_name": null,
+      "model": null,
+      "modelOverride": null,
+      "software": null
+    },
+    "traffic": {
+      "bytesIn": -500,
+      "bytesOut": 100,
+      "totalBytes": -400,
+      "pktsIn": 0,
+      "pktsOut": 0
+    },
+    "protocols": [
+      {
+        "protocol": "",
+        "bytesIn": 100,
+        "bytesOut": 200,
+        "totalBytes": 300,
+        "connections": 5,
+        "lastSeen": "2026-03-12T16:00:00.000Z"
+      }
+    ],
+    "associatedDetections": [],
+    "associatedAlerts": [],
+    "activitySummary": {
+      "firstSeen": null,
+      "lastSeen": null,
+      "totalProtocols": "five",
+      "totalConnections": 0,
+      "peakThroughputBps": null
+    }
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "description": "Not-found fixture — device ID does not exist in the appliance. The BFF returns 404 with standard error shape. This is distinct from transport-error (network failure) and quiet (device exists but no activity).",
+  "error": "Device not found",
+  "message": "No device with id 99999 exists on the appliance"
+}

@@ -1,0 +1,5 @@
+{
+  "description": "Transport error fixture — simulates a BFF failure when fetching device detail. The error and message fields match the standard BFF error shape.",
+  "error": "Device detail fetch failed",
+  "message": "Connection to ExtraHop appliance timed out after 10000ms"
+}

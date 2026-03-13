@@ -16,7 +16,7 @@
  *   5. Returning proper error shapes for transport failures and malformed data
  */
 import { Router } from 'express';
-import { TimeWindowQuerySchema, ImpactHeadlineSchema, SeriesPointSchema, TopTalkerRowSchema, NormalizedDetectionSchema, NormalizedAlertSchema, ApplianceStatusSchema } from '../../shared/cockpit-validators';
+import { TimeWindowQuerySchema, ImpactHeadlineSchema, SeriesPointSchema, TopTalkerRowSchema, NormalizedDetectionSchema, NormalizedAlertSchema, ApplianceStatusSchema, DeviceDetailSchema } from '../../shared/cockpit-validators';
 import { z } from 'zod';
 import { resolveTimeWindow } from '../../shared/normalize';
 import type { ImpactOverviewPayload } from '../../shared/cockpit-types';
@@ -573,6 +573,97 @@ impactRouter.get('/appliance-status', (_req, res) => {
   } catch (err: any) {
     return res.status(500).json({
       error: 'Appliance status fetch failed',
+      message: err.message || 'Unknown error',
+    });
+  }
+});
+
+/**
+ * Load a fixture file from the fixtures/device-detail directory.
+ * Returns null if the file cannot be read or parsed.
+ */
+function loadDeviceDetailFixture(name: string): any | null {
+  try {
+    const fixturePath = join(process.cwd(), 'fixtures', 'device-detail', name);
+    const raw = readFileSync(fixturePath, 'utf-8');
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * GET /api/bff/impact/device-detail
+ *
+ * Query params: id (required, device ID)
+ *
+ * Response shape on success:
+ *   { deviceDetail: DeviceDetail }
+ *
+ * Response shape on not found:
+ *   { error: string, message: string } (404)
+ *
+ * Response shape on error:
+ *   { error: string, message: string } (500/502)
+ *
+ * Fixture backing: loads from fixtures/device-detail/device-detail.populated.fixture.json
+ * In fixture mode, only device id 1042 returns populated data; all others return quiet.
+ *
+ * Contract:
+ *   - Accepts device ID as query param
+ *   - Returns full DeviceDetail validated via DeviceDetailSchema
+ *   - Browser calls this route, never ExtraHop directly
+ *   - Empty protocols/detections/alerts arrays are valid (quiet device)
+ */
+impactRouter.get('/device-detail', (req, res) => {
+  try {
+    // 1. Validate device ID
+    const idParam = req.query.id;
+    if (!idParam || isNaN(Number(idParam))) {
+      return res.status(400).json({
+        error: 'Invalid device ID',
+        message: 'Query param "id" must be a numeric device ID',
+      });
+    }
+
+    const deviceId = Number(idParam);
+
+    // 2. In fixture mode, return fixture data
+    if (isFixtureMode()) {
+      // Only device 1042 has a populated fixture; others get quiet
+      const fixtureName = deviceId === 1042
+        ? 'device-detail.populated.fixture.json'
+        : 'device-detail.quiet.fixture.json';
+
+      const fixture = loadDeviceDetailFixture(fixtureName);
+      if (!fixture) {
+        return res.status(500).json({
+          error: 'Fixture load failed',
+          message: `Could not load fixture: ${fixtureName}`,
+        });
+      }
+
+      // Validate before sending
+      const validation = DeviceDetailSchema.safeParse(fixture.deviceDetail);
+      if (!validation.success) {
+        return res.status(502).json({
+          error: 'Malformed device detail data',
+          message: 'Device detail data from source failed schema validation',
+          details: validation.error.issues,
+        });
+      }
+
+      return res.json({ deviceDetail: validation.data });
+    }
+
+    // 3. Live mode — placeholder for future ExtraHop integration
+    return res.status(404).json({
+      error: 'Device not found',
+      message: `No device with id ${deviceId} exists (live mode not yet integrated)`,
+    });
+  } catch (err: any) {
+    return res.status(500).json({
+      error: 'Device detail fetch failed',
       message: err.message || 'Unknown error',
     });
   }

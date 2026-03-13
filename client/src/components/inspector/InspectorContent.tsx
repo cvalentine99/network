@@ -13,14 +13,15 @@
  *   - Each preview is a compact summary, NOT the full detail pane (that is Slice 09+)
  *   - No ExtraHop calls — all data comes from the already-fetched entity
  *
- * These previews are intentionally minimal for Slice 08.
- * Slice 09 will replace DevicePreview with a full DeviceDetailPane.
+ * Slice 09 replaced DevicePreview with DeviceDetailPane (full detail with BFF fetch).
+ * Detection and Alert previews remain compact (Slice 08 level).
  */
 import type { InspectorSelection } from '../../../../shared/cockpit-types';
 import { formatBytes } from '../../../../shared/formatters';
 import { SeverityBadge, GOLD, CYAN, MUTED, BRIGHT, RED, GREEN } from '@/components/DashboardWidgets';
 import { riskScoreToSeverity } from '@/components/tables/DetectionsTable';
 import { alertSeverityToLabel } from '@/components/tables/AlertsPanel';
+import { DeviceDetailPane } from './DeviceDetailPane';
 import { Monitor, Shield, Bell, Globe, Server, Tag, Clock, Activity } from 'lucide-react';
 
 // ─── Shared field row ────────────────────────────────────────────────────
@@ -300,7 +301,7 @@ export function InspectorContent({ selection }: { selection: InspectorSelection 
 
   switch (selection.kind) {
     case 'device':
-      return <DevicePreview selection={selection} />;
+      return <DeviceDetailPane selection={selection} />;
     case 'detection':
       return <DetectionPreview selection={selection} />;
     case 'alert':

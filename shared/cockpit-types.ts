@@ -223,6 +223,60 @@ export interface ApplianceIdentity {
   services: Record<string, { enabled: boolean }>;
 }
 
+// ─── Device Protocol Activity (Slice 09) ────────────────────────────────
+/**
+ * A single protocol activity row for a device.
+ * Represents traffic breakdown by protocol (e.g., DNS, HTTP, TLS, SMB).
+ *
+ * Fields:
+ *   protocol     — protocol name (e.g. "DNS", "HTTP", "TLS", "SMB")
+ *   bytesIn      — inbound bytes for this protocol
+ *   bytesOut     — outbound bytes for this protocol
+ *   totalBytes   — total bytes (bytesIn + bytesOut)
+ *   connections  — number of connections/flows observed
+ *   lastSeen     — ISO timestamp of last activity for this protocol
+ */
+export interface DeviceProtocolActivity {
+  protocol: string;
+  bytesIn: number;
+  bytesOut: number;
+  totalBytes: number;
+  connections: number;
+  lastSeen: IsoString;
+}
+
+// ─── Device Detail (Slice 09) ───────────────────────────────────────────
+/**
+ * Full device detail for the inspector pane.
+ * Extends the compact DevicePreview (Slice 08) with:
+ *   - Protocol activity breakdown
+ *   - Associated detections (NormalizedDetection[])
+ *   - Associated alerts (NormalizedAlert[])
+ *   - Activity summary metrics
+ *
+ * This is the BFF response shape for GET /api/bff/impact/device-detail?id=<deviceId>
+ */
+export interface DeviceDetail {
+  device: DeviceIdentity;
+  traffic: {
+    bytesIn: number;
+    bytesOut: number;
+    totalBytes: number;
+    pktsIn: number;
+    pktsOut: number;
+  };
+  protocols: DeviceProtocolActivity[];
+  associatedDetections: NormalizedDetection[];
+  associatedAlerts: NormalizedAlert[];
+  activitySummary: {
+    firstSeen: IsoString | null;
+    lastSeen: IsoString | null;
+    totalProtocols: number;
+    totalConnections: number;
+    peakThroughputBps: number | null;
+  };
+}
+
 // ─── Inspector Selection (Slice 08) ─────────────────────────────────────
 /**
  * Discriminated union representing what entity is currently selected in the inspector.
