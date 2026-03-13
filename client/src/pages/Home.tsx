@@ -1,24 +1,26 @@
 /**
- * Impact Deck — Landing page (Slice 00 shell + Slice 02 KPI Strip + Slice 03 Timeseries)
+ * Impact Deck — Landing page (Slice 00 shell + Slice 02 KPI Strip + Slice 03 Timeseries + Slice 04 Top Talkers)
  *
  * CONTRACT:
  * - Global time window is wired and readable
  * - Inspector shell opens/closes without breaking layout
  * - KPI Strip fetches from /api/bff/impact/headline (never ExtraHop directly)
  * - GhostedTimeline fetches from /api/bff/impact/timeseries (never ExtraHop directly)
+ * - TopTalkersTable fetches from /api/bff/impact/top-talkers (never ExtraHop directly)
  * - All 5 UI states are reachable per panel: loading, quiet, populated, error, malformed
  * - No direct ExtraHop calls from this component
  */
 import { useState } from 'react';
-import { PageHeader } from '@/components/DashboardWidgets';
+import { PageHeader, GlassCard, MUTED, GOLD } from '@/components/DashboardWidgets';
 import { TimeWindowSelector } from '@/components/shared/TimeWindowSelector';
 import { InspectorShell } from '@/components/inspector/InspectorShell';
 import { KPIStrip } from '@/components/impact/KPIStrip';
 import { GhostedTimeline } from '@/components/charts/GhostedTimeline';
+import { TopTalkersTable } from '@/components/tables/TopTalkersTable';
 import { useTimeWindow } from '@/lib/useTimeWindow';
 import { useImpactHeadline } from '@/hooks/useImpactHeadline';
 import { useImpactTimeseries } from '@/hooks/useImpactTimeseries';
-import { MUTED, GOLD } from '@/components/DashboardWidgets';
+import { useTopTalkers } from '@/hooks/useTopTalkers';
 import { PanelRightOpen } from 'lucide-react';
 
 export default function Home() {
@@ -26,6 +28,7 @@ export default function Home() {
   const [inspectorOpen, setInspectorOpen] = useState(false);
   const { state: kpiState } = useImpactHeadline();
   const { state: timeseriesState } = useImpactTimeseries();
+  const topTalkersState = useTopTalkers();
 
   return (
     <div className="relative">
@@ -66,6 +69,19 @@ export default function Home() {
       {/* Timeseries chart — throughput and packet rate over time */}
       <div className="mb-6">
         <GhostedTimeline state={timeseriesState} />
+      </div>
+
+      {/* Top Talkers table — ranked by total bytes */}
+      <div className="mb-6">
+        <GlassCard>
+          <p
+            className="text-xs font-bold uppercase tracking-wider mb-4"
+            style={{ color: MUTED }}
+          >
+            Top Talkers — By Total Bytes
+          </p>
+          <TopTalkersTable state={topTalkersState} />
+        </GlassCard>
       </div>
 
       {/* Dashboard content area — placeholder for future slices */}

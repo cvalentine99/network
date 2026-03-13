@@ -16,7 +16,7 @@
  *   5. Returning proper error shapes for transport failures and malformed data
  */
 import { Router } from 'express';
-import { TimeWindowQuerySchema, ImpactHeadlineSchema, SeriesPointSchema } from '../../shared/cockpit-validators';
+import { TimeWindowQuerySchema, ImpactHeadlineSchema, SeriesPointSchema, TopTalkerRowSchema } from '../../shared/cockpit-validators';
 import { z } from 'zod';
 import { resolveTimeWindow } from '../../shared/normalize';
 import type { ImpactOverviewPayload } from '../../shared/cockpit-types';
@@ -202,6 +202,97 @@ impactRouter.get('/timeseries', (req, res) => {
   } catch (err: any) {
     return res.status(500).json({
       error: 'Impact timeseries fetch failed',
+      message: err.message || 'Unknown error',
+    });
+  }
+});
+
+/**
+ * Load a fixture file from the fixtures/top-talkers directory.
+ * Returns null if the file cannot be read or parsed.
+ */
+function loadTopTalkersFixture(name: string): any | null {
+  try {
+    const fixturePath = join(process.cwd(), 'fixtures', 'top-talkers', name);
+    const raw = readFileSync(fixturePath, 'utf-8');
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * GET /api/bff/impact/top-talkers
+ *
+ * Query params: from, until, cycle (all optional, validated by TimeWindowQuerySchema)
+ *
+ * Response shape on success:
+ *   { topTalkers: TopTalkerRow[], timeWindow: TimeWindow }
+ *
+ * Response shape on quiet (no data):
+ *   { topTalkers: [], timeWindow: TimeWindow }
+ *
+ * Response shape on error:
+ *   { error: string, message: string }
+ *
+ * Fixture backing: loads from fixtures/top-talkers/top-talkers.populated.fixture.json
+ * (or top-talkers.quiet.fixture.json for invalid windows).
+ */
+impactRouter.get('/top-talkers', (req, res) => {
+  try {
+    // 1. Validate query params
+    const queryResult = TimeWindowQuerySchema.safeParse(req.query);
+    if (!queryResult.success) {
+      return res.status(400).json({
+        error: 'Invalid time window query',
+        message: queryResult.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('; '),
+      });
+    }
+
+    const { from, until, cycle } = queryResult.data;
+
+    // 2. Resolve time window
+    const timeWindow = resolveTimeWindow(from, until, cycle);
+
+    // 3. In fixture mode, return fixture data
+    if (isFixtureMode()) {
+      const fixtureName = timeWindow.durationMs > 0
+        ? 'top-talkers.populated.fixture.json'
+        : 'top-talkers.quiet.fixture.json';
+
+      const fixture = loadTopTalkersFixture(fixtureName);
+      if (!fixture) {
+        return res.status(500).json({
+          error: 'Fixture load failed',
+          message: `Could not load fixture: ${fixtureName}`,
+        });
+      }
+
+      // Validate each top talker row before sending
+      const topTalkersArray = z.array(TopTalkerRowSchema);
+      const validation = topTalkersArray.safeParse(fixture.topTalkers);
+      if (!validation.success) {
+        return res.status(502).json({
+          error: 'Malformed top talkers data',
+          message: 'Top talkers data from source failed schema validation',
+          details: validation.error.issues,
+        });
+      }
+
+      return res.json({
+        topTalkers: validation.data,
+        timeWindow,
+      });
+    }
+
+    // 4. Live mode — placeholder for future ExtraHop integration
+    return res.json({
+      topTalkers: [],
+      timeWindow,
+    });
+  } catch (err: any) {
+    return res.status(500).json({
+      error: 'Impact top talkers fetch failed',
       message: err.message || 'Unknown error',
     });
   }

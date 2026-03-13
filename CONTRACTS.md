@@ -460,7 +460,7 @@ Commit: e2e8f97a (original), df3c5ac5 (correction)
 
 Slice: 03 — Impact Deck Time-Series Chart Panel
 Status: Passed
-Commit: pending checkpoint
+Commit: 9051832b
 
 ## Scope
 
@@ -560,3 +560,68 @@ Not attempted. Deferred by contract.
 
 ## Verdict
 Slice 03 is implemented against fixtures and validated against schema. UI state complete for mocked payloads. BFF normalization complete and tested. Live integration not yet performed.
+
+
+---
+
+## Slice 04 — Top Talkers Table
+
+```
+TRUTH RECEIPT
+Slice: 04 — Top Talkers Table
+Commit: pending checkpoint
+Claims:
+  - TopTalkersTable component renders 5 UI states: loading, quiet, populated, transport-error, malformed
+  - BFF route GET /api/bff/impact/top-talkers serves TopTalkerRow[] validated via TopTalkerRowSchema
+  - Route fixture backing: loads from fixtures/top-talkers/top-talkers.populated.fixture.json (or quiet for invalid windows)
+  - useTopTalkers hook discriminates 5 states via TopTalkersState union
+  - 4 deterministic fixture files in fixtures/top-talkers/
+  - Table shows rank, device identity (name + IP), role (cyan), bytes in/out, total (gold), sparkline trend
+  - Device with null role renders em-dash
+  - topTalkers are sorted by totalBytes descending (verified in test)
+  - totalBytes = bytesIn + bytesOut for every row (verified in test)
+  - All byte values are non-negative finite numbers (verified in test)
+  - No ExtraHop host references in client code (grep audit clean)
+  - All client fetches go through /api/bff/* routes only
+
+Evidence:
+  - Tests: 28 it() call sites → 34 vitest executions, all passing
+  - Total repo: 192 it() call sites → 292 vitest executions, all passing
+  - Test breakdown (it() call sites → vitest executions):
+    Fixture files exist/parse: 2 → 8 (4 files × 2 dynamic tests each)
+    Populated schema validation: 8 → 8
+    Quiet schema validation: 2 → 2
+    Malformed rejection: 2 → 2
+    BFF route live local: 5 → 5
+    formatBytes for fixture values: 4 → 4
+    Device identity coverage: 3 → 3
+    Transport error fixture: 2 → 2
+  - Fixtures present:
+    fixtures/top-talkers/top-talkers.populated.fixture.json (5 devices, sorted by totalBytes desc)
+    fixtures/top-talkers/top-talkers.quiet.fixture.json (empty array)
+    fixtures/top-talkers/top-talkers.transport-error.fixture.json (error shape)
+    fixtures/top-talkers/top-talkers.malformed.fixture.json (fails TopTalkerRowSchema)
+  - Validators present: TopTalkerRowSchema, DeviceIdentitySchema, SeriesPointSchema (all from cockpit-validators.ts)
+  - Screenshots:
+    screenshots/slice04-populated.png (163,696 bytes) — above-fold capture from webdev_check_status; shows KPI strip and chart but Top Talkers table is below the fold
+    Browser scroll screenshot observed during development shows full table with 5 ranked devices, but was not saved as a separate PNG in the project directory
+  - Static audit: grep confirms no ExtraHop host (192.168.50.*), EH_HOST, or EH_API_KEY in client/src/
+  - Network audit: all client fetch() calls target /api/bff/* routes only
+
+Not proven:
+  - Screenshot of quiet, loading, error, and malformed UI states (only populated state captured)
+  - The saved screenshot file (slice04-populated.png) does not actually show the Top Talkers table because it captures only the initial viewport above the fold
+  - Component DOM render tests (jsdom) not written — only BFF route and schema tests exist
+  - Sorting is not user-interactive (no column header click-to-sort) — fixture data arrives pre-sorted
+
+Deferred by contract:
+  - Live hardware / appliance / packet store / environment access is not part of the current frontend phase
+  - Live ExtraHop integration not attempted
+
+Live integration status: Not attempted
+Verdict: Passed — with noted screenshot limitation (populated screenshot does not show table due to viewport capture) and missing state screenshots (quiet/loading/error/malformed)
+```
+
+### Correction note (Slice 04)
+
+The populated screenshot file (slice04-populated.png) is a webdev_check_status capture that only shows the initial viewport. The Top Talkers table renders below the fold and is not visible in this file. During development, a browser scroll screenshot confirmed the table renders correctly with 5 ranked devices, roles in cyan, totals in gold, and sparkline trends — but this was not saved as a separate PNG. The receipt explicitly notes this limitation in the "Not proven" section rather than claiming the screenshot proves the table renders.
