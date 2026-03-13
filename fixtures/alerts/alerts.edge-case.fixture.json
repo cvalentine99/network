@@ -1,0 +1,58 @@
+{
+  "alerts": [
+    {
+      "id": 201,
+      "name": "Disabled Legacy Alert",
+      "author": "admin",
+      "statName": "extrahop.device.net",
+      "fieldName": "bytes_in",
+      "fieldOp": null,
+      "fieldName2": null,
+      "operator": ">",
+      "operand": 0,
+      "severity": 1,
+      "severityLabel": "critical",
+      "type": "threshold",
+      "disabled": true,
+      "description": "This alert is disabled and should render with a visual disabled indicator.",
+      "intervalLength": null,
+      "refireInterval": null
+    },
+    {
+      "id": 202,
+      "name": "String Operand Alert",
+      "author": "ExtraHop",
+      "statName": "extrahop.device.http_server",
+      "fieldName": "uri",
+      "fieldOp": null,
+      "fieldName2": null,
+      "operator": "~",
+      "operand": "/admin.*",
+      "severity": 4,
+      "severityLabel": "medium",
+      "type": "detection",
+      "disabled": false,
+      "description": "Fires when HTTP URI matches admin pattern. Operand is a string regex.",
+      "intervalLength": 60,
+      "refireInterval": 600
+    },
+    {
+      "id": 203,
+      "name": "Boundary Severity 6",
+      "author": "admin",
+      "statName": "extrahop.device.net",
+      "fieldName": "pkts_in",
+      "fieldOp": null,
+      "fieldName2": null,
+      "operator": "<",
+      "operand": 10,
+      "severity": 6,
+      "severityLabel": "low",
+      "type": "threshold",
+      "disabled": false,
+      "description": "Severity 6 is the boundary for low tier (6+).",
+      "intervalLength": 300,
+      "refireInterval": 1800
+    }
+  ]
+}

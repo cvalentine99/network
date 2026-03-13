@@ -1,0 +1,5 @@
+{
+  "description": "Transport error fixture: simulates BFF-to-appliance communication failure.",
+  "error": "ECONNREFUSED",
+  "message": "Connection refused to appliance at 192.168.50.157:443"
+}

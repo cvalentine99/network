@@ -1,0 +1,16 @@
+{
+  "alerts": [
+    {
+      "id": "not-a-number",
+      "name": 12345,
+      "severity": "should-be-number",
+      "severityLabel": "invalid-tier",
+      "operator": true,
+      "operand": null
+    },
+    {
+      "id": 999,
+      "name": "Missing required fields"
+    }
+  ]
+}

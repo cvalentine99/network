@@ -1,5 +1,5 @@
 /**
- * Impact Deck — Landing page (Slice 00-05)
+ * Impact Deck — Landing page (Slice 00-06)
  *
  * CONTRACT:
  * - Global time window is wired and readable
@@ -8,6 +8,7 @@
  * - GhostedTimeline fetches from /api/bff/impact/timeseries (never ExtraHop directly)
  * - TopTalkersTable fetches from /api/bff/impact/top-talkers (never ExtraHop directly)
  * - DetectionsTable fetches from /api/bff/impact/detections (never ExtraHop directly)
+ * - AlertsPanel fetches from /api/bff/impact/alerts (never ExtraHop directly)
  * - All 5 UI states are reachable per panel: loading, quiet, populated, error, malformed
  * - No direct ExtraHop calls from this component
  */
@@ -19,11 +20,13 @@ import { KPIStrip } from '@/components/impact/KPIStrip';
 import { GhostedTimeline } from '@/components/charts/GhostedTimeline';
 import { TopTalkersTable } from '@/components/tables/TopTalkersTable';
 import { DetectionsTable } from '@/components/tables/DetectionsTable';
+import { AlertsPanel } from '@/components/tables/AlertsPanel';
 import { useTimeWindow } from '@/lib/useTimeWindow';
 import { useImpactHeadline } from '@/hooks/useImpactHeadline';
 import { useImpactTimeseries } from '@/hooks/useImpactTimeseries';
 import { useTopTalkers } from '@/hooks/useTopTalkers';
 import { useDetections } from '@/hooks/useDetections';
+import { useAlerts } from '@/hooks/useAlerts';
 import { PanelRightOpen } from 'lucide-react';
 
 export default function Home() {
@@ -33,6 +36,7 @@ export default function Home() {
   const { state: timeseriesState } = useImpactTimeseries();
   const topTalkersState = useTopTalkers();
   const detectionsState = useDetections();
+  const alertsState = useAlerts();
 
   // Detection count badge color
   const detectionCount = detectionsState.kind === 'populated' ? detectionsState.detections.length : 0;
@@ -117,6 +121,11 @@ export default function Home() {
             <DetectionsTable state={detectionsState} />
           </GlassCard>
         </div>
+      </div>
+
+      {/* Alerts Panel — configured alert rules */}
+      <div className="mb-6">
+        <AlertsPanel state={alertsState} />
       </div>
 
       {/* Dashboard content area — placeholder for future slices */}

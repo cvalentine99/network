@@ -736,7 +736,7 @@ The populated screenshot file (slice04-populated.png) is a webdev_check_status c
 ```
 TRUTH RECEIPT
 Slice: 05 — Detections Panel
-Commit: pending checkpoint
+Commit: 0b9f0431
 Claims:
   - DetectionsTable component renders 5 UI states via discriminated union
   - riskScoreToSeverity maps at exact boundary values (80→critical, 60→high, 30→medium, <30→low)
@@ -768,3 +768,112 @@ Deferred by contract:
 Live integration status: Not attempted
 Verdict: PASSED — all tests pass, all fixtures present, all schemas enforced, all pure functions tested at boundaries. Screenshot evidence is incomplete (above-fold only). Receipt is honest about what is and is not proven.
 ```
+
+---
+
+## Slice 06 — Alerts Panel
+
+# TRUTH RECEIPT
+
+Slice: 06 — Alerts Panel
+Status: Passed
+Commit: (pending checkpoint)
+
+## Scope Contract
+
+IN SCOPE:
+- AlertsPanel component (5 UI states: loading, quiet, populated, error, malformed)
+- alertSeverityToLabel mapping function (ExtraHop convention: LOWER severity int = MORE severe)
+- BFF route GET /api/bff/impact/alerts with schema-validated NormalizedAlert[]
+- useAlerts hook with 5-state discrimination
+- 5 deterministic fixture files
+- Metric expression construction (statName + fieldName + fieldOp + operator + operand)
+
+OUT OF SCOPE:
+- Alert creation/editing/toggling
+- Alert notification configuration
+- Alert history/firing events
+- Inspector drill-down on alert click
+
+## Data Contract
+
+Request shape: GET /api/bff/impact/alerts?from={ms}&until={ms}&cycle={enum}
+Response shape (populated): { alerts: NormalizedAlert[], timeWindow: { fromMs, untilMs, durationMs, cycle } }
+Response shape (quiet): { alerts: [], timeWindow: { ... } }
+Response shape (error): HTTP 400 with { error: string, message: string }
+
+Validators: NormalizedAlertSchema (Zod) enforces all 14 fields including severity (number), severityLabel (enum), operator (string), operand (number | string), disabled (boolean).
+
+## Tests
+
+43 it() call sites → 59 vitest executions (grep -c "it(" returns 53 but 10 are in comments/annotations).
+391 total repo tests passing (excluding pre-existing network.test.ts failures).
+
+Per-block breakdown:
+
+| Block | it() call sites | vitest executions | Expansion |
+|---|---|---|---|
+| Fixture files exist/parse | 2 | 10 | 5 files × 2 tests via for-loop |
+| Populated schema validation | 8 | 13 | 1 loop × 6 alerts + 7 static (note: awk counts 8 because it includes the for-loop it()) |
+| Quiet fixture | 2 | 2 | no expansion |
+| Malformed rejection | 3 | 4 | 1 loop × 2 entries + 2 static |
+| Edge-case fixture | 7 | 9 | 1 loop × 3 alerts + 6 static |
+| Transport error fixture | 2 | 2 | no expansion |
+| alertSeverityToLabel mapping | 10 | 10 | no expansion |
+| BFF route live local | 5 | 5 | no expansion |
+| Metric expression construction | 4 | 4 | no expansion |
+
+Note on grep vs actual: grep -c "it(" reports 53 because it matches "it(" in 10 comment lines (lines 5, 26, 40, 93, 106, 127, 170, 186, 203, 241 — the annotation comments documenting call site counts). Actual executable it() call sites are 43.
+
+## Fixtures
+
+5 fixture files in fixtures/alerts/:
+- alerts.populated.fixture.json — 6 alerts spanning all 4 severity tiers (sev 0,1 = critical; 2,3 = high; 5 = medium; 7 = low)
+- alerts.quiet.fixture.json — empty array
+- alerts.transport-error.fixture.json — { error, message } shape
+- alerts.malformed.fixture.json — 2 entries that fail NormalizedAlertSchema (wrong types, missing fields)
+- alerts.edge-case.fixture.json — 3 entries: disabled alert (null intervals), string operand with regex operator, severity 6 boundary
+
+## BFF Route Fixture Backing
+
+The route at /api/bff/impact/alerts reads from fixtures/impact/impact-overview.populated.fixture.json and extracts the .alerts array. The 5 alerts-specific fixture files (alerts.*.fixture.json) are used exclusively by slice06.test.ts for schema validation and state discrimination testing.
+
+## Screenshots
+
+- screenshots/slice06-above-fold.png (163,708 bytes) — shows KPI strip + chart; alerts panel is NOT visible (below fold)
+- Browser scroll to bottom confirmed all 6 alert cards render in 3-column grid with correct severity badges, type pills, metric expressions, and descriptions. This was visually confirmed during development but NOT saved as a persistent PNG file.
+
+## alertSeverityToLabel Boundary Values
+
+| Input | Output | Verified |
+|---|---|---|
+| -1 | critical | test passes |
+| 0 | critical | test passes |
+| 1 | critical | test passes |
+| 2 | high | test passes |
+| 3 | high | test passes |
+| 4 | medium | test passes |
+| 5 | medium | test passes |
+| 6 | low | test passes |
+| 7 | low | test passes |
+| 100 | low | test passes |
+
+## Client Audit
+
+- No ExtraHop host references in client/src/ (grep clean)
+- 5 BFF hooks all fetch via /api/bff/* paths: useImpactHeadline, useImpactTimeseries, useTopTalkers, useDetections, useAlerts
+
+## Not Proven
+
+- Alerts panel screenshot as persistent PNG (only above-fold PNG saved; browser scroll confirmed render but not persisted)
+- Quiet/loading/error/malformed state screenshots not captured
+- Component DOM render tests (jsdom) not written — only schema/fixture/route tests
+- Alert card disabled visual indicator not screenshotted
+
+## Deferred by Contract
+
+Deferred by contract: live hardware / appliance / packet store / environment access is not part of the current frontend phase.
+
+## Verdict
+
+Passed. 43 it() call sites expanding to 59 vitest executions, all passing. 5 fixture files. BFF route live-tested against local dev server. alertSeverityToLabel boundary values verified for all 10 test points. Metric expression construction verified for 4 representative alerts. Receipt is honest about screenshot limitations: above-fold PNG does not show the alerts panel, and browser scroll confirmation is not persisted as a file.

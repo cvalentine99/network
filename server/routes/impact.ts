@@ -16,7 +16,7 @@
  *   5. Returning proper error shapes for transport failures and malformed data
  */
 import { Router } from 'express';
-import { TimeWindowQuerySchema, ImpactHeadlineSchema, SeriesPointSchema, TopTalkerRowSchema, NormalizedDetectionSchema } from '../../shared/cockpit-validators';
+import { TimeWindowQuerySchema, ImpactHeadlineSchema, SeriesPointSchema, TopTalkerRowSchema, NormalizedDetectionSchema, NormalizedAlertSchema } from '../../shared/cockpit-validators';
 import { z } from 'zod';
 import { resolveTimeWindow } from '../../shared/normalize';
 import type { ImpactOverviewPayload } from '../../shared/cockpit-types';
@@ -384,6 +384,100 @@ impactRouter.get('/detections', (req, res) => {
   } catch (err: any) {
     return res.status(500).json({
       error: 'Impact detections fetch failed',
+      message: err.message || 'Unknown error',
+    });
+  }
+});
+
+/**
+ * Load a fixture file from the fixtures/alerts directory.
+ * Returns null if the file cannot be read or parsed.
+ */
+function loadAlertsFixture(name: string): any | null {
+  try {
+    const fixturePath = join(process.cwd(), 'fixtures', 'alerts', name);
+    const raw = readFileSync(fixturePath, 'utf-8');
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * GET /api/bff/impact/alerts
+ *
+ * Query params: from, until, cycle (all optional, validated by TimeWindowQuerySchema)
+ *
+ * Response shape on success:
+ *   { alerts: NormalizedAlert[], timeWindow: TimeWindow }
+ *
+ * Response shape on quiet (no data):
+ *   { alerts: [], timeWindow: TimeWindow }
+ *
+ * Response shape on error:
+ *   { error: string, message: string }
+ *
+ * Fixture backing: loads from fixtures/alerts/alerts.populated.fixture.json
+ * (or alerts.quiet.fixture.json for invalid windows).
+ *
+ * Alert severity mapping (ExtraHop convention — LOWER = MORE severe):
+ *   0-1 → critical, 2-3 → high, 4-5 → medium, 6+ → low
+ */
+impactRouter.get('/alerts', (req, res) => {
+  try {
+    // 1. Validate query params
+    const queryResult = TimeWindowQuerySchema.safeParse(req.query);
+    if (!queryResult.success) {
+      return res.status(400).json({
+        error: 'Invalid time window query',
+        message: queryResult.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('; '),
+      });
+    }
+
+    const { from, until, cycle } = queryResult.data;
+
+    // 2. Resolve time window
+    const timeWindow = resolveTimeWindow(from, until, cycle);
+
+    // 3. In fixture mode, return fixture data
+    if (isFixtureMode()) {
+      const fixtureName = timeWindow.durationMs > 0
+        ? 'alerts.populated.fixture.json'
+        : 'alerts.quiet.fixture.json';
+
+      const fixture = loadAlertsFixture(fixtureName);
+      if (!fixture) {
+        return res.status(500).json({
+          error: 'Fixture load failed',
+          message: `Could not load fixture: ${fixtureName}`,
+        });
+      }
+
+      // Validate each alert before sending
+      const alertsArray = z.array(NormalizedAlertSchema);
+      const validation = alertsArray.safeParse(fixture.alerts);
+      if (!validation.success) {
+        return res.status(502).json({
+          error: 'Malformed alerts data',
+          message: 'Alerts data from source failed schema validation',
+          details: validation.error.issues,
+        });
+      }
+
+      return res.json({
+        alerts: validation.data,
+        timeWindow,
+      });
+    }
+
+    // 4. Live mode — placeholder for future ExtraHop integration
+    return res.json({
+      alerts: [],
+      timeWindow,
+    });
+  } catch (err: any) {
+    return res.status(500).json({
+      error: 'Impact alerts fetch failed',
       message: err.message || 'Unknown error',
     });
   }
