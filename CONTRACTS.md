@@ -1773,7 +1773,7 @@ IN SCOPE:
     - Returns null when history is empty (quiet state)
     - Keyboard accessible: all buttons have aria-labels
     - Horizontal scrollable overflow for long breadcrumb trails
-  - 65 it() call sites → 65 vitest executions in slice13.test.ts across 14 describe groups
+  - 59 static it() call sites + 6 dynamic (fixture-loop) = 65 vitest runtime executions in slice13.test.ts across 14 describe groups
 OUT OF SCOPE:
   - Persistent history across page reloads (history is in-memory only)
   - URL-based deep linking for inspector history state
@@ -1848,12 +1848,12 @@ Claims:
   - Breadcrumb returns null when history is empty (quiet state verified by screenshot)
   - Breadcrumb shows back button + clickable history entries + current selection when populated (verified by screenshot)
   - All breadcrumb buttons have aria-labels for keyboard accessibility
-  - 65 tests pass across 14 describe groups in slice13.test.ts
+  - 59 static it() sites + 6 dynamic (fixture-loop) = 65 runtime executions pass across 14 describe groups in slice13.test.ts
   - 6 deterministic fixture files cover quiet, single-entry, multi-entry, max-depth, long-label, and dedup scenarios
   - All fixture files validate against InspectorHistoryEntrySchema
   - Full 856 tests pass across 16 test files (0 failures, 0 TypeScript errors)
 Evidence:
-  - tests passed: 65/65 in slice13.test.ts, 856/856 total
+  - tests passed: 65/65 runtime executions (59 static + 6 dynamic) in slice13.test.ts, 856/856 total
   - fixtures present: 6 files in fixtures/inspector-history/
   - screenshots present: slice13-above-fold.png, slice13-quiet.png, slice13-populated.png
   - validators present: InspectorHistoryEntrySchema in shared/cockpit-validators.ts
@@ -1865,5 +1865,5 @@ Deferred by contract:
   - Live hardware / appliance / packet store / environment access is not part of the current frontend phase.
   - Cross-entity navigation from live ExtraHop data not attempted.
 Live integration status: Not attempted
-Verdict: PASSED — 65 tests pass, 6 fixture files validate, 3 screenshots captured (quiet, populated, above-fold), breadcrumb renders correctly in both empty and populated states, back navigation and history index jumping tested deterministically, all pure functions verified with edge cases including max-depth eviction and consecutive deduplication.
+Verdict: PASSED — 65 runtime executions (59 static it() + 6 dynamic fixture-loop) pass, 6 fixture files validate, 3 screenshots captured (quiet, populated, above-fold), breadcrumb renders correctly in both empty and populated states, back navigation and history index jumping tested deterministically, all pure functions verified with edge cases including max-depth eviction and consecutive deduplication.
 ```
