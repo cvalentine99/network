@@ -71,7 +71,7 @@ function KPICardItem({ label, value, icon, accentColor, delta }: KPICardDef) {
             {label}
           </p>
           <p
-            className="text-xl font-bold mt-1.5 tabular-nums truncate"
+            className="text-[0.95rem] leading-snug font-bold mt-1.5 tabular-nums whitespace-nowrap"
             style={{ fontFamily: 'var(--font-mono)', color: BRIGHT }}
             title={value}
           >
@@ -84,7 +84,7 @@ function KPICardItem({ label, value, icon, accentColor, delta }: KPICardDef) {
           )}
         </div>
         <div
-          className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ml-3"
+          className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ml-2"
           style={{ background: `color-mix(in oklch, ${accentColor} 12%, transparent)` }}
         >
           {icon}
