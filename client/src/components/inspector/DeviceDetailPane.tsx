@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { PcapDownloadButton } from './PcapDownloadButton';
 import { useTimeWindow } from '@/lib/useTimeWindow';
+import { useInspector } from '@/contexts/InspectorContext';
 
 // ─── Shared field row (reused from InspectorContent pattern) ─────────────
 function FieldRow({ label, value, mono }: { label: string; value: string | null | undefined; mono?: boolean }) {
@@ -76,16 +77,25 @@ function ProtocolRow({ proto }: { proto: DeviceProtocolActivity }) {
   );
 }
 
-// ─── Mini detection row ──────────────────────────────────────────────────
-function MiniDetectionRow({ detection }: { detection: NormalizedDetection }) {
+// ─── Mini detection row (clickable for cross-entity navigation — Slice 12) ──
+function MiniDetectionRow({ detection, onClick }: { detection: NormalizedDetection; onClick?: () => void }) {
   const severity = riskScoreToSeverity(detection.riskScore);
   return (
-    <div className="py-2" style={{ borderBottom: '1px solid oklch(1 0 0 / 4%)' }}>
+    <div
+      className="py-2 transition-colors"
+      style={{ borderBottom: '1px solid oklch(1 0 0 / 4%)', cursor: onClick ? 'pointer' : undefined }}
+      onClick={onClick}
+      onKeyDown={onClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') onClick(); } : undefined}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      data-testid={onClick ? `cross-nav-detection-${detection.id}` : undefined}
+    >
       <div className="flex items-center gap-2 mb-0.5">
         <SeverityBadge level={severity} />
         <span className="text-[12px] font-semibold truncate" style={{ color: BRIGHT }}>
           {detection.title}
         </span>
+        {onClick && <span className="text-[9px] ml-auto" style={{ color: GOLD }}>→</span>}
       </div>
       <div className="flex items-center gap-3 text-[10px]" style={{ color: MUTED }}>
         <span>Risk {detection.riskScore}</span>
@@ -98,15 +108,24 @@ function MiniDetectionRow({ detection }: { detection: NormalizedDetection }) {
   );
 }
 
-// ─── Mini alert row ──────────────────────────────────────────────────────
-function MiniAlertRow({ alert }: { alert: NormalizedAlert }) {
+// ─── Mini alert row (clickable for cross-entity navigation — Slice 12) ──────
+function MiniAlertRow({ alert, onClick }: { alert: NormalizedAlert; onClick?: () => void }) {
   return (
-    <div className="py-2" style={{ borderBottom: '1px solid oklch(1 0 0 / 4%)' }}>
+    <div
+      className="py-2 transition-colors"
+      style={{ borderBottom: '1px solid oklch(1 0 0 / 4%)', cursor: onClick ? 'pointer' : undefined }}
+      onClick={onClick}
+      onKeyDown={onClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') onClick(); } : undefined}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      data-testid={onClick ? `cross-nav-alert-${alert.id}` : undefined}
+    >
       <div className="flex items-center gap-2 mb-0.5">
         <SeverityBadge level={alert.severityLabel} />
         <span className="text-[12px] font-semibold truncate" style={{ color: BRIGHT }}>
           {alert.name}
         </span>
+        {onClick && <span className="text-[9px] ml-auto" style={{ color: GOLD }}>→</span>}
       </div>
       <div className="flex items-center gap-3 text-[10px]" style={{ color: MUTED }}>
         <span>{alert.type}</span>
@@ -224,9 +243,10 @@ function DeviceIdentityFields({ device }: { device: DeviceDetail['device'] }) {
   );
 }
 
-// ─── Populated state ─────────────────────────────────────────────────────
+// ─── Populated state (with cross-entity navigation — Slice 12) ──────────
 function PopulatedState({ detail }: { detail: DeviceDetail }) {
   const { window: tw } = useTimeWindow();
+  const { selectDetectionEntity, selectAlertEntity } = useInspector();
   return (
     <div data-testid="device-detail-populated">
       {/* Identity header */}
@@ -300,7 +320,11 @@ function PopulatedState({ detail }: { detail: DeviceDetail }) {
         <>
           <SectionHeader icon={<Shield className="h-3.5 w-3.5" />} label={`Detections (${detail.associatedDetections.length})`} />
           {detail.associatedDetections.map((d) => (
-            <MiniDetectionRow key={d.id} detection={d} />
+            <MiniDetectionRow
+              key={d.id}
+              detection={d}
+              onClick={() => selectDetectionEntity(d)}
+            />
           ))}
         </>
       )}
@@ -310,7 +334,11 @@ function PopulatedState({ detail }: { detail: DeviceDetail }) {
         <>
           <SectionHeader icon={<Bell className="h-3.5 w-3.5" />} label={`Alerts (${detail.associatedAlerts.length})`} />
           {detail.associatedAlerts.map((a) => (
-            <MiniAlertRow key={a.id} alert={a} />
+            <MiniAlertRow
+              key={a.id}
+              alert={a}
+              onClick={() => selectAlertEntity(a)}
+            />
           ))}
         </>
       )}

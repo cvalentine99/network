@@ -16,5 +16,6 @@
 - [x] Slice 10 — PCAP Download Contract: PcapRequest/PcapMetadata types, Zod validators, BFF route POST /api/bff/packets/download (binary), usePcapDownload hook, download trigger in DeviceDetailPane, fixtures, tests, screenshot, truth receipt
 - [x] Slice 10 fix: wire PcapDownloadButton to shared TimeWindowContext instead of Date.now()
 - [x] Slice 11 — Detection & Alert Detail Panes: DetectionDetail/AlertDetail types, Zod validators, BFF routes GET /api/bff/impact/detection-detail and /alert-detail, useDetectionDetail/useAlertDetail hooks, DetectionDetailPane/AlertDetailPane components, fixtures, tests, screenshots, truth receipt
+- [x] Slice 12 — Cross-Entity Navigation: clickable related devices in DetectionDetailPane/AlertDetailPane, clickable associated detections/alerts in DeviceDetailPane, InspectorContext navigation helpers, fixtures, tests, screenshot, truth receipt
 - [ ] Below-fold screenshots for Slices 04-06
 - [ ] Responsive breakpoint audit for 5-column KPI grid

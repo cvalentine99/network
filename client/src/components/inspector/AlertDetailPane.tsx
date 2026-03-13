@@ -2,18 +2,22 @@
  * AlertDetailPane — Full alert detail inspector pane.
  *
  * Slice 11 — Replaces the compact AlertPreview (Slice 08) when an alert is selected.
+ * Slice 12 — Cross-entity navigation: MiniDeviceRow and MiniDetectionRow are clickable.
  *
  * CONTRACT:
  *   - Receives alertId from InspectorSelection (kind: 'alert')
  *   - Fetches full detail via useAlertDetail hook (BFF route)
  *   - Renders 4 sections: Alert Info, Trigger History, Associated Devices, Associated Detections
  *   - Handles all 6 states: loading, quiet, populated, error, malformed, not-found
+ *   - Cross-entity navigation: clicking an associated device opens DeviceDetailPane,
+ *     clicking an associated detection opens DetectionDetailPane (Slice 12)
  *   - No ExtraHop calls — all data comes via BFF
  *   - Uses shared types only (AlertDetail, NormalizedAlert, etc.)
  */
 import type { InspectorSelection, AlertDetail, NormalizedDetection } from '../../../../shared/cockpit-types';
 import type { DeviceIdentity } from '../../../../shared/cockpit-types';
 import { useAlertDetail } from '@/hooks/useAlertDetail';
+import { useInspector } from '@/contexts/InspectorContext';
 import { SeverityBadge, GOLD, CYAN, MUTED, BRIGHT, RED, GREEN } from '@/components/DashboardWidgets';
 import { riskScoreToSeverity } from '@/components/tables/DetectionsTable';
 import {
@@ -51,15 +55,24 @@ function SectionHeader({ icon, label }: { icon: React.ReactNode; label: string }
   );
 }
 
-// ─── Mini device row ────────────────────────────────────────────────────
-function MiniDeviceRow({ device }: { device: DeviceIdentity }) {
+// ─── Mini device row (clickable for cross-entity navigation — Slice 12) ─────────
+function MiniDeviceRow({ device, onClick }: { device: DeviceIdentity; onClick?: () => void }) {
   return (
-    <div className="py-2" style={{ borderBottom: '1px solid oklch(1 0 0 / 4%)' }}>
+    <div
+      className="py-2 transition-colors"
+      style={{ borderBottom: '1px solid oklch(1 0 0 / 4%)', cursor: onClick ? 'pointer' : undefined }}
+      onClick={onClick}
+      onKeyDown={onClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') onClick(); } : undefined}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      data-testid={onClick ? `cross-nav-device-${device.id}` : undefined}
+    >
       <div className="flex items-center gap-2 mb-0.5">
         <Monitor className="h-3 w-3" style={{ color: CYAN }} />
         <span className="text-[12px] font-semibold truncate" style={{ color: BRIGHT }}>
           {device.displayName}
         </span>
+        {onClick && <span className="text-[9px] ml-auto" style={{ color: GOLD }}>→</span>}
       </div>
       <div className="flex items-center gap-3 text-[10px]" style={{ color: MUTED }}>
         {device.ipaddr4 && <span style={{ fontFamily: 'var(--font-mono)' }}>{device.ipaddr4}</span>}
@@ -70,16 +83,25 @@ function MiniDeviceRow({ device }: { device: DeviceIdentity }) {
   );
 }
 
-// ─── Mini detection row ─────────────────────────────────────────────────
-function MiniDetectionRow({ detection }: { detection: NormalizedDetection }) {
+// ─── Mini detection row (clickable for cross-entity navigation — Slice 12) ──────
+function MiniDetectionRow({ detection, onClick }: { detection: NormalizedDetection; onClick?: () => void }) {
   const severity = riskScoreToSeverity(detection.riskScore);
   return (
-    <div className="py-2" style={{ borderBottom: '1px solid oklch(1 0 0 / 4%)' }}>
+    <div
+      className="py-2 transition-colors"
+      style={{ borderBottom: '1px solid oklch(1 0 0 / 4%)', cursor: onClick ? 'pointer' : undefined }}
+      onClick={onClick}
+      onKeyDown={onClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') onClick(); } : undefined}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      data-testid={onClick ? `cross-nav-detection-${detection.id}` : undefined}
+    >
       <div className="flex items-center gap-2 mb-0.5">
         <SeverityBadge level={severity} />
         <span className="text-[12px] font-semibold truncate" style={{ color: BRIGHT }}>
           {detection.title}
         </span>
+        {onClick && <span className="text-[9px] ml-auto" style={{ color: GOLD }}>→</span>}
       </div>
       <div className="flex items-center gap-3 text-[10px]" style={{ color: MUTED }}>
         <span>Risk {detection.riskScore}</span>
@@ -155,6 +177,23 @@ function AlertHeader({ alert }: { alert: AlertDetail['alert'] }) {
   );
 }
 
+// ─── Alert info fields (shared between quiet and populated) ─────────────
+function AlertInfoFields({ alert }: { alert: AlertDetail['alert'] }) {
+  return (
+    <>
+      <FieldRow label="ID" value={String(alert.id)} mono />
+      <FieldRow label="Author" value={alert.author} />
+      <FieldRow label="Stat" value={alert.statName} mono />
+      <FieldRow label="Field" value={alert.fieldName} mono />
+      <FieldRow label="Operator" value={alert.operator} />
+      <FieldRow label="Operand" value={String(alert.operand)} mono />
+      <FieldRow label="Interval" value={`${alert.intervalLength}s`} mono />
+      <FieldRow label="Refire" value={`${alert.refireInterval}s`} mono />
+      {alert.description && <FieldRow label="Description" value={alert.description} />}
+    </>
+  );
+}
+
 // ─── Loading state ──────────────────────────────────────────────────────
 function LoadingState() {
   return (
@@ -209,15 +248,7 @@ function QuietState({ detail }: { detail: AlertDetail }) {
 
       {/* Core alert info */}
       <SectionHeader icon={<Info className="h-3.5 w-3.5" />} label="Alert Configuration" />
-      <FieldRow label="ID" value={String(detail.alert.id)} mono />
-      <FieldRow label="Author" value={detail.alert.author} />
-      <FieldRow label="Stat" value={detail.alert.statName} mono />
-      <FieldRow label="Field" value={detail.alert.fieldName} mono />
-      <FieldRow label="Operator" value={detail.alert.operator} />
-      <FieldRow label="Operand" value={String(detail.alert.operand)} mono />
-      <FieldRow label="Interval" value={`${detail.alert.intervalLength}s`} mono />
-      <FieldRow label="Refire" value={`${detail.alert.refireInterval}s`} mono />
-      {detail.alert.description && <FieldRow label="Description" value={detail.alert.description} />}
+      <AlertInfoFields alert={detail.alert} />
 
       {/* Quiet message */}
       <div className="flex flex-col items-center py-8 gap-2">
@@ -230,23 +261,17 @@ function QuietState({ detail }: { detail: AlertDetail }) {
   );
 }
 
-// ─── Populated state ────────────────────────────────────────────────────
+// ─── Populated state (with cross-entity navigation — Slice 12) ─────────
 function PopulatedState({ detail }: { detail: AlertDetail }) {
+  const { selectDeviceByIdentity, selectDetectionEntity } = useInspector();
+
   return (
     <div data-testid="alert-detail-populated">
       <AlertHeader alert={detail.alert} />
 
       {/* Core alert info */}
       <SectionHeader icon={<Info className="h-3.5 w-3.5" />} label="Alert Configuration" />
-      <FieldRow label="ID" value={String(detail.alert.id)} mono />
-      <FieldRow label="Author" value={detail.alert.author} />
-      <FieldRow label="Stat" value={detail.alert.statName} mono />
-      <FieldRow label="Field" value={detail.alert.fieldName} mono />
-      <FieldRow label="Operator" value={detail.alert.operator} />
-      <FieldRow label="Operand" value={String(detail.alert.operand)} mono />
-      <FieldRow label="Interval" value={`${detail.alert.intervalLength}s`} mono />
-      <FieldRow label="Refire" value={`${detail.alert.refireInterval}s`} mono />
-      {detail.alert.description && <FieldRow label="Description" value={detail.alert.description} />}
+      <AlertInfoFields alert={detail.alert} />
 
       {/* Trigger history */}
       {detail.triggerHistory.length > 0 && (
@@ -258,22 +283,30 @@ function PopulatedState({ detail }: { detail: AlertDetail }) {
         </>
       )}
 
-      {/* Associated devices */}
+      {/* Associated devices — clickable (Slice 12) */}
       {detail.associatedDevices.length > 0 && (
         <>
           <SectionHeader icon={<Monitor className="h-3.5 w-3.5" />} label={`Associated Devices (${detail.associatedDevices.length})`} />
           {detail.associatedDevices.map((d) => (
-            <MiniDeviceRow key={d.id} device={d} />
+            <MiniDeviceRow
+              key={d.id}
+              device={d}
+              onClick={() => selectDeviceByIdentity(d)}
+            />
           ))}
         </>
       )}
 
-      {/* Associated detections */}
+      {/* Associated detections — clickable (Slice 12) */}
       {detail.associatedDetections.length > 0 && (
         <>
           <SectionHeader icon={<Shield className="h-3.5 w-3.5" />} label={`Associated Detections (${detail.associatedDetections.length})`} />
           {detail.associatedDetections.map((d) => (
-            <MiniDetectionRow key={d.id} detection={d} />
+            <MiniDetectionRow
+              key={d.id}
+              detection={d}
+              onClick={() => selectDetectionEntity(d)}
+            />
           ))}
         </>
       )}

@@ -14,7 +14,7 @@
  *   - Closing the inspector via X button calls clear()
  */
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
-import type { InspectorSelection, TopTalkerRow, NormalizedDetection, NormalizedAlert } from '../../../shared/cockpit-types';
+import type { InspectorSelection, TopTalkerRow, NormalizedDetection, NormalizedAlert, DeviceIdentity } from '../../../shared/cockpit-types';
 
 export interface InspectorContextValue {
   /** Currently selected entity, or null if nothing is selected */
@@ -27,6 +27,12 @@ export interface InspectorContextValue {
   selectDetection: (detection: NormalizedDetection) => void;
   /** Select an alert (from Alerts card click) — auto-opens inspector */
   selectAlert: (alert: NormalizedAlert) => void;
+  /** Select a device by identity only (from cross-entity navigation in detail panes) — auto-opens inspector */
+  selectDeviceByIdentity: (device: DeviceIdentity) => void;
+  /** Select a detection by entity (from cross-entity navigation in detail panes) — auto-opens inspector */
+  selectDetectionEntity: (detection: NormalizedDetection) => void;
+  /** Select an alert by entity (from cross-entity navigation in detail panes) — auto-opens inspector */
+  selectAlertEntity: (alert: NormalizedAlert) => void;
   /** Clear selection and close inspector */
   clear: () => void;
   /** Toggle inspector open/close without changing selection */
@@ -54,6 +60,32 @@ export function InspectorProvider({ children }: { children: ReactNode }) {
     setIsOpen(true);
   }, []);
 
+  const selectDeviceByIdentity = useCallback((device: DeviceIdentity) => {
+    // Create a minimal TopTalkerRow shell so the existing device selection path works.
+    // The DeviceDetailPane only uses selection.device.id to fetch full detail via BFF.
+    const shellRow: TopTalkerRow = {
+      device,
+      bytesIn: 0,
+      bytesOut: 0,
+      totalBytes: 0,
+      pktsIn: 0,
+      pktsOut: 0,
+      sparkline: [],
+    };
+    setSelection({ kind: 'device', device, topTalkerRow: shellRow });
+    setIsOpen(true);
+  }, []);
+
+  const selectDetectionEntity = useCallback((detection: NormalizedDetection) => {
+    setSelection({ kind: 'detection', detection });
+    setIsOpen(true);
+  }, []);
+
+  const selectAlertEntity = useCallback((alert: NormalizedAlert) => {
+    setSelection({ kind: 'alert', alert });
+    setIsOpen(true);
+  }, []);
+
   const clear = useCallback(() => {
     setSelection(null);
     setIsOpen(false);
@@ -65,7 +97,7 @@ export function InspectorProvider({ children }: { children: ReactNode }) {
 
   return (
     <InspectorContext.Provider
-      value={{ selection, isOpen, selectDevice, selectDetection, selectAlert, clear, toggle }}
+      value={{ selection, isOpen, selectDevice, selectDetection, selectAlert, selectDeviceByIdentity, selectDetectionEntity, selectAlertEntity, clear, toggle }}
     >
       {children}
     </InspectorContext.Provider>
