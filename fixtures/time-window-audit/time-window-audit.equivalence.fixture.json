@@ -1,0 +1,97 @@
+{
+  "_fixture": "time-window-audit.equivalence",
+  "_description": "Test cases for comparing shared/normalize.ts resolveTimeWindow with client/src/lib/useTimeWindow.ts resolveTimeWindow. Both should produce identical output for the same inputs (when the input produces a valid window).",
+  "anchorNow": 1710000000000,
+  "cases": [
+    {
+      "label": "5 minutes ago (default preset)",
+      "from": -300000,
+      "expectedFromMs": 1709999700000,
+      "expectedUntilMs": 1710000000000,
+      "expectedDurationMs": 300000,
+      "expectedCycle": "1sec"
+    },
+    {
+      "label": "30 minutes ago",
+      "from": -1800000,
+      "expectedFromMs": 1709998200000,
+      "expectedUntilMs": 1710000000000,
+      "expectedDurationMs": 1800000,
+      "expectedCycle": "30sec"
+    },
+    {
+      "label": "1 hour ago",
+      "from": -3600000,
+      "expectedFromMs": 1709996400000,
+      "expectedUntilMs": 1710000000000,
+      "expectedDurationMs": 3600000,
+      "expectedCycle": "5min"
+    },
+    {
+      "label": "6 hours ago",
+      "from": -21600000,
+      "expectedFromMs": 1709978400000,
+      "expectedUntilMs": 1710000000000,
+      "expectedDurationMs": 21600000,
+      "expectedCycle": "5min"
+    },
+    {
+      "label": "24 hours ago",
+      "from": -86400000,
+      "expectedFromMs": 1709913600000,
+      "expectedUntilMs": 1710000000000,
+      "expectedDurationMs": 86400000,
+      "expectedCycle": "1hr"
+    },
+    {
+      "label": "2 days ago",
+      "from": -172800000,
+      "expectedFromMs": 1709827200000,
+      "expectedUntilMs": 1710000000000,
+      "expectedDurationMs": 172800000,
+      "expectedCycle": "1hr"
+    },
+    {
+      "label": "7 days ago",
+      "from": -604800000,
+      "expectedFromMs": 1709395200000,
+      "expectedUntilMs": 1710000000000,
+      "expectedDurationMs": 604800000,
+      "expectedCycle": "24hr"
+    },
+    {
+      "label": "absolute window (1 hour)",
+      "from": 1709996400000,
+      "until": 1710000000000,
+      "expectedFromMs": 1709996400000,
+      "expectedUntilMs": 1710000000000,
+      "expectedDurationMs": 3600000,
+      "expectedCycle": "5min"
+    },
+    {
+      "label": "explicit cycle override",
+      "from": -300000,
+      "cycle": "30sec",
+      "expectedFromMs": 1709999700000,
+      "expectedUntilMs": 1710000000000,
+      "expectedDurationMs": 300000,
+      "expectedCycle": "30sec"
+    },
+    {
+      "label": "at exact 6-minute boundary",
+      "from": -360000,
+      "expectedFromMs": 1709999640000,
+      "expectedUntilMs": 1710000000000,
+      "expectedDurationMs": 360000,
+      "expectedCycle": "1sec"
+    },
+    {
+      "label": "just past 6-minute boundary (360001ms)",
+      "from": -360001,
+      "expectedFromMs": 1709999639999,
+      "expectedUntilMs": 1710000000000,
+      "expectedDurationMs": 360001,
+      "expectedCycle": "30sec"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+SLICE 15 — TIME-WINDOW SYNCHRONIZATION AUDIT — ARCHITECTURE REVIEW
+
+SINGLE PROVIDER:
+- TimeWindowProvider wraps entire app in App.tsx (line 30-33)
+- All routes (Home, ApplianceSettings) are children of the provider
+- No secondary TimeWindowProvider instances exist
+
+CONTEXT SHAPE (useTimeWindow.ts):
+- window: TimeWindow { fromMs, untilMs, durationMs, cycle }
+- fromOffset: raw offset (e.g. -300000)
+- setFromOffset: updates offset → triggers re-resolve
+- refresh: forces re-resolve against Date.now()
+
+CONSUMERS (7 total):
+1. TimeWindowSelector — reads fromOffset, writes setFromOffset, calls refresh
+2. useImpactHeadline — reads tw.fromMs, tw.untilMs, tw.cycle → BFF query params
+3. useImpactTimeseries — reads tw.fromMs, tw.untilMs, tw.cycle → BFF query params
+4. useTopTalkers — reads timeWindow.fromMs, timeWindow.untilMs, timeWindow.cycle → BFF query params
+5. useDetections — reads tw.fromMs, tw.untilMs, tw.cycle → BFF query params
+6. useAlerts — reads tw.fromMs, tw.untilMs, tw.cycle → BFF query params
+7. DeviceDetailPane — reads tw.fromMs, tw.untilMs → passes to child component
+
+DRIFT RISK ANALYSIS:
+- All 6 data hooks destructure from the same useTimeWindow() context
+- No hook calls resolveTimeWindow() independently
+- No hook calls Date.now() independently
+- No hook creates a local time window
+- BFF routes all validate via TimeWindowQuerySchema and resolve via shared resolveTimeWindow()
+
+DUPLICATION FINDING:
+- shared/normalize.ts has its own resolveTimeWindow (for server/test use)
+- client/src/lib/useTimeWindow.ts has its own resolveTimeWindow (for React context)
+- The two are structurally similar but not identical:
+  - normalize.ts accepts optional `now` param for deterministic testing
+  - normalize.ts handles durationMs <= 0 → returns zero-width window
+  - useTimeWindow.ts does NOT handle durationMs <= 0
+  - useTimeWindow.ts does NOT accept `now` param
+- This duplication is documented in CONTRACTS.md Slice 01 as a known limitation
+
+KEY INVARIANTS TO TEST:
+1. Single provider — no component creates its own time window
+2. All hooks read from the same context reference
+3. All BFF queries use the same from/until/cycle triple
+4. No Date.now() calls in hooks (only in provider via resolveTimeWindow)
+5. resolveTimeWindow equivalence between shared/normalize.ts and useTimeWindow.ts
+6. autoSelectCycle equivalence between the two implementations
+7. TimeWindowQuerySchema validates all preset values
+8. Cycle selection is deterministic from duration
