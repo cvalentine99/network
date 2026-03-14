@@ -1,0 +1,72 @@
+{
+  "_meta": {
+    "fixture": "blast-radius.malformed",
+    "description": "Malformed blast radius payload with invalid types, missing required fields, NaN values, and corrupt peer entries. Used to test schema rejection and error handling.",
+    "malformedFields": 7
+  },
+  "intent": {
+    "mode": "device-id",
+    "value": "1042",
+    "timeWindow": {
+      "fromMs": 1710000000000,
+      "untilMs": 1710001800000,
+      "durationMs": 1800000,
+      "cycle": "30sec"
+    }
+  },
+  "payload": {
+    "source": {
+      "deviceId": "not-a-number",
+      "displayName": "",
+      "ipaddr": 12345,
+      "macaddr": null,
+      "role": null,
+      "deviceClass": null,
+      "critical": "yes"
+    },
+    "peers": [
+      {
+        "deviceId": -1,
+        "displayName": "",
+        "ipaddr": null,
+        "role": null,
+        "critical": false,
+        "protocols": [],
+        "detections": [],
+        "totalBytes": -500,
+        "impactScore": "NaN",
+        "firstSeen": 1710001800000,
+        "lastSeen": 1710000000000
+      },
+      null,
+      "not-an-object",
+      {
+        "deviceId": 2001,
+        "protocols": [
+          { "name": "", "port": -1, "bytesSent": "lots", "bytesReceived": null, "hasDetections": "maybe" }
+        ],
+        "detections": [
+          { "id": 0, "title": "", "type": "", "riskScore": 150, "severity": "extreme", "startTime": -1, "participants": null }
+        ]
+      }
+    ],
+    "summary": {
+      "peerCount": "six",
+      "affectedPeerCount": -1,
+      "totalDetections": null,
+      "uniqueProtocols": 0,
+      "totalBytes": "Infinity",
+      "maxImpactScore": -10,
+      "severityDistribution": {
+        "critical": 0,
+        "high": 0
+      }
+    },
+    "timeWindow": {
+      "fromMs": 1710001800000,
+      "untilMs": 1710000000000,
+      "durationMs": -1800000,
+      "cycle": "invalid"
+    }
+  }
+}

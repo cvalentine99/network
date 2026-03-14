@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "fixture": "blast-radius.transport-error",
+    "description": "Simulates a transport-level failure when the BFF cannot reach the ExtraHop appliance. Returns HTTP 502 with a structured error.",
+    "entryMode": "device-id",
+    "entryValue": "1042",
+    "expectedStatus": "error",
+    "expectedHttpStatus": 502
+  },
+  "intent": {
+    "mode": "device-id",
+    "value": "1042",
+    "timeWindow": {
+      "fromMs": 1710000000000,
+      "untilMs": 1710001800000,
+      "durationMs": 1800000,
+      "cycle": "30sec"
+    }
+  },
+  "error": {
+    "code": "UPSTREAM_UNREACHABLE",
+    "message": "Failed to connect to ExtraHop appliance: ECONNREFUSED 10.1.0.1:443",
+    "status": 502
+  }
+}

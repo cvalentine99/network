@@ -1,0 +1,85 @@
+{
+  "_meta": {
+    "fixture": "blast-radius.ip-entry",
+    "description": "Blast radius query via IP address entry mode for 10.1.20.200. Shows 2 peers with minimal traffic and no detections.",
+    "entryMode": "ip-address",
+    "entryValue": "10.1.20.200",
+    "expectedStatus": "populated",
+    "peerCount": 2,
+    "detectionCount": 0
+  },
+  "intent": {
+    "mode": "ip-address",
+    "value": "10.1.20.200",
+    "timeWindow": {
+      "fromMs": 1710000000000,
+      "untilMs": 1710001800000,
+      "durationMs": 1800000,
+      "cycle": "30sec"
+    }
+  },
+  "payload": {
+    "source": {
+      "deviceId": 2004,
+      "displayName": "10.1.20.200",
+      "ipaddr": "10.1.20.200",
+      "macaddr": "00:1a:8c:10:00:c8",
+      "role": null,
+      "deviceClass": null,
+      "critical": false
+    },
+    "peers": [
+      {
+        "deviceId": 1042,
+        "displayName": "dc01.lab.local",
+        "ipaddr": "10.1.20.42",
+        "role": "domain_controller",
+        "critical": true,
+        "protocols": [
+          { "name": "HTTPS", "port": 443, "bytesSent": 8388608, "bytesReceived": 16777216, "hasDetections": false }
+        ],
+        "detections": [],
+        "totalBytes": 25165824,
+        "impactScore": 11.1,
+        "firstSeen": 1710000500000,
+        "lastSeen": 1710001500000
+      },
+      {
+        "deviceId": 2005,
+        "displayName": "print-srv.lab.local",
+        "ipaddr": "10.1.20.30",
+        "role": "server",
+        "critical": false,
+        "protocols": [
+          { "name": "HTTP", "port": 80, "bytesSent": 1048576, "bytesReceived": 524288, "hasDetections": false }
+        ],
+        "detections": [],
+        "totalBytes": 1572864,
+        "impactScore": 6.2,
+        "firstSeen": 1710000800000,
+        "lastSeen": 1710001200000
+      }
+    ],
+    "summary": {
+      "peerCount": 2,
+      "affectedPeerCount": 0,
+      "totalDetections": 0,
+      "uniqueProtocols": 2,
+      "totalBytes": 26738688,
+      "maxImpactScore": 11.1,
+      "severityDistribution": {
+        "critical": 0,
+        "high": 0,
+        "medium": 0,
+        "low": 0,
+        "info": 0
+      }
+    },
+    "timeWindow": {
+      "fromMs": 1710000000000,
+      "untilMs": 1710001800000,
+      "durationMs": 1800000,
+      "cycle": "30sec"
+    }
+  }
+}

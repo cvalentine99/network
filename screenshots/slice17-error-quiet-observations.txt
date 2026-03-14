@@ -1,0 +1,32 @@
+Slice 17 — Flow Theater Error/Quiet State Screenshots
+=====================================================
+Captured: 2026-03-14
+
+1. slice17-error.png (Resolution Error)
+   Sentinel: hostname "unknown.invalid"
+   Step 1 (Input Accepted) completed green with 38ms timing.
+   Step 2 (Entry Resolution) shows red error icon with message "No device found for hostname nonexistent.lab.local".
+   Steps 3-8 remain idle (gray circles).
+   Red "Trace Failed" banner at bottom: "Device resolution failed: no device found for hostname nonexistent.lab.local".
+   "New Trace" button visible (terminal state).
+   Trace progress shows "1/8 steps".
+
+2. slice17-quiet.png (Quiet/Empty Data)
+   Sentinel: hostname "quiet.lab.local"
+   All 8 steps completed. Steps 1-3 green (serial). Steps 4-8 amber triangles (quiet).
+   Each quiet step shows descriptive message: "No activity records", "No metric data points", "No records found", "No detections or alerts", "No data to assemble".
+   Parallel fan-out section clearly labeled with teal "PARALLEL" badges.
+   Amber "Trace Quiet" banner: "The trace completed but found no meaningful data for this device in the selected time window."
+   Trace Summary card shows device "idle-printer-01.lab.local" (10.1.20.201) with all zero counts (Activity 0, Metrics 0, Records 0, Detections 0, Alerts 0).
+   Step Timings grid shows all 8 step durations.
+   Progress shows "8/8 steps 0.48s".
+
+3. slice17-partial-error.png (Partial Error — mid-trace failure)
+   Sentinel: device "8888"
+   Steps 1-3 completed green (serial). Step 4 (Activity Timeline) completed green with 142 records.
+   Step 5 (Metric Timeline) shows running spinner.
+   Step 6 (Records/Search) shows red error: "Records API timeout after 5000ms".
+   Steps 7-8 still running.
+   Red "Trace Failed" banner: "Trace terminated: records-search step failed with timeout after 5000ms".
+   Progress shows "4/8 steps".
+   Demonstrates mid-trace failure where some steps succeed and one fails.

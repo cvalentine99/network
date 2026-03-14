@@ -9,6 +9,7 @@ import { TimeWindowProvider } from "./providers/TimeWindowProvider";
 import Home from "./pages/Home";
 import ApplianceSettings from "./pages/ApplianceSettings";
 import FlowTheater from "./pages/FlowTheater";
+import BlastRadius from "./pages/BlastRadius";
 
 function Router() {
   return (
@@ -17,6 +18,7 @@ function Router() {
         <Route path="/" component={Home} />
         <Route path="/settings" component={ApplianceSettings} />
         <Route path="/flow-theater" component={FlowTheater} />
+        <Route path="/blast-radius" component={BlastRadius} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>

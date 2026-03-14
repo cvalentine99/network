@@ -14,20 +14,58 @@ import {
 import { useIsMobile } from "@/hooks/useMobile";
 import {
   Activity,
+  CircleDot,
+  HelpCircle,
   LayoutDashboard,
+  Network,
   PanelLeft,
   Radio,
   Settings,
+  Target,
 } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { useLocation } from "wouter";
 import { GOLD, MUTED, BRIGHT, CYAN } from "./DashboardWidgets";
 
-const menuItems = [
-  { icon: LayoutDashboard, label: "Dashboard", path: "/" },
-  { icon: Activity, label: "Flow Theater", path: "/flow-theater" },
-  { icon: Settings, label: "Appliance", path: "/settings" },
+type MenuItem = {
+  icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
+  label: string;
+  path: string;
+  placeholder?: boolean;
+};
+
+type MenuSection = {
+  title: string;
+  items: MenuItem[];
+};
+
+const menuSections: MenuSection[] = [
+  {
+    title: "Monitoring",
+    items: [
+      { icon: LayoutDashboard, label: "Impact Deck", path: "/" },
+      { icon: Activity, label: "Flow Theater", path: "/flow-theater" },
+      { icon: Target, label: "Blast Radius", path: "/blast-radius" },
+    ],
+  },
+  {
+    title: "Analysis",
+    items: [
+      { icon: CircleDot, label: "Correlation", path: "/correlation", placeholder: true },
+      { icon: Network, label: "Topology", path: "/topology", placeholder: true },
+    ],
+  },
+  {
+    title: "System",
+    items: [
+      { icon: Settings, label: "Settings", path: "/settings" },
+      { icon: HelpCircle, label: "Help", path: "/help", placeholder: true },
+    ],
+  },
 ];
+
+const allMenuItems = menuSections.flatMap(s => s.items);
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
 const DEFAULT_WIDTH = 260;
@@ -77,7 +115,7 @@ function DashboardLayoutContent({
   const isCollapsed = state === "collapsed";
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const activeMenuItem = menuItems.find((item) => item.path === location);
+  const activeMenuItem = allMenuItems.find((item) => item.path === location);
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -148,44 +186,54 @@ function DashboardLayoutContent({
           </SidebarHeader>
 
           <SidebarContent className="gap-0">
-            {!isCollapsed && (
-              <div className="px-4 py-2">
-                <p
-                  className="text-[9px] font-bold uppercase tracking-widest"
-                  style={{ color: MUTED }}
-                >
-                  Monitoring
-                </p>
-              </div>
-            )}
-            <SidebarMenu className="px-2 py-1">
-              {menuItems.map((item) => {
-                const isActive = location === item.path;
-                return (
-                  <SidebarMenuItem key={item.path}>
-                    <SidebarMenuButton
-                      isActive={isActive}
-                      onClick={() => setLocation(item.path)}
-                      tooltip={item.label}
-                      className="h-10 transition-all font-normal"
+            {menuSections.map((section) => (
+              <div key={section.title}>
+                {!isCollapsed && (
+                  <div className="px-4 py-2 mt-2 first:mt-0">
+                    <p
+                      className="text-[9px] font-bold uppercase tracking-widest"
+                      style={{ color: MUTED }}
                     >
-                      <item.icon
-                        className="h-4 w-4"
-                        style={{ color: isActive ? GOLD : MUTED }}
-                      />
-                      <span
-                        className="text-sm"
-                        style={{
-                          color: isActive ? BRIGHT : MUTED,
-                        }}
-                      >
-                        {item.label}
-                      </span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
+                      {section.title}
+                    </p>
+                  </div>
+                )}
+                <SidebarMenu className="px-2 py-1">
+                  {section.items.map((item) => {
+                    const isActive = location === item.path;
+                    return (
+                      <SidebarMenuItem key={item.path}>
+                        <SidebarMenuButton
+                          isActive={isActive}
+                          onClick={() => {
+                            if (item.placeholder) {
+                              toast("Coming soon", { description: `${item.label} is not yet implemented.` });
+                              return;
+                            }
+                            setLocation(item.path);
+                          }}
+                          tooltip={item.label}
+                          className="h-10 transition-all font-normal"
+                        >
+                          <item.icon
+                            className="h-4 w-4"
+                            style={{ color: isActive ? GOLD : item.placeholder ? "oklch(0.45 0 0)" : MUTED }}
+                          />
+                          <span
+                            className="text-sm"
+                            style={{
+                              color: isActive ? BRIGHT : item.placeholder ? "oklch(0.45 0 0)" : MUTED,
+                            }}
+                          >
+                            {item.label}
+                          </span>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+                  })}
+                </SidebarMenu>
+              </div>
+            ))}
           </SidebarContent>
 
           <SidebarFooter className="p-3" />

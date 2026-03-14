@@ -1,0 +1,218 @@
+{
+  "_meta": {
+    "fixture": "blast-radius.populated",
+    "description": "Blast radius for dc01.lab.local (device 1042) showing 6 peer devices with mixed severity detections, multiple protocols, and realistic traffic volumes.",
+    "entryMode": "device-id",
+    "entryValue": "1042",
+    "expectedStatus": "populated",
+    "peerCount": 6,
+    "detectionCount": 7
+  },
+  "intent": {
+    "mode": "device-id",
+    "value": "1042",
+    "timeWindow": {
+      "fromMs": 1710000000000,
+      "untilMs": 1710001800000,
+      "durationMs": 1800000,
+      "cycle": "30sec"
+    }
+  },
+  "payload": {
+    "source": {
+      "deviceId": 1042,
+      "displayName": "dc01.lab.local",
+      "ipaddr": "10.1.20.42",
+      "macaddr": "00:1a:8c:10:00:2a",
+      "role": "domain_controller",
+      "deviceClass": "node",
+      "critical": true
+    },
+    "peers": [
+      {
+        "deviceId": 2001,
+        "displayName": "ws-finance-01.lab.local",
+        "ipaddr": "10.1.20.101",
+        "role": "client",
+        "critical": false,
+        "protocols": [
+          { "name": "SMB", "port": 445, "bytesSent": 284729344, "bytesReceived": 1073741824, "hasDetections": true },
+          { "name": "LDAP", "port": 389, "bytesSent": 12582912, "bytesReceived": 8388608, "hasDetections": false },
+          { "name": "Kerberos", "port": 88, "bytesSent": 524288, "bytesReceived": 786432, "hasDetections": false }
+        ],
+        "detections": [
+          {
+            "id": 5001,
+            "title": "Anomalous SMB Write Volume",
+            "type": "anomaly",
+            "riskScore": 82,
+            "severity": "high",
+            "startTime": 1710000300000,
+            "participants": ["dc01.lab.local", "ws-finance-01.lab.local"]
+          },
+          {
+            "id": 5002,
+            "title": "Potential Data Exfiltration via SMB",
+            "type": "threat",
+            "riskScore": 91,
+            "severity": "critical",
+            "startTime": 1710000600000,
+            "participants": ["dc01.lab.local", "ws-finance-01.lab.local"]
+          }
+        ],
+        "totalBytes": 1380027392,
+        "impactScore": 186.64,
+        "firstSeen": 1710000000000,
+        "lastSeen": 1710001800000
+      },
+      {
+        "deviceId": 2002,
+        "displayName": "db-primary.lab.local",
+        "ipaddr": "10.1.20.50",
+        "role": "db_server",
+        "critical": true,
+        "protocols": [
+          { "name": "TDS", "port": 1433, "bytesSent": 536870912, "bytesReceived": 268435456, "hasDetections": true },
+          { "name": "SMB", "port": 445, "bytesSent": 4194304, "bytesReceived": 2097152, "hasDetections": false }
+        ],
+        "detections": [
+          {
+            "id": 5003,
+            "title": "Unusual SQL Query Pattern",
+            "type": "anomaly",
+            "riskScore": 67,
+            "severity": "medium",
+            "startTime": 1710000900000,
+            "participants": ["dc01.lab.local", "db-primary.lab.local"]
+          }
+        ],
+        "totalBytes": 811597824,
+        "impactScore": 127.41,
+        "firstSeen": 1710000000000,
+        "lastSeen": 1710001700000
+      },
+      {
+        "deviceId": 2003,
+        "displayName": "mail-relay.lab.local",
+        "ipaddr": "10.1.20.25",
+        "role": "server",
+        "critical": false,
+        "protocols": [
+          { "name": "SMTP", "port": 25, "bytesSent": 67108864, "bytesReceived": 33554432, "hasDetections": true },
+          { "name": "DNS", "port": 53, "bytesSent": 1048576, "bytesReceived": 2097152, "hasDetections": false }
+        ],
+        "detections": [
+          {
+            "id": 5004,
+            "title": "Suspicious SMTP Relay Activity",
+            "type": "threat",
+            "riskScore": 75,
+            "severity": "high",
+            "startTime": 1710001200000,
+            "participants": ["dc01.lab.local", "mail-relay.lab.local"]
+          },
+          {
+            "id": 5005,
+            "title": "Elevated DNS Query Rate",
+            "type": "anomaly",
+            "riskScore": 45,
+            "severity": "medium",
+            "startTime": 1710001000000,
+            "participants": ["dc01.lab.local", "mail-relay.lab.local"]
+          }
+        ],
+        "totalBytes": 103809024,
+        "impactScore": 112.52,
+        "firstSeen": 1710000100000,
+        "lastSeen": 1710001600000
+      },
+      {
+        "deviceId": 2004,
+        "displayName": "10.1.20.200",
+        "ipaddr": "10.1.20.200",
+        "role": null,
+        "critical": false,
+        "protocols": [
+          { "name": "HTTPS", "port": 443, "bytesSent": 16777216, "bytesReceived": 8388608, "hasDetections": false }
+        ],
+        "detections": [],
+        "totalBytes": 25165824,
+        "impactScore": 7.4,
+        "firstSeen": 1710000500000,
+        "lastSeen": 1710001500000
+      },
+      {
+        "deviceId": 2005,
+        "displayName": "print-srv.lab.local",
+        "ipaddr": "10.1.20.30",
+        "role": "server",
+        "critical": false,
+        "protocols": [
+          { "name": "SMB", "port": 445, "bytesSent": 2097152, "bytesReceived": 1048576, "hasDetections": false },
+          { "name": "LLMNR", "port": 5355, "bytesSent": 65536, "bytesReceived": 32768, "hasDetections": true }
+        ],
+        "detections": [
+          {
+            "id": 5006,
+            "title": "LLMNR Poisoning Attempt",
+            "type": "threat",
+            "riskScore": 88,
+            "severity": "critical",
+            "startTime": 1710001400000,
+            "participants": ["dc01.lab.local", "print-srv.lab.local"]
+          }
+        ],
+        "totalBytes": 3244032,
+        "impactScore": 150.51,
+        "firstSeen": 1710000200000,
+        "lastSeen": 1710001800000
+      },
+      {
+        "deviceId": 2006,
+        "displayName": "backup-agent.lab.local",
+        "ipaddr": "10.1.20.60",
+        "role": "server",
+        "critical": false,
+        "protocols": [
+          { "name": "iSCSI", "port": 3260, "bytesSent": 2147483648, "bytesReceived": 1073741824, "hasDetections": false }
+        ],
+        "detections": [
+          {
+            "id": 5007,
+            "title": "Unusual Backup Volume Spike",
+            "type": "anomaly",
+            "riskScore": 35,
+            "severity": "low",
+            "startTime": 1710000800000,
+            "participants": ["dc01.lab.local", "backup-agent.lab.local"]
+          }
+        ],
+        "totalBytes": 3221225472,
+        "impactScore": 42.01,
+        "firstSeen": 1710000000000,
+        "lastSeen": 1710001800000
+      }
+    ],
+    "summary": {
+      "peerCount": 6,
+      "affectedPeerCount": 5,
+      "totalDetections": 7,
+      "uniqueProtocols": 8,
+      "totalBytes": 5545069568,
+      "maxImpactScore": 186.64,
+      "severityDistribution": {
+        "critical": 2,
+        "high": 2,
+        "medium": 2,
+        "low": 1,
+        "info": 0
+      }
+    },
+    "timeWindow": {
+      "fromMs": 1710000000000,
+      "untilMs": 1710001800000,
+      "durationMs": 1800000,
+      "cycle": "30sec"
+    }
+  }
+}

@@ -1,0 +1,43 @@
+Slice 18 — Blast Radius Screenshot Observations
+=================================================
+Captured: 2026-03-14
+
+1. slice18-idle.png
+   - Shows Blast Radius page with entry form (Device ID mode, empty input, Analyze button disabled)
+   - Dashed border idle area with shield icon and instructional text
+   - Sidebar visible with Dashboard, Flow Theater, Appliance entries
+   - Dark obsidian theme consistent with other surfaces
+
+2. slice18-populated.png
+   - Source device: dc01.lab.local (Critical, domain_controller, 10.1.20.42)
+   - 6 summary cards: Peers (6), Affected (5, red), Detections (7, orange), Protocols (8), Traffic (5.16 GB), Max Impact (186.6, red)
+   - Severity distribution badges: CRITICAL 2, HIGH 2, MEDIUM 2, LOW 1
+   - Peer table with 6 rows sorted by impact score descending
+   - Each row shows: device name, IP, protocol badges, detection count, traffic, impact bar
+   - ws-finance-01.lab.local highest impact (186.6), 10.1.20.200 lowest (7.4)
+   - Critical device (db-primary.lab.local) has red "CRITICAL" badge
+   - Footer shows "6 of 6 peers"
+
+3. slice18-quiet.png
+   - Source device: quiet.lab.local (10.1.20.254)
+   - Amber banner: "No Blast Radius Detected"
+   - Explanatory text about idle/isolated/undiscovered device
+   - No peer table rendered (correct quiet state)
+
+4. slice18-error.png
+   - Red error banner: "Blast Radius Query Failed"
+   - Error message: "Device not found: unknown.invalid"
+   - Dismiss button (X) present
+   - Entry form shows Hostname mode with "unknown.invalid" input
+
+5. slice18-transport-error.png
+   - Red error banner: "Blast Radius Query Failed"
+   - Error message about ECONNREFUSED (upstream unreachable)
+
+6. slice18-hostname-populated.png
+   - Source device: mail-relay.lab.local via hostname entry
+   - 3 peers with SMTP-focused traffic
+   - Demonstrates hostname entry mode works correctly
+
+All 5 required states captured: idle, populated, quiet, error, transport-error.
+Additional: hostname entry mode populated state.
