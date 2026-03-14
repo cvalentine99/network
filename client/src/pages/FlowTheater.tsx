@@ -33,6 +33,9 @@ import {
 } from "@/components/ui/select";
 import { GOLD, MUTED, BRIGHT, CYAN, GREEN } from "@/components/DashboardWidgets";
 import { useTimeWindow } from "@/lib/useTimeWindow";
+import CrossSurfaceNavButton from '@/components/CrossSurfaceNavButton';
+import { buildFlowTheaterToBlastRadiusLink } from '../../../shared/cross-surface-nav-types';
+import { useFlowTheaterNavParams } from '@/hooks/useNavParams';
 import type {
   TraceEntryMode,
   TraceRunState,
@@ -228,6 +231,29 @@ export default function FlowTheater() {
   const [inputValue, setInputValue] = useState("");
   const { window: timeWindow } = useTimeWindow();
   const { traceState, startTrace, resetTrace } = useTraceSSE();
+  const navParams = useFlowTheaterNavParams();
+  const navConsumedRef = useRef(false);
+
+  // Consume cross-surface nav params on mount
+  useEffect(() => {
+    if (navParams && !navConsumedRef.current) {
+      navConsumedRef.current = true;
+      setEntryMode(navParams.mode as TraceEntryMode);
+      setInputValue(navParams.value);
+    }
+  }, [navParams]);
+
+  // Auto-submit after nav params are consumed
+  const autoSubmitRef = useRef(false);
+  useEffect(() => {
+    if (navParams?.autoSubmit && navConsumedRef.current && !autoSubmitRef.current && inputValue === navParams.value) {
+      autoSubmitRef.current = true;
+      const timer = setTimeout(() => {
+        startTrace(navParams.mode as TraceEntryMode, navParams.value, timeWindow);
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [navParams, inputValue, timeWindow, startTrace]);
 
   const isRunning = traceState.status === "running";
   const isTerminal =
@@ -538,7 +564,7 @@ export default function FlowTheater() {
           {traceState.summary.resolvedDevice && (
             <div className="flex items-center gap-3 mb-4 pb-4" style={{ borderBottom: "1px solid oklch(1 0 0 / 8%)" }}>
               <Server className="h-5 w-5" style={{ color: CYAN }} />
-              <div>
+              <div className="flex-1">
                 <p
                   className="text-sm font-medium"
                   style={{ color: BRIGHT, fontFamily: "var(--font-mono)" }}
@@ -551,6 +577,12 @@ export default function FlowTheater() {
                   Resolved via {traceState.summary.resolvedDevice.resolvedVia}
                 </p>
               </div>
+              <CrossSurfaceNavButton
+                link={buildFlowTheaterToBlastRadiusLink(
+                  traceState.summary.resolvedDevice.device.displayName,
+                  traceState.summary.resolvedDevice.device.id,
+                )}
+              />
             </div>
           )}
 

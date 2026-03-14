@@ -52,6 +52,8 @@ import {
   filterEventsByCategory,
 } from '../../../shared/correlation-types';
 import { useTimeWindow } from '@/lib/useTimeWindow';
+import CrossSurfaceNavButton from '@/components/CrossSurfaceNavButton';
+import { buildCorrelationToBlastRadiusLink } from '../../../shared/cross-surface-nav-types';
 
 // ─── Icon map ─────────────────────────────────────────────────────────────
 const ICON_MAP: Record<string, React.FC<{ className?: string; style?: React.CSSProperties }>> = {
@@ -183,15 +185,27 @@ function EventDetailCard({ event }: { event: CorrelationEvent }) {
               <span className="text-[10px] uppercase font-medium" style={{ color: MUTED }}>
                 Refs:
               </span>
-              {event.refs.map((ref: { kind: string; label: string }, i: number) => (
-                <span
-                  key={i}
-                  className="text-[10px] px-1.5 py-0.5 rounded font-mono"
-                  style={{ background: 'oklch(1 0 0 / 5%)', color: CYAN }}
-                >
-                  {ref.kind}:{ref.label}
-                </span>
-              ))}
+              {event.refs.map((ref: { kind: string; label: string }, i: number) => {
+                const navLink = buildCorrelationToBlastRadiusLink(ref.kind, ref.label);
+                if (navLink) {
+                  return (
+                    <CrossSurfaceNavButton
+                      key={i}
+                      link={navLink}
+                      compact
+                    />
+                  );
+                }
+                return (
+                  <span
+                    key={i}
+                    className="text-[10px] px-1.5 py-0.5 rounded font-mono"
+                    style={{ background: 'oklch(1 0 0 / 5%)', color: CYAN }}
+                  >
+                    {ref.kind}:{ref.label}
+                  </span>
+                );
+              })}
             </div>
           )}
         </div>

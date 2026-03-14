@@ -1,0 +1,47 @@
+{
+  "description": "Correlation event ref → Blast Radius navigation fixture",
+  "scenarios": [
+    {
+      "name": "device ref by ID",
+      "refKind": "device",
+      "refLabel": "2048",
+      "expectedLink": {
+        "label": "Blast Radius: 2048",
+        "href": "/blast-radius?brMode=device-id&brValue=2048&brAuto=1",
+        "targetSurface": "blast-radius",
+        "sourceSurface": "correlation",
+        "entityContext": "correlation-ref-device-2048"
+      }
+    },
+    {
+      "name": "IP ref",
+      "refKind": "ip",
+      "refLabel": "10.1.1.100",
+      "expectedLink": {
+        "label": "Blast Radius: 10.1.1.100",
+        "href": "/blast-radius?brMode=ip-address&brValue=10.1.1.100&brAuto=1",
+        "targetSurface": "blast-radius",
+        "sourceSurface": "correlation",
+        "entityContext": "correlation-ref-ip-10.1.1.100"
+      }
+    },
+    {
+      "name": "hostname ref",
+      "refKind": "hostname",
+      "refLabel": "web01.lab.local",
+      "expectedLink": {
+        "label": "Blast Radius: web01.lab.local",
+        "href": "/blast-radius?brMode=hostname&brValue=web01.lab.local&brAuto=1",
+        "targetSurface": "blast-radius",
+        "sourceSurface": "correlation",
+        "entityContext": "correlation-ref-hostname-web01.lab.local"
+      }
+    },
+    {
+      "name": "non-navigable ref kind",
+      "refKind": "protocol",
+      "refLabel": "SMB",
+      "expectedLink": null
+    }
+  ]
+}

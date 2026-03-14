@@ -22,6 +22,9 @@ import {
   filterAffectedPeers, getSeverityColor,
 } from '../../../shared/blast-radius-types';
 import { BlastRadiusPayloadSchema } from '../../../shared/blast-radius-validators';
+import CrossSurfaceNavButton from '@/components/CrossSurfaceNavButton';
+import { buildBlastRadiusToFlowTheaterLink } from '../../../shared/cross-surface-nav-types';
+import { useBlastRadiusNavParams } from '@/hooks/useNavParams';
 
 // ─── Color constants (matching DashboardWidgets) ───────────────────────────
 
@@ -205,6 +208,13 @@ function PeerRow({
                 </div>
               </div>
 
+              {/* Cross-surface navigation */}
+              <div className="flex gap-2">
+                <CrossSurfaceNavButton
+                  link={buildBlastRadiusToFlowTheaterLink(peer.displayName, peer.deviceId)}
+                />
+              </div>
+
               {/* Detections detail */}
               {peer.detections.length > 0 && (
                 <div>
@@ -251,6 +261,31 @@ export default function BlastRadius() {
   const [inputMode, setInputMode] = useState<'device-id' | 'hostname' | 'ip-address'>('device-id');
   const [expandedPeerId, setExpandedPeerId] = useState<number | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const navParams = useBlastRadiusNavParams();
+  const navConsumedRef = useRef(false);
+
+  // Consume cross-surface nav params on mount
+  useEffect(() => {
+    if (navParams && !navConsumedRef.current) {
+      navConsumedRef.current = true;
+      setInputMode(navParams.mode);
+      setInputValue(navParams.value);
+      // autoSubmit is handled after state settles (see next effect)
+    }
+  }, [navParams]);
+
+  // Auto-submit after nav params are consumed
+  const autoSubmitRef = useRef(false);
+  useEffect(() => {
+    if (navParams?.autoSubmit && navConsumedRef.current && !autoSubmitRef.current && inputValue === navParams.value) {
+      autoSubmitRef.current = true;
+      // Trigger query on next tick after state has settled
+      const timer = setTimeout(() => {
+        handleQuery();
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [navParams, inputValue]);
 
   // Cleanup on unmount
   useEffect(() => {

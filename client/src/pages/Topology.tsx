@@ -41,6 +41,8 @@ import {
   Puzzle,
 } from 'lucide-react';
 import { useTopology, type TopologyState } from '@/hooks/useTopology';
+import CrossSurfaceNavButton from '@/components/CrossSurfaceNavButton';
+import { buildTopologyToBlastRadiusLink } from '../../../shared/cross-surface-nav-types';
 import type {
   TopologyNode,
   TopologyEdge,
@@ -220,6 +222,13 @@ function DetailPanel({
               {node.activeAlerts}
             </div>
           </div>
+        </div>
+
+        {/* Cross-surface navigation */}
+        <div className="flex flex-col gap-1.5 mb-4">
+          <CrossSurfaceNavButton
+            link={buildTopologyToBlastRadiusLink(node.id, node.displayName, node.ipaddr ?? undefined)}
+          />
         </div>
 
         {/* Connections */}
