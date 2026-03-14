@@ -1,0 +1,9 @@
+{
+  "_meta": {
+    "fixture": "topology.error.fixture.json",
+    "generatedAt": "2026-03-14T12:00:00.000Z"
+  },
+  "intent": "error",
+  "payload": null,
+  "error": "ExtraHop appliance returned 503: Activity map service temporarily unavailable"
+}

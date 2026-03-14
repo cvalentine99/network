@@ -1,0 +1,7290 @@
+{
+  "_meta": {
+    "fixture": "topology.large-scale.fixture.json",
+    "generatedAt": "2026-03-14T12:00:00.000Z"
+  },
+  "intent": "populated",
+  "payload": {
+    "nodes": [
+      {
+        "id": 5000,
+        "displayName": "device-0000.lab.local",
+        "ipaddr": "10.1.0.1",
+        "macaddr": "00:AA:BB:CC:00:00",
+        "role": "server",
+        "critical": true,
+        "activeDetections": 1,
+        "activeAlerts": 1,
+        "totalBytes": 10000000000,
+        "clusterId": "subnet-10.1.0"
+      },
+      {
+        "id": 5001,
+        "displayName": "device-0001.lab.local",
+        "ipaddr": "10.2.0.1",
+        "macaddr": "00:AA:BB:CC:00:01",
+        "role": "client",
+        "critical": true,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 9950000000,
+        "clusterId": "subnet-10.2.0"
+      },
+      {
+        "id": 5002,
+        "displayName": "device-0002.lab.local",
+        "ipaddr": "10.3.0.1",
+        "macaddr": "00:AA:BB:CC:00:02",
+        "role": "gateway",
+        "critical": true,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 9900000000,
+        "clusterId": "subnet-10.3.0"
+      },
+      {
+        "id": 5003,
+        "displayName": "device-0003.lab.local",
+        "ipaddr": "10.4.0.1",
+        "macaddr": "00:AA:BB:CC:00:03",
+        "role": "db_server",
+        "critical": true,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 9850000000,
+        "clusterId": "subnet-10.4.0"
+      },
+      {
+        "id": 5004,
+        "displayName": "device-0004.lab.local",
+        "ipaddr": "10.5.0.1",
+        "macaddr": "00:AA:BB:CC:00:04",
+        "role": "dns_server",
+        "critical": true,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 9800000000,
+        "clusterId": "subnet-10.5.0"
+      },
+      {
+        "id": 5005,
+        "displayName": "device-0005.lab.local",
+        "ipaddr": "10.6.0.1",
+        "macaddr": "00:AA:BB:CC:00:05",
+        "role": "file_server",
+        "critical": true,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 9750000000,
+        "clusterId": "subnet-10.6.0"
+      },
+      {
+        "id": 5006,
+        "displayName": "device-0006.lab.local",
+        "ipaddr": "10.7.0.1",
+        "macaddr": "00:AA:BB:CC:00:06",
+        "role": "firewall",
+        "critical": true,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 9700000000,
+        "clusterId": "subnet-10.7.0"
+      },
+      {
+        "id": 5007,
+        "displayName": "device-0007.lab.local",
+        "ipaddr": "10.8.0.1",
+        "macaddr": "00:AA:BB:CC:00:07",
+        "role": "load_balancer",
+        "critical": true,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 9650000000,
+        "clusterId": "subnet-10.8.0"
+      },
+      {
+        "id": 5008,
+        "displayName": "device-0008.lab.local",
+        "ipaddr": "10.9.0.1",
+        "macaddr": "00:AA:BB:CC:00:08",
+        "role": "other",
+        "critical": true,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 9600000000,
+        "clusterId": "subnet-10.9.0"
+      },
+      {
+        "id": 5009,
+        "displayName": "device-0009.lab.local",
+        "ipaddr": "10.10.0.1",
+        "macaddr": "00:AA:BB:CC:00:09",
+        "role": "unknown",
+        "critical": true,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 9550000000,
+        "clusterId": "subnet-10.10.0"
+      },
+      {
+        "id": 5010,
+        "displayName": "device-0010.lab.local",
+        "ipaddr": "10.1.0.2",
+        "macaddr": "00:AA:BB:CC:00:0A",
+        "role": "server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 9500000000,
+        "clusterId": "subnet-10.1.0"
+      },
+      {
+        "id": 5011,
+        "displayName": "device-0011.lab.local",
+        "ipaddr": "10.2.0.2",
+        "macaddr": "00:AA:BB:CC:00:0B",
+        "role": "client",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 9450000000,
+        "clusterId": "subnet-10.2.0"
+      },
+      {
+        "id": 5012,
+        "displayName": "device-0012.lab.local",
+        "ipaddr": "10.3.0.2",
+        "macaddr": "00:AA:BB:CC:00:0C",
+        "role": "gateway",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 9400000000,
+        "clusterId": "subnet-10.3.0"
+      },
+      {
+        "id": 5013,
+        "displayName": "device-0013.lab.local",
+        "ipaddr": "10.4.0.2",
+        "macaddr": "00:AA:BB:CC:00:0D",
+        "role": "db_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 9350000000,
+        "clusterId": "subnet-10.4.0"
+      },
+      {
+        "id": 5014,
+        "displayName": "device-0014.lab.local",
+        "ipaddr": "10.5.0.2",
+        "macaddr": "00:AA:BB:CC:00:0E",
+        "role": "dns_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 9300000000,
+        "clusterId": "subnet-10.5.0"
+      },
+      {
+        "id": 5015,
+        "displayName": "device-0015.lab.local",
+        "ipaddr": "10.6.0.2",
+        "macaddr": "00:AA:BB:CC:00:0F",
+        "role": "file_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 9250000000,
+        "clusterId": "subnet-10.6.0"
+      },
+      {
+        "id": 5016,
+        "displayName": "device-0016.lab.local",
+        "ipaddr": "10.7.0.2",
+        "macaddr": "00:AA:BB:CC:00:10",
+        "role": "firewall",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 9200000000,
+        "clusterId": "subnet-10.7.0"
+      },
+      {
+        "id": 5017,
+        "displayName": "device-0017.lab.local",
+        "ipaddr": "10.8.0.2",
+        "macaddr": "00:AA:BB:CC:00:11",
+        "role": "load_balancer",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 9150000000,
+        "clusterId": "subnet-10.8.0"
+      },
+      {
+        "id": 5018,
+        "displayName": "device-0018.lab.local",
+        "ipaddr": "10.9.0.2",
+        "macaddr": "00:AA:BB:CC:00:12",
+        "role": "other",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 9100000000,
+        "clusterId": "subnet-10.9.0"
+      },
+      {
+        "id": 5019,
+        "displayName": "device-0019.lab.local",
+        "ipaddr": "10.10.0.2",
+        "macaddr": "00:AA:BB:CC:00:13",
+        "role": "unknown",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 9050000000,
+        "clusterId": "subnet-10.10.0"
+      },
+      {
+        "id": 5020,
+        "displayName": "device-0020.lab.local",
+        "ipaddr": "10.1.0.3",
+        "macaddr": "00:AA:BB:CC:00:14",
+        "role": "server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 9000000000,
+        "clusterId": "subnet-10.1.0"
+      },
+      {
+        "id": 5021,
+        "displayName": "device-0021.lab.local",
+        "ipaddr": "10.2.0.3",
+        "macaddr": "00:AA:BB:CC:00:15",
+        "role": "client",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 8950000000,
+        "clusterId": "subnet-10.2.0"
+      },
+      {
+        "id": 5022,
+        "displayName": "device-0022.lab.local",
+        "ipaddr": "10.3.0.3",
+        "macaddr": "00:AA:BB:CC:00:16",
+        "role": "gateway",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 8900000000,
+        "clusterId": "subnet-10.3.0"
+      },
+      {
+        "id": 5023,
+        "displayName": "device-0023.lab.local",
+        "ipaddr": "10.4.0.3",
+        "macaddr": "00:AA:BB:CC:00:17",
+        "role": "db_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 8850000000,
+        "clusterId": "subnet-10.4.0"
+      },
+      {
+        "id": 5024,
+        "displayName": "device-0024.lab.local",
+        "ipaddr": "10.5.0.3",
+        "macaddr": "00:AA:BB:CC:00:18",
+        "role": "dns_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 8800000000,
+        "clusterId": "subnet-10.5.0"
+      },
+      {
+        "id": 5025,
+        "displayName": "device-0025.lab.local",
+        "ipaddr": "10.6.0.3",
+        "macaddr": "00:AA:BB:CC:00:19",
+        "role": "file_server",
+        "critical": false,
+        "activeDetections": 1,
+        "activeAlerts": 0,
+        "totalBytes": 8750000000,
+        "clusterId": "subnet-10.6.0"
+      },
+      {
+        "id": 5026,
+        "displayName": "device-0026.lab.local",
+        "ipaddr": "10.7.0.3",
+        "macaddr": "00:AA:BB:CC:00:1A",
+        "role": "firewall",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 8700000000,
+        "clusterId": "subnet-10.7.0"
+      },
+      {
+        "id": 5027,
+        "displayName": "device-0027.lab.local",
+        "ipaddr": "10.8.0.3",
+        "macaddr": "00:AA:BB:CC:00:1B",
+        "role": "load_balancer",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 8650000000,
+        "clusterId": "subnet-10.8.0"
+      },
+      {
+        "id": 5028,
+        "displayName": "device-0028.lab.local",
+        "ipaddr": "10.9.0.3",
+        "macaddr": "00:AA:BB:CC:00:1C",
+        "role": "other",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 8600000000,
+        "clusterId": "subnet-10.9.0"
+      },
+      {
+        "id": 5029,
+        "displayName": "device-0029.lab.local",
+        "ipaddr": "10.10.0.3",
+        "macaddr": "00:AA:BB:CC:00:1D",
+        "role": "unknown",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 8550000000,
+        "clusterId": "subnet-10.10.0"
+      },
+      {
+        "id": 5030,
+        "displayName": "device-0030.lab.local",
+        "ipaddr": "10.1.0.4",
+        "macaddr": "00:AA:BB:CC:00:1E",
+        "role": "server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 8500000000,
+        "clusterId": "subnet-10.1.0"
+      },
+      {
+        "id": 5031,
+        "displayName": "device-0031.lab.local",
+        "ipaddr": "10.2.0.4",
+        "macaddr": "00:AA:BB:CC:00:1F",
+        "role": "client",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 8450000000,
+        "clusterId": "subnet-10.2.0"
+      },
+      {
+        "id": 5032,
+        "displayName": "device-0032.lab.local",
+        "ipaddr": "10.3.0.4",
+        "macaddr": "00:AA:BB:CC:00:20",
+        "role": "gateway",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 8400000000,
+        "clusterId": "subnet-10.3.0"
+      },
+      {
+        "id": 5033,
+        "displayName": "device-0033.lab.local",
+        "ipaddr": "10.4.0.4",
+        "macaddr": "00:AA:BB:CC:00:21",
+        "role": "db_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 8350000000,
+        "clusterId": "subnet-10.4.0"
+      },
+      {
+        "id": 5034,
+        "displayName": "device-0034.lab.local",
+        "ipaddr": "10.5.0.4",
+        "macaddr": "00:AA:BB:CC:00:22",
+        "role": "dns_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 8300000000,
+        "clusterId": "subnet-10.5.0"
+      },
+      {
+        "id": 5035,
+        "displayName": "device-0035.lab.local",
+        "ipaddr": "10.6.0.4",
+        "macaddr": "00:AA:BB:CC:00:23",
+        "role": "file_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 8250000000,
+        "clusterId": "subnet-10.6.0"
+      },
+      {
+        "id": 5036,
+        "displayName": "device-0036.lab.local",
+        "ipaddr": "10.7.0.4",
+        "macaddr": "00:AA:BB:CC:00:24",
+        "role": "firewall",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 8200000000,
+        "clusterId": "subnet-10.7.0"
+      },
+      {
+        "id": 5037,
+        "displayName": "device-0037.lab.local",
+        "ipaddr": "10.8.0.4",
+        "macaddr": "00:AA:BB:CC:00:25",
+        "role": "load_balancer",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 8150000000,
+        "clusterId": "subnet-10.8.0"
+      },
+      {
+        "id": 5038,
+        "displayName": "device-0038.lab.local",
+        "ipaddr": "10.9.0.4",
+        "macaddr": "00:AA:BB:CC:00:26",
+        "role": "other",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 8100000000,
+        "clusterId": "subnet-10.9.0"
+      },
+      {
+        "id": 5039,
+        "displayName": "device-0039.lab.local",
+        "ipaddr": "10.10.0.4",
+        "macaddr": "00:AA:BB:CC:00:27",
+        "role": "unknown",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 8050000000,
+        "clusterId": "subnet-10.10.0"
+      },
+      {
+        "id": 5040,
+        "displayName": "device-0040.lab.local",
+        "ipaddr": "10.1.0.5",
+        "macaddr": "00:AA:BB:CC:00:28",
+        "role": "server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 1,
+        "totalBytes": 8000000000,
+        "clusterId": "subnet-10.1.0"
+      },
+      {
+        "id": 5041,
+        "displayName": "device-0041.lab.local",
+        "ipaddr": "10.2.0.5",
+        "macaddr": "00:AA:BB:CC:00:29",
+        "role": "client",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 7950000000,
+        "clusterId": "subnet-10.2.0"
+      },
+      {
+        "id": 5042,
+        "displayName": "device-0042.lab.local",
+        "ipaddr": "10.3.0.5",
+        "macaddr": "00:AA:BB:CC:00:2A",
+        "role": "gateway",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 7900000000,
+        "clusterId": "subnet-10.3.0"
+      },
+      {
+        "id": 5043,
+        "displayName": "device-0043.lab.local",
+        "ipaddr": "10.4.0.5",
+        "macaddr": "00:AA:BB:CC:00:2B",
+        "role": "db_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 7850000000,
+        "clusterId": "subnet-10.4.0"
+      },
+      {
+        "id": 5044,
+        "displayName": "device-0044.lab.local",
+        "ipaddr": "10.5.0.5",
+        "macaddr": "00:AA:BB:CC:00:2C",
+        "role": "dns_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 7800000000,
+        "clusterId": "subnet-10.5.0"
+      },
+      {
+        "id": 5045,
+        "displayName": "device-0045.lab.local",
+        "ipaddr": "10.6.0.5",
+        "macaddr": "00:AA:BB:CC:00:2D",
+        "role": "file_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 7750000000,
+        "clusterId": "subnet-10.6.0"
+      },
+      {
+        "id": 5046,
+        "displayName": "device-0046.lab.local",
+        "ipaddr": "10.7.0.5",
+        "macaddr": "00:AA:BB:CC:00:2E",
+        "role": "firewall",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 7700000000,
+        "clusterId": "subnet-10.7.0"
+      },
+      {
+        "id": 5047,
+        "displayName": "device-0047.lab.local",
+        "ipaddr": "10.8.0.5",
+        "macaddr": "00:AA:BB:CC:00:2F",
+        "role": "load_balancer",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 7650000000,
+        "clusterId": "subnet-10.8.0"
+      },
+      {
+        "id": 5048,
+        "displayName": "device-0048.lab.local",
+        "ipaddr": "10.9.0.5",
+        "macaddr": "00:AA:BB:CC:00:30",
+        "role": "other",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 7600000000,
+        "clusterId": "subnet-10.9.0"
+      },
+      {
+        "id": 5049,
+        "displayName": "device-0049.lab.local",
+        "ipaddr": "10.10.0.5",
+        "macaddr": "00:AA:BB:CC:00:31",
+        "role": "unknown",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 7550000000,
+        "clusterId": "subnet-10.10.0"
+      },
+      {
+        "id": 5050,
+        "displayName": "device-0050.lab.local",
+        "ipaddr": "10.1.0.6",
+        "macaddr": "00:AA:BB:CC:00:32",
+        "role": "server",
+        "critical": false,
+        "activeDetections": 1,
+        "activeAlerts": 0,
+        "totalBytes": 7500000000,
+        "clusterId": "subnet-10.1.0"
+      },
+      {
+        "id": 5051,
+        "displayName": "device-0051.lab.local",
+        "ipaddr": "10.2.0.6",
+        "macaddr": "00:AA:BB:CC:00:33",
+        "role": "client",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 7450000000,
+        "clusterId": "subnet-10.2.0"
+      },
+      {
+        "id": 5052,
+        "displayName": "device-0052.lab.local",
+        "ipaddr": "10.3.0.6",
+        "macaddr": "00:AA:BB:CC:00:34",
+        "role": "gateway",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 7400000000,
+        "clusterId": "subnet-10.3.0"
+      },
+      {
+        "id": 5053,
+        "displayName": "device-0053.lab.local",
+        "ipaddr": "10.4.0.6",
+        "macaddr": "00:AA:BB:CC:00:35",
+        "role": "db_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 7350000000,
+        "clusterId": "subnet-10.4.0"
+      },
+      {
+        "id": 5054,
+        "displayName": "device-0054.lab.local",
+        "ipaddr": "10.5.0.6",
+        "macaddr": "00:AA:BB:CC:00:36",
+        "role": "dns_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 7300000000,
+        "clusterId": "subnet-10.5.0"
+      },
+      {
+        "id": 5055,
+        "displayName": "device-0055.lab.local",
+        "ipaddr": "10.6.0.6",
+        "macaddr": "00:AA:BB:CC:00:37",
+        "role": "file_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 7250000000,
+        "clusterId": "subnet-10.6.0"
+      },
+      {
+        "id": 5056,
+        "displayName": "device-0056.lab.local",
+        "ipaddr": "10.7.0.6",
+        "macaddr": "00:AA:BB:CC:00:38",
+        "role": "firewall",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 7200000000,
+        "clusterId": "subnet-10.7.0"
+      },
+      {
+        "id": 5057,
+        "displayName": "device-0057.lab.local",
+        "ipaddr": "10.8.0.6",
+        "macaddr": "00:AA:BB:CC:00:39",
+        "role": "load_balancer",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 7150000000,
+        "clusterId": "subnet-10.8.0"
+      },
+      {
+        "id": 5058,
+        "displayName": "device-0058.lab.local",
+        "ipaddr": "10.9.0.6",
+        "macaddr": "00:AA:BB:CC:00:3A",
+        "role": "other",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 7100000000,
+        "clusterId": "subnet-10.9.0"
+      },
+      {
+        "id": 5059,
+        "displayName": "device-0059.lab.local",
+        "ipaddr": "10.10.0.6",
+        "macaddr": "00:AA:BB:CC:00:3B",
+        "role": "unknown",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 7050000000,
+        "clusterId": "subnet-10.10.0"
+      },
+      {
+        "id": 5060,
+        "displayName": "device-0060.lab.local",
+        "ipaddr": "10.1.0.7",
+        "macaddr": "00:AA:BB:CC:00:3C",
+        "role": "server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 7000000000,
+        "clusterId": "subnet-10.1.0"
+      },
+      {
+        "id": 5061,
+        "displayName": "device-0061.lab.local",
+        "ipaddr": "10.2.0.7",
+        "macaddr": "00:AA:BB:CC:00:3D",
+        "role": "client",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 6950000000,
+        "clusterId": "subnet-10.2.0"
+      },
+      {
+        "id": 5062,
+        "displayName": "device-0062.lab.local",
+        "ipaddr": "10.3.0.7",
+        "macaddr": "00:AA:BB:CC:00:3E",
+        "role": "gateway",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 6900000000,
+        "clusterId": "subnet-10.3.0"
+      },
+      {
+        "id": 5063,
+        "displayName": "device-0063.lab.local",
+        "ipaddr": "10.4.0.7",
+        "macaddr": "00:AA:BB:CC:00:3F",
+        "role": "db_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 6850000000,
+        "clusterId": "subnet-10.4.0"
+      },
+      {
+        "id": 5064,
+        "displayName": "device-0064.lab.local",
+        "ipaddr": "10.5.0.7",
+        "macaddr": "00:AA:BB:CC:00:40",
+        "role": "dns_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 6800000000,
+        "clusterId": "subnet-10.5.0"
+      },
+      {
+        "id": 5065,
+        "displayName": "device-0065.lab.local",
+        "ipaddr": "10.6.0.7",
+        "macaddr": "00:AA:BB:CC:00:41",
+        "role": "file_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 6750000000,
+        "clusterId": "subnet-10.6.0"
+      },
+      {
+        "id": 5066,
+        "displayName": "device-0066.lab.local",
+        "ipaddr": "10.7.0.7",
+        "macaddr": "00:AA:BB:CC:00:42",
+        "role": "firewall",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 6700000000,
+        "clusterId": "subnet-10.7.0"
+      },
+      {
+        "id": 5067,
+        "displayName": "device-0067.lab.local",
+        "ipaddr": "10.8.0.7",
+        "macaddr": "00:AA:BB:CC:00:43",
+        "role": "load_balancer",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 6650000000,
+        "clusterId": "subnet-10.8.0"
+      },
+      {
+        "id": 5068,
+        "displayName": "device-0068.lab.local",
+        "ipaddr": "10.9.0.7",
+        "macaddr": "00:AA:BB:CC:00:44",
+        "role": "other",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 6600000000,
+        "clusterId": "subnet-10.9.0"
+      },
+      {
+        "id": 5069,
+        "displayName": "device-0069.lab.local",
+        "ipaddr": "10.10.0.7",
+        "macaddr": "00:AA:BB:CC:00:45",
+        "role": "unknown",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 6550000000,
+        "clusterId": "subnet-10.10.0"
+      },
+      {
+        "id": 5070,
+        "displayName": "device-0070.lab.local",
+        "ipaddr": "10.1.0.8",
+        "macaddr": "00:AA:BB:CC:00:46",
+        "role": "server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 6500000000,
+        "clusterId": "subnet-10.1.0"
+      },
+      {
+        "id": 5071,
+        "displayName": "device-0071.lab.local",
+        "ipaddr": "10.2.0.8",
+        "macaddr": "00:AA:BB:CC:00:47",
+        "role": "client",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 6450000000,
+        "clusterId": "subnet-10.2.0"
+      },
+      {
+        "id": 5072,
+        "displayName": "device-0072.lab.local",
+        "ipaddr": "10.3.0.8",
+        "macaddr": "00:AA:BB:CC:00:48",
+        "role": "gateway",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 6400000000,
+        "clusterId": "subnet-10.3.0"
+      },
+      {
+        "id": 5073,
+        "displayName": "device-0073.lab.local",
+        "ipaddr": "10.4.0.8",
+        "macaddr": "00:AA:BB:CC:00:49",
+        "role": "db_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 6350000000,
+        "clusterId": "subnet-10.4.0"
+      },
+      {
+        "id": 5074,
+        "displayName": "device-0074.lab.local",
+        "ipaddr": "10.5.0.8",
+        "macaddr": "00:AA:BB:CC:00:4A",
+        "role": "dns_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 6300000000,
+        "clusterId": "subnet-10.5.0"
+      },
+      {
+        "id": 5075,
+        "displayName": "device-0075.lab.local",
+        "ipaddr": "10.6.0.8",
+        "macaddr": "00:AA:BB:CC:00:4B",
+        "role": "file_server",
+        "critical": false,
+        "activeDetections": 1,
+        "activeAlerts": 0,
+        "totalBytes": 6250000000,
+        "clusterId": "subnet-10.6.0"
+      },
+      {
+        "id": 5076,
+        "displayName": "device-0076.lab.local",
+        "ipaddr": "10.7.0.8",
+        "macaddr": "00:AA:BB:CC:00:4C",
+        "role": "firewall",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 6200000000,
+        "clusterId": "subnet-10.7.0"
+      },
+      {
+        "id": 5077,
+        "displayName": "device-0077.lab.local",
+        "ipaddr": "10.8.0.8",
+        "macaddr": "00:AA:BB:CC:00:4D",
+        "role": "load_balancer",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 6150000000,
+        "clusterId": "subnet-10.8.0"
+      },
+      {
+        "id": 5078,
+        "displayName": "device-0078.lab.local",
+        "ipaddr": "10.9.0.8",
+        "macaddr": "00:AA:BB:CC:00:4E",
+        "role": "other",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 6100000000,
+        "clusterId": "subnet-10.9.0"
+      },
+      {
+        "id": 5079,
+        "displayName": "device-0079.lab.local",
+        "ipaddr": "10.10.0.8",
+        "macaddr": "00:AA:BB:CC:00:4F",
+        "role": "unknown",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 6050000000,
+        "clusterId": "subnet-10.10.0"
+      },
+      {
+        "id": 5080,
+        "displayName": "device-0080.lab.local",
+        "ipaddr": "10.1.0.9",
+        "macaddr": "00:AA:BB:CC:00:50",
+        "role": "server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 1,
+        "totalBytes": 6000000000,
+        "clusterId": "subnet-10.1.0"
+      },
+      {
+        "id": 5081,
+        "displayName": "device-0081.lab.local",
+        "ipaddr": "10.2.0.9",
+        "macaddr": "00:AA:BB:CC:00:51",
+        "role": "client",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 5950000000,
+        "clusterId": "subnet-10.2.0"
+      },
+      {
+        "id": 5082,
+        "displayName": "device-0082.lab.local",
+        "ipaddr": "10.3.0.9",
+        "macaddr": "00:AA:BB:CC:00:52",
+        "role": "gateway",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 5900000000,
+        "clusterId": "subnet-10.3.0"
+      },
+      {
+        "id": 5083,
+        "displayName": "device-0083.lab.local",
+        "ipaddr": "10.4.0.9",
+        "macaddr": "00:AA:BB:CC:00:53",
+        "role": "db_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 5850000000,
+        "clusterId": "subnet-10.4.0"
+      },
+      {
+        "id": 5084,
+        "displayName": "device-0084.lab.local",
+        "ipaddr": "10.5.0.9",
+        "macaddr": "00:AA:BB:CC:00:54",
+        "role": "dns_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 5800000000,
+        "clusterId": "subnet-10.5.0"
+      },
+      {
+        "id": 5085,
+        "displayName": "device-0085.lab.local",
+        "ipaddr": "10.6.0.9",
+        "macaddr": "00:AA:BB:CC:00:55",
+        "role": "file_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 5750000000,
+        "clusterId": "subnet-10.6.0"
+      },
+      {
+        "id": 5086,
+        "displayName": "device-0086.lab.local",
+        "ipaddr": "10.7.0.9",
+        "macaddr": "00:AA:BB:CC:00:56",
+        "role": "firewall",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 5700000000,
+        "clusterId": "subnet-10.7.0"
+      },
+      {
+        "id": 5087,
+        "displayName": "device-0087.lab.local",
+        "ipaddr": "10.8.0.9",
+        "macaddr": "00:AA:BB:CC:00:57",
+        "role": "load_balancer",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 5650000000,
+        "clusterId": "subnet-10.8.0"
+      },
+      {
+        "id": 5088,
+        "displayName": "device-0088.lab.local",
+        "ipaddr": "10.9.0.9",
+        "macaddr": "00:AA:BB:CC:00:58",
+        "role": "other",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 5600000000,
+        "clusterId": "subnet-10.9.0"
+      },
+      {
+        "id": 5089,
+        "displayName": "device-0089.lab.local",
+        "ipaddr": "10.10.0.9",
+        "macaddr": "00:AA:BB:CC:00:59",
+        "role": "unknown",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 5550000000,
+        "clusterId": "subnet-10.10.0"
+      },
+      {
+        "id": 5090,
+        "displayName": "device-0090.lab.local",
+        "ipaddr": "10.1.0.10",
+        "macaddr": "00:AA:BB:CC:00:5A",
+        "role": "server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 5500000000,
+        "clusterId": "subnet-10.1.0"
+      },
+      {
+        "id": 5091,
+        "displayName": "device-0091.lab.local",
+        "ipaddr": "10.2.0.10",
+        "macaddr": "00:AA:BB:CC:00:5B",
+        "role": "client",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 5450000000,
+        "clusterId": "subnet-10.2.0"
+      },
+      {
+        "id": 5092,
+        "displayName": "device-0092.lab.local",
+        "ipaddr": "10.3.0.10",
+        "macaddr": "00:AA:BB:CC:00:5C",
+        "role": "gateway",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 5400000000,
+        "clusterId": "subnet-10.3.0"
+      },
+      {
+        "id": 5093,
+        "displayName": "device-0093.lab.local",
+        "ipaddr": "10.4.0.10",
+        "macaddr": "00:AA:BB:CC:00:5D",
+        "role": "db_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 5350000000,
+        "clusterId": "subnet-10.4.0"
+      },
+      {
+        "id": 5094,
+        "displayName": "device-0094.lab.local",
+        "ipaddr": "10.5.0.10",
+        "macaddr": "00:AA:BB:CC:00:5E",
+        "role": "dns_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 5300000000,
+        "clusterId": "subnet-10.5.0"
+      },
+      {
+        "id": 5095,
+        "displayName": "device-0095.lab.local",
+        "ipaddr": "10.6.0.10",
+        "macaddr": "00:AA:BB:CC:00:5F",
+        "role": "file_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 5250000000,
+        "clusterId": "subnet-10.6.0"
+      },
+      {
+        "id": 5096,
+        "displayName": "device-0096.lab.local",
+        "ipaddr": "10.7.0.10",
+        "macaddr": "00:AA:BB:CC:00:60",
+        "role": "firewall",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 5200000000,
+        "clusterId": "subnet-10.7.0"
+      },
+      {
+        "id": 5097,
+        "displayName": "device-0097.lab.local",
+        "ipaddr": "10.8.0.10",
+        "macaddr": "00:AA:BB:CC:00:61",
+        "role": "load_balancer",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 5150000000,
+        "clusterId": "subnet-10.8.0"
+      },
+      {
+        "id": 5098,
+        "displayName": "device-0098.lab.local",
+        "ipaddr": "10.9.0.10",
+        "macaddr": "00:AA:BB:CC:00:62",
+        "role": "other",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 5100000000,
+        "clusterId": "subnet-10.9.0"
+      },
+      {
+        "id": 5099,
+        "displayName": "device-0099.lab.local",
+        "ipaddr": "10.10.0.10",
+        "macaddr": "00:AA:BB:CC:00:63",
+        "role": "unknown",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 5050000000,
+        "clusterId": "subnet-10.10.0"
+      },
+      {
+        "id": 5100,
+        "displayName": "device-0100.lab.local",
+        "ipaddr": "10.1.0.11",
+        "macaddr": "00:AA:BB:CC:00:64",
+        "role": "server",
+        "critical": false,
+        "activeDetections": 1,
+        "activeAlerts": 0,
+        "totalBytes": 5000000000,
+        "clusterId": "subnet-10.1.0"
+      },
+      {
+        "id": 5101,
+        "displayName": "device-0101.lab.local",
+        "ipaddr": "10.2.0.11",
+        "macaddr": "00:AA:BB:CC:00:65",
+        "role": "client",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 4950000000,
+        "clusterId": "subnet-10.2.0"
+      },
+      {
+        "id": 5102,
+        "displayName": "device-0102.lab.local",
+        "ipaddr": "10.3.0.11",
+        "macaddr": "00:AA:BB:CC:00:66",
+        "role": "gateway",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 4900000000,
+        "clusterId": "subnet-10.3.0"
+      },
+      {
+        "id": 5103,
+        "displayName": "device-0103.lab.local",
+        "ipaddr": "10.4.0.11",
+        "macaddr": "00:AA:BB:CC:00:67",
+        "role": "db_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 4850000000,
+        "clusterId": "subnet-10.4.0"
+      },
+      {
+        "id": 5104,
+        "displayName": "device-0104.lab.local",
+        "ipaddr": "10.5.0.11",
+        "macaddr": "00:AA:BB:CC:00:68",
+        "role": "dns_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 4800000000,
+        "clusterId": "subnet-10.5.0"
+      },
+      {
+        "id": 5105,
+        "displayName": "device-0105.lab.local",
+        "ipaddr": "10.6.0.11",
+        "macaddr": "00:AA:BB:CC:00:69",
+        "role": "file_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 4750000000,
+        "clusterId": "subnet-10.6.0"
+      },
+      {
+        "id": 5106,
+        "displayName": "device-0106.lab.local",
+        "ipaddr": "10.7.0.11",
+        "macaddr": "00:AA:BB:CC:00:6A",
+        "role": "firewall",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 4700000000,
+        "clusterId": "subnet-10.7.0"
+      },
+      {
+        "id": 5107,
+        "displayName": "device-0107.lab.local",
+        "ipaddr": "10.8.0.11",
+        "macaddr": "00:AA:BB:CC:00:6B",
+        "role": "load_balancer",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 4650000000,
+        "clusterId": "subnet-10.8.0"
+      },
+      {
+        "id": 5108,
+        "displayName": "device-0108.lab.local",
+        "ipaddr": "10.9.0.11",
+        "macaddr": "00:AA:BB:CC:00:6C",
+        "role": "other",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 4600000000,
+        "clusterId": "subnet-10.9.0"
+      },
+      {
+        "id": 5109,
+        "displayName": "device-0109.lab.local",
+        "ipaddr": "10.10.0.11",
+        "macaddr": "00:AA:BB:CC:00:6D",
+        "role": "unknown",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 4550000000,
+        "clusterId": "subnet-10.10.0"
+      },
+      {
+        "id": 5110,
+        "displayName": "device-0110.lab.local",
+        "ipaddr": "10.1.0.12",
+        "macaddr": "00:AA:BB:CC:00:6E",
+        "role": "server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 4500000000,
+        "clusterId": "subnet-10.1.0"
+      },
+      {
+        "id": 5111,
+        "displayName": "device-0111.lab.local",
+        "ipaddr": "10.2.0.12",
+        "macaddr": "00:AA:BB:CC:00:6F",
+        "role": "client",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 4450000000,
+        "clusterId": "subnet-10.2.0"
+      },
+      {
+        "id": 5112,
+        "displayName": "device-0112.lab.local",
+        "ipaddr": "10.3.0.12",
+        "macaddr": "00:AA:BB:CC:00:70",
+        "role": "gateway",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 4400000000,
+        "clusterId": "subnet-10.3.0"
+      },
+      {
+        "id": 5113,
+        "displayName": "device-0113.lab.local",
+        "ipaddr": "10.4.0.12",
+        "macaddr": "00:AA:BB:CC:00:71",
+        "role": "db_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 4350000000,
+        "clusterId": "subnet-10.4.0"
+      },
+      {
+        "id": 5114,
+        "displayName": "device-0114.lab.local",
+        "ipaddr": "10.5.0.12",
+        "macaddr": "00:AA:BB:CC:00:72",
+        "role": "dns_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 4300000000,
+        "clusterId": "subnet-10.5.0"
+      },
+      {
+        "id": 5115,
+        "displayName": "device-0115.lab.local",
+        "ipaddr": "10.6.0.12",
+        "macaddr": "00:AA:BB:CC:00:73",
+        "role": "file_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 4250000000,
+        "clusterId": "subnet-10.6.0"
+      },
+      {
+        "id": 5116,
+        "displayName": "device-0116.lab.local",
+        "ipaddr": "10.7.0.12",
+        "macaddr": "00:AA:BB:CC:00:74",
+        "role": "firewall",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 4200000000,
+        "clusterId": "subnet-10.7.0"
+      },
+      {
+        "id": 5117,
+        "displayName": "device-0117.lab.local",
+        "ipaddr": "10.8.0.12",
+        "macaddr": "00:AA:BB:CC:00:75",
+        "role": "load_balancer",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 4150000000,
+        "clusterId": "subnet-10.8.0"
+      },
+      {
+        "id": 5118,
+        "displayName": "device-0118.lab.local",
+        "ipaddr": "10.9.0.12",
+        "macaddr": "00:AA:BB:CC:00:76",
+        "role": "other",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 4100000000,
+        "clusterId": "subnet-10.9.0"
+      },
+      {
+        "id": 5119,
+        "displayName": "device-0119.lab.local",
+        "ipaddr": "10.10.0.12",
+        "macaddr": "00:AA:BB:CC:00:77",
+        "role": "unknown",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 4050000000,
+        "clusterId": "subnet-10.10.0"
+      },
+      {
+        "id": 5120,
+        "displayName": "device-0120.lab.local",
+        "ipaddr": "10.1.0.13",
+        "macaddr": "00:AA:BB:CC:00:78",
+        "role": "server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 1,
+        "totalBytes": 4000000000,
+        "clusterId": "subnet-10.1.0"
+      },
+      {
+        "id": 5121,
+        "displayName": "device-0121.lab.local",
+        "ipaddr": "10.2.0.13",
+        "macaddr": "00:AA:BB:CC:00:79",
+        "role": "client",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 3950000000,
+        "clusterId": "subnet-10.2.0"
+      },
+      {
+        "id": 5122,
+        "displayName": "device-0122.lab.local",
+        "ipaddr": "10.3.0.13",
+        "macaddr": "00:AA:BB:CC:00:7A",
+        "role": "gateway",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 3900000000,
+        "clusterId": "subnet-10.3.0"
+      },
+      {
+        "id": 5123,
+        "displayName": "device-0123.lab.local",
+        "ipaddr": "10.4.0.13",
+        "macaddr": "00:AA:BB:CC:00:7B",
+        "role": "db_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 3850000000,
+        "clusterId": "subnet-10.4.0"
+      },
+      {
+        "id": 5124,
+        "displayName": "device-0124.lab.local",
+        "ipaddr": "10.5.0.13",
+        "macaddr": "00:AA:BB:CC:00:7C",
+        "role": "dns_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 3800000000,
+        "clusterId": "subnet-10.5.0"
+      },
+      {
+        "id": 5125,
+        "displayName": "device-0125.lab.local",
+        "ipaddr": "10.6.0.13",
+        "macaddr": "00:AA:BB:CC:00:7D",
+        "role": "file_server",
+        "critical": false,
+        "activeDetections": 1,
+        "activeAlerts": 0,
+        "totalBytes": 3750000000,
+        "clusterId": "subnet-10.6.0"
+      },
+      {
+        "id": 5126,
+        "displayName": "device-0126.lab.local",
+        "ipaddr": "10.7.0.13",
+        "macaddr": "00:AA:BB:CC:00:7E",
+        "role": "firewall",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 3700000000,
+        "clusterId": "subnet-10.7.0"
+      },
+      {
+        "id": 5127,
+        "displayName": "device-0127.lab.local",
+        "ipaddr": "10.8.0.13",
+        "macaddr": "00:AA:BB:CC:00:7F",
+        "role": "load_balancer",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 3650000000,
+        "clusterId": "subnet-10.8.0"
+      },
+      {
+        "id": 5128,
+        "displayName": "device-0128.lab.local",
+        "ipaddr": "10.9.0.13",
+        "macaddr": "00:AA:BB:CC:00:80",
+        "role": "other",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 3600000000,
+        "clusterId": "subnet-10.9.0"
+      },
+      {
+        "id": 5129,
+        "displayName": "device-0129.lab.local",
+        "ipaddr": "10.10.0.13",
+        "macaddr": "00:AA:BB:CC:00:81",
+        "role": "unknown",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 3550000000,
+        "clusterId": "subnet-10.10.0"
+      },
+      {
+        "id": 5130,
+        "displayName": "device-0130.lab.local",
+        "ipaddr": "10.1.0.14",
+        "macaddr": "00:AA:BB:CC:00:82",
+        "role": "server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 3500000000,
+        "clusterId": "subnet-10.1.0"
+      },
+      {
+        "id": 5131,
+        "displayName": "device-0131.lab.local",
+        "ipaddr": "10.2.0.14",
+        "macaddr": "00:AA:BB:CC:00:83",
+        "role": "client",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 3450000000,
+        "clusterId": "subnet-10.2.0"
+      },
+      {
+        "id": 5132,
+        "displayName": "device-0132.lab.local",
+        "ipaddr": "10.3.0.14",
+        "macaddr": "00:AA:BB:CC:00:84",
+        "role": "gateway",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 3400000000,
+        "clusterId": "subnet-10.3.0"
+      },
+      {
+        "id": 5133,
+        "displayName": "device-0133.lab.local",
+        "ipaddr": "10.4.0.14",
+        "macaddr": "00:AA:BB:CC:00:85",
+        "role": "db_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 3350000000,
+        "clusterId": "subnet-10.4.0"
+      },
+      {
+        "id": 5134,
+        "displayName": "device-0134.lab.local",
+        "ipaddr": "10.5.0.14",
+        "macaddr": "00:AA:BB:CC:00:86",
+        "role": "dns_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 3300000000,
+        "clusterId": "subnet-10.5.0"
+      },
+      {
+        "id": 5135,
+        "displayName": "device-0135.lab.local",
+        "ipaddr": "10.6.0.14",
+        "macaddr": "00:AA:BB:CC:00:87",
+        "role": "file_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 3250000000,
+        "clusterId": "subnet-10.6.0"
+      },
+      {
+        "id": 5136,
+        "displayName": "device-0136.lab.local",
+        "ipaddr": "10.7.0.14",
+        "macaddr": "00:AA:BB:CC:00:88",
+        "role": "firewall",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 3200000000,
+        "clusterId": "subnet-10.7.0"
+      },
+      {
+        "id": 5137,
+        "displayName": "device-0137.lab.local",
+        "ipaddr": "10.8.0.14",
+        "macaddr": "00:AA:BB:CC:00:89",
+        "role": "load_balancer",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 3150000000,
+        "clusterId": "subnet-10.8.0"
+      },
+      {
+        "id": 5138,
+        "displayName": "device-0138.lab.local",
+        "ipaddr": "10.9.0.14",
+        "macaddr": "00:AA:BB:CC:00:8A",
+        "role": "other",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 3100000000,
+        "clusterId": "subnet-10.9.0"
+      },
+      {
+        "id": 5139,
+        "displayName": "device-0139.lab.local",
+        "ipaddr": "10.10.0.14",
+        "macaddr": "00:AA:BB:CC:00:8B",
+        "role": "unknown",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 3050000000,
+        "clusterId": "subnet-10.10.0"
+      },
+      {
+        "id": 5140,
+        "displayName": "device-0140.lab.local",
+        "ipaddr": "10.1.0.15",
+        "macaddr": "00:AA:BB:CC:00:8C",
+        "role": "server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 3000000000,
+        "clusterId": "subnet-10.1.0"
+      },
+      {
+        "id": 5141,
+        "displayName": "device-0141.lab.local",
+        "ipaddr": "10.2.0.15",
+        "macaddr": "00:AA:BB:CC:00:8D",
+        "role": "client",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 2950000000,
+        "clusterId": "subnet-10.2.0"
+      },
+      {
+        "id": 5142,
+        "displayName": "device-0142.lab.local",
+        "ipaddr": "10.3.0.15",
+        "macaddr": "00:AA:BB:CC:00:8E",
+        "role": "gateway",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 2900000000,
+        "clusterId": "subnet-10.3.0"
+      },
+      {
+        "id": 5143,
+        "displayName": "device-0143.lab.local",
+        "ipaddr": "10.4.0.15",
+        "macaddr": "00:AA:BB:CC:00:8F",
+        "role": "db_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 2850000000,
+        "clusterId": "subnet-10.4.0"
+      },
+      {
+        "id": 5144,
+        "displayName": "device-0144.lab.local",
+        "ipaddr": "10.5.0.15",
+        "macaddr": "00:AA:BB:CC:00:90",
+        "role": "dns_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 2800000000,
+        "clusterId": "subnet-10.5.0"
+      },
+      {
+        "id": 5145,
+        "displayName": "device-0145.lab.local",
+        "ipaddr": "10.6.0.15",
+        "macaddr": "00:AA:BB:CC:00:91",
+        "role": "file_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 2750000000,
+        "clusterId": "subnet-10.6.0"
+      },
+      {
+        "id": 5146,
+        "displayName": "device-0146.lab.local",
+        "ipaddr": "10.7.0.15",
+        "macaddr": "00:AA:BB:CC:00:92",
+        "role": "firewall",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 2700000000,
+        "clusterId": "subnet-10.7.0"
+      },
+      {
+        "id": 5147,
+        "displayName": "device-0147.lab.local",
+        "ipaddr": "10.8.0.15",
+        "macaddr": "00:AA:BB:CC:00:93",
+        "role": "load_balancer",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 2650000000,
+        "clusterId": "subnet-10.8.0"
+      },
+      {
+        "id": 5148,
+        "displayName": "device-0148.lab.local",
+        "ipaddr": "10.9.0.15",
+        "macaddr": "00:AA:BB:CC:00:94",
+        "role": "other",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 2600000000,
+        "clusterId": "subnet-10.9.0"
+      },
+      {
+        "id": 5149,
+        "displayName": "device-0149.lab.local",
+        "ipaddr": "10.10.0.15",
+        "macaddr": "00:AA:BB:CC:00:95",
+        "role": "unknown",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 2550000000,
+        "clusterId": "subnet-10.10.0"
+      },
+      {
+        "id": 5150,
+        "displayName": "device-0150.lab.local",
+        "ipaddr": "10.1.0.16",
+        "macaddr": "00:AA:BB:CC:00:96",
+        "role": "server",
+        "critical": false,
+        "activeDetections": 1,
+        "activeAlerts": 0,
+        "totalBytes": 2500000000,
+        "clusterId": "subnet-10.1.0"
+      },
+      {
+        "id": 5151,
+        "displayName": "device-0151.lab.local",
+        "ipaddr": "10.2.0.16",
+        "macaddr": "00:AA:BB:CC:00:97",
+        "role": "client",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 2450000000,
+        "clusterId": "subnet-10.2.0"
+      },
+      {
+        "id": 5152,
+        "displayName": "device-0152.lab.local",
+        "ipaddr": "10.3.0.16",
+        "macaddr": "00:AA:BB:CC:00:98",
+        "role": "gateway",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 2400000000,
+        "clusterId": "subnet-10.3.0"
+      },
+      {
+        "id": 5153,
+        "displayName": "device-0153.lab.local",
+        "ipaddr": "10.4.0.16",
+        "macaddr": "00:AA:BB:CC:00:99",
+        "role": "db_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 2350000000,
+        "clusterId": "subnet-10.4.0"
+      },
+      {
+        "id": 5154,
+        "displayName": "device-0154.lab.local",
+        "ipaddr": "10.5.0.16",
+        "macaddr": "00:AA:BB:CC:00:9A",
+        "role": "dns_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 2300000000,
+        "clusterId": "subnet-10.5.0"
+      },
+      {
+        "id": 5155,
+        "displayName": "device-0155.lab.local",
+        "ipaddr": "10.6.0.16",
+        "macaddr": "00:AA:BB:CC:00:9B",
+        "role": "file_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 2250000000,
+        "clusterId": "subnet-10.6.0"
+      },
+      {
+        "id": 5156,
+        "displayName": "device-0156.lab.local",
+        "ipaddr": "10.7.0.16",
+        "macaddr": "00:AA:BB:CC:00:9C",
+        "role": "firewall",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 2200000000,
+        "clusterId": "subnet-10.7.0"
+      },
+      {
+        "id": 5157,
+        "displayName": "device-0157.lab.local",
+        "ipaddr": "10.8.0.16",
+        "macaddr": "00:AA:BB:CC:00:9D",
+        "role": "load_balancer",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 2150000000,
+        "clusterId": "subnet-10.8.0"
+      },
+      {
+        "id": 5158,
+        "displayName": "device-0158.lab.local",
+        "ipaddr": "10.9.0.16",
+        "macaddr": "00:AA:BB:CC:00:9E",
+        "role": "other",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 2100000000,
+        "clusterId": "subnet-10.9.0"
+      },
+      {
+        "id": 5159,
+        "displayName": "device-0159.lab.local",
+        "ipaddr": "10.10.0.16",
+        "macaddr": "00:AA:BB:CC:00:9F",
+        "role": "unknown",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 2050000000,
+        "clusterId": "subnet-10.10.0"
+      },
+      {
+        "id": 5160,
+        "displayName": "device-0160.lab.local",
+        "ipaddr": "10.1.0.17",
+        "macaddr": "00:AA:BB:CC:00:A0",
+        "role": "server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 1,
+        "totalBytes": 2000000000,
+        "clusterId": "subnet-10.1.0"
+      },
+      {
+        "id": 5161,
+        "displayName": "device-0161.lab.local",
+        "ipaddr": "10.2.0.17",
+        "macaddr": "00:AA:BB:CC:00:A1",
+        "role": "client",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 1950000000,
+        "clusterId": "subnet-10.2.0"
+      },
+      {
+        "id": 5162,
+        "displayName": "device-0162.lab.local",
+        "ipaddr": "10.3.0.17",
+        "macaddr": "00:AA:BB:CC:00:A2",
+        "role": "gateway",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 1900000000,
+        "clusterId": "subnet-10.3.0"
+      },
+      {
+        "id": 5163,
+        "displayName": "device-0163.lab.local",
+        "ipaddr": "10.4.0.17",
+        "macaddr": "00:AA:BB:CC:00:A3",
+        "role": "db_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 1850000000,
+        "clusterId": "subnet-10.4.0"
+      },
+      {
+        "id": 5164,
+        "displayName": "device-0164.lab.local",
+        "ipaddr": "10.5.0.17",
+        "macaddr": "00:AA:BB:CC:00:A4",
+        "role": "dns_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 1800000000,
+        "clusterId": "subnet-10.5.0"
+      },
+      {
+        "id": 5165,
+        "displayName": "device-0165.lab.local",
+        "ipaddr": "10.6.0.17",
+        "macaddr": "00:AA:BB:CC:00:A5",
+        "role": "file_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 1750000000,
+        "clusterId": "subnet-10.6.0"
+      },
+      {
+        "id": 5166,
+        "displayName": "device-0166.lab.local",
+        "ipaddr": "10.7.0.17",
+        "macaddr": "00:AA:BB:CC:00:A6",
+        "role": "firewall",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 1700000000,
+        "clusterId": "subnet-10.7.0"
+      },
+      {
+        "id": 5167,
+        "displayName": "device-0167.lab.local",
+        "ipaddr": "10.8.0.17",
+        "macaddr": "00:AA:BB:CC:00:A7",
+        "role": "load_balancer",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 1650000000,
+        "clusterId": "subnet-10.8.0"
+      },
+      {
+        "id": 5168,
+        "displayName": "device-0168.lab.local",
+        "ipaddr": "10.9.0.17",
+        "macaddr": "00:AA:BB:CC:00:A8",
+        "role": "other",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 1600000000,
+        "clusterId": "subnet-10.9.0"
+      },
+      {
+        "id": 5169,
+        "displayName": "device-0169.lab.local",
+        "ipaddr": "10.10.0.17",
+        "macaddr": "00:AA:BB:CC:00:A9",
+        "role": "unknown",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 1550000000,
+        "clusterId": "subnet-10.10.0"
+      },
+      {
+        "id": 5170,
+        "displayName": "device-0170.lab.local",
+        "ipaddr": "10.1.0.18",
+        "macaddr": "00:AA:BB:CC:00:AA",
+        "role": "server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 1500000000,
+        "clusterId": "subnet-10.1.0"
+      },
+      {
+        "id": 5171,
+        "displayName": "device-0171.lab.local",
+        "ipaddr": "10.2.0.18",
+        "macaddr": "00:AA:BB:CC:00:AB",
+        "role": "client",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 1450000000,
+        "clusterId": "subnet-10.2.0"
+      },
+      {
+        "id": 5172,
+        "displayName": "device-0172.lab.local",
+        "ipaddr": "10.3.0.18",
+        "macaddr": "00:AA:BB:CC:00:AC",
+        "role": "gateway",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 1400000000,
+        "clusterId": "subnet-10.3.0"
+      },
+      {
+        "id": 5173,
+        "displayName": "device-0173.lab.local",
+        "ipaddr": "10.4.0.18",
+        "macaddr": "00:AA:BB:CC:00:AD",
+        "role": "db_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 1350000000,
+        "clusterId": "subnet-10.4.0"
+      },
+      {
+        "id": 5174,
+        "displayName": "device-0174.lab.local",
+        "ipaddr": "10.5.0.18",
+        "macaddr": "00:AA:BB:CC:00:AE",
+        "role": "dns_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 1300000000,
+        "clusterId": "subnet-10.5.0"
+      },
+      {
+        "id": 5175,
+        "displayName": "device-0175.lab.local",
+        "ipaddr": "10.6.0.18",
+        "macaddr": "00:AA:BB:CC:00:AF",
+        "role": "file_server",
+        "critical": false,
+        "activeDetections": 1,
+        "activeAlerts": 0,
+        "totalBytes": 1250000000,
+        "clusterId": "subnet-10.6.0"
+      },
+      {
+        "id": 5176,
+        "displayName": "device-0176.lab.local",
+        "ipaddr": "10.7.0.18",
+        "macaddr": "00:AA:BB:CC:00:B0",
+        "role": "firewall",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 1200000000,
+        "clusterId": "subnet-10.7.0"
+      },
+      {
+        "id": 5177,
+        "displayName": "device-0177.lab.local",
+        "ipaddr": "10.8.0.18",
+        "macaddr": "00:AA:BB:CC:00:B1",
+        "role": "load_balancer",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 1150000000,
+        "clusterId": "subnet-10.8.0"
+      },
+      {
+        "id": 5178,
+        "displayName": "device-0178.lab.local",
+        "ipaddr": "10.9.0.18",
+        "macaddr": "00:AA:BB:CC:00:B2",
+        "role": "other",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 1100000000,
+        "clusterId": "subnet-10.9.0"
+      },
+      {
+        "id": 5179,
+        "displayName": "device-0179.lab.local",
+        "ipaddr": "10.10.0.18",
+        "macaddr": "00:AA:BB:CC:00:B3",
+        "role": "unknown",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 1050000000,
+        "clusterId": "subnet-10.10.0"
+      },
+      {
+        "id": 5180,
+        "displayName": "device-0180.lab.local",
+        "ipaddr": "10.1.0.19",
+        "macaddr": "00:AA:BB:CC:00:B4",
+        "role": "server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 1000000000,
+        "clusterId": "subnet-10.1.0"
+      },
+      {
+        "id": 5181,
+        "displayName": "device-0181.lab.local",
+        "ipaddr": "10.2.0.19",
+        "macaddr": "00:AA:BB:CC:00:B5",
+        "role": "client",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 950000000,
+        "clusterId": "subnet-10.2.0"
+      },
+      {
+        "id": 5182,
+        "displayName": "device-0182.lab.local",
+        "ipaddr": "10.3.0.19",
+        "macaddr": "00:AA:BB:CC:00:B6",
+        "role": "gateway",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 900000000,
+        "clusterId": "subnet-10.3.0"
+      },
+      {
+        "id": 5183,
+        "displayName": "device-0183.lab.local",
+        "ipaddr": "10.4.0.19",
+        "macaddr": "00:AA:BB:CC:00:B7",
+        "role": "db_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 850000000,
+        "clusterId": "subnet-10.4.0"
+      },
+      {
+        "id": 5184,
+        "displayName": "device-0184.lab.local",
+        "ipaddr": "10.5.0.19",
+        "macaddr": "00:AA:BB:CC:00:B8",
+        "role": "dns_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 800000000,
+        "clusterId": "subnet-10.5.0"
+      },
+      {
+        "id": 5185,
+        "displayName": "device-0185.lab.local",
+        "ipaddr": "10.6.0.19",
+        "macaddr": "00:AA:BB:CC:00:B9",
+        "role": "file_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 750000000,
+        "clusterId": "subnet-10.6.0"
+      },
+      {
+        "id": 5186,
+        "displayName": "device-0186.lab.local",
+        "ipaddr": "10.7.0.19",
+        "macaddr": "00:AA:BB:CC:00:BA",
+        "role": "firewall",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 700000000,
+        "clusterId": "subnet-10.7.0"
+      },
+      {
+        "id": 5187,
+        "displayName": "device-0187.lab.local",
+        "ipaddr": "10.8.0.19",
+        "macaddr": "00:AA:BB:CC:00:BB",
+        "role": "load_balancer",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 650000000,
+        "clusterId": "subnet-10.8.0"
+      },
+      {
+        "id": 5188,
+        "displayName": "device-0188.lab.local",
+        "ipaddr": "10.9.0.19",
+        "macaddr": "00:AA:BB:CC:00:BC",
+        "role": "other",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 600000000,
+        "clusterId": "subnet-10.9.0"
+      },
+      {
+        "id": 5189,
+        "displayName": "device-0189.lab.local",
+        "ipaddr": "10.10.0.19",
+        "macaddr": "00:AA:BB:CC:00:BD",
+        "role": "unknown",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 550000000,
+        "clusterId": "subnet-10.10.0"
+      },
+      {
+        "id": 5190,
+        "displayName": "device-0190.lab.local",
+        "ipaddr": "10.1.0.20",
+        "macaddr": "00:AA:BB:CC:00:BE",
+        "role": "server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 500000000,
+        "clusterId": "subnet-10.1.0"
+      },
+      {
+        "id": 5191,
+        "displayName": "device-0191.lab.local",
+        "ipaddr": "10.2.0.20",
+        "macaddr": "00:AA:BB:CC:00:BF",
+        "role": "client",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 450000000,
+        "clusterId": "subnet-10.2.0"
+      },
+      {
+        "id": 5192,
+        "displayName": "device-0192.lab.local",
+        "ipaddr": "10.3.0.20",
+        "macaddr": "00:AA:BB:CC:00:C0",
+        "role": "gateway",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 400000000,
+        "clusterId": "subnet-10.3.0"
+      },
+      {
+        "id": 5193,
+        "displayName": "device-0193.lab.local",
+        "ipaddr": "10.4.0.20",
+        "macaddr": "00:AA:BB:CC:00:C1",
+        "role": "db_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 350000000,
+        "clusterId": "subnet-10.4.0"
+      },
+      {
+        "id": 5194,
+        "displayName": "device-0194.lab.local",
+        "ipaddr": "10.5.0.20",
+        "macaddr": "00:AA:BB:CC:00:C2",
+        "role": "dns_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 300000000,
+        "clusterId": "subnet-10.5.0"
+      },
+      {
+        "id": 5195,
+        "displayName": "device-0195.lab.local",
+        "ipaddr": "10.6.0.20",
+        "macaddr": "00:AA:BB:CC:00:C3",
+        "role": "file_server",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 250000000,
+        "clusterId": "subnet-10.6.0"
+      },
+      {
+        "id": 5196,
+        "displayName": "device-0196.lab.local",
+        "ipaddr": "10.7.0.20",
+        "macaddr": "00:AA:BB:CC:00:C4",
+        "role": "firewall",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 200000000,
+        "clusterId": "subnet-10.7.0"
+      },
+      {
+        "id": 5197,
+        "displayName": "device-0197.lab.local",
+        "ipaddr": "10.8.0.20",
+        "macaddr": "00:AA:BB:CC:00:C5",
+        "role": "load_balancer",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 150000000,
+        "clusterId": "subnet-10.8.0"
+      },
+      {
+        "id": 5198,
+        "displayName": "device-0198.lab.local",
+        "ipaddr": "10.9.0.20",
+        "macaddr": "00:AA:BB:CC:00:C6",
+        "role": "other",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 100000000,
+        "clusterId": "subnet-10.9.0"
+      },
+      {
+        "id": 5199,
+        "displayName": "device-0199.lab.local",
+        "ipaddr": "10.10.0.20",
+        "macaddr": "00:AA:BB:CC:00:C7",
+        "role": "unknown",
+        "critical": false,
+        "activeDetections": 0,
+        "activeAlerts": 0,
+        "totalBytes": 50000000,
+        "clusterId": "subnet-10.10.0"
+      }
+    ],
+    "edges": [
+      {
+        "sourceId": 5000,
+        "targetId": 5001,
+        "protocol": "TCP",
+        "bytes": 2000000000,
+        "hasDetection": true,
+        "latencyMs": 0.1
+      },
+      {
+        "sourceId": 5000,
+        "targetId": 5007,
+        "protocol": "TCP",
+        "bytes": 2000000000,
+        "hasDetection": true,
+        "latencyMs": 0.1
+      },
+      {
+        "sourceId": 5000,
+        "targetId": 5023,
+        "protocol": "TCP",
+        "bytes": 2000000000,
+        "hasDetection": true,
+        "latencyMs": 0.1
+      },
+      {
+        "sourceId": 5001,
+        "targetId": 5002,
+        "protocol": "HTTP",
+        "bytes": 1990000000,
+        "hasDetection": false,
+        "latencyMs": 0.2
+      },
+      {
+        "sourceId": 5001,
+        "targetId": 5008,
+        "protocol": "HTTP",
+        "bytes": 1990000000,
+        "hasDetection": false,
+        "latencyMs": 0.2
+      },
+      {
+        "sourceId": 5001,
+        "targetId": 5024,
+        "protocol": "HTTP",
+        "bytes": 1990000000,
+        "hasDetection": false,
+        "latencyMs": 0.2
+      },
+      {
+        "sourceId": 5002,
+        "targetId": 5003,
+        "protocol": "HTTPS",
+        "bytes": 1980000000,
+        "hasDetection": false,
+        "latencyMs": 0.3
+      },
+      {
+        "sourceId": 5002,
+        "targetId": 5009,
+        "protocol": "HTTPS",
+        "bytes": 1980000000,
+        "hasDetection": false,
+        "latencyMs": 0.3
+      },
+      {
+        "sourceId": 5002,
+        "targetId": 5025,
+        "protocol": "HTTPS",
+        "bytes": 1980000000,
+        "hasDetection": false,
+        "latencyMs": 0.3
+      },
+      {
+        "sourceId": 5003,
+        "targetId": 5004,
+        "protocol": "DNS",
+        "bytes": 1970000000,
+        "hasDetection": false,
+        "latencyMs": 0.4
+      },
+      {
+        "sourceId": 5003,
+        "targetId": 5010,
+        "protocol": "DNS",
+        "bytes": 1970000000,
+        "hasDetection": false,
+        "latencyMs": 0.4
+      },
+      {
+        "sourceId": 5003,
+        "targetId": 5026,
+        "protocol": "DNS",
+        "bytes": 1970000000,
+        "hasDetection": false,
+        "latencyMs": 0.4
+      },
+      {
+        "sourceId": 5004,
+        "targetId": 5005,
+        "protocol": "UDP",
+        "bytes": 1960000000,
+        "hasDetection": false,
+        "latencyMs": 0.5
+      },
+      {
+        "sourceId": 5004,
+        "targetId": 5011,
+        "protocol": "UDP",
+        "bytes": 1960000000,
+        "hasDetection": false,
+        "latencyMs": 0.5
+      },
+      {
+        "sourceId": 5004,
+        "targetId": 5027,
+        "protocol": "UDP",
+        "bytes": 1960000000,
+        "hasDetection": false,
+        "latencyMs": 0.5
+      },
+      {
+        "sourceId": 5005,
+        "targetId": 5006,
+        "protocol": "SSH",
+        "bytes": 1950000000,
+        "hasDetection": false,
+        "latencyMs": 0.6
+      },
+      {
+        "sourceId": 5005,
+        "targetId": 5012,
+        "protocol": "SSH",
+        "bytes": 1950000000,
+        "hasDetection": false,
+        "latencyMs": 0.6
+      },
+      {
+        "sourceId": 5005,
+        "targetId": 5028,
+        "protocol": "SSH",
+        "bytes": 1950000000,
+        "hasDetection": false,
+        "latencyMs": 0.6
+      },
+      {
+        "sourceId": 5006,
+        "targetId": 5007,
+        "protocol": "TCP",
+        "bytes": 1940000000,
+        "hasDetection": false,
+        "latencyMs": 0.7
+      },
+      {
+        "sourceId": 5006,
+        "targetId": 5013,
+        "protocol": "TCP",
+        "bytes": 1940000000,
+        "hasDetection": false,
+        "latencyMs": 0.7
+      },
+      {
+        "sourceId": 5006,
+        "targetId": 5029,
+        "protocol": "TCP",
+        "bytes": 1940000000,
+        "hasDetection": false,
+        "latencyMs": 0.7
+      },
+      {
+        "sourceId": 5007,
+        "targetId": 5008,
+        "protocol": "HTTP",
+        "bytes": 1930000000,
+        "hasDetection": false,
+        "latencyMs": 0.8
+      },
+      {
+        "sourceId": 5007,
+        "targetId": 5014,
+        "protocol": "HTTP",
+        "bytes": 1930000000,
+        "hasDetection": false,
+        "latencyMs": 0.8
+      },
+      {
+        "sourceId": 5007,
+        "targetId": 5030,
+        "protocol": "HTTP",
+        "bytes": 1930000000,
+        "hasDetection": false,
+        "latencyMs": 0.8
+      },
+      {
+        "sourceId": 5008,
+        "targetId": 5009,
+        "protocol": "HTTPS",
+        "bytes": 1920000000,
+        "hasDetection": false,
+        "latencyMs": 0.9
+      },
+      {
+        "sourceId": 5008,
+        "targetId": 5015,
+        "protocol": "HTTPS",
+        "bytes": 1920000000,
+        "hasDetection": false,
+        "latencyMs": 0.9
+      },
+      {
+        "sourceId": 5008,
+        "targetId": 5031,
+        "protocol": "HTTPS",
+        "bytes": 1920000000,
+        "hasDetection": false,
+        "latencyMs": 0.9
+      },
+      {
+        "sourceId": 5009,
+        "targetId": 5010,
+        "protocol": "DNS",
+        "bytes": 1910000000,
+        "hasDetection": false,
+        "latencyMs": 1.0
+      },
+      {
+        "sourceId": 5009,
+        "targetId": 5016,
+        "protocol": "DNS",
+        "bytes": 1910000000,
+        "hasDetection": false,
+        "latencyMs": 1.0
+      },
+      {
+        "sourceId": 5009,
+        "targetId": 5032,
+        "protocol": "DNS",
+        "bytes": 1910000000,
+        "hasDetection": false,
+        "latencyMs": 1.0
+      },
+      {
+        "sourceId": 5010,
+        "targetId": 5011,
+        "protocol": "UDP",
+        "bytes": 1900000000,
+        "hasDetection": false,
+        "latencyMs": 1.1
+      },
+      {
+        "sourceId": 5010,
+        "targetId": 5017,
+        "protocol": "UDP",
+        "bytes": 1900000000,
+        "hasDetection": false,
+        "latencyMs": 1.1
+      },
+      {
+        "sourceId": 5010,
+        "targetId": 5033,
+        "protocol": "UDP",
+        "bytes": 1900000000,
+        "hasDetection": false,
+        "latencyMs": 1.1
+      },
+      {
+        "sourceId": 5011,
+        "targetId": 5012,
+        "protocol": "SSH",
+        "bytes": 1890000000,
+        "hasDetection": false,
+        "latencyMs": 1.2
+      },
+      {
+        "sourceId": 5011,
+        "targetId": 5018,
+        "protocol": "SSH",
+        "bytes": 1890000000,
+        "hasDetection": false,
+        "latencyMs": 1.2
+      },
+      {
+        "sourceId": 5011,
+        "targetId": 5034,
+        "protocol": "SSH",
+        "bytes": 1890000000,
+        "hasDetection": false,
+        "latencyMs": 1.2
+      },
+      {
+        "sourceId": 5012,
+        "targetId": 5013,
+        "protocol": "TCP",
+        "bytes": 1880000000,
+        "hasDetection": false,
+        "latencyMs": 1.3
+      },
+      {
+        "sourceId": 5012,
+        "targetId": 5019,
+        "protocol": "TCP",
+        "bytes": 1880000000,
+        "hasDetection": false,
+        "latencyMs": 1.3
+      },
+      {
+        "sourceId": 5012,
+        "targetId": 5035,
+        "protocol": "TCP",
+        "bytes": 1880000000,
+        "hasDetection": false,
+        "latencyMs": 1.3
+      },
+      {
+        "sourceId": 5013,
+        "targetId": 5014,
+        "protocol": "HTTP",
+        "bytes": 1870000000,
+        "hasDetection": false,
+        "latencyMs": 1.4
+      },
+      {
+        "sourceId": 5013,
+        "targetId": 5020,
+        "protocol": "HTTP",
+        "bytes": 1870000000,
+        "hasDetection": false,
+        "latencyMs": 1.4
+      },
+      {
+        "sourceId": 5013,
+        "targetId": 5036,
+        "protocol": "HTTP",
+        "bytes": 1870000000,
+        "hasDetection": false,
+        "latencyMs": 1.4
+      },
+      {
+        "sourceId": 5014,
+        "targetId": 5015,
+        "protocol": "HTTPS",
+        "bytes": 1860000000,
+        "hasDetection": false,
+        "latencyMs": 1.5
+      },
+      {
+        "sourceId": 5014,
+        "targetId": 5021,
+        "protocol": "HTTPS",
+        "bytes": 1860000000,
+        "hasDetection": false,
+        "latencyMs": 1.5
+      },
+      {
+        "sourceId": 5014,
+        "targetId": 5037,
+        "protocol": "HTTPS",
+        "bytes": 1860000000,
+        "hasDetection": false,
+        "latencyMs": 1.5
+      },
+      {
+        "sourceId": 5015,
+        "targetId": 5016,
+        "protocol": "DNS",
+        "bytes": 1850000000,
+        "hasDetection": false,
+        "latencyMs": 1.6
+      },
+      {
+        "sourceId": 5015,
+        "targetId": 5022,
+        "protocol": "DNS",
+        "bytes": 1850000000,
+        "hasDetection": false,
+        "latencyMs": 1.6
+      },
+      {
+        "sourceId": 5015,
+        "targetId": 5038,
+        "protocol": "DNS",
+        "bytes": 1850000000,
+        "hasDetection": false,
+        "latencyMs": 1.6
+      },
+      {
+        "sourceId": 5016,
+        "targetId": 5017,
+        "protocol": "UDP",
+        "bytes": 1840000000,
+        "hasDetection": false,
+        "latencyMs": 1.7
+      },
+      {
+        "sourceId": 5016,
+        "targetId": 5023,
+        "protocol": "UDP",
+        "bytes": 1840000000,
+        "hasDetection": false,
+        "latencyMs": 1.7
+      },
+      {
+        "sourceId": 5016,
+        "targetId": 5039,
+        "protocol": "UDP",
+        "bytes": 1840000000,
+        "hasDetection": false,
+        "latencyMs": 1.7
+      },
+      {
+        "sourceId": 5017,
+        "targetId": 5018,
+        "protocol": "SSH",
+        "bytes": 1830000000,
+        "hasDetection": false,
+        "latencyMs": 1.8
+      },
+      {
+        "sourceId": 5017,
+        "targetId": 5024,
+        "protocol": "SSH",
+        "bytes": 1830000000,
+        "hasDetection": false,
+        "latencyMs": 1.8
+      },
+      {
+        "sourceId": 5017,
+        "targetId": 5040,
+        "protocol": "SSH",
+        "bytes": 1830000000,
+        "hasDetection": false,
+        "latencyMs": 1.8
+      },
+      {
+        "sourceId": 5018,
+        "targetId": 5019,
+        "protocol": "TCP",
+        "bytes": 1820000000,
+        "hasDetection": false,
+        "latencyMs": 1.9
+      },
+      {
+        "sourceId": 5018,
+        "targetId": 5025,
+        "protocol": "TCP",
+        "bytes": 1820000000,
+        "hasDetection": false,
+        "latencyMs": 1.9
+      },
+      {
+        "sourceId": 5018,
+        "targetId": 5041,
+        "protocol": "TCP",
+        "bytes": 1820000000,
+        "hasDetection": false,
+        "latencyMs": 1.9
+      },
+      {
+        "sourceId": 5019,
+        "targetId": 5020,
+        "protocol": "HTTP",
+        "bytes": 1810000000,
+        "hasDetection": false,
+        "latencyMs": 2.0
+      },
+      {
+        "sourceId": 5019,
+        "targetId": 5026,
+        "protocol": "HTTP",
+        "bytes": 1810000000,
+        "hasDetection": false,
+        "latencyMs": 2.0
+      },
+      {
+        "sourceId": 5019,
+        "targetId": 5042,
+        "protocol": "HTTP",
+        "bytes": 1810000000,
+        "hasDetection": false,
+        "latencyMs": 2.0
+      },
+      {
+        "sourceId": 5020,
+        "targetId": 5021,
+        "protocol": "HTTPS",
+        "bytes": 1800000000,
+        "hasDetection": false,
+        "latencyMs": 2.1
+      },
+      {
+        "sourceId": 5020,
+        "targetId": 5027,
+        "protocol": "HTTPS",
+        "bytes": 1800000000,
+        "hasDetection": false,
+        "latencyMs": 2.1
+      },
+      {
+        "sourceId": 5020,
+        "targetId": 5043,
+        "protocol": "HTTPS",
+        "bytes": 1800000000,
+        "hasDetection": false,
+        "latencyMs": 2.1
+      },
+      {
+        "sourceId": 5021,
+        "targetId": 5022,
+        "protocol": "DNS",
+        "bytes": 1790000000,
+        "hasDetection": false,
+        "latencyMs": 2.2
+      },
+      {
+        "sourceId": 5021,
+        "targetId": 5028,
+        "protocol": "DNS",
+        "bytes": 1790000000,
+        "hasDetection": false,
+        "latencyMs": 2.2
+      },
+      {
+        "sourceId": 5021,
+        "targetId": 5044,
+        "protocol": "DNS",
+        "bytes": 1790000000,
+        "hasDetection": false,
+        "latencyMs": 2.2
+      },
+      {
+        "sourceId": 5022,
+        "targetId": 5023,
+        "protocol": "UDP",
+        "bytes": 1780000000,
+        "hasDetection": false,
+        "latencyMs": 2.3
+      },
+      {
+        "sourceId": 5022,
+        "targetId": 5029,
+        "protocol": "UDP",
+        "bytes": 1780000000,
+        "hasDetection": false,
+        "latencyMs": 2.3
+      },
+      {
+        "sourceId": 5022,
+        "targetId": 5045,
+        "protocol": "UDP",
+        "bytes": 1780000000,
+        "hasDetection": false,
+        "latencyMs": 2.3
+      },
+      {
+        "sourceId": 5023,
+        "targetId": 5024,
+        "protocol": "SSH",
+        "bytes": 1770000000,
+        "hasDetection": false,
+        "latencyMs": 2.4
+      },
+      {
+        "sourceId": 5023,
+        "targetId": 5030,
+        "protocol": "SSH",
+        "bytes": 1770000000,
+        "hasDetection": false,
+        "latencyMs": 2.4
+      },
+      {
+        "sourceId": 5023,
+        "targetId": 5046,
+        "protocol": "SSH",
+        "bytes": 1770000000,
+        "hasDetection": false,
+        "latencyMs": 2.4
+      },
+      {
+        "sourceId": 5024,
+        "targetId": 5025,
+        "protocol": "TCP",
+        "bytes": 1760000000,
+        "hasDetection": false,
+        "latencyMs": 2.5
+      },
+      {
+        "sourceId": 5024,
+        "targetId": 5031,
+        "protocol": "TCP",
+        "bytes": 1760000000,
+        "hasDetection": false,
+        "latencyMs": 2.5
+      },
+      {
+        "sourceId": 5024,
+        "targetId": 5047,
+        "protocol": "TCP",
+        "bytes": 1760000000,
+        "hasDetection": false,
+        "latencyMs": 2.5
+      },
+      {
+        "sourceId": 5025,
+        "targetId": 5026,
+        "protocol": "HTTP",
+        "bytes": 1750000000,
+        "hasDetection": true,
+        "latencyMs": 2.6
+      },
+      {
+        "sourceId": 5025,
+        "targetId": 5032,
+        "protocol": "HTTP",
+        "bytes": 1750000000,
+        "hasDetection": true,
+        "latencyMs": 2.6
+      },
+      {
+        "sourceId": 5025,
+        "targetId": 5048,
+        "protocol": "HTTP",
+        "bytes": 1750000000,
+        "hasDetection": true,
+        "latencyMs": 2.6
+      },
+      {
+        "sourceId": 5026,
+        "targetId": 5027,
+        "protocol": "HTTPS",
+        "bytes": 1740000000,
+        "hasDetection": false,
+        "latencyMs": 2.7
+      },
+      {
+        "sourceId": 5026,
+        "targetId": 5033,
+        "protocol": "HTTPS",
+        "bytes": 1740000000,
+        "hasDetection": false,
+        "latencyMs": 2.7
+      },
+      {
+        "sourceId": 5026,
+        "targetId": 5049,
+        "protocol": "HTTPS",
+        "bytes": 1740000000,
+        "hasDetection": false,
+        "latencyMs": 2.7
+      },
+      {
+        "sourceId": 5027,
+        "targetId": 5028,
+        "protocol": "DNS",
+        "bytes": 1730000000,
+        "hasDetection": false,
+        "latencyMs": 2.8
+      },
+      {
+        "sourceId": 5027,
+        "targetId": 5034,
+        "protocol": "DNS",
+        "bytes": 1730000000,
+        "hasDetection": false,
+        "latencyMs": 2.8
+      },
+      {
+        "sourceId": 5027,
+        "targetId": 5050,
+        "protocol": "DNS",
+        "bytes": 1730000000,
+        "hasDetection": false,
+        "latencyMs": 2.8
+      },
+      {
+        "sourceId": 5028,
+        "targetId": 5029,
+        "protocol": "UDP",
+        "bytes": 1720000000,
+        "hasDetection": false,
+        "latencyMs": 2.9
+      },
+      {
+        "sourceId": 5028,
+        "targetId": 5035,
+        "protocol": "UDP",
+        "bytes": 1720000000,
+        "hasDetection": false,
+        "latencyMs": 2.9
+      },
+      {
+        "sourceId": 5028,
+        "targetId": 5051,
+        "protocol": "UDP",
+        "bytes": 1720000000,
+        "hasDetection": false,
+        "latencyMs": 2.9
+      },
+      {
+        "sourceId": 5029,
+        "targetId": 5030,
+        "protocol": "SSH",
+        "bytes": 1710000000,
+        "hasDetection": false,
+        "latencyMs": 3.0
+      },
+      {
+        "sourceId": 5029,
+        "targetId": 5036,
+        "protocol": "SSH",
+        "bytes": 1710000000,
+        "hasDetection": false,
+        "latencyMs": 3.0
+      },
+      {
+        "sourceId": 5029,
+        "targetId": 5052,
+        "protocol": "SSH",
+        "bytes": 1710000000,
+        "hasDetection": false,
+        "latencyMs": 3.0
+      },
+      {
+        "sourceId": 5030,
+        "targetId": 5031,
+        "protocol": "TCP",
+        "bytes": 1700000000,
+        "hasDetection": false,
+        "latencyMs": 3.1
+      },
+      {
+        "sourceId": 5030,
+        "targetId": 5037,
+        "protocol": "TCP",
+        "bytes": 1700000000,
+        "hasDetection": false,
+        "latencyMs": 3.1
+      },
+      {
+        "sourceId": 5030,
+        "targetId": 5053,
+        "protocol": "TCP",
+        "bytes": 1700000000,
+        "hasDetection": false,
+        "latencyMs": 3.1
+      },
+      {
+        "sourceId": 5031,
+        "targetId": 5032,
+        "protocol": "HTTP",
+        "bytes": 1690000000,
+        "hasDetection": false,
+        "latencyMs": 3.2
+      },
+      {
+        "sourceId": 5031,
+        "targetId": 5038,
+        "protocol": "HTTP",
+        "bytes": 1690000000,
+        "hasDetection": false,
+        "latencyMs": 3.2
+      },
+      {
+        "sourceId": 5031,
+        "targetId": 5054,
+        "protocol": "HTTP",
+        "bytes": 1690000000,
+        "hasDetection": false,
+        "latencyMs": 3.2
+      },
+      {
+        "sourceId": 5032,
+        "targetId": 5033,
+        "protocol": "HTTPS",
+        "bytes": 1680000000,
+        "hasDetection": false,
+        "latencyMs": 3.3
+      },
+      {
+        "sourceId": 5032,
+        "targetId": 5039,
+        "protocol": "HTTPS",
+        "bytes": 1680000000,
+        "hasDetection": false,
+        "latencyMs": 3.3
+      },
+      {
+        "sourceId": 5032,
+        "targetId": 5055,
+        "protocol": "HTTPS",
+        "bytes": 1680000000,
+        "hasDetection": false,
+        "latencyMs": 3.3
+      },
+      {
+        "sourceId": 5033,
+        "targetId": 5034,
+        "protocol": "DNS",
+        "bytes": 1670000000,
+        "hasDetection": false,
+        "latencyMs": 3.4
+      },
+      {
+        "sourceId": 5033,
+        "targetId": 5040,
+        "protocol": "DNS",
+        "bytes": 1670000000,
+        "hasDetection": false,
+        "latencyMs": 3.4
+      },
+      {
+        "sourceId": 5033,
+        "targetId": 5056,
+        "protocol": "DNS",
+        "bytes": 1670000000,
+        "hasDetection": false,
+        "latencyMs": 3.4
+      },
+      {
+        "sourceId": 5034,
+        "targetId": 5035,
+        "protocol": "UDP",
+        "bytes": 1660000000,
+        "hasDetection": false,
+        "latencyMs": 3.5
+      },
+      {
+        "sourceId": 5034,
+        "targetId": 5041,
+        "protocol": "UDP",
+        "bytes": 1660000000,
+        "hasDetection": false,
+        "latencyMs": 3.5
+      },
+      {
+        "sourceId": 5034,
+        "targetId": 5057,
+        "protocol": "UDP",
+        "bytes": 1660000000,
+        "hasDetection": false,
+        "latencyMs": 3.5
+      },
+      {
+        "sourceId": 5035,
+        "targetId": 5036,
+        "protocol": "SSH",
+        "bytes": 1650000000,
+        "hasDetection": false,
+        "latencyMs": 3.6
+      },
+      {
+        "sourceId": 5035,
+        "targetId": 5042,
+        "protocol": "SSH",
+        "bytes": 1650000000,
+        "hasDetection": false,
+        "latencyMs": 3.6
+      },
+      {
+        "sourceId": 5035,
+        "targetId": 5058,
+        "protocol": "SSH",
+        "bytes": 1650000000,
+        "hasDetection": false,
+        "latencyMs": 3.6
+      },
+      {
+        "sourceId": 5036,
+        "targetId": 5037,
+        "protocol": "TCP",
+        "bytes": 1640000000,
+        "hasDetection": false,
+        "latencyMs": 3.7
+      },
+      {
+        "sourceId": 5036,
+        "targetId": 5043,
+        "protocol": "TCP",
+        "bytes": 1640000000,
+        "hasDetection": false,
+        "latencyMs": 3.7
+      },
+      {
+        "sourceId": 5036,
+        "targetId": 5059,
+        "protocol": "TCP",
+        "bytes": 1640000000,
+        "hasDetection": false,
+        "latencyMs": 3.7
+      },
+      {
+        "sourceId": 5037,
+        "targetId": 5038,
+        "protocol": "HTTP",
+        "bytes": 1630000000,
+        "hasDetection": false,
+        "latencyMs": 3.8
+      },
+      {
+        "sourceId": 5037,
+        "targetId": 5044,
+        "protocol": "HTTP",
+        "bytes": 1630000000,
+        "hasDetection": false,
+        "latencyMs": 3.8
+      },
+      {
+        "sourceId": 5037,
+        "targetId": 5060,
+        "protocol": "HTTP",
+        "bytes": 1630000000,
+        "hasDetection": false,
+        "latencyMs": 3.8
+      },
+      {
+        "sourceId": 5038,
+        "targetId": 5039,
+        "protocol": "HTTPS",
+        "bytes": 1620000000,
+        "hasDetection": false,
+        "latencyMs": 3.9
+      },
+      {
+        "sourceId": 5038,
+        "targetId": 5045,
+        "protocol": "HTTPS",
+        "bytes": 1620000000,
+        "hasDetection": false,
+        "latencyMs": 3.9
+      },
+      {
+        "sourceId": 5038,
+        "targetId": 5061,
+        "protocol": "HTTPS",
+        "bytes": 1620000000,
+        "hasDetection": false,
+        "latencyMs": 3.9
+      },
+      {
+        "sourceId": 5039,
+        "targetId": 5040,
+        "protocol": "DNS",
+        "bytes": 1610000000,
+        "hasDetection": false,
+        "latencyMs": 4.0
+      },
+      {
+        "sourceId": 5039,
+        "targetId": 5046,
+        "protocol": "DNS",
+        "bytes": 1610000000,
+        "hasDetection": false,
+        "latencyMs": 4.0
+      },
+      {
+        "sourceId": 5039,
+        "targetId": 5062,
+        "protocol": "DNS",
+        "bytes": 1610000000,
+        "hasDetection": false,
+        "latencyMs": 4.0
+      },
+      {
+        "sourceId": 5040,
+        "targetId": 5041,
+        "protocol": "UDP",
+        "bytes": 1600000000,
+        "hasDetection": false,
+        "latencyMs": 4.1
+      },
+      {
+        "sourceId": 5040,
+        "targetId": 5047,
+        "protocol": "UDP",
+        "bytes": 1600000000,
+        "hasDetection": false,
+        "latencyMs": 4.1
+      },
+      {
+        "sourceId": 5040,
+        "targetId": 5063,
+        "protocol": "UDP",
+        "bytes": 1600000000,
+        "hasDetection": false,
+        "latencyMs": 4.1
+      },
+      {
+        "sourceId": 5041,
+        "targetId": 5042,
+        "protocol": "SSH",
+        "bytes": 1590000000,
+        "hasDetection": false,
+        "latencyMs": 4.2
+      },
+      {
+        "sourceId": 5041,
+        "targetId": 5048,
+        "protocol": "SSH",
+        "bytes": 1590000000,
+        "hasDetection": false,
+        "latencyMs": 4.2
+      },
+      {
+        "sourceId": 5041,
+        "targetId": 5064,
+        "protocol": "SSH",
+        "bytes": 1590000000,
+        "hasDetection": false,
+        "latencyMs": 4.2
+      },
+      {
+        "sourceId": 5042,
+        "targetId": 5043,
+        "protocol": "TCP",
+        "bytes": 1580000000,
+        "hasDetection": false,
+        "latencyMs": 4.3
+      },
+      {
+        "sourceId": 5042,
+        "targetId": 5049,
+        "protocol": "TCP",
+        "bytes": 1580000000,
+        "hasDetection": false,
+        "latencyMs": 4.3
+      },
+      {
+        "sourceId": 5042,
+        "targetId": 5065,
+        "protocol": "TCP",
+        "bytes": 1580000000,
+        "hasDetection": false,
+        "latencyMs": 4.3
+      },
+      {
+        "sourceId": 5043,
+        "targetId": 5044,
+        "protocol": "HTTP",
+        "bytes": 1570000000,
+        "hasDetection": false,
+        "latencyMs": 4.4
+      },
+      {
+        "sourceId": 5043,
+        "targetId": 5050,
+        "protocol": "HTTP",
+        "bytes": 1570000000,
+        "hasDetection": false,
+        "latencyMs": 4.4
+      },
+      {
+        "sourceId": 5043,
+        "targetId": 5066,
+        "protocol": "HTTP",
+        "bytes": 1570000000,
+        "hasDetection": false,
+        "latencyMs": 4.4
+      },
+      {
+        "sourceId": 5044,
+        "targetId": 5045,
+        "protocol": "HTTPS",
+        "bytes": 1560000000,
+        "hasDetection": false,
+        "latencyMs": 4.5
+      },
+      {
+        "sourceId": 5044,
+        "targetId": 5051,
+        "protocol": "HTTPS",
+        "bytes": 1560000000,
+        "hasDetection": false,
+        "latencyMs": 4.5
+      },
+      {
+        "sourceId": 5044,
+        "targetId": 5067,
+        "protocol": "HTTPS",
+        "bytes": 1560000000,
+        "hasDetection": false,
+        "latencyMs": 4.5
+      },
+      {
+        "sourceId": 5045,
+        "targetId": 5046,
+        "protocol": "DNS",
+        "bytes": 1550000000,
+        "hasDetection": false,
+        "latencyMs": 4.6
+      },
+      {
+        "sourceId": 5045,
+        "targetId": 5052,
+        "protocol": "DNS",
+        "bytes": 1550000000,
+        "hasDetection": false,
+        "latencyMs": 4.6
+      },
+      {
+        "sourceId": 5045,
+        "targetId": 5068,
+        "protocol": "DNS",
+        "bytes": 1550000000,
+        "hasDetection": false,
+        "latencyMs": 4.6
+      },
+      {
+        "sourceId": 5046,
+        "targetId": 5047,
+        "protocol": "UDP",
+        "bytes": 1540000000,
+        "hasDetection": false,
+        "latencyMs": 4.7
+      },
+      {
+        "sourceId": 5046,
+        "targetId": 5053,
+        "protocol": "UDP",
+        "bytes": 1540000000,
+        "hasDetection": false,
+        "latencyMs": 4.7
+      },
+      {
+        "sourceId": 5046,
+        "targetId": 5069,
+        "protocol": "UDP",
+        "bytes": 1540000000,
+        "hasDetection": false,
+        "latencyMs": 4.7
+      },
+      {
+        "sourceId": 5047,
+        "targetId": 5048,
+        "protocol": "SSH",
+        "bytes": 1530000000,
+        "hasDetection": false,
+        "latencyMs": 4.8
+      },
+      {
+        "sourceId": 5047,
+        "targetId": 5054,
+        "protocol": "SSH",
+        "bytes": 1530000000,
+        "hasDetection": false,
+        "latencyMs": 4.8
+      },
+      {
+        "sourceId": 5047,
+        "targetId": 5070,
+        "protocol": "SSH",
+        "bytes": 1530000000,
+        "hasDetection": false,
+        "latencyMs": 4.8
+      },
+      {
+        "sourceId": 5048,
+        "targetId": 5049,
+        "protocol": "TCP",
+        "bytes": 1520000000,
+        "hasDetection": false,
+        "latencyMs": 4.9
+      },
+      {
+        "sourceId": 5048,
+        "targetId": 5055,
+        "protocol": "TCP",
+        "bytes": 1520000000,
+        "hasDetection": false,
+        "latencyMs": 4.9
+      },
+      {
+        "sourceId": 5048,
+        "targetId": 5071,
+        "protocol": "TCP",
+        "bytes": 1520000000,
+        "hasDetection": false,
+        "latencyMs": 4.9
+      },
+      {
+        "sourceId": 5049,
+        "targetId": 5050,
+        "protocol": "HTTP",
+        "bytes": 1510000000,
+        "hasDetection": false,
+        "latencyMs": 5.0
+      },
+      {
+        "sourceId": 5049,
+        "targetId": 5056,
+        "protocol": "HTTP",
+        "bytes": 1510000000,
+        "hasDetection": false,
+        "latencyMs": 5.0
+      },
+      {
+        "sourceId": 5049,
+        "targetId": 5072,
+        "protocol": "HTTP",
+        "bytes": 1510000000,
+        "hasDetection": false,
+        "latencyMs": 5.0
+      },
+      {
+        "sourceId": 5050,
+        "targetId": 5051,
+        "protocol": "HTTPS",
+        "bytes": 1500000000,
+        "hasDetection": true,
+        "latencyMs": 0.1
+      },
+      {
+        "sourceId": 5050,
+        "targetId": 5057,
+        "protocol": "HTTPS",
+        "bytes": 1500000000,
+        "hasDetection": true,
+        "latencyMs": 0.1
+      },
+      {
+        "sourceId": 5050,
+        "targetId": 5073,
+        "protocol": "HTTPS",
+        "bytes": 1500000000,
+        "hasDetection": true,
+        "latencyMs": 0.1
+      },
+      {
+        "sourceId": 5051,
+        "targetId": 5052,
+        "protocol": "DNS",
+        "bytes": 1490000000,
+        "hasDetection": false,
+        "latencyMs": 0.2
+      },
+      {
+        "sourceId": 5051,
+        "targetId": 5058,
+        "protocol": "DNS",
+        "bytes": 1490000000,
+        "hasDetection": false,
+        "latencyMs": 0.2
+      },
+      {
+        "sourceId": 5051,
+        "targetId": 5074,
+        "protocol": "DNS",
+        "bytes": 1490000000,
+        "hasDetection": false,
+        "latencyMs": 0.2
+      },
+      {
+        "sourceId": 5052,
+        "targetId": 5053,
+        "protocol": "UDP",
+        "bytes": 1480000000,
+        "hasDetection": false,
+        "latencyMs": 0.3
+      },
+      {
+        "sourceId": 5052,
+        "targetId": 5059,
+        "protocol": "UDP",
+        "bytes": 1480000000,
+        "hasDetection": false,
+        "latencyMs": 0.3
+      },
+      {
+        "sourceId": 5052,
+        "targetId": 5075,
+        "protocol": "UDP",
+        "bytes": 1480000000,
+        "hasDetection": false,
+        "latencyMs": 0.3
+      },
+      {
+        "sourceId": 5053,
+        "targetId": 5054,
+        "protocol": "SSH",
+        "bytes": 1470000000,
+        "hasDetection": false,
+        "latencyMs": 0.4
+      },
+      {
+        "sourceId": 5053,
+        "targetId": 5060,
+        "protocol": "SSH",
+        "bytes": 1470000000,
+        "hasDetection": false,
+        "latencyMs": 0.4
+      },
+      {
+        "sourceId": 5053,
+        "targetId": 5076,
+        "protocol": "SSH",
+        "bytes": 1470000000,
+        "hasDetection": false,
+        "latencyMs": 0.4
+      },
+      {
+        "sourceId": 5054,
+        "targetId": 5055,
+        "protocol": "TCP",
+        "bytes": 1460000000,
+        "hasDetection": false,
+        "latencyMs": 0.5
+      },
+      {
+        "sourceId": 5054,
+        "targetId": 5061,
+        "protocol": "TCP",
+        "bytes": 1460000000,
+        "hasDetection": false,
+        "latencyMs": 0.5
+      },
+      {
+        "sourceId": 5054,
+        "targetId": 5077,
+        "protocol": "TCP",
+        "bytes": 1460000000,
+        "hasDetection": false,
+        "latencyMs": 0.5
+      },
+      {
+        "sourceId": 5055,
+        "targetId": 5056,
+        "protocol": "HTTP",
+        "bytes": 1450000000,
+        "hasDetection": false,
+        "latencyMs": 0.6
+      },
+      {
+        "sourceId": 5055,
+        "targetId": 5062,
+        "protocol": "HTTP",
+        "bytes": 1450000000,
+        "hasDetection": false,
+        "latencyMs": 0.6
+      },
+      {
+        "sourceId": 5055,
+        "targetId": 5078,
+        "protocol": "HTTP",
+        "bytes": 1450000000,
+        "hasDetection": false,
+        "latencyMs": 0.6
+      },
+      {
+        "sourceId": 5056,
+        "targetId": 5057,
+        "protocol": "HTTPS",
+        "bytes": 1440000000,
+        "hasDetection": false,
+        "latencyMs": 0.7
+      },
+      {
+        "sourceId": 5056,
+        "targetId": 5063,
+        "protocol": "HTTPS",
+        "bytes": 1440000000,
+        "hasDetection": false,
+        "latencyMs": 0.7
+      },
+      {
+        "sourceId": 5056,
+        "targetId": 5079,
+        "protocol": "HTTPS",
+        "bytes": 1440000000,
+        "hasDetection": false,
+        "latencyMs": 0.7
+      },
+      {
+        "sourceId": 5057,
+        "targetId": 5058,
+        "protocol": "DNS",
+        "bytes": 1430000000,
+        "hasDetection": false,
+        "latencyMs": 0.8
+      },
+      {
+        "sourceId": 5057,
+        "targetId": 5064,
+        "protocol": "DNS",
+        "bytes": 1430000000,
+        "hasDetection": false,
+        "latencyMs": 0.8
+      },
+      {
+        "sourceId": 5057,
+        "targetId": 5080,
+        "protocol": "DNS",
+        "bytes": 1430000000,
+        "hasDetection": false,
+        "latencyMs": 0.8
+      },
+      {
+        "sourceId": 5058,
+        "targetId": 5059,
+        "protocol": "UDP",
+        "bytes": 1420000000,
+        "hasDetection": false,
+        "latencyMs": 0.9
+      },
+      {
+        "sourceId": 5058,
+        "targetId": 5065,
+        "protocol": "UDP",
+        "bytes": 1420000000,
+        "hasDetection": false,
+        "latencyMs": 0.9
+      },
+      {
+        "sourceId": 5058,
+        "targetId": 5081,
+        "protocol": "UDP",
+        "bytes": 1420000000,
+        "hasDetection": false,
+        "latencyMs": 0.9
+      },
+      {
+        "sourceId": 5059,
+        "targetId": 5060,
+        "protocol": "SSH",
+        "bytes": 1410000000,
+        "hasDetection": false,
+        "latencyMs": 1.0
+      },
+      {
+        "sourceId": 5059,
+        "targetId": 5066,
+        "protocol": "SSH",
+        "bytes": 1410000000,
+        "hasDetection": false,
+        "latencyMs": 1.0
+      },
+      {
+        "sourceId": 5059,
+        "targetId": 5082,
+        "protocol": "SSH",
+        "bytes": 1410000000,
+        "hasDetection": false,
+        "latencyMs": 1.0
+      },
+      {
+        "sourceId": 5060,
+        "targetId": 5061,
+        "protocol": "TCP",
+        "bytes": 1400000000,
+        "hasDetection": false,
+        "latencyMs": 1.1
+      },
+      {
+        "sourceId": 5060,
+        "targetId": 5067,
+        "protocol": "TCP",
+        "bytes": 1400000000,
+        "hasDetection": false,
+        "latencyMs": 1.1
+      },
+      {
+        "sourceId": 5060,
+        "targetId": 5083,
+        "protocol": "TCP",
+        "bytes": 1400000000,
+        "hasDetection": false,
+        "latencyMs": 1.1
+      },
+      {
+        "sourceId": 5061,
+        "targetId": 5062,
+        "protocol": "HTTP",
+        "bytes": 1390000000,
+        "hasDetection": false,
+        "latencyMs": 1.2
+      },
+      {
+        "sourceId": 5061,
+        "targetId": 5068,
+        "protocol": "HTTP",
+        "bytes": 1390000000,
+        "hasDetection": false,
+        "latencyMs": 1.2
+      },
+      {
+        "sourceId": 5061,
+        "targetId": 5084,
+        "protocol": "HTTP",
+        "bytes": 1390000000,
+        "hasDetection": false,
+        "latencyMs": 1.2
+      },
+      {
+        "sourceId": 5062,
+        "targetId": 5063,
+        "protocol": "HTTPS",
+        "bytes": 1380000000,
+        "hasDetection": false,
+        "latencyMs": 1.3
+      },
+      {
+        "sourceId": 5062,
+        "targetId": 5069,
+        "protocol": "HTTPS",
+        "bytes": 1380000000,
+        "hasDetection": false,
+        "latencyMs": 1.3
+      },
+      {
+        "sourceId": 5062,
+        "targetId": 5085,
+        "protocol": "HTTPS",
+        "bytes": 1380000000,
+        "hasDetection": false,
+        "latencyMs": 1.3
+      },
+      {
+        "sourceId": 5063,
+        "targetId": 5064,
+        "protocol": "DNS",
+        "bytes": 1370000000,
+        "hasDetection": false,
+        "latencyMs": 1.4
+      },
+      {
+        "sourceId": 5063,
+        "targetId": 5070,
+        "protocol": "DNS",
+        "bytes": 1370000000,
+        "hasDetection": false,
+        "latencyMs": 1.4
+      },
+      {
+        "sourceId": 5063,
+        "targetId": 5086,
+        "protocol": "DNS",
+        "bytes": 1370000000,
+        "hasDetection": false,
+        "latencyMs": 1.4
+      },
+      {
+        "sourceId": 5064,
+        "targetId": 5065,
+        "protocol": "UDP",
+        "bytes": 1360000000,
+        "hasDetection": false,
+        "latencyMs": 1.5
+      },
+      {
+        "sourceId": 5064,
+        "targetId": 5071,
+        "protocol": "UDP",
+        "bytes": 1360000000,
+        "hasDetection": false,
+        "latencyMs": 1.5
+      },
+      {
+        "sourceId": 5064,
+        "targetId": 5087,
+        "protocol": "UDP",
+        "bytes": 1360000000,
+        "hasDetection": false,
+        "latencyMs": 1.5
+      },
+      {
+        "sourceId": 5065,
+        "targetId": 5066,
+        "protocol": "SSH",
+        "bytes": 1350000000,
+        "hasDetection": false,
+        "latencyMs": 1.6
+      },
+      {
+        "sourceId": 5065,
+        "targetId": 5072,
+        "protocol": "SSH",
+        "bytes": 1350000000,
+        "hasDetection": false,
+        "latencyMs": 1.6
+      },
+      {
+        "sourceId": 5065,
+        "targetId": 5088,
+        "protocol": "SSH",
+        "bytes": 1350000000,
+        "hasDetection": false,
+        "latencyMs": 1.6
+      },
+      {
+        "sourceId": 5066,
+        "targetId": 5067,
+        "protocol": "TCP",
+        "bytes": 1340000000,
+        "hasDetection": false,
+        "latencyMs": 1.7
+      },
+      {
+        "sourceId": 5066,
+        "targetId": 5073,
+        "protocol": "TCP",
+        "bytes": 1340000000,
+        "hasDetection": false,
+        "latencyMs": 1.7
+      },
+      {
+        "sourceId": 5066,
+        "targetId": 5089,
+        "protocol": "TCP",
+        "bytes": 1340000000,
+        "hasDetection": false,
+        "latencyMs": 1.7
+      },
+      {
+        "sourceId": 5067,
+        "targetId": 5068,
+        "protocol": "HTTP",
+        "bytes": 1330000000,
+        "hasDetection": false,
+        "latencyMs": 1.8
+      },
+      {
+        "sourceId": 5067,
+        "targetId": 5074,
+        "protocol": "HTTP",
+        "bytes": 1330000000,
+        "hasDetection": false,
+        "latencyMs": 1.8
+      },
+      {
+        "sourceId": 5067,
+        "targetId": 5090,
+        "protocol": "HTTP",
+        "bytes": 1330000000,
+        "hasDetection": false,
+        "latencyMs": 1.8
+      },
+      {
+        "sourceId": 5068,
+        "targetId": 5069,
+        "protocol": "HTTPS",
+        "bytes": 1320000000,
+        "hasDetection": false,
+        "latencyMs": 1.9
+      },
+      {
+        "sourceId": 5068,
+        "targetId": 5075,
+        "protocol": "HTTPS",
+        "bytes": 1320000000,
+        "hasDetection": false,
+        "latencyMs": 1.9
+      },
+      {
+        "sourceId": 5068,
+        "targetId": 5091,
+        "protocol": "HTTPS",
+        "bytes": 1320000000,
+        "hasDetection": false,
+        "latencyMs": 1.9
+      },
+      {
+        "sourceId": 5069,
+        "targetId": 5070,
+        "protocol": "DNS",
+        "bytes": 1310000000,
+        "hasDetection": false,
+        "latencyMs": 2.0
+      },
+      {
+        "sourceId": 5069,
+        "targetId": 5076,
+        "protocol": "DNS",
+        "bytes": 1310000000,
+        "hasDetection": false,
+        "latencyMs": 2.0
+      },
+      {
+        "sourceId": 5069,
+        "targetId": 5092,
+        "protocol": "DNS",
+        "bytes": 1310000000,
+        "hasDetection": false,
+        "latencyMs": 2.0
+      },
+      {
+        "sourceId": 5070,
+        "targetId": 5071,
+        "protocol": "UDP",
+        "bytes": 1300000000,
+        "hasDetection": false,
+        "latencyMs": 2.1
+      },
+      {
+        "sourceId": 5070,
+        "targetId": 5077,
+        "protocol": "UDP",
+        "bytes": 1300000000,
+        "hasDetection": false,
+        "latencyMs": 2.1
+      },
+      {
+        "sourceId": 5070,
+        "targetId": 5093,
+        "protocol": "UDP",
+        "bytes": 1300000000,
+        "hasDetection": false,
+        "latencyMs": 2.1
+      },
+      {
+        "sourceId": 5071,
+        "targetId": 5072,
+        "protocol": "SSH",
+        "bytes": 1290000000,
+        "hasDetection": false,
+        "latencyMs": 2.2
+      },
+      {
+        "sourceId": 5071,
+        "targetId": 5078,
+        "protocol": "SSH",
+        "bytes": 1290000000,
+        "hasDetection": false,
+        "latencyMs": 2.2
+      },
+      {
+        "sourceId": 5071,
+        "targetId": 5094,
+        "protocol": "SSH",
+        "bytes": 1290000000,
+        "hasDetection": false,
+        "latencyMs": 2.2
+      },
+      {
+        "sourceId": 5072,
+        "targetId": 5073,
+        "protocol": "TCP",
+        "bytes": 1280000000,
+        "hasDetection": false,
+        "latencyMs": 2.3
+      },
+      {
+        "sourceId": 5072,
+        "targetId": 5079,
+        "protocol": "TCP",
+        "bytes": 1280000000,
+        "hasDetection": false,
+        "latencyMs": 2.3
+      },
+      {
+        "sourceId": 5072,
+        "targetId": 5095,
+        "protocol": "TCP",
+        "bytes": 1280000000,
+        "hasDetection": false,
+        "latencyMs": 2.3
+      },
+      {
+        "sourceId": 5073,
+        "targetId": 5074,
+        "protocol": "HTTP",
+        "bytes": 1270000000,
+        "hasDetection": false,
+        "latencyMs": 2.4
+      },
+      {
+        "sourceId": 5073,
+        "targetId": 5080,
+        "protocol": "HTTP",
+        "bytes": 1270000000,
+        "hasDetection": false,
+        "latencyMs": 2.4
+      },
+      {
+        "sourceId": 5073,
+        "targetId": 5096,
+        "protocol": "HTTP",
+        "bytes": 1270000000,
+        "hasDetection": false,
+        "latencyMs": 2.4
+      },
+      {
+        "sourceId": 5074,
+        "targetId": 5075,
+        "protocol": "HTTPS",
+        "bytes": 1260000000,
+        "hasDetection": false,
+        "latencyMs": 2.5
+      },
+      {
+        "sourceId": 5074,
+        "targetId": 5081,
+        "protocol": "HTTPS",
+        "bytes": 1260000000,
+        "hasDetection": false,
+        "latencyMs": 2.5
+      },
+      {
+        "sourceId": 5074,
+        "targetId": 5097,
+        "protocol": "HTTPS",
+        "bytes": 1260000000,
+        "hasDetection": false,
+        "latencyMs": 2.5
+      },
+      {
+        "sourceId": 5075,
+        "targetId": 5076,
+        "protocol": "DNS",
+        "bytes": 1250000000,
+        "hasDetection": true,
+        "latencyMs": 2.6
+      },
+      {
+        "sourceId": 5075,
+        "targetId": 5082,
+        "protocol": "DNS",
+        "bytes": 1250000000,
+        "hasDetection": true,
+        "latencyMs": 2.6
+      },
+      {
+        "sourceId": 5075,
+        "targetId": 5098,
+        "protocol": "DNS",
+        "bytes": 1250000000,
+        "hasDetection": true,
+        "latencyMs": 2.6
+      },
+      {
+        "sourceId": 5076,
+        "targetId": 5077,
+        "protocol": "UDP",
+        "bytes": 1240000000,
+        "hasDetection": false,
+        "latencyMs": 2.7
+      },
+      {
+        "sourceId": 5076,
+        "targetId": 5083,
+        "protocol": "UDP",
+        "bytes": 1240000000,
+        "hasDetection": false,
+        "latencyMs": 2.7
+      },
+      {
+        "sourceId": 5076,
+        "targetId": 5099,
+        "protocol": "UDP",
+        "bytes": 1240000000,
+        "hasDetection": false,
+        "latencyMs": 2.7
+      },
+      {
+        "sourceId": 5077,
+        "targetId": 5078,
+        "protocol": "SSH",
+        "bytes": 1230000000,
+        "hasDetection": false,
+        "latencyMs": 2.8
+      },
+      {
+        "sourceId": 5077,
+        "targetId": 5084,
+        "protocol": "SSH",
+        "bytes": 1230000000,
+        "hasDetection": false,
+        "latencyMs": 2.8
+      },
+      {
+        "sourceId": 5077,
+        "targetId": 5100,
+        "protocol": "SSH",
+        "bytes": 1230000000,
+        "hasDetection": false,
+        "latencyMs": 2.8
+      },
+      {
+        "sourceId": 5078,
+        "targetId": 5079,
+        "protocol": "TCP",
+        "bytes": 1220000000,
+        "hasDetection": false,
+        "latencyMs": 2.9
+      },
+      {
+        "sourceId": 5078,
+        "targetId": 5085,
+        "protocol": "TCP",
+        "bytes": 1220000000,
+        "hasDetection": false,
+        "latencyMs": 2.9
+      },
+      {
+        "sourceId": 5078,
+        "targetId": 5101,
+        "protocol": "TCP",
+        "bytes": 1220000000,
+        "hasDetection": false,
+        "latencyMs": 2.9
+      },
+      {
+        "sourceId": 5079,
+        "targetId": 5080,
+        "protocol": "HTTP",
+        "bytes": 1210000000,
+        "hasDetection": false,
+        "latencyMs": 3.0
+      },
+      {
+        "sourceId": 5079,
+        "targetId": 5086,
+        "protocol": "HTTP",
+        "bytes": 1210000000,
+        "hasDetection": false,
+        "latencyMs": 3.0
+      },
+      {
+        "sourceId": 5079,
+        "targetId": 5102,
+        "protocol": "HTTP",
+        "bytes": 1210000000,
+        "hasDetection": false,
+        "latencyMs": 3.0
+      },
+      {
+        "sourceId": 5080,
+        "targetId": 5081,
+        "protocol": "HTTPS",
+        "bytes": 1200000000,
+        "hasDetection": false,
+        "latencyMs": 3.1
+      },
+      {
+        "sourceId": 5080,
+        "targetId": 5087,
+        "protocol": "HTTPS",
+        "bytes": 1200000000,
+        "hasDetection": false,
+        "latencyMs": 3.1
+      },
+      {
+        "sourceId": 5080,
+        "targetId": 5103,
+        "protocol": "HTTPS",
+        "bytes": 1200000000,
+        "hasDetection": false,
+        "latencyMs": 3.1
+      },
+      {
+        "sourceId": 5081,
+        "targetId": 5082,
+        "protocol": "DNS",
+        "bytes": 1190000000,
+        "hasDetection": false,
+        "latencyMs": 3.2
+      },
+      {
+        "sourceId": 5081,
+        "targetId": 5088,
+        "protocol": "DNS",
+        "bytes": 1190000000,
+        "hasDetection": false,
+        "latencyMs": 3.2
+      },
+      {
+        "sourceId": 5081,
+        "targetId": 5104,
+        "protocol": "DNS",
+        "bytes": 1190000000,
+        "hasDetection": false,
+        "latencyMs": 3.2
+      },
+      {
+        "sourceId": 5082,
+        "targetId": 5083,
+        "protocol": "UDP",
+        "bytes": 1180000000,
+        "hasDetection": false,
+        "latencyMs": 3.3
+      },
+      {
+        "sourceId": 5082,
+        "targetId": 5089,
+        "protocol": "UDP",
+        "bytes": 1180000000,
+        "hasDetection": false,
+        "latencyMs": 3.3
+      },
+      {
+        "sourceId": 5082,
+        "targetId": 5105,
+        "protocol": "UDP",
+        "bytes": 1180000000,
+        "hasDetection": false,
+        "latencyMs": 3.3
+      },
+      {
+        "sourceId": 5083,
+        "targetId": 5084,
+        "protocol": "SSH",
+        "bytes": 1170000000,
+        "hasDetection": false,
+        "latencyMs": 3.4
+      },
+      {
+        "sourceId": 5083,
+        "targetId": 5090,
+        "protocol": "SSH",
+        "bytes": 1170000000,
+        "hasDetection": false,
+        "latencyMs": 3.4
+      },
+      {
+        "sourceId": 5083,
+        "targetId": 5106,
+        "protocol": "SSH",
+        "bytes": 1170000000,
+        "hasDetection": false,
+        "latencyMs": 3.4
+      },
+      {
+        "sourceId": 5084,
+        "targetId": 5085,
+        "protocol": "TCP",
+        "bytes": 1160000000,
+        "hasDetection": false,
+        "latencyMs": 3.5
+      },
+      {
+        "sourceId": 5084,
+        "targetId": 5091,
+        "protocol": "TCP",
+        "bytes": 1160000000,
+        "hasDetection": false,
+        "latencyMs": 3.5
+      },
+      {
+        "sourceId": 5084,
+        "targetId": 5107,
+        "protocol": "TCP",
+        "bytes": 1160000000,
+        "hasDetection": false,
+        "latencyMs": 3.5
+      },
+      {
+        "sourceId": 5085,
+        "targetId": 5086,
+        "protocol": "HTTP",
+        "bytes": 1150000000,
+        "hasDetection": false,
+        "latencyMs": 3.6
+      },
+      {
+        "sourceId": 5085,
+        "targetId": 5092,
+        "protocol": "HTTP",
+        "bytes": 1150000000,
+        "hasDetection": false,
+        "latencyMs": 3.6
+      },
+      {
+        "sourceId": 5085,
+        "targetId": 5108,
+        "protocol": "HTTP",
+        "bytes": 1150000000,
+        "hasDetection": false,
+        "latencyMs": 3.6
+      },
+      {
+        "sourceId": 5086,
+        "targetId": 5087,
+        "protocol": "HTTPS",
+        "bytes": 1140000000,
+        "hasDetection": false,
+        "latencyMs": 3.7
+      },
+      {
+        "sourceId": 5086,
+        "targetId": 5093,
+        "protocol": "HTTPS",
+        "bytes": 1140000000,
+        "hasDetection": false,
+        "latencyMs": 3.7
+      },
+      {
+        "sourceId": 5086,
+        "targetId": 5109,
+        "protocol": "HTTPS",
+        "bytes": 1140000000,
+        "hasDetection": false,
+        "latencyMs": 3.7
+      },
+      {
+        "sourceId": 5087,
+        "targetId": 5088,
+        "protocol": "DNS",
+        "bytes": 1130000000,
+        "hasDetection": false,
+        "latencyMs": 3.8
+      },
+      {
+        "sourceId": 5087,
+        "targetId": 5094,
+        "protocol": "DNS",
+        "bytes": 1130000000,
+        "hasDetection": false,
+        "latencyMs": 3.8
+      },
+      {
+        "sourceId": 5087,
+        "targetId": 5110,
+        "protocol": "DNS",
+        "bytes": 1130000000,
+        "hasDetection": false,
+        "latencyMs": 3.8
+      },
+      {
+        "sourceId": 5088,
+        "targetId": 5089,
+        "protocol": "UDP",
+        "bytes": 1120000000,
+        "hasDetection": false,
+        "latencyMs": 3.9
+      },
+      {
+        "sourceId": 5088,
+        "targetId": 5095,
+        "protocol": "UDP",
+        "bytes": 1120000000,
+        "hasDetection": false,
+        "latencyMs": 3.9
+      },
+      {
+        "sourceId": 5088,
+        "targetId": 5111,
+        "protocol": "UDP",
+        "bytes": 1120000000,
+        "hasDetection": false,
+        "latencyMs": 3.9
+      },
+      {
+        "sourceId": 5089,
+        "targetId": 5090,
+        "protocol": "SSH",
+        "bytes": 1110000000,
+        "hasDetection": false,
+        "latencyMs": 4.0
+      },
+      {
+        "sourceId": 5089,
+        "targetId": 5096,
+        "protocol": "SSH",
+        "bytes": 1110000000,
+        "hasDetection": false,
+        "latencyMs": 4.0
+      },
+      {
+        "sourceId": 5089,
+        "targetId": 5112,
+        "protocol": "SSH",
+        "bytes": 1110000000,
+        "hasDetection": false,
+        "latencyMs": 4.0
+      },
+      {
+        "sourceId": 5090,
+        "targetId": 5091,
+        "protocol": "TCP",
+        "bytes": 1100000000,
+        "hasDetection": false,
+        "latencyMs": 4.1
+      },
+      {
+        "sourceId": 5090,
+        "targetId": 5097,
+        "protocol": "TCP",
+        "bytes": 1100000000,
+        "hasDetection": false,
+        "latencyMs": 4.1
+      },
+      {
+        "sourceId": 5090,
+        "targetId": 5113,
+        "protocol": "TCP",
+        "bytes": 1100000000,
+        "hasDetection": false,
+        "latencyMs": 4.1
+      },
+      {
+        "sourceId": 5091,
+        "targetId": 5092,
+        "protocol": "HTTP",
+        "bytes": 1090000000,
+        "hasDetection": false,
+        "latencyMs": 4.2
+      },
+      {
+        "sourceId": 5091,
+        "targetId": 5098,
+        "protocol": "HTTP",
+        "bytes": 1090000000,
+        "hasDetection": false,
+        "latencyMs": 4.2
+      },
+      {
+        "sourceId": 5091,
+        "targetId": 5114,
+        "protocol": "HTTP",
+        "bytes": 1090000000,
+        "hasDetection": false,
+        "latencyMs": 4.2
+      },
+      {
+        "sourceId": 5092,
+        "targetId": 5093,
+        "protocol": "HTTPS",
+        "bytes": 1080000000,
+        "hasDetection": false,
+        "latencyMs": 4.3
+      },
+      {
+        "sourceId": 5092,
+        "targetId": 5099,
+        "protocol": "HTTPS",
+        "bytes": 1080000000,
+        "hasDetection": false,
+        "latencyMs": 4.3
+      },
+      {
+        "sourceId": 5092,
+        "targetId": 5115,
+        "protocol": "HTTPS",
+        "bytes": 1080000000,
+        "hasDetection": false,
+        "latencyMs": 4.3
+      },
+      {
+        "sourceId": 5093,
+        "targetId": 5094,
+        "protocol": "DNS",
+        "bytes": 1070000000,
+        "hasDetection": false,
+        "latencyMs": 4.4
+      },
+      {
+        "sourceId": 5093,
+        "targetId": 5100,
+        "protocol": "DNS",
+        "bytes": 1070000000,
+        "hasDetection": false,
+        "latencyMs": 4.4
+      },
+      {
+        "sourceId": 5093,
+        "targetId": 5116,
+        "protocol": "DNS",
+        "bytes": 1070000000,
+        "hasDetection": false,
+        "latencyMs": 4.4
+      },
+      {
+        "sourceId": 5094,
+        "targetId": 5095,
+        "protocol": "UDP",
+        "bytes": 1060000000,
+        "hasDetection": false,
+        "latencyMs": 4.5
+      },
+      {
+        "sourceId": 5094,
+        "targetId": 5101,
+        "protocol": "UDP",
+        "bytes": 1060000000,
+        "hasDetection": false,
+        "latencyMs": 4.5
+      },
+      {
+        "sourceId": 5094,
+        "targetId": 5117,
+        "protocol": "UDP",
+        "bytes": 1060000000,
+        "hasDetection": false,
+        "latencyMs": 4.5
+      },
+      {
+        "sourceId": 5095,
+        "targetId": 5096,
+        "protocol": "SSH",
+        "bytes": 1050000000,
+        "hasDetection": false,
+        "latencyMs": 4.6
+      },
+      {
+        "sourceId": 5095,
+        "targetId": 5102,
+        "protocol": "SSH",
+        "bytes": 1050000000,
+        "hasDetection": false,
+        "latencyMs": 4.6
+      },
+      {
+        "sourceId": 5095,
+        "targetId": 5118,
+        "protocol": "SSH",
+        "bytes": 1050000000,
+        "hasDetection": false,
+        "latencyMs": 4.6
+      },
+      {
+        "sourceId": 5096,
+        "targetId": 5097,
+        "protocol": "TCP",
+        "bytes": 1040000000,
+        "hasDetection": false,
+        "latencyMs": 4.7
+      },
+      {
+        "sourceId": 5096,
+        "targetId": 5103,
+        "protocol": "TCP",
+        "bytes": 1040000000,
+        "hasDetection": false,
+        "latencyMs": 4.7
+      },
+      {
+        "sourceId": 5096,
+        "targetId": 5119,
+        "protocol": "TCP",
+        "bytes": 1040000000,
+        "hasDetection": false,
+        "latencyMs": 4.7
+      },
+      {
+        "sourceId": 5097,
+        "targetId": 5098,
+        "protocol": "HTTP",
+        "bytes": 1030000000,
+        "hasDetection": false,
+        "latencyMs": 4.8
+      },
+      {
+        "sourceId": 5097,
+        "targetId": 5104,
+        "protocol": "HTTP",
+        "bytes": 1030000000,
+        "hasDetection": false,
+        "latencyMs": 4.8
+      },
+      {
+        "sourceId": 5097,
+        "targetId": 5120,
+        "protocol": "HTTP",
+        "bytes": 1030000000,
+        "hasDetection": false,
+        "latencyMs": 4.8
+      },
+      {
+        "sourceId": 5098,
+        "targetId": 5099,
+        "protocol": "HTTPS",
+        "bytes": 1020000000,
+        "hasDetection": false,
+        "latencyMs": 4.9
+      },
+      {
+        "sourceId": 5098,
+        "targetId": 5105,
+        "protocol": "HTTPS",
+        "bytes": 1020000000,
+        "hasDetection": false,
+        "latencyMs": 4.9
+      },
+      {
+        "sourceId": 5098,
+        "targetId": 5121,
+        "protocol": "HTTPS",
+        "bytes": 1020000000,
+        "hasDetection": false,
+        "latencyMs": 4.9
+      },
+      {
+        "sourceId": 5099,
+        "targetId": 5100,
+        "protocol": "DNS",
+        "bytes": 1010000000,
+        "hasDetection": false,
+        "latencyMs": 5.0
+      },
+      {
+        "sourceId": 5099,
+        "targetId": 5106,
+        "protocol": "DNS",
+        "bytes": 1010000000,
+        "hasDetection": false,
+        "latencyMs": 5.0
+      },
+      {
+        "sourceId": 5099,
+        "targetId": 5122,
+        "protocol": "DNS",
+        "bytes": 1010000000,
+        "hasDetection": false,
+        "latencyMs": 5.0
+      },
+      {
+        "sourceId": 5100,
+        "targetId": 5101,
+        "protocol": "UDP",
+        "bytes": 1000000000,
+        "hasDetection": true,
+        "latencyMs": 0.1
+      },
+      {
+        "sourceId": 5100,
+        "targetId": 5107,
+        "protocol": "UDP",
+        "bytes": 1000000000,
+        "hasDetection": true,
+        "latencyMs": 0.1
+      },
+      {
+        "sourceId": 5100,
+        "targetId": 5123,
+        "protocol": "UDP",
+        "bytes": 1000000000,
+        "hasDetection": true,
+        "latencyMs": 0.1
+      },
+      {
+        "sourceId": 5101,
+        "targetId": 5102,
+        "protocol": "SSH",
+        "bytes": 990000000,
+        "hasDetection": false,
+        "latencyMs": 0.2
+      },
+      {
+        "sourceId": 5101,
+        "targetId": 5108,
+        "protocol": "SSH",
+        "bytes": 990000000,
+        "hasDetection": false,
+        "latencyMs": 0.2
+      },
+      {
+        "sourceId": 5101,
+        "targetId": 5124,
+        "protocol": "SSH",
+        "bytes": 990000000,
+        "hasDetection": false,
+        "latencyMs": 0.2
+      },
+      {
+        "sourceId": 5102,
+        "targetId": 5103,
+        "protocol": "TCP",
+        "bytes": 980000000,
+        "hasDetection": false,
+        "latencyMs": 0.3
+      },
+      {
+        "sourceId": 5102,
+        "targetId": 5109,
+        "protocol": "TCP",
+        "bytes": 980000000,
+        "hasDetection": false,
+        "latencyMs": 0.3
+      },
+      {
+        "sourceId": 5102,
+        "targetId": 5125,
+        "protocol": "TCP",
+        "bytes": 980000000,
+        "hasDetection": false,
+        "latencyMs": 0.3
+      },
+      {
+        "sourceId": 5103,
+        "targetId": 5104,
+        "protocol": "HTTP",
+        "bytes": 970000000,
+        "hasDetection": false,
+        "latencyMs": 0.4
+      },
+      {
+        "sourceId": 5103,
+        "targetId": 5110,
+        "protocol": "HTTP",
+        "bytes": 970000000,
+        "hasDetection": false,
+        "latencyMs": 0.4
+      },
+      {
+        "sourceId": 5103,
+        "targetId": 5126,
+        "protocol": "HTTP",
+        "bytes": 970000000,
+        "hasDetection": false,
+        "latencyMs": 0.4
+      },
+      {
+        "sourceId": 5104,
+        "targetId": 5105,
+        "protocol": "HTTPS",
+        "bytes": 960000000,
+        "hasDetection": false,
+        "latencyMs": 0.5
+      },
+      {
+        "sourceId": 5104,
+        "targetId": 5111,
+        "protocol": "HTTPS",
+        "bytes": 960000000,
+        "hasDetection": false,
+        "latencyMs": 0.5
+      },
+      {
+        "sourceId": 5104,
+        "targetId": 5127,
+        "protocol": "HTTPS",
+        "bytes": 960000000,
+        "hasDetection": false,
+        "latencyMs": 0.5
+      },
+      {
+        "sourceId": 5105,
+        "targetId": 5106,
+        "protocol": "DNS",
+        "bytes": 950000000,
+        "hasDetection": false,
+        "latencyMs": 0.6
+      },
+      {
+        "sourceId": 5105,
+        "targetId": 5112,
+        "protocol": "DNS",
+        "bytes": 950000000,
+        "hasDetection": false,
+        "latencyMs": 0.6
+      },
+      {
+        "sourceId": 5105,
+        "targetId": 5128,
+        "protocol": "DNS",
+        "bytes": 950000000,
+        "hasDetection": false,
+        "latencyMs": 0.6
+      },
+      {
+        "sourceId": 5106,
+        "targetId": 5107,
+        "protocol": "UDP",
+        "bytes": 940000000,
+        "hasDetection": false,
+        "latencyMs": 0.7
+      },
+      {
+        "sourceId": 5106,
+        "targetId": 5113,
+        "protocol": "UDP",
+        "bytes": 940000000,
+        "hasDetection": false,
+        "latencyMs": 0.7
+      },
+      {
+        "sourceId": 5106,
+        "targetId": 5129,
+        "protocol": "UDP",
+        "bytes": 940000000,
+        "hasDetection": false,
+        "latencyMs": 0.7
+      },
+      {
+        "sourceId": 5107,
+        "targetId": 5108,
+        "protocol": "SSH",
+        "bytes": 930000000,
+        "hasDetection": false,
+        "latencyMs": 0.8
+      },
+      {
+        "sourceId": 5107,
+        "targetId": 5114,
+        "protocol": "SSH",
+        "bytes": 930000000,
+        "hasDetection": false,
+        "latencyMs": 0.8
+      },
+      {
+        "sourceId": 5107,
+        "targetId": 5130,
+        "protocol": "SSH",
+        "bytes": 930000000,
+        "hasDetection": false,
+        "latencyMs": 0.8
+      },
+      {
+        "sourceId": 5108,
+        "targetId": 5109,
+        "protocol": "TCP",
+        "bytes": 920000000,
+        "hasDetection": false,
+        "latencyMs": 0.9
+      },
+      {
+        "sourceId": 5108,
+        "targetId": 5115,
+        "protocol": "TCP",
+        "bytes": 920000000,
+        "hasDetection": false,
+        "latencyMs": 0.9
+      },
+      {
+        "sourceId": 5108,
+        "targetId": 5131,
+        "protocol": "TCP",
+        "bytes": 920000000,
+        "hasDetection": false,
+        "latencyMs": 0.9
+      },
+      {
+        "sourceId": 5109,
+        "targetId": 5110,
+        "protocol": "HTTP",
+        "bytes": 910000000,
+        "hasDetection": false,
+        "latencyMs": 1.0
+      },
+      {
+        "sourceId": 5109,
+        "targetId": 5116,
+        "protocol": "HTTP",
+        "bytes": 910000000,
+        "hasDetection": false,
+        "latencyMs": 1.0
+      },
+      {
+        "sourceId": 5109,
+        "targetId": 5132,
+        "protocol": "HTTP",
+        "bytes": 910000000,
+        "hasDetection": false,
+        "latencyMs": 1.0
+      },
+      {
+        "sourceId": 5110,
+        "targetId": 5111,
+        "protocol": "HTTPS",
+        "bytes": 900000000,
+        "hasDetection": false,
+        "latencyMs": 1.1
+      },
+      {
+        "sourceId": 5110,
+        "targetId": 5117,
+        "protocol": "HTTPS",
+        "bytes": 900000000,
+        "hasDetection": false,
+        "latencyMs": 1.1
+      },
+      {
+        "sourceId": 5110,
+        "targetId": 5133,
+        "protocol": "HTTPS",
+        "bytes": 900000000,
+        "hasDetection": false,
+        "latencyMs": 1.1
+      },
+      {
+        "sourceId": 5111,
+        "targetId": 5112,
+        "protocol": "DNS",
+        "bytes": 890000000,
+        "hasDetection": false,
+        "latencyMs": 1.2
+      },
+      {
+        "sourceId": 5111,
+        "targetId": 5118,
+        "protocol": "DNS",
+        "bytes": 890000000,
+        "hasDetection": false,
+        "latencyMs": 1.2
+      },
+      {
+        "sourceId": 5111,
+        "targetId": 5134,
+        "protocol": "DNS",
+        "bytes": 890000000,
+        "hasDetection": false,
+        "latencyMs": 1.2
+      },
+      {
+        "sourceId": 5112,
+        "targetId": 5113,
+        "protocol": "UDP",
+        "bytes": 880000000,
+        "hasDetection": false,
+        "latencyMs": 1.3
+      },
+      {
+        "sourceId": 5112,
+        "targetId": 5119,
+        "protocol": "UDP",
+        "bytes": 880000000,
+        "hasDetection": false,
+        "latencyMs": 1.3
+      },
+      {
+        "sourceId": 5112,
+        "targetId": 5135,
+        "protocol": "UDP",
+        "bytes": 880000000,
+        "hasDetection": false,
+        "latencyMs": 1.3
+      },
+      {
+        "sourceId": 5113,
+        "targetId": 5114,
+        "protocol": "SSH",
+        "bytes": 870000000,
+        "hasDetection": false,
+        "latencyMs": 1.4
+      },
+      {
+        "sourceId": 5113,
+        "targetId": 5120,
+        "protocol": "SSH",
+        "bytes": 870000000,
+        "hasDetection": false,
+        "latencyMs": 1.4
+      },
+      {
+        "sourceId": 5113,
+        "targetId": 5136,
+        "protocol": "SSH",
+        "bytes": 870000000,
+        "hasDetection": false,
+        "latencyMs": 1.4
+      },
+      {
+        "sourceId": 5114,
+        "targetId": 5115,
+        "protocol": "TCP",
+        "bytes": 860000000,
+        "hasDetection": false,
+        "latencyMs": 1.5
+      },
+      {
+        "sourceId": 5114,
+        "targetId": 5121,
+        "protocol": "TCP",
+        "bytes": 860000000,
+        "hasDetection": false,
+        "latencyMs": 1.5
+      },
+      {
+        "sourceId": 5114,
+        "targetId": 5137,
+        "protocol": "TCP",
+        "bytes": 860000000,
+        "hasDetection": false,
+        "latencyMs": 1.5
+      },
+      {
+        "sourceId": 5115,
+        "targetId": 5116,
+        "protocol": "HTTP",
+        "bytes": 850000000,
+        "hasDetection": false,
+        "latencyMs": 1.6
+      },
+      {
+        "sourceId": 5115,
+        "targetId": 5122,
+        "protocol": "HTTP",
+        "bytes": 850000000,
+        "hasDetection": false,
+        "latencyMs": 1.6
+      },
+      {
+        "sourceId": 5115,
+        "targetId": 5138,
+        "protocol": "HTTP",
+        "bytes": 850000000,
+        "hasDetection": false,
+        "latencyMs": 1.6
+      },
+      {
+        "sourceId": 5116,
+        "targetId": 5117,
+        "protocol": "HTTPS",
+        "bytes": 840000000,
+        "hasDetection": false,
+        "latencyMs": 1.7
+      },
+      {
+        "sourceId": 5116,
+        "targetId": 5123,
+        "protocol": "HTTPS",
+        "bytes": 840000000,
+        "hasDetection": false,
+        "latencyMs": 1.7
+      },
+      {
+        "sourceId": 5116,
+        "targetId": 5139,
+        "protocol": "HTTPS",
+        "bytes": 840000000,
+        "hasDetection": false,
+        "latencyMs": 1.7
+      },
+      {
+        "sourceId": 5117,
+        "targetId": 5118,
+        "protocol": "DNS",
+        "bytes": 830000000,
+        "hasDetection": false,
+        "latencyMs": 1.8
+      },
+      {
+        "sourceId": 5117,
+        "targetId": 5124,
+        "protocol": "DNS",
+        "bytes": 830000000,
+        "hasDetection": false,
+        "latencyMs": 1.8
+      },
+      {
+        "sourceId": 5117,
+        "targetId": 5140,
+        "protocol": "DNS",
+        "bytes": 830000000,
+        "hasDetection": false,
+        "latencyMs": 1.8
+      },
+      {
+        "sourceId": 5118,
+        "targetId": 5119,
+        "protocol": "UDP",
+        "bytes": 820000000,
+        "hasDetection": false,
+        "latencyMs": 1.9
+      },
+      {
+        "sourceId": 5118,
+        "targetId": 5125,
+        "protocol": "UDP",
+        "bytes": 820000000,
+        "hasDetection": false,
+        "latencyMs": 1.9
+      },
+      {
+        "sourceId": 5118,
+        "targetId": 5141,
+        "protocol": "UDP",
+        "bytes": 820000000,
+        "hasDetection": false,
+        "latencyMs": 1.9
+      },
+      {
+        "sourceId": 5119,
+        "targetId": 5120,
+        "protocol": "SSH",
+        "bytes": 810000000,
+        "hasDetection": false,
+        "latencyMs": 2.0
+      },
+      {
+        "sourceId": 5119,
+        "targetId": 5126,
+        "protocol": "SSH",
+        "bytes": 810000000,
+        "hasDetection": false,
+        "latencyMs": 2.0
+      },
+      {
+        "sourceId": 5119,
+        "targetId": 5142,
+        "protocol": "SSH",
+        "bytes": 810000000,
+        "hasDetection": false,
+        "latencyMs": 2.0
+      },
+      {
+        "sourceId": 5120,
+        "targetId": 5121,
+        "protocol": "TCP",
+        "bytes": 800000000,
+        "hasDetection": false,
+        "latencyMs": 2.1
+      },
+      {
+        "sourceId": 5120,
+        "targetId": 5127,
+        "protocol": "TCP",
+        "bytes": 800000000,
+        "hasDetection": false,
+        "latencyMs": 2.1
+      },
+      {
+        "sourceId": 5120,
+        "targetId": 5143,
+        "protocol": "TCP",
+        "bytes": 800000000,
+        "hasDetection": false,
+        "latencyMs": 2.1
+      },
+      {
+        "sourceId": 5121,
+        "targetId": 5122,
+        "protocol": "HTTP",
+        "bytes": 790000000,
+        "hasDetection": false,
+        "latencyMs": 2.2
+      },
+      {
+        "sourceId": 5121,
+        "targetId": 5128,
+        "protocol": "HTTP",
+        "bytes": 790000000,
+        "hasDetection": false,
+        "latencyMs": 2.2
+      },
+      {
+        "sourceId": 5121,
+        "targetId": 5144,
+        "protocol": "HTTP",
+        "bytes": 790000000,
+        "hasDetection": false,
+        "latencyMs": 2.2
+      },
+      {
+        "sourceId": 5122,
+        "targetId": 5123,
+        "protocol": "HTTPS",
+        "bytes": 780000000,
+        "hasDetection": false,
+        "latencyMs": 2.3
+      },
+      {
+        "sourceId": 5122,
+        "targetId": 5129,
+        "protocol": "HTTPS",
+        "bytes": 780000000,
+        "hasDetection": false,
+        "latencyMs": 2.3
+      },
+      {
+        "sourceId": 5122,
+        "targetId": 5145,
+        "protocol": "HTTPS",
+        "bytes": 780000000,
+        "hasDetection": false,
+        "latencyMs": 2.3
+      },
+      {
+        "sourceId": 5123,
+        "targetId": 5124,
+        "protocol": "DNS",
+        "bytes": 770000000,
+        "hasDetection": false,
+        "latencyMs": 2.4
+      },
+      {
+        "sourceId": 5123,
+        "targetId": 5130,
+        "protocol": "DNS",
+        "bytes": 770000000,
+        "hasDetection": false,
+        "latencyMs": 2.4
+      },
+      {
+        "sourceId": 5123,
+        "targetId": 5146,
+        "protocol": "DNS",
+        "bytes": 770000000,
+        "hasDetection": false,
+        "latencyMs": 2.4
+      },
+      {
+        "sourceId": 5124,
+        "targetId": 5125,
+        "protocol": "UDP",
+        "bytes": 760000000,
+        "hasDetection": false,
+        "latencyMs": 2.5
+      },
+      {
+        "sourceId": 5124,
+        "targetId": 5131,
+        "protocol": "UDP",
+        "bytes": 760000000,
+        "hasDetection": false,
+        "latencyMs": 2.5
+      },
+      {
+        "sourceId": 5124,
+        "targetId": 5147,
+        "protocol": "UDP",
+        "bytes": 760000000,
+        "hasDetection": false,
+        "latencyMs": 2.5
+      },
+      {
+        "sourceId": 5125,
+        "targetId": 5126,
+        "protocol": "SSH",
+        "bytes": 750000000,
+        "hasDetection": true,
+        "latencyMs": 2.6
+      },
+      {
+        "sourceId": 5125,
+        "targetId": 5132,
+        "protocol": "SSH",
+        "bytes": 750000000,
+        "hasDetection": true,
+        "latencyMs": 2.6
+      },
+      {
+        "sourceId": 5125,
+        "targetId": 5148,
+        "protocol": "SSH",
+        "bytes": 750000000,
+        "hasDetection": true,
+        "latencyMs": 2.6
+      },
+      {
+        "sourceId": 5126,
+        "targetId": 5127,
+        "protocol": "TCP",
+        "bytes": 740000000,
+        "hasDetection": false,
+        "latencyMs": 2.7
+      },
+      {
+        "sourceId": 5126,
+        "targetId": 5133,
+        "protocol": "TCP",
+        "bytes": 740000000,
+        "hasDetection": false,
+        "latencyMs": 2.7
+      },
+      {
+        "sourceId": 5126,
+        "targetId": 5149,
+        "protocol": "TCP",
+        "bytes": 740000000,
+        "hasDetection": false,
+        "latencyMs": 2.7
+      },
+      {
+        "sourceId": 5127,
+        "targetId": 5128,
+        "protocol": "HTTP",
+        "bytes": 730000000,
+        "hasDetection": false,
+        "latencyMs": 2.8
+      },
+      {
+        "sourceId": 5127,
+        "targetId": 5134,
+        "protocol": "HTTP",
+        "bytes": 730000000,
+        "hasDetection": false,
+        "latencyMs": 2.8
+      },
+      {
+        "sourceId": 5127,
+        "targetId": 5150,
+        "protocol": "HTTP",
+        "bytes": 730000000,
+        "hasDetection": false,
+        "latencyMs": 2.8
+      },
+      {
+        "sourceId": 5128,
+        "targetId": 5129,
+        "protocol": "HTTPS",
+        "bytes": 720000000,
+        "hasDetection": false,
+        "latencyMs": 2.9
+      },
+      {
+        "sourceId": 5128,
+        "targetId": 5135,
+        "protocol": "HTTPS",
+        "bytes": 720000000,
+        "hasDetection": false,
+        "latencyMs": 2.9
+      },
+      {
+        "sourceId": 5128,
+        "targetId": 5151,
+        "protocol": "HTTPS",
+        "bytes": 720000000,
+        "hasDetection": false,
+        "latencyMs": 2.9
+      },
+      {
+        "sourceId": 5129,
+        "targetId": 5130,
+        "protocol": "DNS",
+        "bytes": 710000000,
+        "hasDetection": false,
+        "latencyMs": 3.0
+      },
+      {
+        "sourceId": 5129,
+        "targetId": 5136,
+        "protocol": "DNS",
+        "bytes": 710000000,
+        "hasDetection": false,
+        "latencyMs": 3.0
+      },
+      {
+        "sourceId": 5129,
+        "targetId": 5152,
+        "protocol": "DNS",
+        "bytes": 710000000,
+        "hasDetection": false,
+        "latencyMs": 3.0
+      },
+      {
+        "sourceId": 5130,
+        "targetId": 5131,
+        "protocol": "UDP",
+        "bytes": 700000000,
+        "hasDetection": false,
+        "latencyMs": 3.1
+      },
+      {
+        "sourceId": 5130,
+        "targetId": 5137,
+        "protocol": "UDP",
+        "bytes": 700000000,
+        "hasDetection": false,
+        "latencyMs": 3.1
+      },
+      {
+        "sourceId": 5130,
+        "targetId": 5153,
+        "protocol": "UDP",
+        "bytes": 700000000,
+        "hasDetection": false,
+        "latencyMs": 3.1
+      },
+      {
+        "sourceId": 5131,
+        "targetId": 5132,
+        "protocol": "SSH",
+        "bytes": 690000000,
+        "hasDetection": false,
+        "latencyMs": 3.2
+      },
+      {
+        "sourceId": 5131,
+        "targetId": 5138,
+        "protocol": "SSH",
+        "bytes": 690000000,
+        "hasDetection": false,
+        "latencyMs": 3.2
+      },
+      {
+        "sourceId": 5131,
+        "targetId": 5154,
+        "protocol": "SSH",
+        "bytes": 690000000,
+        "hasDetection": false,
+        "latencyMs": 3.2
+      },
+      {
+        "sourceId": 5132,
+        "targetId": 5133,
+        "protocol": "TCP",
+        "bytes": 680000000,
+        "hasDetection": false,
+        "latencyMs": 3.3
+      },
+      {
+        "sourceId": 5132,
+        "targetId": 5139,
+        "protocol": "TCP",
+        "bytes": 680000000,
+        "hasDetection": false,
+        "latencyMs": 3.3
+      },
+      {
+        "sourceId": 5132,
+        "targetId": 5155,
+        "protocol": "TCP",
+        "bytes": 680000000,
+        "hasDetection": false,
+        "latencyMs": 3.3
+      },
+      {
+        "sourceId": 5133,
+        "targetId": 5134,
+        "protocol": "HTTP",
+        "bytes": 670000000,
+        "hasDetection": false,
+        "latencyMs": 3.4
+      },
+      {
+        "sourceId": 5133,
+        "targetId": 5140,
+        "protocol": "HTTP",
+        "bytes": 670000000,
+        "hasDetection": false,
+        "latencyMs": 3.4
+      },
+      {
+        "sourceId": 5133,
+        "targetId": 5156,
+        "protocol": "HTTP",
+        "bytes": 670000000,
+        "hasDetection": false,
+        "latencyMs": 3.4
+      },
+      {
+        "sourceId": 5134,
+        "targetId": 5135,
+        "protocol": "HTTPS",
+        "bytes": 660000000,
+        "hasDetection": false,
+        "latencyMs": 3.5
+      },
+      {
+        "sourceId": 5134,
+        "targetId": 5141,
+        "protocol": "HTTPS",
+        "bytes": 660000000,
+        "hasDetection": false,
+        "latencyMs": 3.5
+      },
+      {
+        "sourceId": 5134,
+        "targetId": 5157,
+        "protocol": "HTTPS",
+        "bytes": 660000000,
+        "hasDetection": false,
+        "latencyMs": 3.5
+      },
+      {
+        "sourceId": 5135,
+        "targetId": 5136,
+        "protocol": "DNS",
+        "bytes": 650000000,
+        "hasDetection": false,
+        "latencyMs": 3.6
+      },
+      {
+        "sourceId": 5135,
+        "targetId": 5142,
+        "protocol": "DNS",
+        "bytes": 650000000,
+        "hasDetection": false,
+        "latencyMs": 3.6
+      },
+      {
+        "sourceId": 5135,
+        "targetId": 5158,
+        "protocol": "DNS",
+        "bytes": 650000000,
+        "hasDetection": false,
+        "latencyMs": 3.6
+      },
+      {
+        "sourceId": 5136,
+        "targetId": 5137,
+        "protocol": "UDP",
+        "bytes": 640000000,
+        "hasDetection": false,
+        "latencyMs": 3.7
+      },
+      {
+        "sourceId": 5136,
+        "targetId": 5143,
+        "protocol": "UDP",
+        "bytes": 640000000,
+        "hasDetection": false,
+        "latencyMs": 3.7
+      },
+      {
+        "sourceId": 5136,
+        "targetId": 5159,
+        "protocol": "UDP",
+        "bytes": 640000000,
+        "hasDetection": false,
+        "latencyMs": 3.7
+      },
+      {
+        "sourceId": 5137,
+        "targetId": 5138,
+        "protocol": "SSH",
+        "bytes": 630000000,
+        "hasDetection": false,
+        "latencyMs": 3.8
+      },
+      {
+        "sourceId": 5137,
+        "targetId": 5144,
+        "protocol": "SSH",
+        "bytes": 630000000,
+        "hasDetection": false,
+        "latencyMs": 3.8
+      },
+      {
+        "sourceId": 5137,
+        "targetId": 5160,
+        "protocol": "SSH",
+        "bytes": 630000000,
+        "hasDetection": false,
+        "latencyMs": 3.8
+      },
+      {
+        "sourceId": 5138,
+        "targetId": 5139,
+        "protocol": "TCP",
+        "bytes": 620000000,
+        "hasDetection": false,
+        "latencyMs": 3.9
+      },
+      {
+        "sourceId": 5138,
+        "targetId": 5145,
+        "protocol": "TCP",
+        "bytes": 620000000,
+        "hasDetection": false,
+        "latencyMs": 3.9
+      },
+      {
+        "sourceId": 5138,
+        "targetId": 5161,
+        "protocol": "TCP",
+        "bytes": 620000000,
+        "hasDetection": false,
+        "latencyMs": 3.9
+      },
+      {
+        "sourceId": 5139,
+        "targetId": 5140,
+        "protocol": "HTTP",
+        "bytes": 610000000,
+        "hasDetection": false,
+        "latencyMs": 4.0
+      },
+      {
+        "sourceId": 5139,
+        "targetId": 5146,
+        "protocol": "HTTP",
+        "bytes": 610000000,
+        "hasDetection": false,
+        "latencyMs": 4.0
+      },
+      {
+        "sourceId": 5139,
+        "targetId": 5162,
+        "protocol": "HTTP",
+        "bytes": 610000000,
+        "hasDetection": false,
+        "latencyMs": 4.0
+      },
+      {
+        "sourceId": 5140,
+        "targetId": 5141,
+        "protocol": "HTTPS",
+        "bytes": 600000000,
+        "hasDetection": false,
+        "latencyMs": 4.1
+      },
+      {
+        "sourceId": 5140,
+        "targetId": 5147,
+        "protocol": "HTTPS",
+        "bytes": 600000000,
+        "hasDetection": false,
+        "latencyMs": 4.1
+      },
+      {
+        "sourceId": 5140,
+        "targetId": 5163,
+        "protocol": "HTTPS",
+        "bytes": 600000000,
+        "hasDetection": false,
+        "latencyMs": 4.1
+      },
+      {
+        "sourceId": 5141,
+        "targetId": 5142,
+        "protocol": "DNS",
+        "bytes": 590000000,
+        "hasDetection": false,
+        "latencyMs": 4.2
+      },
+      {
+        "sourceId": 5141,
+        "targetId": 5148,
+        "protocol": "DNS",
+        "bytes": 590000000,
+        "hasDetection": false,
+        "latencyMs": 4.2
+      },
+      {
+        "sourceId": 5141,
+        "targetId": 5164,
+        "protocol": "DNS",
+        "bytes": 590000000,
+        "hasDetection": false,
+        "latencyMs": 4.2
+      },
+      {
+        "sourceId": 5142,
+        "targetId": 5143,
+        "protocol": "UDP",
+        "bytes": 580000000,
+        "hasDetection": false,
+        "latencyMs": 4.3
+      },
+      {
+        "sourceId": 5142,
+        "targetId": 5149,
+        "protocol": "UDP",
+        "bytes": 580000000,
+        "hasDetection": false,
+        "latencyMs": 4.3
+      },
+      {
+        "sourceId": 5142,
+        "targetId": 5165,
+        "protocol": "UDP",
+        "bytes": 580000000,
+        "hasDetection": false,
+        "latencyMs": 4.3
+      },
+      {
+        "sourceId": 5143,
+        "targetId": 5144,
+        "protocol": "SSH",
+        "bytes": 570000000,
+        "hasDetection": false,
+        "latencyMs": 4.4
+      },
+      {
+        "sourceId": 5143,
+        "targetId": 5150,
+        "protocol": "SSH",
+        "bytes": 570000000,
+        "hasDetection": false,
+        "latencyMs": 4.4
+      },
+      {
+        "sourceId": 5143,
+        "targetId": 5166,
+        "protocol": "SSH",
+        "bytes": 570000000,
+        "hasDetection": false,
+        "latencyMs": 4.4
+      },
+      {
+        "sourceId": 5144,
+        "targetId": 5145,
+        "protocol": "TCP",
+        "bytes": 560000000,
+        "hasDetection": false,
+        "latencyMs": 4.5
+      },
+      {
+        "sourceId": 5144,
+        "targetId": 5151,
+        "protocol": "TCP",
+        "bytes": 560000000,
+        "hasDetection": false,
+        "latencyMs": 4.5
+      },
+      {
+        "sourceId": 5144,
+        "targetId": 5167,
+        "protocol": "TCP",
+        "bytes": 560000000,
+        "hasDetection": false,
+        "latencyMs": 4.5
+      },
+      {
+        "sourceId": 5145,
+        "targetId": 5146,
+        "protocol": "HTTP",
+        "bytes": 550000000,
+        "hasDetection": false,
+        "latencyMs": 4.6
+      },
+      {
+        "sourceId": 5145,
+        "targetId": 5152,
+        "protocol": "HTTP",
+        "bytes": 550000000,
+        "hasDetection": false,
+        "latencyMs": 4.6
+      },
+      {
+        "sourceId": 5145,
+        "targetId": 5168,
+        "protocol": "HTTP",
+        "bytes": 550000000,
+        "hasDetection": false,
+        "latencyMs": 4.6
+      },
+      {
+        "sourceId": 5146,
+        "targetId": 5147,
+        "protocol": "HTTPS",
+        "bytes": 540000000,
+        "hasDetection": false,
+        "latencyMs": 4.7
+      },
+      {
+        "sourceId": 5146,
+        "targetId": 5153,
+        "protocol": "HTTPS",
+        "bytes": 540000000,
+        "hasDetection": false,
+        "latencyMs": 4.7
+      },
+      {
+        "sourceId": 5146,
+        "targetId": 5169,
+        "protocol": "HTTPS",
+        "bytes": 540000000,
+        "hasDetection": false,
+        "latencyMs": 4.7
+      },
+      {
+        "sourceId": 5147,
+        "targetId": 5148,
+        "protocol": "DNS",
+        "bytes": 530000000,
+        "hasDetection": false,
+        "latencyMs": 4.8
+      },
+      {
+        "sourceId": 5147,
+        "targetId": 5154,
+        "protocol": "DNS",
+        "bytes": 530000000,
+        "hasDetection": false,
+        "latencyMs": 4.8
+      },
+      {
+        "sourceId": 5147,
+        "targetId": 5170,
+        "protocol": "DNS",
+        "bytes": 530000000,
+        "hasDetection": false,
+        "latencyMs": 4.8
+      },
+      {
+        "sourceId": 5148,
+        "targetId": 5149,
+        "protocol": "UDP",
+        "bytes": 520000000,
+        "hasDetection": false,
+        "latencyMs": 4.9
+      },
+      {
+        "sourceId": 5148,
+        "targetId": 5155,
+        "protocol": "UDP",
+        "bytes": 520000000,
+        "hasDetection": false,
+        "latencyMs": 4.9
+      },
+      {
+        "sourceId": 5148,
+        "targetId": 5171,
+        "protocol": "UDP",
+        "bytes": 520000000,
+        "hasDetection": false,
+        "latencyMs": 4.9
+      },
+      {
+        "sourceId": 5149,
+        "targetId": 5150,
+        "protocol": "SSH",
+        "bytes": 510000000,
+        "hasDetection": false,
+        "latencyMs": 5.0
+      },
+      {
+        "sourceId": 5149,
+        "targetId": 5156,
+        "protocol": "SSH",
+        "bytes": 510000000,
+        "hasDetection": false,
+        "latencyMs": 5.0
+      },
+      {
+        "sourceId": 5149,
+        "targetId": 5172,
+        "protocol": "SSH",
+        "bytes": 510000000,
+        "hasDetection": false,
+        "latencyMs": 5.0
+      },
+      {
+        "sourceId": 5150,
+        "targetId": 5151,
+        "protocol": "TCP",
+        "bytes": 500000000,
+        "hasDetection": true,
+        "latencyMs": 0.1
+      },
+      {
+        "sourceId": 5150,
+        "targetId": 5157,
+        "protocol": "TCP",
+        "bytes": 500000000,
+        "hasDetection": true,
+        "latencyMs": 0.1
+      },
+      {
+        "sourceId": 5150,
+        "targetId": 5173,
+        "protocol": "TCP",
+        "bytes": 500000000,
+        "hasDetection": true,
+        "latencyMs": 0.1
+      },
+      {
+        "sourceId": 5151,
+        "targetId": 5152,
+        "protocol": "HTTP",
+        "bytes": 490000000,
+        "hasDetection": false,
+        "latencyMs": 0.2
+      },
+      {
+        "sourceId": 5151,
+        "targetId": 5158,
+        "protocol": "HTTP",
+        "bytes": 490000000,
+        "hasDetection": false,
+        "latencyMs": 0.2
+      },
+      {
+        "sourceId": 5151,
+        "targetId": 5174,
+        "protocol": "HTTP",
+        "bytes": 490000000,
+        "hasDetection": false,
+        "latencyMs": 0.2
+      },
+      {
+        "sourceId": 5152,
+        "targetId": 5153,
+        "protocol": "HTTPS",
+        "bytes": 480000000,
+        "hasDetection": false,
+        "latencyMs": 0.3
+      },
+      {
+        "sourceId": 5152,
+        "targetId": 5159,
+        "protocol": "HTTPS",
+        "bytes": 480000000,
+        "hasDetection": false,
+        "latencyMs": 0.3
+      },
+      {
+        "sourceId": 5152,
+        "targetId": 5175,
+        "protocol": "HTTPS",
+        "bytes": 480000000,
+        "hasDetection": false,
+        "latencyMs": 0.3
+      },
+      {
+        "sourceId": 5153,
+        "targetId": 5154,
+        "protocol": "DNS",
+        "bytes": 470000000,
+        "hasDetection": false,
+        "latencyMs": 0.4
+      },
+      {
+        "sourceId": 5153,
+        "targetId": 5160,
+        "protocol": "DNS",
+        "bytes": 470000000,
+        "hasDetection": false,
+        "latencyMs": 0.4
+      },
+      {
+        "sourceId": 5153,
+        "targetId": 5176,
+        "protocol": "DNS",
+        "bytes": 470000000,
+        "hasDetection": false,
+        "latencyMs": 0.4
+      },
+      {
+        "sourceId": 5154,
+        "targetId": 5155,
+        "protocol": "UDP",
+        "bytes": 460000000,
+        "hasDetection": false,
+        "latencyMs": 0.5
+      },
+      {
+        "sourceId": 5154,
+        "targetId": 5161,
+        "protocol": "UDP",
+        "bytes": 460000000,
+        "hasDetection": false,
+        "latencyMs": 0.5
+      },
+      {
+        "sourceId": 5154,
+        "targetId": 5177,
+        "protocol": "UDP",
+        "bytes": 460000000,
+        "hasDetection": false,
+        "latencyMs": 0.5
+      },
+      {
+        "sourceId": 5155,
+        "targetId": 5156,
+        "protocol": "SSH",
+        "bytes": 450000000,
+        "hasDetection": false,
+        "latencyMs": 0.6
+      },
+      {
+        "sourceId": 5155,
+        "targetId": 5162,
+        "protocol": "SSH",
+        "bytes": 450000000,
+        "hasDetection": false,
+        "latencyMs": 0.6
+      },
+      {
+        "sourceId": 5155,
+        "targetId": 5178,
+        "protocol": "SSH",
+        "bytes": 450000000,
+        "hasDetection": false,
+        "latencyMs": 0.6
+      },
+      {
+        "sourceId": 5156,
+        "targetId": 5157,
+        "protocol": "TCP",
+        "bytes": 440000000,
+        "hasDetection": false,
+        "latencyMs": 0.7
+      },
+      {
+        "sourceId": 5156,
+        "targetId": 5163,
+        "protocol": "TCP",
+        "bytes": 440000000,
+        "hasDetection": false,
+        "latencyMs": 0.7
+      },
+      {
+        "sourceId": 5156,
+        "targetId": 5179,
+        "protocol": "TCP",
+        "bytes": 440000000,
+        "hasDetection": false,
+        "latencyMs": 0.7
+      },
+      {
+        "sourceId": 5157,
+        "targetId": 5158,
+        "protocol": "HTTP",
+        "bytes": 430000000,
+        "hasDetection": false,
+        "latencyMs": 0.8
+      },
+      {
+        "sourceId": 5157,
+        "targetId": 5164,
+        "protocol": "HTTP",
+        "bytes": 430000000,
+        "hasDetection": false,
+        "latencyMs": 0.8
+      },
+      {
+        "sourceId": 5157,
+        "targetId": 5180,
+        "protocol": "HTTP",
+        "bytes": 430000000,
+        "hasDetection": false,
+        "latencyMs": 0.8
+      },
+      {
+        "sourceId": 5158,
+        "targetId": 5159,
+        "protocol": "HTTPS",
+        "bytes": 420000000,
+        "hasDetection": false,
+        "latencyMs": 0.9
+      },
+      {
+        "sourceId": 5158,
+        "targetId": 5165,
+        "protocol": "HTTPS",
+        "bytes": 420000000,
+        "hasDetection": false,
+        "latencyMs": 0.9
+      },
+      {
+        "sourceId": 5158,
+        "targetId": 5181,
+        "protocol": "HTTPS",
+        "bytes": 420000000,
+        "hasDetection": false,
+        "latencyMs": 0.9
+      },
+      {
+        "sourceId": 5159,
+        "targetId": 5160,
+        "protocol": "DNS",
+        "bytes": 410000000,
+        "hasDetection": false,
+        "latencyMs": 1.0
+      },
+      {
+        "sourceId": 5159,
+        "targetId": 5166,
+        "protocol": "DNS",
+        "bytes": 410000000,
+        "hasDetection": false,
+        "latencyMs": 1.0
+      },
+      {
+        "sourceId": 5159,
+        "targetId": 5182,
+        "protocol": "DNS",
+        "bytes": 410000000,
+        "hasDetection": false,
+        "latencyMs": 1.0
+      },
+      {
+        "sourceId": 5160,
+        "targetId": 5161,
+        "protocol": "UDP",
+        "bytes": 400000000,
+        "hasDetection": false,
+        "latencyMs": 1.1
+      },
+      {
+        "sourceId": 5160,
+        "targetId": 5167,
+        "protocol": "UDP",
+        "bytes": 400000000,
+        "hasDetection": false,
+        "latencyMs": 1.1
+      },
+      {
+        "sourceId": 5160,
+        "targetId": 5183,
+        "protocol": "UDP",
+        "bytes": 400000000,
+        "hasDetection": false,
+        "latencyMs": 1.1
+      },
+      {
+        "sourceId": 5161,
+        "targetId": 5162,
+        "protocol": "SSH",
+        "bytes": 390000000,
+        "hasDetection": false,
+        "latencyMs": 1.2
+      },
+      {
+        "sourceId": 5161,
+        "targetId": 5168,
+        "protocol": "SSH",
+        "bytes": 390000000,
+        "hasDetection": false,
+        "latencyMs": 1.2
+      },
+      {
+        "sourceId": 5161,
+        "targetId": 5184,
+        "protocol": "SSH",
+        "bytes": 390000000,
+        "hasDetection": false,
+        "latencyMs": 1.2
+      },
+      {
+        "sourceId": 5162,
+        "targetId": 5163,
+        "protocol": "TCP",
+        "bytes": 380000000,
+        "hasDetection": false,
+        "latencyMs": 1.3
+      },
+      {
+        "sourceId": 5162,
+        "targetId": 5169,
+        "protocol": "TCP",
+        "bytes": 380000000,
+        "hasDetection": false,
+        "latencyMs": 1.3
+      },
+      {
+        "sourceId": 5162,
+        "targetId": 5185,
+        "protocol": "TCP",
+        "bytes": 380000000,
+        "hasDetection": false,
+        "latencyMs": 1.3
+      },
+      {
+        "sourceId": 5163,
+        "targetId": 5164,
+        "protocol": "HTTP",
+        "bytes": 370000000,
+        "hasDetection": false,
+        "latencyMs": 1.4
+      },
+      {
+        "sourceId": 5163,
+        "targetId": 5170,
+        "protocol": "HTTP",
+        "bytes": 370000000,
+        "hasDetection": false,
+        "latencyMs": 1.4
+      },
+      {
+        "sourceId": 5163,
+        "targetId": 5186,
+        "protocol": "HTTP",
+        "bytes": 370000000,
+        "hasDetection": false,
+        "latencyMs": 1.4
+      },
+      {
+        "sourceId": 5164,
+        "targetId": 5165,
+        "protocol": "HTTPS",
+        "bytes": 360000000,
+        "hasDetection": false,
+        "latencyMs": 1.5
+      },
+      {
+        "sourceId": 5164,
+        "targetId": 5171,
+        "protocol": "HTTPS",
+        "bytes": 360000000,
+        "hasDetection": false,
+        "latencyMs": 1.5
+      },
+      {
+        "sourceId": 5164,
+        "targetId": 5187,
+        "protocol": "HTTPS",
+        "bytes": 360000000,
+        "hasDetection": false,
+        "latencyMs": 1.5
+      },
+      {
+        "sourceId": 5165,
+        "targetId": 5166,
+        "protocol": "DNS",
+        "bytes": 350000000,
+        "hasDetection": false,
+        "latencyMs": 1.6
+      },
+      {
+        "sourceId": 5165,
+        "targetId": 5172,
+        "protocol": "DNS",
+        "bytes": 350000000,
+        "hasDetection": false,
+        "latencyMs": 1.6
+      },
+      {
+        "sourceId": 5165,
+        "targetId": 5188,
+        "protocol": "DNS",
+        "bytes": 350000000,
+        "hasDetection": false,
+        "latencyMs": 1.6
+      },
+      {
+        "sourceId": 5166,
+        "targetId": 5167,
+        "protocol": "UDP",
+        "bytes": 340000000,
+        "hasDetection": false,
+        "latencyMs": 1.7
+      },
+      {
+        "sourceId": 5166,
+        "targetId": 5173,
+        "protocol": "UDP",
+        "bytes": 340000000,
+        "hasDetection": false,
+        "latencyMs": 1.7
+      },
+      {
+        "sourceId": 5166,
+        "targetId": 5189,
+        "protocol": "UDP",
+        "bytes": 340000000,
+        "hasDetection": false,
+        "latencyMs": 1.7
+      },
+      {
+        "sourceId": 5167,
+        "targetId": 5168,
+        "protocol": "SSH",
+        "bytes": 330000000,
+        "hasDetection": false,
+        "latencyMs": 1.8
+      },
+      {
+        "sourceId": 5167,
+        "targetId": 5174,
+        "protocol": "SSH",
+        "bytes": 330000000,
+        "hasDetection": false,
+        "latencyMs": 1.8
+      },
+      {
+        "sourceId": 5167,
+        "targetId": 5190,
+        "protocol": "SSH",
+        "bytes": 330000000,
+        "hasDetection": false,
+        "latencyMs": 1.8
+      },
+      {
+        "sourceId": 5168,
+        "targetId": 5169,
+        "protocol": "TCP",
+        "bytes": 320000000,
+        "hasDetection": false,
+        "latencyMs": 1.9
+      },
+      {
+        "sourceId": 5168,
+        "targetId": 5175,
+        "protocol": "TCP",
+        "bytes": 320000000,
+        "hasDetection": false,
+        "latencyMs": 1.9
+      },
+      {
+        "sourceId": 5168,
+        "targetId": 5191,
+        "protocol": "TCP",
+        "bytes": 320000000,
+        "hasDetection": false,
+        "latencyMs": 1.9
+      },
+      {
+        "sourceId": 5169,
+        "targetId": 5170,
+        "protocol": "HTTP",
+        "bytes": 310000000,
+        "hasDetection": false,
+        "latencyMs": 2.0
+      },
+      {
+        "sourceId": 5169,
+        "targetId": 5176,
+        "protocol": "HTTP",
+        "bytes": 310000000,
+        "hasDetection": false,
+        "latencyMs": 2.0
+      },
+      {
+        "sourceId": 5169,
+        "targetId": 5192,
+        "protocol": "HTTP",
+        "bytes": 310000000,
+        "hasDetection": false,
+        "latencyMs": 2.0
+      },
+      {
+        "sourceId": 5170,
+        "targetId": 5171,
+        "protocol": "HTTPS",
+        "bytes": 300000000,
+        "hasDetection": false,
+        "latencyMs": 2.1
+      },
+      {
+        "sourceId": 5170,
+        "targetId": 5177,
+        "protocol": "HTTPS",
+        "bytes": 300000000,
+        "hasDetection": false,
+        "latencyMs": 2.1
+      },
+      {
+        "sourceId": 5170,
+        "targetId": 5193,
+        "protocol": "HTTPS",
+        "bytes": 300000000,
+        "hasDetection": false,
+        "latencyMs": 2.1
+      },
+      {
+        "sourceId": 5171,
+        "targetId": 5172,
+        "protocol": "DNS",
+        "bytes": 290000000,
+        "hasDetection": false,
+        "latencyMs": 2.2
+      },
+      {
+        "sourceId": 5171,
+        "targetId": 5178,
+        "protocol": "DNS",
+        "bytes": 290000000,
+        "hasDetection": false,
+        "latencyMs": 2.2
+      },
+      {
+        "sourceId": 5171,
+        "targetId": 5194,
+        "protocol": "DNS",
+        "bytes": 290000000,
+        "hasDetection": false,
+        "latencyMs": 2.2
+      },
+      {
+        "sourceId": 5172,
+        "targetId": 5173,
+        "protocol": "UDP",
+        "bytes": 280000000,
+        "hasDetection": false,
+        "latencyMs": 2.3
+      },
+      {
+        "sourceId": 5172,
+        "targetId": 5179,
+        "protocol": "UDP",
+        "bytes": 280000000,
+        "hasDetection": false,
+        "latencyMs": 2.3
+      },
+      {
+        "sourceId": 5172,
+        "targetId": 5195,
+        "protocol": "UDP",
+        "bytes": 280000000,
+        "hasDetection": false,
+        "latencyMs": 2.3
+      },
+      {
+        "sourceId": 5173,
+        "targetId": 5174,
+        "protocol": "SSH",
+        "bytes": 270000000,
+        "hasDetection": false,
+        "latencyMs": 2.4
+      },
+      {
+        "sourceId": 5173,
+        "targetId": 5180,
+        "protocol": "SSH",
+        "bytes": 270000000,
+        "hasDetection": false,
+        "latencyMs": 2.4
+      },
+      {
+        "sourceId": 5173,
+        "targetId": 5196,
+        "protocol": "SSH",
+        "bytes": 270000000,
+        "hasDetection": false,
+        "latencyMs": 2.4
+      },
+      {
+        "sourceId": 5174,
+        "targetId": 5175,
+        "protocol": "TCP",
+        "bytes": 260000000,
+        "hasDetection": false,
+        "latencyMs": 2.5
+      },
+      {
+        "sourceId": 5174,
+        "targetId": 5181,
+        "protocol": "TCP",
+        "bytes": 260000000,
+        "hasDetection": false,
+        "latencyMs": 2.5
+      },
+      {
+        "sourceId": 5174,
+        "targetId": 5197,
+        "protocol": "TCP",
+        "bytes": 260000000,
+        "hasDetection": false,
+        "latencyMs": 2.5
+      },
+      {
+        "sourceId": 5175,
+        "targetId": 5176,
+        "protocol": "HTTP",
+        "bytes": 250000000,
+        "hasDetection": true,
+        "latencyMs": 2.6
+      },
+      {
+        "sourceId": 5175,
+        "targetId": 5182,
+        "protocol": "HTTP",
+        "bytes": 250000000,
+        "hasDetection": true,
+        "latencyMs": 2.6
+      },
+      {
+        "sourceId": 5175,
+        "targetId": 5198,
+        "protocol": "HTTP",
+        "bytes": 250000000,
+        "hasDetection": true,
+        "latencyMs": 2.6
+      },
+      {
+        "sourceId": 5176,
+        "targetId": 5177,
+        "protocol": "HTTPS",
+        "bytes": 240000000,
+        "hasDetection": false,
+        "latencyMs": 2.7
+      },
+      {
+        "sourceId": 5176,
+        "targetId": 5183,
+        "protocol": "HTTPS",
+        "bytes": 240000000,
+        "hasDetection": false,
+        "latencyMs": 2.7
+      },
+      {
+        "sourceId": 5176,
+        "targetId": 5199,
+        "protocol": "HTTPS",
+        "bytes": 240000000,
+        "hasDetection": false,
+        "latencyMs": 2.7
+      },
+      {
+        "sourceId": 5177,
+        "targetId": 5178,
+        "protocol": "DNS",
+        "bytes": 230000000,
+        "hasDetection": false,
+        "latencyMs": 2.8
+      },
+      {
+        "sourceId": 5177,
+        "targetId": 5184,
+        "protocol": "DNS",
+        "bytes": 230000000,
+        "hasDetection": false,
+        "latencyMs": 2.8
+      },
+      {
+        "sourceId": 5177,
+        "targetId": 5000,
+        "protocol": "DNS",
+        "bytes": 230000000,
+        "hasDetection": false,
+        "latencyMs": 2.8
+      },
+      {
+        "sourceId": 5178,
+        "targetId": 5179,
+        "protocol": "UDP",
+        "bytes": 220000000,
+        "hasDetection": false,
+        "latencyMs": 2.9
+      },
+      {
+        "sourceId": 5178,
+        "targetId": 5185,
+        "protocol": "UDP",
+        "bytes": 220000000,
+        "hasDetection": false,
+        "latencyMs": 2.9
+      },
+      {
+        "sourceId": 5178,
+        "targetId": 5001,
+        "protocol": "UDP",
+        "bytes": 220000000,
+        "hasDetection": false,
+        "latencyMs": 2.9
+      },
+      {
+        "sourceId": 5179,
+        "targetId": 5180,
+        "protocol": "SSH",
+        "bytes": 210000000,
+        "hasDetection": false,
+        "latencyMs": 3.0
+      },
+      {
+        "sourceId": 5179,
+        "targetId": 5186,
+        "protocol": "SSH",
+        "bytes": 210000000,
+        "hasDetection": false,
+        "latencyMs": 3.0
+      },
+      {
+        "sourceId": 5179,
+        "targetId": 5002,
+        "protocol": "SSH",
+        "bytes": 210000000,
+        "hasDetection": false,
+        "latencyMs": 3.0
+      },
+      {
+        "sourceId": 5180,
+        "targetId": 5181,
+        "protocol": "TCP",
+        "bytes": 200000000,
+        "hasDetection": false,
+        "latencyMs": 3.1
+      },
+      {
+        "sourceId": 5180,
+        "targetId": 5187,
+        "protocol": "TCP",
+        "bytes": 200000000,
+        "hasDetection": false,
+        "latencyMs": 3.1
+      },
+      {
+        "sourceId": 5180,
+        "targetId": 5003,
+        "protocol": "TCP",
+        "bytes": 200000000,
+        "hasDetection": false,
+        "latencyMs": 3.1
+      },
+      {
+        "sourceId": 5181,
+        "targetId": 5182,
+        "protocol": "HTTP",
+        "bytes": 190000000,
+        "hasDetection": false,
+        "latencyMs": 3.2
+      },
+      {
+        "sourceId": 5181,
+        "targetId": 5188,
+        "protocol": "HTTP",
+        "bytes": 190000000,
+        "hasDetection": false,
+        "latencyMs": 3.2
+      },
+      {
+        "sourceId": 5181,
+        "targetId": 5004,
+        "protocol": "HTTP",
+        "bytes": 190000000,
+        "hasDetection": false,
+        "latencyMs": 3.2
+      },
+      {
+        "sourceId": 5182,
+        "targetId": 5183,
+        "protocol": "HTTPS",
+        "bytes": 180000000,
+        "hasDetection": false,
+        "latencyMs": 3.3
+      },
+      {
+        "sourceId": 5182,
+        "targetId": 5189,
+        "protocol": "HTTPS",
+        "bytes": 180000000,
+        "hasDetection": false,
+        "latencyMs": 3.3
+      },
+      {
+        "sourceId": 5182,
+        "targetId": 5005,
+        "protocol": "HTTPS",
+        "bytes": 180000000,
+        "hasDetection": false,
+        "latencyMs": 3.3
+      },
+      {
+        "sourceId": 5183,
+        "targetId": 5184,
+        "protocol": "DNS",
+        "bytes": 170000000,
+        "hasDetection": false,
+        "latencyMs": 3.4
+      },
+      {
+        "sourceId": 5183,
+        "targetId": 5190,
+        "protocol": "DNS",
+        "bytes": 170000000,
+        "hasDetection": false,
+        "latencyMs": 3.4
+      },
+      {
+        "sourceId": 5183,
+        "targetId": 5006,
+        "protocol": "DNS",
+        "bytes": 170000000,
+        "hasDetection": false,
+        "latencyMs": 3.4
+      },
+      {
+        "sourceId": 5184,
+        "targetId": 5185,
+        "protocol": "UDP",
+        "bytes": 160000000,
+        "hasDetection": false,
+        "latencyMs": 3.5
+      },
+      {
+        "sourceId": 5184,
+        "targetId": 5191,
+        "protocol": "UDP",
+        "bytes": 160000000,
+        "hasDetection": false,
+        "latencyMs": 3.5
+      },
+      {
+        "sourceId": 5184,
+        "targetId": 5007,
+        "protocol": "UDP",
+        "bytes": 160000000,
+        "hasDetection": false,
+        "latencyMs": 3.5
+      },
+      {
+        "sourceId": 5185,
+        "targetId": 5186,
+        "protocol": "SSH",
+        "bytes": 150000000,
+        "hasDetection": false,
+        "latencyMs": 3.6
+      },
+      {
+        "sourceId": 5185,
+        "targetId": 5192,
+        "protocol": "SSH",
+        "bytes": 150000000,
+        "hasDetection": false,
+        "latencyMs": 3.6
+      },
+      {
+        "sourceId": 5185,
+        "targetId": 5008,
+        "protocol": "SSH",
+        "bytes": 150000000,
+        "hasDetection": false,
+        "latencyMs": 3.6
+      },
+      {
+        "sourceId": 5186,
+        "targetId": 5187,
+        "protocol": "TCP",
+        "bytes": 140000000,
+        "hasDetection": false,
+        "latencyMs": 3.7
+      },
+      {
+        "sourceId": 5186,
+        "targetId": 5193,
+        "protocol": "TCP",
+        "bytes": 140000000,
+        "hasDetection": false,
+        "latencyMs": 3.7
+      },
+      {
+        "sourceId": 5186,
+        "targetId": 5009,
+        "protocol": "TCP",
+        "bytes": 140000000,
+        "hasDetection": false,
+        "latencyMs": 3.7
+      },
+      {
+        "sourceId": 5187,
+        "targetId": 5188,
+        "protocol": "HTTP",
+        "bytes": 130000000,
+        "hasDetection": false,
+        "latencyMs": 3.8
+      },
+      {
+        "sourceId": 5187,
+        "targetId": 5194,
+        "protocol": "HTTP",
+        "bytes": 130000000,
+        "hasDetection": false,
+        "latencyMs": 3.8
+      },
+      {
+        "sourceId": 5187,
+        "targetId": 5010,
+        "protocol": "HTTP",
+        "bytes": 130000000,
+        "hasDetection": false,
+        "latencyMs": 3.8
+      },
+      {
+        "sourceId": 5188,
+        "targetId": 5189,
+        "protocol": "HTTPS",
+        "bytes": 120000000,
+        "hasDetection": false,
+        "latencyMs": 3.9
+      },
+      {
+        "sourceId": 5188,
+        "targetId": 5195,
+        "protocol": "HTTPS",
+        "bytes": 120000000,
+        "hasDetection": false,
+        "latencyMs": 3.9
+      },
+      {
+        "sourceId": 5188,
+        "targetId": 5011,
+        "protocol": "HTTPS",
+        "bytes": 120000000,
+        "hasDetection": false,
+        "latencyMs": 3.9
+      },
+      {
+        "sourceId": 5189,
+        "targetId": 5190,
+        "protocol": "DNS",
+        "bytes": 110000000,
+        "hasDetection": false,
+        "latencyMs": 4.0
+      },
+      {
+        "sourceId": 5189,
+        "targetId": 5196,
+        "protocol": "DNS",
+        "bytes": 110000000,
+        "hasDetection": false,
+        "latencyMs": 4.0
+      },
+      {
+        "sourceId": 5189,
+        "targetId": 5012,
+        "protocol": "DNS",
+        "bytes": 110000000,
+        "hasDetection": false,
+        "latencyMs": 4.0
+      },
+      {
+        "sourceId": 5190,
+        "targetId": 5191,
+        "protocol": "UDP",
+        "bytes": 100000000,
+        "hasDetection": false,
+        "latencyMs": 4.1
+      },
+      {
+        "sourceId": 5190,
+        "targetId": 5197,
+        "protocol": "UDP",
+        "bytes": 100000000,
+        "hasDetection": false,
+        "latencyMs": 4.1
+      },
+      {
+        "sourceId": 5190,
+        "targetId": 5013,
+        "protocol": "UDP",
+        "bytes": 100000000,
+        "hasDetection": false,
+        "latencyMs": 4.1
+      },
+      {
+        "sourceId": 5191,
+        "targetId": 5192,
+        "protocol": "SSH",
+        "bytes": 90000000,
+        "hasDetection": false,
+        "latencyMs": 4.2
+      },
+      {
+        "sourceId": 5191,
+        "targetId": 5198,
+        "protocol": "SSH",
+        "bytes": 90000000,
+        "hasDetection": false,
+        "latencyMs": 4.2
+      },
+      {
+        "sourceId": 5191,
+        "targetId": 5014,
+        "protocol": "SSH",
+        "bytes": 90000000,
+        "hasDetection": false,
+        "latencyMs": 4.2
+      },
+      {
+        "sourceId": 5192,
+        "targetId": 5193,
+        "protocol": "TCP",
+        "bytes": 80000000,
+        "hasDetection": false,
+        "latencyMs": 4.3
+      },
+      {
+        "sourceId": 5192,
+        "targetId": 5199,
+        "protocol": "TCP",
+        "bytes": 80000000,
+        "hasDetection": false,
+        "latencyMs": 4.3
+      },
+      {
+        "sourceId": 5192,
+        "targetId": 5015,
+        "protocol": "TCP",
+        "bytes": 80000000,
+        "hasDetection": false,
+        "latencyMs": 4.3
+      },
+      {
+        "sourceId": 5193,
+        "targetId": 5194,
+        "protocol": "HTTP",
+        "bytes": 70000000,
+        "hasDetection": false,
+        "latencyMs": 4.4
+      },
+      {
+        "sourceId": 5193,
+        "targetId": 5000,
+        "protocol": "HTTP",
+        "bytes": 70000000,
+        "hasDetection": false,
+        "latencyMs": 4.4
+      },
+      {
+        "sourceId": 5193,
+        "targetId": 5016,
+        "protocol": "HTTP",
+        "bytes": 70000000,
+        "hasDetection": false,
+        "latencyMs": 4.4
+      },
+      {
+        "sourceId": 5194,
+        "targetId": 5195,
+        "protocol": "HTTPS",
+        "bytes": 60000000,
+        "hasDetection": false,
+        "latencyMs": 4.5
+      },
+      {
+        "sourceId": 5194,
+        "targetId": 5001,
+        "protocol": "HTTPS",
+        "bytes": 60000000,
+        "hasDetection": false,
+        "latencyMs": 4.5
+      },
+      {
+        "sourceId": 5194,
+        "targetId": 5017,
+        "protocol": "HTTPS",
+        "bytes": 60000000,
+        "hasDetection": false,
+        "latencyMs": 4.5
+      },
+      {
+        "sourceId": 5195,
+        "targetId": 5196,
+        "protocol": "DNS",
+        "bytes": 50000000,
+        "hasDetection": false,
+        "latencyMs": 4.6
+      },
+      {
+        "sourceId": 5195,
+        "targetId": 5002,
+        "protocol": "DNS",
+        "bytes": 50000000,
+        "hasDetection": false,
+        "latencyMs": 4.6
+      },
+      {
+        "sourceId": 5195,
+        "targetId": 5018,
+        "protocol": "DNS",
+        "bytes": 50000000,
+        "hasDetection": false,
+        "latencyMs": 4.6
+      },
+      {
+        "sourceId": 5196,
+        "targetId": 5197,
+        "protocol": "UDP",
+        "bytes": 40000000,
+        "hasDetection": false,
+        "latencyMs": 4.7
+      },
+      {
+        "sourceId": 5196,
+        "targetId": 5003,
+        "protocol": "UDP",
+        "bytes": 40000000,
+        "hasDetection": false,
+        "latencyMs": 4.7
+      },
+      {
+        "sourceId": 5196,
+        "targetId": 5019,
+        "protocol": "UDP",
+        "bytes": 40000000,
+        "hasDetection": false,
+        "latencyMs": 4.7
+      },
+      {
+        "sourceId": 5197,
+        "targetId": 5198,
+        "protocol": "SSH",
+        "bytes": 30000000,
+        "hasDetection": false,
+        "latencyMs": 4.8
+      },
+      {
+        "sourceId": 5197,
+        "targetId": 5004,
+        "protocol": "SSH",
+        "bytes": 30000000,
+        "hasDetection": false,
+        "latencyMs": 4.8
+      },
+      {
+        "sourceId": 5197,
+        "targetId": 5020,
+        "protocol": "SSH",
+        "bytes": 30000000,
+        "hasDetection": false,
+        "latencyMs": 4.8
+      },
+      {
+        "sourceId": 5198,
+        "targetId": 5199,
+        "protocol": "TCP",
+        "bytes": 20000000,
+        "hasDetection": false,
+        "latencyMs": 4.9
+      },
+      {
+        "sourceId": 5198,
+        "targetId": 5005,
+        "protocol": "TCP",
+        "bytes": 20000000,
+        "hasDetection": false,
+        "latencyMs": 4.9
+      },
+      {
+        "sourceId": 5198,
+        "targetId": 5021,
+        "protocol": "TCP",
+        "bytes": 20000000,
+        "hasDetection": false,
+        "latencyMs": 4.9
+      },
+      {
+        "sourceId": 5199,
+        "targetId": 5000,
+        "protocol": "HTTP",
+        "bytes": 10000000,
+        "hasDetection": false,
+        "latencyMs": 5.0
+      },
+      {
+        "sourceId": 5199,
+        "targetId": 5006,
+        "protocol": "HTTP",
+        "bytes": 10000000,
+        "hasDetection": false,
+        "latencyMs": 5.0
+      },
+      {
+        "sourceId": 5199,
+        "targetId": 5022,
+        "protocol": "HTTP",
+        "bytes": 10000000,
+        "hasDetection": false,
+        "latencyMs": 5.0
+      }
+    ],
+    "clusters": [
+      {
+        "id": "subnet-10.1.0",
+        "label": "Subnet 10.1.0.0/24",
+        "groupBy": "subnet",
+        "nodeCount": 20
+      },
+      {
+        "id": "subnet-10.2.0",
+        "label": "Subnet 10.2.0.0/24",
+        "groupBy": "subnet",
+        "nodeCount": 20
+      },
+      {
+        "id": "subnet-10.3.0",
+        "label": "Subnet 10.3.0.0/24",
+        "groupBy": "subnet",
+        "nodeCount": 20
+      },
+      {
+        "id": "subnet-10.4.0",
+        "label": "Subnet 10.4.0.0/24",
+        "groupBy": "subnet",
+        "nodeCount": 20
+      },
+      {
+        "id": "subnet-10.5.0",
+        "label": "Subnet 10.5.0.0/24",
+        "groupBy": "subnet",
+        "nodeCount": 20
+      },
+      {
+        "id": "subnet-10.6.0",
+        "label": "Subnet 10.6.0.0/24",
+        "groupBy": "subnet",
+        "nodeCount": 20
+      },
+      {
+        "id": "subnet-10.7.0",
+        "label": "Subnet 10.7.0.0/24",
+        "groupBy": "subnet",
+        "nodeCount": 20
+      },
+      {
+        "id": "subnet-10.8.0",
+        "label": "Subnet 10.8.0.0/24",
+        "groupBy": "subnet",
+        "nodeCount": 20
+      },
+      {
+        "id": "subnet-10.9.0",
+        "label": "Subnet 10.9.0.0/24",
+        "groupBy": "subnet",
+        "nodeCount": 20
+      },
+      {
+        "id": "subnet-10.10.0",
+        "label": "Subnet 10.10.0.0/24",
+        "groupBy": "subnet",
+        "nodeCount": 20
+      }
+    ],
+    "summary": {
+      "totalNodes": 200,
+      "totalEdges": 600,
+      "totalClusters": 10,
+      "nodesWithDetections": 8,
+      "nodesWithAlerts": 5,
+      "totalBytes": 603000000000,
+      "truncated": true,
+      "maxNodes": 200
+    },
+    "timeWindow": {
+      "fromMs": 1710000000000,
+      "toMs": 1710000300000
+    }
+  },
+  "error": null
+}

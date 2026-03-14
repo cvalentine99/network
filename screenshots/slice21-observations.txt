@@ -1,0 +1,53 @@
+Slice 21 — Living Topology: Screenshot Observations
+====================================================
+Captured: 2026-03-14
+
+1. slice21-loading.png
+   - Shows the Topology page with loading spinner
+   - Sidebar nav shows Topology as active (highlighted), de-placeholdered
+   - All 7 nav entries visible in 3 sections (MONITORING/ANALYSIS/SYSTEM)
+
+2. slice21-populated.png
+   - 15-node constellation view with 3 clusters visible
+   - Cluster labels: "Subnet 10.1.20.0/24 (Servers)", "Infrastructure", "Subnet 10.1.30.0/24 (Clients)"
+   - Cluster boundaries shown as dashed circles
+   - Nodes color-coded by role (server=pink, gateway=orange, firewall=red, etc.)
+   - Critical nodes have red ring indicators
+   - Edges drawn as lines between connected nodes, detection edges in red
+   - Summary bar: "15 nodes  20 edges  3 clusters  3 with detections  3 with alerts  21.4 GB total"
+   - Search bar visible in top-right
+   - Zoom controls visible
+
+3. slice21-detail-panel.png
+   - Same constellation view with dc01.lab.local selected
+   - Right-side detail panel shows:
+     - Device name: dc01.lab.local
+     - Role: Domain Controller with CRITICAL badge
+     - IP: 10.1.20.1
+     - MAC: 00:1A:2B:3C:4D:01
+     - Traffic: 5.2 GB, Detections: 2, Alerts: 1
+     - Connections (3): db-primary.lab.local (LDAP 800.0 MB), dns-int.lab.local (DNS 45.0 MB), gw-core.lab.local (TCP 520.0 MB)
+   - Selected node is visually highlighted
+
+4. slice21-quiet.png
+   - Empty state: "No Devices Observed"
+   - Subtitle: "No network activity detected in the current time window."
+   - Refresh button visible
+   - Clean centered layout
+
+5. slice21-error.png
+   - Error state: "Topology Unavailable"
+   - Error message: "ExtraHop appliance returned 503: Activity map service temporarily unavailable"
+   - Retry button visible
+   - Warning icon in amber/red
+
+6. slice21-large-scale.png
+   - 200-node constellation view with 10 clusters
+   - Summary bar: "200 nodes  600 edges  10 clusters  8 with detections  5 with alerts  603.0 GB total  Truncated to 200 nodes"
+   - "Truncated to 200 nodes" shown in amber, confirming performance budget enforcement
+   - Dense but readable layout with cluster grouping maintaining visual structure
+   - All nodes labeled, color-coded by role
+   - Performance budget of 200 nodes is visually demonstrated
+
+All 6 screenshots captured successfully via Puppeteer with sentinel injection.
+Sentinel injection method: Puppeteer request interception rewriting fromMs to sentinel values.

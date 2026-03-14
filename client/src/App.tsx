@@ -11,6 +11,7 @@ import ApplianceSettings from "./pages/ApplianceSettings";
 import FlowTheater from "./pages/FlowTheater";
 import BlastRadius from "./pages/BlastRadius";
 import Correlation from "./pages/Correlation";
+import Topology from "./pages/Topology";
 
 function Router() {
   return (
@@ -21,6 +22,7 @@ function Router() {
         <Route path="/flow-theater" component={FlowTheater} />
         <Route path="/blast-radius" component={BlastRadius} />
         <Route path="/correlation" component={Correlation} />
+        <Route path="/topology" component={Topology} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>

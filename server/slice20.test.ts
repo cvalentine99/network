@@ -109,13 +109,14 @@ describe('Slice 20 — Nav De-Placeholdering', () => {
     expect(correlationLine).not.toContain('placeholder:true');
   });
 
-  it('Topology still has placeholder: true (not prematurely de-placeholdered)', () => {
+  it('Topology nav item exists in DashboardLayout', () => {
     const lines = layoutSrc.split('\n');
     const topologyLine = lines.find(
       (l) => l.includes('"Topology"') && l.includes('path:'),
     );
     expect(topologyLine).toBeDefined();
-    expect(topologyLine).toContain('placeholder: true');
+    // Note: Topology was de-placeholdered by Slice 21.
+    // This test originally asserted placeholder: true, updated to reflect current state.
   });
 });
 

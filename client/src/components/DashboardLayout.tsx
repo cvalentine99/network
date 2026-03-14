@@ -53,7 +53,7 @@ const menuSections: MenuSection[] = [
     title: "Analysis",
     items: [
       { icon: CircleDot, label: "Correlation", path: "/correlation" },
-      { icon: Network, label: "Topology", path: "/topology", placeholder: true },
+      { icon: Network, label: "Topology", path: "/topology" },
     ],
   },
   {

@@ -1,0 +1,27 @@
+{
+  "_meta": {
+    "fixture": "topology.quiet.fixture.json",
+    "generatedAt": "2026-03-14T12:00:00.000Z"
+  },
+  "intent": "quiet",
+  "payload": {
+    "nodes": [],
+    "edges": [],
+    "clusters": [],
+    "summary": {
+      "totalNodes": 0,
+      "totalEdges": 0,
+      "totalClusters": 0,
+      "nodesWithDetections": 0,
+      "nodesWithAlerts": 0,
+      "totalBytes": 0,
+      "truncated": false,
+      "maxNodes": 200
+    },
+    "timeWindow": {
+      "fromMs": 1710000000000,
+      "toMs": 1710000300000
+    }
+  },
+  "error": null
+}
