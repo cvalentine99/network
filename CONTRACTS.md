@@ -2159,7 +2159,7 @@ Live ExtraHop protocol data (deferred by contract). Chart animation/transition t
 
 ### ROUTES
 
-No new BFF routes. Protocol data is already part of the device-detail response served by `GET /api/impact/device/:id`.
+No new BFF routes. Protocol data is already part of the device-detail response served by `GET /api/bff/impact/device-detail?id=<number>` (Slice 08 contract). The `protocols` array is a field within the `DeviceDetail` response shape.
 
 ### TYPES
 
