@@ -1,0 +1,5 @@
+{
+  "error": true,
+  "message": "Gateway timeout: upstream did not respond within 30000ms",
+  "code": "GATEWAY_TIMEOUT"
+}

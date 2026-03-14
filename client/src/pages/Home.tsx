@@ -41,6 +41,8 @@ import { useDetections } from '@/hooks/useDetections';
 import { useAlerts } from '@/hooks/useAlerts';
 import { useApplianceStatus } from '@/hooks/useApplianceStatus';
 import { PanelRightOpen } from 'lucide-react';
+import { CorrelationStrip } from '@/components/charts/CorrelationStrip';
+import { useCorrelationOverlay } from '@/hooks/useCorrelationOverlay';
 
 function ImpactDeckContent() {
   const { window: tw } = useTimeWindow();
@@ -51,6 +53,7 @@ function ImpactDeckContent() {
   const detectionsState = useDetections();
   const alertsState = useAlerts();
   const applianceState = useApplianceStatus();
+  const { state: correlationState } = useCorrelationOverlay();
 
   // Detection count badge color
   const detectionCount = detectionsState.kind === 'populated' ? detectionsState.detections.length : 0;
@@ -96,6 +99,9 @@ function ImpactDeckContent() {
       <div className="mb-6">
         <KPIStrip state={kpiState} />
       </div>
+
+      {/* Correlation overlay strip — causal markers above timeline (Slice 19) */}
+      <CorrelationStrip state={correlationState} />
 
       {/* Timeseries chart — throughput and packet rate over time */}
       <div className="mb-6">

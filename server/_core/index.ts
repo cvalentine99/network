@@ -10,6 +10,7 @@ import { impactRouter } from "../routes/impact";
 import { packetsRouter } from "../routes/packets";
 import { traceRouter } from "../routes/trace";
 import { blastRadiusRouter } from "../routes/blast-radius";
+import { default as correlationRouter } from "../routes/correlation";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 
@@ -46,6 +47,7 @@ async function startServer() {
   app.use('/api/bff/packets', packetsRouter);
   app.use('/api/bff/trace', traceRouter);
   app.use('/api/bff/blast-radius', blastRadiusRouter);
+  app.use('/api/bff/correlation', correlationRouter);
 
   // tRPC API
   app.use(

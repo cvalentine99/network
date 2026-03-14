@@ -1,0 +1,17 @@
+{
+  "events": [],
+  "timeWindow": {
+    "fromMs": 1710000000000,
+    "untilMs": 1710000300000
+  },
+  "categoryCounts": {
+    "detection": 0,
+    "alert": 0,
+    "config_change": 0,
+    "firmware": 0,
+    "topology": 0,
+    "threshold": 0,
+    "external": 0
+  },
+  "totalCount": 0
+}

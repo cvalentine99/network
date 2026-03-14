@@ -1,0 +1,47 @@
+Slice 19 — Correlation Overlay Screenshot Observations
+Captured: 2026-03-14
+
+slice19-populated.png
+  - CORRELATION EVENTS 8 header visible between KPI strip and Network Throughput chart
+  - Category legend pills visible: Detection 2, Alert 1, Config Change 1, Firmware 1, Topology 1, Threshold 1, External 1
+  - 8 marker icons positioned along a horizontal strip aligned to the timeline X-axis
+  - Markers use distinct category-colored icons (red circles for detection, orange for alert, etc.)
+  - Strip sits between KPI cards and the GhostedTimeline chart
+  - Sidebar shows 3-section/7-entry structure (MONITORING, ANALYSIS, SYSTEM)
+  - Full Impact Deck visible: KPI strip, correlation strip, throughput chart, top talkers, recent detections
+
+slice19-populated-popover.png
+  - Popover card visible after clicking first marker (external/maintenance event)
+  - Shows "1 EVENT" header with close button
+  - Event title: "Maintenance Window Started"
+  - Timestamp: 11:00:00 AM, category badge: External
+  - Description truncated: "Scheduled maintenance window MW-2024-0309 opened by NOC..."
+  - Popover positioned below the marker, overlapping the chart area
+
+slice19-quiet.png
+  - Shows "No correlation events in this time window" text in muted color
+  - Positioned at top of content area where correlation strip would be
+  - Rest of page content removed by DOM injection (expected for screenshot)
+  - Sidebar nav fully visible
+
+slice19-error.png
+  - Error banner visible with warning triangle icon
+  - Red text: "Correlation overlay failed"
+  - Monospace detail: "ExtraHop appliance unreachable: ECONNREFUSED 10.1.0.5:443"
+  - Dark background card with subtle border
+  - Sidebar nav fully visible
+
+slice19-malformed.png
+  - Warning banner visible with triangle icon in amber/orange
+  - Text: "Correlation data contract violation"
+  - Monospace detail about schema validation failure
+  - Distinct from error state (amber vs red)
+
+slice19-loading.png
+  - Spinner icon with "Loading correlation events..." text
+  - Positioned at top of content area
+  - Muted text color, small font consistent with overlay design
+
+All 6 states captured successfully. Populated state shows real fixture data with
+category-colored markers aligned to the timeline axis. Popover shows event detail
+on click. Error/quiet/malformed/loading states all render distinct visual treatments.

@@ -1,0 +1,31 @@
+{
+  "events": [
+    {
+      "id": "",
+      "category": "invalid_category",
+      "title": "",
+      "description": null,
+      "timestampMs": -1,
+      "timestampIso": "",
+      "durationMs": -500,
+      "severity": "unknown",
+      "riskScore": 150,
+      "source": { "kind": "device", "displayName": "", "id": null },
+      "refs": [{ "kind": "invalid", "id": "", "label": "" }]
+    }
+  ],
+  "timeWindow": {
+    "fromMs": 1710000300000,
+    "untilMs": 1710000000000
+  },
+  "categoryCounts": {
+    "detection": 5,
+    "alert": 0,
+    "config_change": 0,
+    "firmware": 0,
+    "topology": 0,
+    "threshold": 0,
+    "external": 0
+  },
+  "totalCount": 99
+}
