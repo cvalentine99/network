@@ -2113,7 +2113,7 @@ LIVE INTEGRATION STATUS: Not attempted — deferred by contract: live hardware /
 
 TRUTH RECEIPT
 Slice: 15 — Time-window Synchronization Audit
-Commit: PENDING
+Commit: 4cc76887
 Claims:
 - All 6 dashboard data panels consume the same TimeWindowContext (proven by source-level invariant tests)
 - No hook or component calls resolveTimeWindow or Date.now() independently (proven by file-scan tests)
