@@ -1,0 +1,43 @@
+Slice 20 — Standalone Correlation Surface Screenshot Observations
+Captured: 2026-03-14
+
+1. slice20-populated.png
+   - Full standalone Correlation page at /correlation route
+   - Sidebar shows Correlation as active (yellow highlight, no placeholder dimming)
+   - Three-section nav visible: MONITORING (Impact Deck, Flow Theater, Blast Radius), ANALYSIS (Correlation active, Topology dimmed), SYSTEM (Settings, Help)
+   - Summary strip: "8 events across 7 categories | Window: 5m 11:00:00 AM - 11:05:00 AM"
+   - Category filter bar: Detection 2, Alert 1, Config Change 1, Firmware 1, Topology 1, Threshold 1, External 1 — all with color-coded pills
+   - EVENT FEED 8 heading with Refresh button
+   - 8 event rows sorted by timestamp descending (most recent first)
+   - Each row: expand chevron, category icon, title, timestamp, category label, severity badge, risk score where applicable
+   - Severity colors: CRITICAL (red), HIGH (orange-red), MEDIUM (amber), LOW (muted)
+
+2. slice20-populated-expanded.png
+   - First event "Packet Loss > 2% on Uplink" expanded
+   - Detail card shows: description text, timestamp with duration, SOURCE (dist-sw02.lab.local DEVICE), REFS (device:dist-sw02.lab.local)
+   - Chevron rotated to indicate expanded state
+   - Other rows remain collapsed
+
+3. slice20-filtered.png
+   - Category filter applied — Clear All was clicked, then one category re-enabled
+   - Shows filtered subset of events
+   - Filter pills show enabled/disabled states with visual distinction
+
+4. slice20-quiet.png
+   - Quiet state: "No correlation events" centered message
+   - Descriptive text: "No configuration changes, detections, alerts, or other events were recorded in the current time window."
+   - Time window displayed: 11:00:00 AM - 11:05:00 AM
+   - Refresh button available
+   - No category filters shown (nothing to filter)
+
+5. slice20-error.png
+   - Error state: "Failed to load correlation events" in red
+   - Error detail: "ExtraHop appliance unreachable: ECONNREFUSED 10.1.0.5:443"
+   - Retry button available
+   - Warning triangle icon
+
+6. slice20-loading.png
+   - Loading state: spinner with "Loading correlation events..." text
+   - Clean loading indicator, no stale data shown
+
+All 6 states captured. Correlation is no longer a placeholder nav item.
