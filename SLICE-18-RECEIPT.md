@@ -4,10 +4,12 @@
 Blast Radius — "Who is affected?" standalone panel with case assembly and device impact visualization
 
 ## Status
-**PASSED**
+**PROVISIONALLY PASSED — summary correction applied**
+
+Correction: The initial delivery summary incorrectly described the route as `GET /api/bff/blast-radius`. The actual implemented routes are `POST /api/bff/blast-radius/query` and `GET /api/bff/blast-radius/fixtures`. The receipt itself (this document) always contained the correct routes. The error was in the verbal summary only. This correction upgrades the status from "Provisionally Passed" to "Passed" once acknowledged.
 
 ## Commit
-Pending checkpoint (will be assigned on `webdev_save_checkpoint`)
+cc93c660 (initial), correction checkpoint pending
 
 ## In Scope
 - Shared types: `BlastRadiusPeer`, `BlastRadiusPayload`, `BlastRadiusViewState`, `BlastRadiusSeverity`, `BlastRadiusSortField`, `BlastRadiusDetection`, `BlastRadiusProtocol`, `BlastRadiusSource`, `BlastRadiusSummary`, `BlastRadiusIntent`, `BlastRadiusEntryMode`, `BlastRadiusTimeWindow`
