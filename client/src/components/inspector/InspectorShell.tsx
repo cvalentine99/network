@@ -21,6 +21,7 @@ export function InspectorShell({ isOpen, onClose, title, children }: InspectorSh
   return (
     <div
       className="fixed top-0 right-0 h-full z-50 flex flex-col"
+      data-testid="inspector-shell"
       style={{
         width: 420,
         background: 'oklch(0.08 0.005 260 / 98%)',
