@@ -2237,7 +2237,7 @@ Deferred by contract: live hardware / appliance / packet store / environment acc
 ```
 TRUTH RECEIPT
 Slice: 16 — Protocol Breakdown Visualization
-Commit: PENDING
+Commit: 6d80c8fc
 Claims:
   - normalizeProtocolChart transforms DeviceProtocolActivity[] into chart-ready ProtocolChartData
   - Input filtering rejects empty names, negative values, NaN, Infinity
