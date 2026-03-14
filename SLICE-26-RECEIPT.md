@@ -1,7 +1,7 @@
 # TRUTH RECEIPT — Slice 26
 
 **Slice:** Time-Window Regression Audit
-**Commit:** (pending checkpoint)
+**Commit:** 7529a5b9
 **Status:** Passed
 
 ## Scope

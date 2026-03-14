@@ -72,3 +72,16 @@
 
 ## Category 4 — Must reconcile before saying done
 - [x] Final truth/release reconciliation: matrix with every surface labeled (fixture-proven, live-integrated, sandbox-performance-validated, deferred, known limitation), single release-readiness document, links to receipts, explicit unresolved items, explicit architectural deviations accepted
+
+# Internal Test Deployment (Port 3013)
+
+- [x] MySQL installed and running
+- [x] Database created with correct credentials
+- [x] All migrations applied, required tables exist (38 tables)
+- [x] Appliance/config seed state present (empty = not_configured quiet state, by design)
+- [x] App server starts cleanly against MySQL (port 3020)
+- [x] Nginx reverse proxy configured on port 3013 → 3020
+- [x] Frontend reachable via nginx on port 3013
+- [x] BFF routes reachable via nginx on port 3013 (all 10 routes HTTP 200)
+- [x] Full stack validation passed
+- [x] Local deployment: no Manus OAuth — all surfaces accessible without authentication (no protectedProcedure, no auth gating)
