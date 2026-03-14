@@ -1,0 +1,22 @@
+{
+  "description": "BlastRadius creates its own time window from Date.now() at query submission time instead of reading from shared context",
+  "scenario": "User opens Impact Deck at T=0, waits 30 seconds, then navigates to Blast Radius and submits a query",
+  "sharedWindowResolvedAt": 1710000000000,
+  "blastRadiusQuerySubmittedAt": 1710000030000,
+  "sharedWindow": {
+    "fromMs": 1709999700000,
+    "untilMs": 1710000000000,
+    "durationMs": 300000,
+    "cycle": "1sec"
+  },
+  "blastRadiusLocalWindow": {
+    "fromMs": 1709998230000,
+    "untilMs": 1710000030000,
+    "durationMs": 1800000,
+    "cycle": "30sec"
+  },
+  "driftMs": 30000,
+  "isKnownDeviation": true,
+  "severity": "minor",
+  "remediation": "Wire BlastRadius query submission to read from useTimeWindow() instead of constructing a new window from Date.now(). This also changes the default duration from 30min to whatever the shared window is set to."
+}

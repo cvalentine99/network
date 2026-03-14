@@ -1,0 +1,26 @@
+{
+  "description": "Full glossary with all terms, definitions, surfaces, and cross-references",
+  "termCount": 23,
+  "sampleTerms": [
+    {
+      "term": "Baseline Delta",
+      "definition": "The percentage difference between the current metric value and the historical baseline for the same time-of-day and day-of-week.",
+      "surface": "Impact Deck",
+      "seeAlso": ["Time Window", "Metric Cycle"]
+    },
+    {
+      "term": "Blast Radius",
+      "definition": "The set of peer devices that communicated with a given source device during the selected time window.",
+      "surface": "Blast Radius",
+      "seeAlso": ["Impact Score", "Peer"]
+    }
+  ],
+  "surfaceCoverage": {
+    "Impact Deck": 6,
+    "Blast Radius": 3,
+    "Flow Theater": 2,
+    "Correlation": 2,
+    "Topology": 1,
+    "Global": 9
+  }
+}

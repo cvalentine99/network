@@ -6,10 +6,10 @@ This file tracks the truth receipts for every completed slice.
 
 ## Project Status & Deviation Register
 
-**Last updated:** Commit f6473275 (Slice 22b)
-**Overall status:** Material alignment with original cockpit plan. Not exact conformance.
+**Last updated:** Finalization bundle (Slices 23–26, ADR)
+**Overall status:** Material alignment with original cockpit plan. Not exact conformance. All named surfaces implemented, Help page live, cross-surface navigation wired, responsive audit complete, time-window regression audited, fan-out reconciliation decided (Option C — Hybrid).
 
-The major named surfaces from the original sprint guide are now materially present in the codebase: Impact Deck, Flow Theater, Blast Radius, Correlation, Topology, and the Inspector subsystem. Each surface has been delivered as an independently contract-proven slice with shared types, Zod validators, deterministic fixtures, Vitest tests, and screenshots. The full test suite stands at 1,905 passing tests across 27 test files with zero failures.
+The major named surfaces from the original sprint guide are now materially present in the codebase: Impact Deck, Flow Theater, Blast Radius, Correlation, Topology, and the Inspector subsystem. Each surface has been delivered as an independently contract-proven slice with shared types, Zod validators, deterministic fixtures, Vitest tests, and screenshots. The finalization bundle (Slices 23–26) added cross-surface navigation wiring, a real Help page (replacing the placeholder), a responsive layout audit at 3 breakpoints, and a time-window regression audit. The full test suite stands at 2,108 passing tests across 31 test files with zero failures.
 
 However, the implementation as-built deviates from the original plan in several documented ways. This section exists to prevent anyone from reading the per-slice receipts as claiming exact conformance with the original sprint guide. The receipts prove what was built; this section documents where what was built differs from what was originally specified.
 
@@ -29,13 +29,11 @@ The Appliance Settings page was added because the Appliance Status Footer (Slice
 
 **Impact:** The sidebar navigation includes a "Settings" item under the "System" section that links to `/settings`. This is a real, functional page with tRPC procedures, database operations, and form validation — not a placeholder. It is tested (90 runtime test executions in Slice 14) and has its own truth receipt. However, it should be understood as an implementation-phase addition, not an original cockpit requirement.
 
-### Deviation 3: Help Nav Item — Still a Placeholder
+### Deviation 3: Help Nav Item — Resolved (Slice 24)
 
-The sidebar navigation includes a "Help" item under the "System" section. This item is flagged as `placeholder: true` in the DashboardLayout menu configuration. Clicking it shows a toast notification ("Coming soon — Help is not yet implemented") and does not navigate to any page. The item renders in a dimmed color (`oklch(0.45 0 0)`) to visually indicate its placeholder status.
+~~The sidebar navigation included a "Help" item flagged as `placeholder: true`.~~ This deviation has been resolved. Slice 24 implemented a full Help page at `/help` with four tabs: Glossary (23 terms with surface badges and cross-references), Keyboard Shortcuts, Surface Guide (what each surface answers), and Integration Status (fixture mode vs. live integration explanation). The `placeholder: true` flag has been removed from the DashboardLayout menu configuration. The Help page is tested (37 tests) and has its own truth receipt.
 
-No Help page, keyboard shortcuts reference, glossary, or support links have been implemented. This is an incomplete nav item, not a deferred-by-contract item — it could be built without live hardware but has not been prioritized.
-
-**Impact:** The sidebar shows 7 nav items, of which 6 are functional and 1 (Help) is a placeholder. Users who click Help will see a toast but no content.
+**Impact:** All 7 sidebar nav items are now functional. No placeholder items remain.
 
 ### Deviation 4: Performance Budget Proof — Bounded to Sandbox Fixture-Backed Harness
 
@@ -77,17 +75,29 @@ The slice numbering is not fully sequential. Slices 0–16 are in CONTRACTS.md. 
 | Appliance Settings | Implemented against fixtures + DB | 14 | Extra scope (not in original plan) |
 | Time-Window Sync | Audited and proven | 15 | None known |
 | Performance Budget | Proven in sandbox harness | 22, 22b | Bounded proof (not production claim) |
-| Help | Placeholder nav item only | — | Not implemented |
+| Help | Implemented (Slice 24) | 24 | Resolved — no longer a placeholder |
+| Cross-Surface Nav | Implemented against fixtures | 23 | None known |
+| Responsive Audit | Audited at 3 breakpoints | 25 | Desktop-first by design (4 known narrow-width limitations) |
+| Time-Window Audit | Audited structurally | 26 | 1 minor deviation (BlastRadius local Date.now()) |
+
+### Deviation 6: Fan-Out Reconciliation — Decided (ADR)
+
+The fan-out reconciliation decision has been formally made via `ADR-FANOUT-RECONCILIATION.md`. **Option C (Hybrid)** was selected: keep the decomposed routes as the primary contract-phase architecture, and add an optional fan-out route (`GET /api/bff/impact/overview`) during the live integration phase. The individual routes remain available for debugging, partial loading, and independent testing. See the ADR for the full route inventory, options analysis, and implementation plan.
+
+### Deviation 7: BlastRadius Time-Window Drift — Documented (Slice 26)
+
+Slice 26 identified that `BlastRadius.tsx` creates a local time window from `Date.now()` at query submission time (lines 314–315, 330–331) instead of reading from the shared `useTimeWindow()` context. This means the Blast Radius query uses a 30-minute window anchored to submission time, which may differ from the global time window. This is classified as a minor deviation with a documented remediation path (wire to `useTimeWindow()`).
 
 ### What This Document Does Not Claim
 
 This contract registry does not claim:
 
 1. **Production readiness.** All data flows through fixture-backed BFF routes. No live ExtraHop integration has been attempted or validated.
-2. **Exact conformance with the original sprint guide.** The deviations listed above are real and documented.
+2. **Exact conformance with the original sprint guide.** The deviations listed above are real and documented. Deviation 1 (decomposed BFF) is the most significant.
 3. **Universal performance guarantees.** The Slice 22 budget proof is bounded to sandbox conditions.
-4. **Feature completeness.** Help is a placeholder. Cross-surface navigation (e.g., clicking a topology node to open Blast Radius) is not yet wired. Responsive layout at mobile breakpoints has not been audited.
+4. **Feature completeness for all use cases.** The Help page is implemented but covers only the terms and surfaces built so far. Responsive layout is desktop-first with 4 documented narrow-width limitations.
 5. **Live validation of any kind.** Every "Passed" verdict in this registry means "passed against deterministic software evidence in the contract phase." It does not mean "validated against live hardware."
+6. **Mobile-first design.** The dashboard is designed for NOC desktop/ultrawide monitors. Narrow-width behavior is functional but degraded (Slice 25).
 
 ---
 

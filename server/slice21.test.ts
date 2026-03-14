@@ -702,11 +702,11 @@ describe('Slice 21 — Nav De-placeholdering', () => {
     expect(dashLayout).toContain('path: "/topology"');
   });
 
-  it('Help is still placeholder', () => {
+  it('Help is a real page (no longer placeholder)', () => {
     const lines = dashLayout.split('\n');
     const helpLine = lines.find((l) => l.includes('"Help"') && l.includes('path'));
     expect(helpLine).toBeDefined();
-    expect(helpLine).toContain('placeholder: true');
+    expect(helpLine).not.toContain('placeholder');
   });
 });
 

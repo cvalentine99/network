@@ -1,0 +1,86 @@
+{
+  "description": "Complete audit of all Date.now() and new Date() calls in client source code",
+  "auditDate": "2026-03-14",
+  "totalDateNowCalls": 6,
+  "totalNewDateCalls": 3,
+  "locations": [
+    {
+      "file": "lib/useTimeWindow.ts",
+      "line": 29,
+      "context": "resolveTimeWindow — canonical entry point for current time",
+      "classification": "approved-canonical",
+      "driftRisk": "none"
+    },
+    {
+      "file": "providers/TimeWindowProvider.tsx",
+      "line": 16,
+      "context": "Comment only: '// tick forces re-resolve against Date.now()'",
+      "classification": "approved-comment",
+      "driftRisk": "none"
+    },
+    {
+      "file": "components/tables/DetectionsTable.tsx",
+      "line": 39,
+      "context": "formatRelativeTime — display-only relative time formatting",
+      "classification": "approved-display",
+      "driftRisk": "none"
+    },
+    {
+      "file": "pages/BlastRadius.tsx",
+      "line": 314,
+      "context": "Fallback time window for query intent state",
+      "classification": "known-deviation",
+      "driftRisk": "minor"
+    },
+    {
+      "file": "pages/BlastRadius.tsx",
+      "line": 315,
+      "context": "Fallback time window for query intent state (untilMs)",
+      "classification": "known-deviation",
+      "driftRisk": "minor"
+    },
+    {
+      "file": "pages/BlastRadius.tsx",
+      "line": 330,
+      "context": "Fallback time window for BFF fetch body",
+      "classification": "known-deviation",
+      "driftRisk": "minor"
+    },
+    {
+      "file": "pages/BlastRadius.tsx",
+      "line": 331,
+      "context": "Fallback time window for BFF fetch body (untilMs)",
+      "classification": "known-deviation",
+      "driftRisk": "minor"
+    },
+    {
+      "file": "pages/ComponentShowcase.tsx",
+      "line": 178,
+      "context": "Demo page date picker — not a data surface",
+      "classification": "approved-demo",
+      "driftRisk": "none"
+    },
+    {
+      "file": "pages/ComponentShowcase.tsx",
+      "line": 516,
+      "context": "Demo page date picker fallback — not a data surface",
+      "classification": "approved-demo",
+      "driftRisk": "none"
+    },
+    {
+      "file": "pages/ComponentShowcase.tsx",
+      "line": 660,
+      "context": "Demo page year range — not a data surface",
+      "classification": "approved-demo",
+      "driftRisk": "none"
+    }
+  ],
+  "summary": {
+    "canonical": 1,
+    "comment": 1,
+    "display": 1,
+    "knownDeviation": 4,
+    "demo": 3,
+    "unapproved": 0
+  }
+}

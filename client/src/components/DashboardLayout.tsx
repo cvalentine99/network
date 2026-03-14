@@ -60,7 +60,7 @@ const menuSections: MenuSection[] = [
     title: "System",
     items: [
       { icon: Settings, label: "Settings", path: "/settings" },
-      { icon: HelpCircle, label: "Help", path: "/help", placeholder: true },
+      { icon: HelpCircle, label: "Help", path: "/help" },
     ],
   },
 ];

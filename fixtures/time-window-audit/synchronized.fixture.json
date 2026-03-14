@@ -1,0 +1,20 @@
+{
+  "description": "All surfaces reading from shared TimeWindowContext — no drift possible by design",
+  "fromOffset": -300000,
+  "resolvedAt": 1710000000000,
+  "expectedWindow": {
+    "fromMs": 1709999700000,
+    "untilMs": 1710000000000,
+    "durationMs": 300000,
+    "cycle": "1sec"
+  },
+  "surfaces": [
+    "Impact Deck",
+    "Flow Theater",
+    "Blast Radius",
+    "Correlation",
+    "Topology"
+  ],
+  "allSurfacesShareSameWindow": true,
+  "mechanism": "Single TimeWindowProvider wraps all routes in App.tsx. All data-fetching hooks call useTimeWindow() to read the shared context. No surface creates its own time window."
+}

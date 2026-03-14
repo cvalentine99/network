@@ -61,14 +61,14 @@
 
 ## Category 1 — Must finish before feature-complete
 - [x] Slice 23 — Cross-surface navigation wiring: topology node → Blast Radius, correlation event → Blast Radius, Blast Radius peer → Flow Theater, Flow Theater resolved device → Blast Radius or Device inspector, preserve shared time window across surface transitions, route-level wiring tests, click-handler tests, screenshots for each cross-surface jump, truth receipt
-- [ ] Slice 24 — Help page: glossary for product terms, keyboard shortcuts, fixture-mode vs live-integration explanation, support/contact links, what each major surface answers, remove placeholder flag, screenshots, content review, nav test, truth receipt
+- [x] Slice 24 — Help page: glossary for product terms, keyboard shortcuts, fixture-mode vs live-integration explanation, support/contact links, what each major surface answers, remove placeholder flag, screenshots, content review, nav test, truth receipt
 
 ## Category 2 — Must verify before release-ready
-- [ ] Slice 25 — Responsive layout audit: screenshots at desktop/tablet/narrow for KPI strip, Top Talkers, alerts/detections, inspector shell, Flow Theater rail, Blast Radius layout, Correlation page, Topology controls, layout assertions, explicit desktop-only notes, truth receipt
-- [ ] Slice 26 — Time-window regression audit: verify all surfaces read shared context, no new Date.now() drift, cross-surface nav preserves time window, focused regression tests, fixture cases for synchronized/drifted states, receipt distinguishing shared-by-design from verified-in-practice, truth receipt
+- [x] Slice 25 — Responsive layout audit: screenshots at desktop/tablet/narrow for KPI strip, Top Talkers, alerts/detections, inspector shell, Flow Theater rail, Blast Radius layout, Correlation page, Topology controls, layout assertions, explicit desktop-only notes, truth receipt
+- [x] Slice 26 — Time-window regression audit: verify all surfaces read shared context, no new Date.now() drift, cross-surface nav preserves time window, focused regression tests, fixture cases for synchronized/drifted states, receipt distinguishing shared-by-design from verified-in-practice, truth receipt
 
 ## Category 3 — Must decide before live EH integration
-- [ ] ADR — Fan-out reconciliation decision: choose Option A/B/C, explicit decision record, updated architecture note, updated deviation register, route inventory, clear statement of what browser calls and why
+- [x] ADR — Fan-out reconciliation decision: choose Option A/B/C, explicit decision record, updated architecture note, updated deviation register, route inventory, clear statement of what browser calls and why
 
 ## Category 4 — Must reconcile before saying done
-- [ ] Final truth/release reconciliation: matrix with every surface labeled (fixture-proven, live-integrated, sandbox-performance-validated, deferred, known limitation), single release-readiness document, links to receipts, explicit unresolved items, explicit architectural deviations accepted
+- [x] Final truth/release reconciliation: matrix with every surface labeled (fixture-proven, live-integrated, sandbox-performance-validated, deferred, known limitation), single release-readiness document, links to receipts, explicit unresolved items, explicit architectural deviations accepted
