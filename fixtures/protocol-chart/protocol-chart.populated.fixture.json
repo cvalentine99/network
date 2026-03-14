@@ -1,0 +1,52 @@
+{
+  "_fixture": "protocol-chart.populated",
+  "_description": "5 protocols from dc01.lab.local device detail. Matches the protocols array in device-detail.populated.fixture.json. Expected output includes sorted entries with percentages and colors.",
+  "input": [
+    {
+      "protocol": "SMB",
+      "bytesIn": 524288000,
+      "bytesOut": 412876800,
+      "totalBytes": 937164800,
+      "connections": 847,
+      "lastSeen": "2026-03-12T16:04:28.000Z"
+    },
+    {
+      "protocol": "DNS",
+      "bytesIn": 312400000,
+      "bytesOut": 198700000,
+      "totalBytes": 511100000,
+      "connections": 12450,
+      "lastSeen": "2026-03-12T16:04:30.000Z"
+    },
+    {
+      "protocol": "LDAP",
+      "bytesIn": 198000000,
+      "bytesOut": 156000000,
+      "totalBytes": 354000000,
+      "connections": 3200,
+      "lastSeen": "2026-03-12T16:04:25.000Z"
+    },
+    {
+      "protocol": "Kerberos",
+      "bytesIn": 145600000,
+      "bytesOut": 112400000,
+      "totalBytes": 258000000,
+      "connections": 5680,
+      "lastSeen": "2026-03-12T16:04:29.000Z"
+    },
+    {
+      "protocol": "TLS",
+      "bytesIn": 65390900,
+      "bytesOut": 107677521,
+      "totalBytes": 173068421,
+      "connections": 1240,
+      "lastSeen": "2026-03-12T16:03:55.000Z"
+    }
+  ],
+  "expected": {
+    "protocolCount": 5,
+    "isEmpty": false,
+    "sortOrder": ["SMB", "DNS", "LDAP", "Kerberos", "TLS"],
+    "hasOtherBucket": false
+  }
+}

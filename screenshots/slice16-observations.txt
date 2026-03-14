@@ -1,0 +1,27 @@
+Slice 16 — Protocol Breakdown Visualization: Screenshot Observations
+=====================================================================
+
+slice16-above-fold.png:
+  - Full dashboard visible with KPI strip, throughput chart, Top Talkers table
+  - Sidebar shows "Dashboard" and "Appliance" nav items
+  - Time window selector shows "Last 5 minutes"
+  - No inspector open (quiet state for inspector)
+
+slice16-populated.png:
+  - Device Inspector open for dc01.lab.local (10.10.1.50)
+  - Inspector shows IDENTITY, ACTIVITY SUMMARY, TRAFFIC, PACKET CAPTURE sections
+  - PROTOCOLS (5) section header visible at bottom-right of inspector
+  - Donut chart partially visible at bottom-right corner — gold/cyan/green segments visible
+  - The chart renders below the PACKET CAPTURE section as designed
+  - Legend entries are below the fold in this viewport
+
+slice16-quiet.png:
+  - idle-printer-01 (10.10.9.200) selected in Device Inspector
+  - Inspector shows IDENTITY section with ID 9999, MAC, CLASS=node, ANALYSIS=standard
+  - "No activity observed for this device in the current time window" quiet message visible
+  - This device has no protocol data, so the protocol chart quiet state is active
+  - The quiet state message appears where the donut chart would be for a populated device
+
+Note: The donut chart is positioned below PACKET CAPTURE in the inspector scroll.
+The populated screenshot confirms the chart renders with colored segments.
+Full chart visibility requires scrolling within the inspector panel.

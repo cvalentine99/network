@@ -1,0 +1,11 @@
+{
+  "_fixture": "protocol-chart.quiet",
+  "_description": "Empty protocols array — quiet state. Chart should render the quiet/empty message, not a donut.",
+  "input": [],
+  "expected": {
+    "entries": [],
+    "grandTotal": 0,
+    "protocolCount": 0,
+    "isEmpty": true
+  }
+}

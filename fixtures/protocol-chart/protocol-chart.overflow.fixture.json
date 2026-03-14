@@ -1,0 +1,23 @@
+{
+  "_fixture": "protocol-chart.overflow",
+  "_description": "9 protocols — exceeds PROTOCOL_CHART_MAX_SLICES (7). Top 6 should be individual slices, remaining 3 grouped into 'Other'.",
+  "input": [
+    { "protocol": "SMB",      "bytesIn": 500000000, "bytesOut": 400000000, "totalBytes": 900000000, "connections": 800, "lastSeen": "2026-03-12T16:00:00.000Z" },
+    { "protocol": "DNS",      "bytesIn": 300000000, "bytesOut": 200000000, "totalBytes": 500000000, "connections": 12000, "lastSeen": "2026-03-12T16:00:00.000Z" },
+    { "protocol": "LDAP",     "bytesIn": 200000000, "bytesOut": 150000000, "totalBytes": 350000000, "connections": 3000, "lastSeen": "2026-03-12T16:00:00.000Z" },
+    { "protocol": "Kerberos", "bytesIn": 140000000, "bytesOut": 110000000, "totalBytes": 250000000, "connections": 5000, "lastSeen": "2026-03-12T16:00:00.000Z" },
+    { "protocol": "TLS",      "bytesIn": 100000000, "bytesOut": 80000000,  "totalBytes": 180000000, "connections": 1200, "lastSeen": "2026-03-12T16:00:00.000Z" },
+    { "protocol": "HTTP",     "bytesIn": 80000000,  "bytesOut": 60000000,  "totalBytes": 140000000, "connections": 900, "lastSeen": "2026-03-12T16:00:00.000Z" },
+    { "protocol": "SSH",      "bytesIn": 40000000,  "bytesOut": 30000000,  "totalBytes": 70000000,  "connections": 400, "lastSeen": "2026-03-12T16:00:00.000Z" },
+    { "protocol": "NTP",      "bytesIn": 10000000,  "bytesOut": 8000000,   "totalBytes": 18000000,  "connections": 200, "lastSeen": "2026-03-12T16:00:00.000Z" },
+    { "protocol": "ICMP",     "bytesIn": 5000000,   "bytesOut": 3000000,   "totalBytes": 8000000,   "connections": 100, "lastSeen": "2026-03-12T16:00:00.000Z" }
+  ],
+  "expected": {
+    "protocolCount": 9,
+    "isEmpty": false,
+    "entryCount": 7,
+    "sortOrder": ["SMB", "DNS", "LDAP", "Kerberos", "TLS", "HTTP", "Other"],
+    "hasOtherBucket": true,
+    "otherAggregatesCount": 3
+  }
+}

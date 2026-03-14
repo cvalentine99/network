@@ -23,6 +23,7 @@ import {
   Loader2, AlertTriangle, Search, Wifi, WifiOff, Download
 } from 'lucide-react';
 import { PcapDownloadButton } from './PcapDownloadButton';
+import { ProtocolBreakdownChart } from './ProtocolBreakdownChart';
 import { useTimeWindow } from '@/lib/useTimeWindow';
 import { useInspector } from '@/contexts/InspectorContext';
 
@@ -305,15 +306,9 @@ function PopulatedState({ detail }: { detail: DeviceDetail }) {
         </>
       )}
 
-      {/* Protocol breakdown */}
-      {detail.protocols.length > 0 && (
-        <>
-          <SectionHeader icon={<Globe className="h-3.5 w-3.5" />} label={`Protocols (${detail.protocols.length})`} />
-          {detail.protocols.map((proto) => (
-            <ProtocolRow key={proto.protocol} proto={proto} />
-          ))}
-        </>
-      )}
+      {/* Protocol breakdown (Slice 16 — donut chart) */}
+      <SectionHeader icon={<Globe className="h-3.5 w-3.5" />} label={`Protocols (${detail.protocols.length})`} />
+      <ProtocolBreakdownChart protocols={detail.protocols} />
 
       {/* Associated detections */}
       {detail.associatedDetections.length > 0 && (

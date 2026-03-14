@@ -1,0 +1,39 @@
+{
+  "_fixture": "protocol-chart.edge-cases",
+  "_description": "Edge cases: zero-byte protocol (valid, shows 0%), mixed valid and invalid entries, exactly 7 protocols (boundary of PROTOCOL_CHART_MAX_SLICES).",
+  "zeroBytesInput": [
+    { "protocol": "ICMP", "bytesIn": 0, "bytesOut": 0, "totalBytes": 0, "connections": 50, "lastSeen": "2026-03-12T16:00:00.000Z" },
+    { "protocol": "DNS", "bytesIn": 100000, "bytesOut": 50000, "totalBytes": 150000, "connections": 300, "lastSeen": "2026-03-12T16:00:00.000Z" }
+  ],
+  "zeroBytesExpected": {
+    "protocolCount": 2,
+    "isEmpty": false,
+    "sortOrder": ["DNS", "ICMP"]
+  },
+  "mixedInput": [
+    { "protocol": "SMB", "bytesIn": 500000, "bytesOut": 300000, "totalBytes": 800000, "connections": 100, "lastSeen": "2026-03-12T16:00:00.000Z" },
+    { "protocol": "", "bytesIn": 100, "bytesOut": 100, "totalBytes": 200, "connections": 1, "lastSeen": "2026-03-12T16:00:00.000Z" },
+    { "protocol": "DNS", "bytesIn": 200000, "bytesOut": 100000, "totalBytes": 300000, "connections": 500, "lastSeen": "2026-03-12T16:00:00.000Z" }
+  ],
+  "mixedExpected": {
+    "protocolCount": 2,
+    "isEmpty": false,
+    "sortOrder": ["SMB", "DNS"]
+  },
+  "exactBoundaryInput": [
+    { "protocol": "P1", "bytesIn": 700, "bytesOut": 300, "totalBytes": 1000, "connections": 10, "lastSeen": "2026-03-12T16:00:00.000Z" },
+    { "protocol": "P2", "bytesIn": 600, "bytesOut": 300, "totalBytes": 900, "connections": 9, "lastSeen": "2026-03-12T16:00:00.000Z" },
+    { "protocol": "P3", "bytesIn": 500, "bytesOut": 300, "totalBytes": 800, "connections": 8, "lastSeen": "2026-03-12T16:00:00.000Z" },
+    { "protocol": "P4", "bytesIn": 400, "bytesOut": 300, "totalBytes": 700, "connections": 7, "lastSeen": "2026-03-12T16:00:00.000Z" },
+    { "protocol": "P5", "bytesIn": 300, "bytesOut": 300, "totalBytes": 600, "connections": 6, "lastSeen": "2026-03-12T16:00:00.000Z" },
+    { "protocol": "P6", "bytesIn": 200, "bytesOut": 300, "totalBytes": 500, "connections": 5, "lastSeen": "2026-03-12T16:00:00.000Z" },
+    { "protocol": "P7", "bytesIn": 100, "bytesOut": 300, "totalBytes": 400, "connections": 4, "lastSeen": "2026-03-12T16:00:00.000Z" }
+  ],
+  "exactBoundaryExpected": {
+    "protocolCount": 7,
+    "isEmpty": false,
+    "entryCount": 7,
+    "hasOtherBucket": false,
+    "sortOrder": ["P1", "P2", "P3", "P4", "P5", "P6", "P7"]
+  }
+}

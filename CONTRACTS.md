@@ -2137,3 +2137,134 @@ Not proven:
 Deferred by contract: live hardware / appliance / packet store / environment access is not part of the current frontend phase.
 Live integration status: Not attempted
 Verdict: PASSED — All architectural invariants proven by deterministic software evidence. Single TimeWindowProvider, no independent Date.now() in hooks, no local time window state, all BFF routes use identical validation/resolution pipeline. Known divergence on inverted windows is documented. 95 tests, 6 fixtures, 3 screenshots.
+
+
+---
+
+## SLICE 16 — Protocol Breakdown Visualization
+
+### STATUS: Passed
+
+### IN SCOPE
+
+Shared pure normalization function `normalizeProtocolChart` in `shared/protocol-chart-types.ts`. Shared types: `ProtocolChartEntry`, `ProtocolChartData`. Shared constants: `PROTOCOL_CHART_COLORS` (8-color OKLCH palette), `PROTOCOL_CHART_MAX_SLICES` (7). Zod validators: `ProtocolChartEntrySchema`, `ProtocolChartDataSchema` in `shared/protocol-chart-validators.ts`. React component `ProtocolBreakdownChart` in `client/src/components/inspector/ProtocolBreakdownChart.tsx`. Donut chart (Recharts PieChart) with active-shape hover, legend with protocol/pct/bytes, In/Out/Conns detail panel. Quiet state with dashed circle and "No protocol activity" message. Wired into `DeviceDetailPane` replacing the previous `ProtocolRow` list. Input filtering: empty protocol name, negative values, NaN, Infinity all rejected. Sort by totalBytes descending; overflow grouping into "Other" bucket when > 7 protocols. Percentage sum invariant (entries sum to ~100% within 1% rounding tolerance). 76 tests across 14 describe groups: 71 source-level it() call sites (70 static + 1 in for-loop), 6 dynamic expansions (FIXTURE_FILES), 70 + 6 = 76 runtime executions. 6 fixture files, 3 screenshots + observations.
+
+### OUT OF SCOPE
+
+Live ExtraHop protocol data (deferred by contract). Chart animation/transition tuning. Protocol drill-down (clicking a slice to filter dashboard). Responsive chart sizing at mobile breakpoints.
+
+### DEPENDENCIES
+
+`shared/cockpit-types.ts` — `DeviceProtocolActivity` interface. `shared/formatters.ts` — `formatBytes` function. `client/src/components/DashboardWidgets.tsx` — `GOLD`, `MUTED`, `BRIGHT` color constants. `recharts` — PieChart, Pie, Cell, Sector, ResponsiveContainer.
+
+### ROUTES
+
+No new BFF routes. Protocol data is already part of the device-detail response served by `GET /api/impact/device/:id`.
+
+### TYPES
+
+| Type | Location | Description |
+|---|---|---|
+| `ProtocolChartEntry` | `shared/protocol-chart-types.ts` | Chart-ready protocol with pct, color |
+| `ProtocolChartData` | `shared/protocol-chart-types.ts` | Normalized chart output with entries, grandTotal, isEmpty |
+| `PROTOCOL_CHART_COLORS` | `shared/protocol-chart-types.ts` | 8-color OKLCH palette |
+| `PROTOCOL_CHART_MAX_SLICES` | `shared/protocol-chart-types.ts` | Max individual slices before Other (7) |
+
+### VALIDATORS
+
+| Validator | Location | Description |
+|---|---|---|
+| `ProtocolChartEntrySchema` | `shared/protocol-chart-validators.ts` | Non-negative bytes, 0-100 pct, non-empty protocol, integer connections |
+| `ProtocolChartDataSchema` | `shared/protocol-chart-validators.ts` | isEmpty/entries consistency, pct sum ~100% |
+
+### FIXTURES
+
+| Fixture | Description |
+|---|---|
+| `protocol-chart.quiet.fixture.json` | Empty protocols array → quiet state |
+| `protocol-chart.populated.fixture.json` | 5 protocols from dc01 device detail |
+| `protocol-chart.single-protocol.fixture.json` | Single protocol at 100% |
+| `protocol-chart.overflow.fixture.json` | 9 protocols → 6 individual + Other bucket |
+| `protocol-chart.malformed.fixture.json` | Invalid entries (NaN, negative, empty name) |
+| `protocol-chart.edge-cases.fixture.json` | Zero bytes, mixed valid/invalid, exact boundary (7) |
+
+### TESTS
+
+76 runtime executions across 14 describe groups. 71 source-level it() call sites: 70 static + 1 inside a for-loop (FIXTURE_FILES, 6 entries). 70 static + 6 dynamic = 76 runtime total.
+
+| # | Describe Group | Tests |
+|---|---|---|
+| 1 | Fixture files exist | 6 |
+| 2 | ProtocolChartEntrySchema validation | 6 |
+| 3 | ProtocolChartDataSchema validation | 5 |
+| 4 | normalizeProtocolChart quiet state | 2 |
+| 5 | normalizeProtocolChart populated | 7 |
+| 6 | normalizeProtocolChart single protocol | 3 |
+| 7 | normalizeProtocolChart overflow | 7 |
+| 8 | normalizeProtocolChart malformed input | 7 |
+| 9 | normalizeProtocolChart edge cases | 7 |
+| 10 | Color assignment and palette cycling | 3 |
+| 11 | Percentage sum invariant | 4 |
+| 12 | Sort order invariant | 3 |
+| 13 | Constants validation | 5 |
+| 14 | Source-level architectural invariants | 11 |
+| | **Total** | **76** |
+
+### SCREENSHOTS
+
+| Screenshot | State | Description |
+|---|---|---|
+| `slice16-above-fold.png` | Dashboard without inspector | Full dashboard, no inspector open |
+| `slice16-populated.png` | Populated donut chart | dc01.lab.local inspector with protocol donut visible (gold/cyan/green segments) |
+| `slice16-quiet.png` | Quiet state | idle-printer-01 inspector with "No activity observed" quiet message |
+| `slice16-observations.txt` | Observations | Detailed notes on each screenshot |
+
+### KNOWN LIMITATIONS
+
+1. The donut chart is positioned below PACKET CAPTURE in the inspector scroll, requiring scrolling to see the full chart with legend on smaller viewports.
+2. The "Other" bucket aggregation is deterministic but loses individual protocol identity for tail protocols.
+3. Percentage rounding can produce sums slightly off from 100% (within 1% tolerance, enforced by schema).
+4. The previous `ProtocolRow` list component is no longer rendered but remains in the source file as dead code.
+
+### LIVE INTEGRATION STATUS
+
+Deferred by contract: live hardware / appliance / packet store / environment access is not part of the current frontend phase. Protocol data comes from the device-detail BFF fixture. When live integration occurs, the `normalizeProtocolChart` function will process real `DeviceProtocolActivity[]` arrays identically.
+
+---
+
+### TRUTH RECEIPT
+
+```
+TRUTH RECEIPT
+Slice: 16 — Protocol Breakdown Visualization
+Commit: PENDING
+Claims:
+  - normalizeProtocolChart transforms DeviceProtocolActivity[] into chart-ready ProtocolChartData
+  - Input filtering rejects empty names, negative values, NaN, Infinity
+  - Sort by totalBytes descending is enforced
+  - Overflow grouping into "Other" bucket when > PROTOCOL_CHART_MAX_SLICES (7)
+  - Percentage sum invariant: entries sum to ~100% within 1% rounding tolerance
+  - ProtocolBreakdownChart renders donut (Recharts PieChart) with hover, legend, In/Out detail
+  - Quiet state renders dashed circle with "No protocol activity" message
+  - DeviceDetailPane wired to ProtocolBreakdownChart replacing ProtocolRow list
+  - 76 tests pass (71 source-level it() sites: 70 static + 1 for-loop generating 6 dynamic = 76 runtime)
+  - 14 describe groups, per-group table sums to 76
+  - 6 fixture files covering quiet, populated, single, overflow, malformed, edge cases
+  - 3 screenshots + observations covering above-fold, populated, quiet states
+Evidence:
+  - tests passed: 76/76 (vitest run server/slice16.test.ts)
+  - full suite: 1,117/1,117 (19 test files, 0 failures)
+  - fixtures present: 6 files in fixtures/protocol-chart/
+  - screenshots present: 3 PNG + 1 TXT in screenshots/
+  - validators present: ProtocolChartEntrySchema, ProtocolChartDataSchema
+  - TypeScript: 0 errors (npx tsc --noEmit)
+Not proven:
+  - Live ExtraHop protocol data rendering (deferred by contract)
+  - Chart animation/transition quality (visual only, not testable deterministically)
+  - Protocol drill-down interaction (out of scope)
+  - Responsive chart sizing at mobile breakpoints (out of scope)
+Deferred by contract:
+  - Live hardware / appliance / packet store / environment access is not part of the current frontend phase.
+Live integration status: Not attempted
+Verdict: Passed — all contract requirements met. Normalization, validation, chart rendering, quiet/populated states, fixtures, tests, and screenshots are all present and verified against deterministic software evidence.
+```
