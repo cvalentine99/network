@@ -3,8 +3,11 @@
 ## TRUTH RECEIPT
 
 **SLICE NAME:** Performance Budget Validation
-**STATUS:** Passed
-**COMMIT:** (pending checkpoint)
+**STATUS:** Provisionally Passed — screenshot evidence missing from bundle (corrected at commit below)
+**COMMIT:** 24ec72ec
+**CORRECTION COMMIT:** (pending checkpoint)
+
+**CORRECTION NOTE:** The original bundle (commit 24ec72ec) excluded `screenshots/*.png` files due to a ZIP exclusion filter. The 5 screenshots exist on disk and were captured by the measurement harness, but were not included in the delivered ZIP. This correction re-bundles the ZIP with screenshots included and updates the receipt status accordingly.
 
 ---
 
