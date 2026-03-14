@@ -1,0 +1,81 @@
+SLICE 21 — LIVING TOPOLOGY: SELF-AUDIT
+=======================================
+Date: 2026-03-14
+Checkpoint: fac9d48b
+
+AUDIT 1: Route Registration and Nav De-placeholdering
+------------------------------------------------------
+PASS  /topology route exists in App.tsx (line 25)
+PASS  Topology import exists in App.tsx (line 14)
+PASS  Topology nav item in DashboardLayout does NOT have placeholder:true (line 56)
+PASS  Only Help remains as placeholder:true (line 63)
+
+AUDIT 2: Shared Types Reuse
+----------------------------
+PASS  Topology.tsx imports TopologyNode, TopologyEdge, TopologyCluster, TopologyPayload, TopologyDeviceRole from shared/topology-types
+PASS  Topology.tsx imports ROLE_DISPLAY, TOPOLOGY_PERFORMANCE from shared/topology-types
+PASS  useTopology.ts imports TopologyBffResponseSchema from shared/topology-validators
+PASS  useTopology.ts imports TopologyPayload from shared/topology-types
+PASS  Only 1 local interface (NodePos) — UI-only layout position type with x/y/cluster fields, not a domain type redefinition
+PASS  TopologyState union type in hook is UI state discriminant, not domain redefinition
+
+AUDIT 3: BFF Route Behavior
+----------------------------
+PASS  POST /api/bff/topology/query with default fromMs → intent=populated, 15 nodes, 20 edges, 3 clusters
+PASS  POST with fromMs=1 → intent=quiet, 0 nodes, 0 edges, 0 clusters
+PASS  POST with fromMs=2 → intent=error, error message present, payload=null
+PASS  POST with fromMs=3 → intent=transport-error, error message present, payload=null
+PASS  POST with fromMs=4 → intent=malformed, error=null (malformed payload returned for UI to handle)
+PASS  POST with fromMs=5 → intent=populated, 200 nodes, 600 edges, 10 clusters (large-scale)
+PASS  POST with invalid body → HTTP 400 with Zod validation errors
+PASS  GET /api/bff/topology/fixtures → 6 fixture filenames returned
+
+AUDIT 4: UI State Coverage
+---------------------------
+PASS  data-testid="topology-loading" exists (line 578)
+PASS  data-testid="topology-populated" exists (line 656)
+PASS  data-testid="topology-quiet" exists (line 635)
+PASS  data-testid="topology-error" exists (line 591)
+PASS  data-testid="topology-malformed" exists (line 613)
+PASS  data-testid="topology-detail-panel" exists (line 167)
+PASS  Additional testids: topology-svg, topology-nodes, topology-edges, topology-cluster-legend, topology-role-legend, topology-summary, topology-search
+
+AUDIT 5: Test Counts
+---------------------
+PASS  91 source-level it() call sites in server/slice21.test.ts
+PASS  125 runtime Vitest executions (34 dynamic expansions from forEach/for-of loops)
+PASS  All 125 tests pass
+NOTE  Receipt correctly states "91 source-level it() call sites, 125 runtime Vitest executions"
+
+AUDIT 6: Fixtures
+------------------
+PASS  6 fixture files exist in fixtures/topology/
+PASS  topology.populated.fixture.json: intent=populated, 15 nodes
+PASS  topology.quiet.fixture.json: intent=quiet, 0 nodes
+PASS  topology.error.fixture.json: intent=error, payload=null
+PASS  topology.transport-error.fixture.json: intent=transport-error, payload=null
+PASS  topology.malformed.fixture.json: intent=malformed, 1 node (structurally invalid)
+PASS  topology.large-scale.fixture.json: intent=populated, 200 nodes
+
+AUDIT 7: Screenshots
+---------------------
+PASS  slice21-loading.png exists (30,490 bytes)
+PASS  slice21-populated.png exists (175,394 bytes)
+PASS  slice21-detail-panel.png exists (180,757 bytes)
+PASS  slice21-quiet.png exists (36,445 bytes)
+PASS  slice21-error.png exists (38,088 bytes)
+PASS  slice21-large-scale.png uploaded to CDN (1,255KB exceeded local limit)
+PASS  slice21-observations.txt documents all 6 screenshots
+
+CROSS-SLICE IMPACT
+-------------------
+NOTE  Slice 20 test (line 112) originally asserted Topology had placeholder:true.
+      Updated to verify Topology nav item exists without asserting placeholder status.
+      This is a legitimate cross-slice evolution, not a test regression.
+
+OVERALL VERDICT
+----------------
+All 7 audit categories PASS for source code evidence.
+Two receipt ledger corrections required and applied:
+1. Commit hash was "(pending checkpoint)" — updated to fac9d48b
+2. Screenshot evidence flattened to "6 screenshots present" — corrected to "5 local PNG + 1 CDN-hosted reference"

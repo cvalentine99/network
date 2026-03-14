@@ -4,10 +4,10 @@
 Living Topology — constellation topology surface with device clustering, 200-device performance budget, shared time window, node detail panel, search, role/cluster legends, and all UI states.
 
 ## Status
-Passed — implemented against fixtures. Live integration not yet performed.
+Provisionally Passed — receipt corrections applied (commit hash, screenshot evidence description). Implemented against fixtures. Live integration not yet performed.
 
 ## Commit
-(pending checkpoint)
+fac9d48b
 
 ## SLICE NAME
 Slice 21 — Living Topology
@@ -26,7 +26,8 @@ Slice 21 — Living Topology
 - Shared time window: consumed via `useTimeWindow()`, passed to BFF query
 - 200-device performance budget: `TOPOLOGY_PERFORMANCE.MAX_NODES = 200`, large-scale fixture has exactly 200 nodes, summary shows "Truncated to 200 nodes" warning
 - 6 fixtures: populated (15 nodes), quiet (0 nodes), error, transport-error, malformed, large-scale (200 nodes)
-- 6 screenshots: loading, populated, detail-panel, quiet, error, large-scale
+- 5 local PNG screenshots: loading, populated, detail-panel, quiet, error
+- 1 CDN-hosted screenshot: large-scale (exceeded 1MB local limit, uploaded to CDN, reference in `slice21-large-scale.cdn.txt`)
 
 ## OUT OF SCOPE
 - Live ExtraHop activity map integration
@@ -96,7 +97,7 @@ Slice 21 — Living Topology
 | Detail Panel | `slice21-detail-panel.png` | dc01.lab.local selected, right panel shows role/IP/MAC/traffic/connections |
 | Quiet | `slice21-quiet.png` | "No Devices Observed" centered message with Refresh button |
 | Error | `slice21-error.png` | "Topology Unavailable" with 503 error message and Retry button |
-| Large-Scale | `slice21-large-scale.png` (CDN: uploaded due to size) | 200 nodes, 600 edges, 10 clusters, "Truncated to 200 nodes" warning |
+| Large-Scale | CDN-hosted (see `slice21-large-scale.cdn.txt`) | 200 nodes, 600 edges, 10 clusters, "Truncated to 200 nodes" warning |
 
 ## KNOWN LIMITATIONS
 - Force-directed layout is computed client-side with a simple simulation; not a production-grade physics engine
@@ -122,7 +123,8 @@ Not attempted. Deferred by contract: live hardware / appliance / packet store / 
 ## Evidence
 - 125 tests passed (91 source-level `it()`, 125 runtime)
 - 6 fixtures present and validated
-- 6 screenshots present
+- 5 local PNG screenshots present (loading, populated, detail-panel, quiet, error)
+- 1 CDN-hosted large-scale screenshot reference (slice21-large-scale.cdn.txt → CDN URL)
 - Zod validators present and tested
 - Structural validators present and tested
 - BFF route tested via supertest
@@ -142,4 +144,8 @@ Live hardware / appliance / packet store / environment access is not part of the
 Slice 20 test `slice20.test.ts` line 112 originally asserted `Topology` nav item had `placeholder: true`. This was correct at Slice 20 time but became stale after Slice 21 de-placeholdered Topology. Updated the test to verify Topology nav item exists without asserting placeholder status. All 614 tests across Slices 17-21 now pass.
 
 ## Verdict
-**Passed.** Implemented against fixtures. The Living Topology surface is a real first-class named surface with route, de-placeholdered nav, shared time window, 200-device performance budget, all 6 UI states, 6 fixtures, 125 tests, and 6 screenshots. Topology is no longer a placeholder nav item. Only Help remains as a placeholder in the sidebar.
+**Provisionally Passed — receipt corrections applied.** Implemented against fixtures. The Living Topology surface is a real first-class named surface with route, de-placeholdered nav, shared time window, 200-device performance budget, all 6 UI states, 6 fixtures, 125 tests, 5 local PNG screenshots + 1 CDN-hosted large-scale screenshot reference. Topology is no longer a placeholder nav item. Only Help remains as a placeholder in the sidebar.
+
+## Receipt Corrections Applied
+1. Commit hash updated from "(pending checkpoint)" to `fac9d48b`
+2. Screenshot evidence now distinguishes 5 local PNG screenshots + 1 CDN-hosted large-scale screenshot reference (not flattened to "6 screenshots present")
