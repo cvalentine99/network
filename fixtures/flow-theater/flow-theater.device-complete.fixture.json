@@ -1,0 +1,75 @@
+{
+  "_meta": {
+    "fixture": "flow-theater.device-complete",
+    "description": "SSE event sequence for a device ID entry trace that completes successfully.",
+    "entryMode": "device",
+    "terminalStatus": "complete",
+    "totalEvents": 19,
+    "totalSteps": 8
+  },
+  "intent": {
+    "mode": "device",
+    "value": "2087",
+    "timeWindow": {
+      "fromMs": 1710000000000,
+      "untilMs": 1710001800000,
+      "durationMs": 1800000,
+      "cycle": "30sec"
+    }
+  },
+  "events": [
+    { "type": "step", "stepId": "input-accepted", "status": "running", "detail": "Validating device ID 2087", "durationMs": null, "count": null, "timestamp": 1710001800100 },
+    { "type": "step", "stepId": "input-accepted", "status": "complete", "detail": "Device ID accepted", "durationMs": 30, "count": null, "timestamp": 1710001800130 },
+    { "type": "step", "stepId": "entry-resolution", "status": "running", "detail": "Looking up device by ID", "durationMs": null, "count": null, "timestamp": 1710001800135 },
+    { "type": "heartbeat", "timestamp": 1710001800200, "activeSteps": 1 },
+    { "type": "step", "stepId": "entry-resolution", "status": "complete", "detail": "Device found: nas01.lab.local", "durationMs": 95, "count": null, "timestamp": 1710001800230 },
+    { "type": "step", "stepId": "device-resolved", "status": "running", "detail": "Loading device identity", "durationMs": null, "count": null, "timestamp": 1710001800235 },
+    { "type": "step", "stepId": "device-resolved", "status": "complete", "detail": "nas01.lab.local (10.1.20.87)", "durationMs": 60, "count": null, "timestamp": 1710001800295 },
+    { "type": "step", "stepId": "activity-timeline", "status": "running", "detail": "Querying activity records", "durationMs": null, "count": null, "timestamp": 1710001800300 },
+    { "type": "step", "stepId": "metric-timeline", "status": "running", "detail": "Querying metric data points", "durationMs": null, "count": null, "timestamp": 1710001800300 },
+    { "type": "step", "stepId": "records-search", "status": "running", "detail": "Searching records", "durationMs": null, "count": null, "timestamp": 1710001800300 },
+    { "type": "step", "stepId": "detection-alert", "status": "running", "detail": "Querying detections and alerts", "durationMs": null, "count": null, "timestamp": 1710001800300 },
+    { "type": "step", "stepId": "trace-assembly", "status": "running", "detail": "Assembling trace results", "durationMs": null, "count": null, "timestamp": 1710001800300 },
+    { "type": "heartbeat", "timestamp": 1710001800450, "activeSteps": 5 },
+    { "type": "step", "stepId": "activity-timeline", "status": "complete", "detail": "67 activity records", "durationMs": 250, "count": 67, "timestamp": 1710001800550 },
+    { "type": "step", "stepId": "metric-timeline", "status": "complete", "detail": "923 metric data points", "durationMs": 310, "count": 923, "timestamp": 1710001800610 },
+    { "type": "step", "stepId": "records-search", "status": "complete", "detail": "12 records found", "durationMs": 180, "count": 12, "timestamp": 1710001800480 },
+    { "type": "step", "stepId": "detection-alert", "status": "complete", "detail": "0 detections, 0 alerts", "durationMs": 150, "count": 0, "timestamp": 1710001800450 },
+    { "type": "step", "stepId": "trace-assembly", "status": "complete", "detail": "Trace assembled", "durationMs": 380, "count": null, "timestamp": 1710001800680 },
+    {
+      "type": "complete",
+      "terminalStatus": "complete",
+      "totalDurationMs": 580,
+      "timestamp": 1710001800690,
+      "summary": {
+        "resolvedDevice": {
+          "resolvedVia": "device",
+          "originalInput": "2087",
+          "device": {
+            "id": 2087,
+            "displayName": "nas01.lab.local",
+            "ipaddr": "10.1.20.87",
+            "macaddr": "00:50:56:C3:4D:5E",
+            "role": "file_server",
+            "vendor": "Synology"
+          }
+        },
+        "activityCount": 67,
+        "metricPointCount": 923,
+        "recordCount": 12,
+        "detectionCount": 0,
+        "alertCount": 0,
+        "stepTimings": [
+          { "stepId": "input-accepted", "status": "complete", "durationMs": 30 },
+          { "stepId": "entry-resolution", "status": "complete", "durationMs": 95 },
+          { "stepId": "device-resolved", "status": "complete", "durationMs": 60 },
+          { "stepId": "activity-timeline", "status": "complete", "durationMs": 250 },
+          { "stepId": "metric-timeline", "status": "complete", "durationMs": 310 },
+          { "stepId": "records-search", "status": "complete", "durationMs": 180 },
+          { "stepId": "detection-alert", "status": "complete", "durationMs": 150 },
+          { "stepId": "trace-assembly", "status": "complete", "durationMs": 380 }
+        ]
+      }
+    }
+  ]
+}

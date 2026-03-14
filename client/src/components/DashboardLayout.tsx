@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/useMobile";
 import {
+  Activity,
   LayoutDashboard,
   PanelLeft,
   Radio,
@@ -24,6 +25,7 @@ import { GOLD, MUTED, BRIGHT, CYAN } from "./DashboardWidgets";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
+  { icon: Activity, label: "Flow Theater", path: "/flow-theater" },
   { icon: Settings, label: "Appliance", path: "/settings" },
 ];
 

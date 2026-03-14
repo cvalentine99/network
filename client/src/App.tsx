@@ -8,6 +8,7 @@ import DashboardLayout from "./components/DashboardLayout";
 import { TimeWindowProvider } from "./providers/TimeWindowProvider";
 import Home from "./pages/Home";
 import ApplianceSettings from "./pages/ApplianceSettings";
+import FlowTheater from "./pages/FlowTheater";
 
 function Router() {
   return (
@@ -15,6 +16,7 @@ function Router() {
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/settings" component={ApplianceSettings} />
+        <Route path="/flow-theater" component={FlowTheater} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>

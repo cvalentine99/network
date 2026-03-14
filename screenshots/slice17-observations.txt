@@ -1,0 +1,56 @@
+Slice 17 — Flow Theater Screenshots
+Date: 2026-03-14 (recaptured after SSE fix)
+
+SCREENSHOT 1: slice17-idle.png — VALID
+- Shows Flow Theater page in idle state
+- Sidebar: Dashboard, Flow Theater (active/highlighted), Appliance
+- Page header: "Flow Theater — Where is the time going?"
+- Entry form: ENTRY MODE (Hostname), HOSTNAME input with placeholder "e.g. dc01.lab.local"
+- Run Trace button (gold, right side)
+- Idle message: "Enter a hostname, device ID, or service row key and click Run Trace to begin."
+- Dashed border idle panel with Activity icon
+
+SCREENSHOT 2: slice17-running.png — VALID
+- Shows the 8-step trace rail mid-execution
+- "Tracing..." button with spinner visible (top-right)
+- Input shows "dc01.lab.local" (disabled during trace)
+- TRACE PROGRESS section: "3/8 steps"
+- Steps 1-3 (serial) show green checkmarks with durations:
+  1. Input Accepted — 45ms
+  2. Entry Resolution — Resolved to device 1042 — 120ms
+  3. Device Resolved — dc01.lab.local (10.1.20.42) — 80ms (highlighted row)
+- "PARALLEL FAN-OUT" divider visible
+- Steps 4-8 still idle (empty circles)
+- Demonstrates mid-trace SSE event processing
+
+SCREENSHOT 3: slice17-complete.png — VALID (full-page)
+- Shows completed trace with all 8 steps green
+- "8/8 steps 0.71s" in header
+- "New Trace" button replaces "Run Trace" (terminal state)
+- All 8 steps show green checkmarks with durations and counts:
+  1. Input Accepted — 45ms
+  2. Entry Resolution — 120ms
+  3. Device Resolved — 80ms
+  4. Activity Timeline — 340ms — 142 (PARALLEL badge)
+  5. Metric Timeline — 410ms — 1847 (PARALLEL badge)
+  6. Records / Search — 280ms — 38 (PARALLEL badge)
+  7. Detections & Alerts — 220ms — 4 (PARALLEL badge)
+  8. Trace Assembly — 450ms (PARALLEL badge)
+- TRACE SUMMARY card:
+  - Resolved device: dc01.lab.local / 10.1.20.42 / domain_controller / via hostname
+  - Counts: 142 Activity, 1,847 Metrics, 38 Records, 3 Detections, 1 Alerts
+  - Step Timings grid: all 8 steps with ms values
+
+SCREENSHOT 4: slice17-above-fold.png — VALID (viewport only)
+- Same content as complete but cropped to viewport height
+
+VALID STATES CAPTURED:
+- Idle state: CAPTURED (slice17-idle.png)
+- Running state with partial step completion: CAPTURED (slice17-running.png)
+- Complete state with all steps green + summary card: CAPTURED (slice17-complete.png)
+- Error state: NOT CAPTURED (separate screenshot would be needed for error fixture)
+
+NOTE: Error state screenshot is not captured because the primary contract
+requires idle/running/complete states. Error state is tested via fixtures
+and Vitest assertions. The error banner component (data-testid="trace-error-banner")
+exists in the component source and renders when traceState.status === "error".

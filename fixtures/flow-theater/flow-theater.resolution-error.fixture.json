@@ -1,0 +1,32 @@
+{
+  "_meta": {
+    "fixture": "flow-theater.resolution-error",
+    "description": "SSE event sequence where entry resolution fails — hostname not found in ExtraHop device list.",
+    "entryMode": "hostname",
+    "terminalStatus": "error",
+    "totalEvents": 5,
+    "totalSteps": 2
+  },
+  "intent": {
+    "mode": "hostname",
+    "value": "nonexistent.lab.local",
+    "timeWindow": {
+      "fromMs": 1710000000000,
+      "untilMs": 1710001800000,
+      "durationMs": 1800000,
+      "cycle": "30sec"
+    }
+  },
+  "events": [
+    { "type": "step", "stepId": "input-accepted", "status": "running", "detail": "Validating hostname nonexistent.lab.local", "durationMs": null, "count": null, "timestamp": 1710001800100 },
+    { "type": "step", "stepId": "input-accepted", "status": "complete", "detail": "Hostname accepted", "durationMs": 38, "count": null, "timestamp": 1710001800138 },
+    { "type": "step", "stepId": "entry-resolution", "status": "running", "detail": "Resolving hostname to device", "durationMs": null, "count": null, "timestamp": 1710001800143 },
+    { "type": "step", "stepId": "entry-resolution", "status": "error", "detail": "No device found for hostname nonexistent.lab.local", "durationMs": 200, "count": null, "timestamp": 1710001800343 },
+    {
+      "type": "error",
+      "message": "Device resolution failed: no device found for hostname nonexistent.lab.local",
+      "failedStepId": "entry-resolution",
+      "timestamp": 1710001800345
+    }
+  ]
+}

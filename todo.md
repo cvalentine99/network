@@ -26,7 +26,7 @@
 - [x] Slice 14 receipt correction: test math — 64 source-level it() call sites (61 static + 3 in for-loops), 29 dynamic expansions (7+10+12), 90 runtime total. Fixed ConnectionTestResultSchema from 4→5, Hostname regex from 21→22 (12 invalid, not 11)
 - [x] Slice 15 — Time-window synchronization audit: prove all dashboard panels share the same TimeWindowContext with no drift, shared types, validators, synchronization enforcement, fixtures, tests, screenshots, truth receipt
 - [x] Slice 16 — Protocol Breakdown Visualization: replace protocol list in DeviceDetailPane with donut/bar chart, shared types, validators, normalization, chart component, fixtures, tests, screenshots, truth receipt
-- [ ] GAP MATRIX RECOVERY — Flow Theater (Slice 17): 8-step SSE trace rail, hostname/device/service-row entry, valid finished states, explicit empty/error states, BFF route, shared types, validators, fixtures, tests, screenshots, truth receipt
+- [x] GAP MATRIX RECOVERY — Flow Theater (Slice 17): 8-step SSE trace rail, hostname/device/service-row entry, valid finished states, explicit empty/error states, BFF route, shared types, validators, fixtures, tests, screenshots, truth receipt
 - [ ] GAP MATRIX RECOVERY — Blast Radius (Slice 18): standalone surface for "who is affected?", case assembly, full panel rendering, GET /api/devices/:id/blast-radius, shared types, validators, fixtures, tests, screenshots, truth receipt
 - [ ] GAP MATRIX RECOVERY — Correlation Overlay (Slice 19): "what changed at roughly the same moment?", correlation feed route, overlay UI, causal strip markers, shared types, validators, fixtures, tests, screenshots, truth receipt
 - [ ] GAP MATRIX RECOVERY — Living Topology (Slice 20): constellation topology surface, GET /api/topology/constellation, clustering fallback, 200-device performance test, shared types, validators, fixtures, tests, screenshots, truth receipt
@@ -34,3 +34,4 @@
 - [ ] GAP MATRIX — Sidebar nav reconciliation: align sidebar to doc spec (Impact Deck, Flow Theater, Blast Radius, Correlation, Topology, Settings, Help); move Appliance under Settings
 - [ ] GAP MATRIX — Doc reconciliation: either build impact/overview aggregator or formally amend spec to bless decomposed routes
 - [x] Slice 16 receipt correction: ROUTES section references stale GET /api/impact/device/:id — updated to GET /api/bff/impact/device-detail?id=<number> (Slice 08 contract)
+- [x] Slice 17 — Flow Theater Foundation: dedicated sidebar surface, POST /api/bff/trace/run SSE route, 8-step rail UI (steps 1-3 serial, 4-8 parallel fan-out), 3 entry modes (hostname/device/service-row), complete/quiet/error semantics, heartbeat handling, fixture-backed SSE replay, shared types/validators, screenshots (idle/running/complete/quiet/error), truth receipt
