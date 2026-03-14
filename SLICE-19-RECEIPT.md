@@ -5,13 +5,13 @@
 | Field | Value |
 |---|---|
 | Slice | 19 — Correlation Overlay |
-| Status | **Passed** |
-| Commit | *(see checkpoint below)* |
+| Status | **Provisionally Passed — partial build-doc recovery, summary wording correction required** |
+| Commit | 97497792 |
 | Date | 2026-03-14 |
 
 ## Claims
 
-The Correlation Overlay surface answers "What changed at roughly the same moment?" by rendering causal strip markers on the Impact Deck timeline, positioned between the KPI strip and the GhostedTimeline chart. The overlay is implemented against deterministic fixtures, validated against Zod schemas, and tested with 135 passing Vitest tests.
+The Correlation Overlay surface answers "What changed at roughly the same moment?" by rendering causal strip markers on the Impact Deck timeline, positioned between the KPI strip and the GhostedTimeline chart. The overlay is implemented against deterministic fixtures, validated against Zod schemas, and tested with 98 source-level `it()` call sites expanding to 135 runtime Vitest executions (via dynamic fixture loops). This slice covers the **overlay on the Impact Deck only**; the standalone Correlation page (sidebar entry) remains a placeholder with a "Coming soon" toast. This is a partial build-doc recovery for the Correlation entry, not a full one.
 
 ## Scope Contract
 
@@ -31,7 +31,7 @@ The Correlation Overlay surface answers "What changed at roughly the same moment
 
 ### Out of Scope
 
-- Standalone Correlation page (sidebar entry is placeholder with "Coming soon" toast)
+- Standalone Correlation page (sidebar entry is placeholder with "Coming soon" toast) — this means the build-doc Correlation entry is only partially recovered by this slice
 - Cross-surface navigation from correlation markers to Flow Theater or Blast Radius
 - Real-time SSE streaming of correlation events (current implementation is request/response)
 - Time-window synchronization with other panels (hook reads from useTimeWindow context but fixture data uses fixed timestamps)
@@ -141,7 +141,7 @@ Transport failures return HTTP 502/504 with `{ error: true, message, code }`. Th
 
 ## Tests
 
-**135 tests passing** in `server/slice19.test.ts`:
+**98 source-level `it()` call sites → 135 runtime Vitest executions** in `server/slice19.test.ts`:
 
 | Section | Count | Coverage |
 |---|---|---|
@@ -171,7 +171,7 @@ Transport failures return HTTP 502/504 with `{ error: true, message, code }`. Th
 
 ## Evidence
 
-- [x] Tests passed: 135/135
+- [x] Tests passed: 98 source-level it() call sites → 135 runtime Vitest executions (all passing)
 - [x] Fixtures present: 6 files validated
 - [x] Screenshots present: 6 files (populated, populated-popover, quiet, error, malformed, loading)
 - [x] Validators present: 8 Zod schemas with cross-field refinements
@@ -195,4 +195,4 @@ Not attempted. Deferred by contract.
 
 ## Verdict
 
-**PASSED.** Slice 19 — Correlation Overlay is implemented against fixtures, validated against schemas, and tested with 135 passing tests. The overlay renders causal strip markers on the Impact Deck timeline with category-colored icons, legend pills, and click-to-expand popovers. All 6 UI states (loading, quiet, populated, error, malformed, popover) are screenshot-proven. BFF route handles sentinel routing for all fixture types. Cross-field schema refinements enforce totalCount/categoryCounts/timeWindow consistency. Live integration not yet performed.
+**PROVISIONALLY PASSED — partial build-doc recovery, summary wording correction applied.** Slice 19 — Correlation Overlay is implemented against fixtures, validated against schemas, and tested with 98 source-level `it()` call sites expanding to 135 runtime Vitest executions. The overlay renders causal strip markers on the Impact Deck timeline with category-colored icons, legend pills, and click-to-expand popovers. All 6 UI states (loading, quiet, populated, error, malformed, popover) are screenshot-proven. BFF route handles sentinel routing for all fixture types. Cross-field schema refinements enforce totalCount/categoryCounts/timeWindow consistency. The standalone Correlation page remains placeholder-only; this slice is a partial build-doc recovery for the Correlation entry, not a full one. Live integration not yet performed.
