@@ -1,0 +1,81 @@
+SLICE 20 SELF-AUDIT — In Progress
+Date: 2026-03-14
+
+=== CHECK 1: Route Registration ===
+PASS: /correlation route exists in App.tsx (line 23)
+PASS: Correlation.tsx component exists (26020 bytes)
+
+=== CHECK 2: Nav De-Placeholdering ===
+PASS: Correlation line 55 in DashboardLayout.tsx has NO placeholder:true
+PASS: Topology line 56 still has placeholder:true (correct)
+
+=== CHECK 3: Type Reuse ===
+PASS: Imports from shared/correlation-types (lines 48, 53)
+PASS: Zero local type/interface definitions
+PASS: Uses useCorrelationOverlay hook (line 44, 402)
+PASS: Uses useTimeWindow (line 54, 403)
+PASS: Zero raw fetch() calls in component
+
+=== CHECK 4: BFF Route Sentinel Routing ===
+CORRECTION NEEDED IN RECEIPT: The route uses TIME-BASED sentinels (fromMs values), NOT intent-string sentinels.
+My initial curl test used {"intent":"populated"} which is NOT how the route works.
+The route validates CorrelationIntentSchema which expects {fromMs, untilMs, categories?}.
+The "intent" field does not exist in the schema — it was my test error, not a route error.
+
+Actual sentinel routing (all verified via curl):
+- fromMs=0, untilMs=0 → quiet (0 events) — PASS
+- fromMs=9999999999999 → error (HTTP 502) — PASS  
+- fromMs=8888888888888 → transport-error (HTTP 504) — PASS
+- fromMs=7777777777777 → malformed (HTTP 200, invalid data) — PASS
+- fromMs=1710000000000, untilMs=1710000300000 → populated (8 events) — PASS
+- Missing fields → HTTP 400 — PASS
+- Invalid types → HTTP 400 — PASS
+- No body → HTTP 400 — PASS
+
+CLARIFICATION: My initial curl test was wrong — I sent {"intent":"populated"} which is not how the route works.
+The route uses TIME-BASED sentinels in fromMs, not string intents. The tests correctly use fromMs sentinel values.
+The BFF route is working correctly. My curl test was the error, not the route.
+
+=== CHECK 5: UI State data-testid Coverage ===
+PASS: All 6 states present with correlation-page-* prefix:
+  correlation-page-idle: 1
+  correlation-page-loading: 1
+  correlation-page-populated: 1
+  correlation-page-quiet: 1
+  correlation-page-error: 1
+  correlation-page-malformed: 1
+PASS: Interactive elements: correlation-filter-bar, correlation-summary, event-row-*, event-detail-*
+
+=== CHECK 6: Test Count ===
+CORRECTION NEEDED:
+  Receipt claimed: 98 source-level it() call sites, 98 runtime executions (no dynamic loops)
+  Actual: 85 source-level it() call sites, 98 runtime Vitest executions
+  Breakdown: 80 static + 3 forEach blocks (6+6+6 = 18 dynamic from 5 source it())
+  Receipt updated to reflect correct counts.
+
+=== CHECK 7: Screenshots ===
+PASS: All 6 screenshots present:
+  slice20-populated.png (244K)
+  slice20-populated-expanded.png (268K)
+  slice20-filtered.png (136K)
+  slice20-quiet.png (156K)
+  slice20-error.png (136K)
+  slice20-loading.png (104K)
+
+=== AUDIT SUMMARY ===
+Issues found: 1
+  1. Test count in receipt was inaccurate — claimed 98 source-level it() but actual is 85.
+     Receipt has been corrected to: 85 source-level, 98 runtime.
+
+All other claims verified:
+  - /correlation route exists in App.tsx
+  - Correlation nav is NOT placeholder
+  - Zero local type redefinitions
+  - Uses shared types, shared hook, shared time window
+  - Zero raw fetch() calls
+  - All 6 UI states have data-testid coverage
+  - All BFF sentinels route correctly
+  - All 6 screenshots present
+  - 98 runtime tests pass
+
+Verdict: Receipt correction applied. Slice 20 holds.

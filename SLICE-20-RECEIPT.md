@@ -6,7 +6,7 @@
 Slice 20 — Standalone Correlation Surface
 
 ## Commit
-(to be filled after checkpoint)
+60c47d04
 
 ## Scope Contract
 
@@ -72,8 +72,9 @@ All 6 existing fixtures reused without modification:
 
 ## Tests
 File: `server/slice20.test.ts`
-Source-level `it()` call sites: 98
-Runtime Vitest executions: 98 (no dynamic fixture loops in this suite)
+Source-level `it()` call sites: 85
+Dynamic expansions: 3 forEach blocks (6+6+6 = 18 runtime from 5 source it())
+Runtime Vitest executions: 98 (80 static + 18 dynamic)
 
 Test sections:
 1. Route Registration (3 tests) — /correlation route exists, imports Correlation, uses component
