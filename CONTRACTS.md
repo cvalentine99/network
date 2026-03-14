@@ -4,6 +4,93 @@ This file tracks the truth receipts for every completed slice.
 
 ---
 
+## Project Status & Deviation Register
+
+**Last updated:** Commit f6473275 (Slice 22b)
+**Overall status:** Material alignment with original cockpit plan. Not exact conformance.
+
+The major named surfaces from the original sprint guide are now materially present in the codebase: Impact Deck, Flow Theater, Blast Radius, Correlation, Topology, and the Inspector subsystem. Each surface has been delivered as an independently contract-proven slice with shared types, Zod validators, deterministic fixtures, Vitest tests, and screenshots. The full test suite stands at 1,905 passing tests across 27 test files with zero failures.
+
+However, the implementation as-built deviates from the original plan in several documented ways. This section exists to prevent anyone from reading the per-slice receipts as claiming exact conformance with the original sprint guide. The receipts prove what was built; this section documents where what was built differs from what was originally specified.
+
+### Deviation 1: Impact Deck BFF Architecture — Decomposed Routes vs. Single Fan-Out
+
+The original sprint guide (Phase 3) specified a single fan-out BFF route at `GET /api/bff/impact/overview` that would issue five parallel ExtraHop API calls and return a unified response containing headline KPIs, time-series data, top talkers, detections, and alerts in one payload. The current implementation decomposes this into six independent BFF routes (`/headline`, `/timeseries`, `/top-talkers`, `/detections`, `/alerts`, `/appliance-status`), each with its own fixture set, error handling, and truth receipt.
+
+This deviation is documented in detail in the "Architectural Drift Record: BFF Route Decomposition" section below (lines 883–929 of this file). It was a deliberate choice for the contract-first phase to enable slice isolation, fixture determinism, and independent error handling. Three reconciliation paths (keep decomposed, reintroduce fan-out, hybrid) are documented for the live integration phase. The shared types and Zod validators are designed to compose into a unified response schema without breaking existing contracts.
+
+**Impact:** The browser makes 5–6 parallel BFF requests on Impact Deck load instead of 1. This does not affect correctness but will affect latency characteristics differently than the original single-request design. The performance budget proof (Slice 22) measures total surface render time, which includes all parallel requests, so the budget numbers are valid for the decomposed architecture but would change under a fan-out architecture.
+
+### Deviation 2: Appliance Settings Surface — Extra Scope Beyond Original Cockpit Path
+
+Slice 14 introduced an Appliance Settings page (`/settings`) with a database-backed configuration form for ExtraHop hostname, API key, verify SSL, cloud services, and nickname. This surface was not part of the original cockpit sprint guide, which focused on the five monitoring/analysis surfaces (Impact Deck, Flow Theater, Blast Radius, Correlation, Topology) and the Inspector subsystem.
+
+The Appliance Settings page was added because the Appliance Status Footer (Slice 07) needed a way to transition from the "not configured" quiet state to a configured state. Without a settings surface, the footer would permanently show "Appliance not configured" with no path to resolution. The settings page provides that path, but it is extra scope that was not in the original plan.
+
+**Impact:** The sidebar navigation includes a "Settings" item under the "System" section that links to `/settings`. This is a real, functional page with tRPC procedures, database operations, and form validation — not a placeholder. It is tested (90 runtime test executions in Slice 14) and has its own truth receipt. However, it should be understood as an implementation-phase addition, not an original cockpit requirement.
+
+### Deviation 3: Help Nav Item — Still a Placeholder
+
+The sidebar navigation includes a "Help" item under the "System" section. This item is flagged as `placeholder: true` in the DashboardLayout menu configuration. Clicking it shows a toast notification ("Coming soon — Help is not yet implemented") and does not navigate to any page. The item renders in a dimmed color (`oklch(0.45 0 0)`) to visually indicate its placeholder status.
+
+No Help page, keyboard shortcuts reference, glossary, or support links have been implemented. This is an incomplete nav item, not a deferred-by-contract item — it could be built without live hardware but has not been prioritized.
+
+**Impact:** The sidebar shows 7 nav items, of which 6 are functional and 1 (Help) is a placeholder. Users who click Help will see a toast but no content.
+
+### Deviation 4: Performance Budget Proof — Bounded to Sandbox Fixture-Backed Harness
+
+Slice 22 formally proved that all 6 major surfaces render within their documented performance budgets (Impact Deck <2s, Flow Theater <5s, Blast Radius <3s, Correlation <2s, Topology <4s, Inspector tab switch <200ms). All 6 surfaces passed, with actual times well below budgets.
+
+However, this proof is valid only under the following conditions:
+
+| Condition | Value |
+|-----------|-------|
+| Browser | Headless Chromium in sandbox VM |
+| Data source | Fixture-backed BFF routes (no network latency to ExtraHop) |
+| Payload size | Deterministic fixture payloads (not production-scale data) |
+| Concurrency | Single user, no contention |
+| Runs | 3 per surface (mean + stddev) |
+| Hardware | Sandbox VM (not production server hardware) |
+
+The performance budget numbers are real measurements under these specific conditions. They are not production SLA claims, not load-test results, and not representative of performance with live ExtraHop appliance data, which would introduce additional latency from appliance API calls, larger payload sizes, and variable network conditions.
+
+Slice 22b (Inspector Performance Deep-Dive) similarly documents render path contracts, mount/unmount lifecycle scenarios, rerender budgets, and memoization audits that are validated structurally (source code analysis, useCallback verification, context isolation) rather than empirically (React.Profiler runtime measurement). The rerender budget of 8 per selection change is a contract, not a measured value.
+
+**Impact:** The performance proof establishes that the frontend rendering layer is not the bottleneck under fixture conditions. Production performance will depend on ExtraHop API latency, BFF processing time, payload size, and server hardware — none of which are measured or claimed.
+
+### Deviation 5: Slice Numbering Gaps and Non-Sequential Delivery
+
+The slice numbering is not fully sequential. Slices 0–16 are in CONTRACTS.md. Slices 17–22b have individual receipt files (`SLICE-17-RECEIPT.md` through `SLICE-22b-RECEIPT.md`). There is no Slice 03 standalone receipt (it is inline in CONTRACTS.md as part of the original delivery). The numbering reflects the order of implementation, not a pre-planned sequence.
+
+### Summary of Current State
+
+| Surface | Status | Slices | Deviation |
+|---------|--------|--------|-----------|
+| Impact Deck | Implemented against fixtures | 00, 02, 03, 04, 05, 06, 07 | Decomposed BFF routes (not single fan-out) |
+| Flow Theater | Implemented against fixtures | 17 | None known |
+| Blast Radius | Implemented against fixtures | 18 | None known |
+| Correlation | Implemented against fixtures | 19 | None known |
+| Topology | Implemented against fixtures | 21 | None known |
+| Inspector (Device) | Implemented against fixtures | 08, 09, 10, 12, 13, 16 | None known |
+| Inspector (Detection) | Implemented against fixtures | 11, 12 | None known |
+| Inspector (Alert) | Implemented against fixtures | 11, 12 | None known |
+| Appliance Settings | Implemented against fixtures + DB | 14 | Extra scope (not in original plan) |
+| Time-Window Sync | Audited and proven | 15 | None known |
+| Performance Budget | Proven in sandbox harness | 22, 22b | Bounded proof (not production claim) |
+| Help | Placeholder nav item only | — | Not implemented |
+
+### What This Document Does Not Claim
+
+This contract registry does not claim:
+
+1. **Production readiness.** All data flows through fixture-backed BFF routes. No live ExtraHop integration has been attempted or validated.
+2. **Exact conformance with the original sprint guide.** The deviations listed above are real and documented.
+3. **Universal performance guarantees.** The Slice 22 budget proof is bounded to sandbox conditions.
+4. **Feature completeness.** Help is a placeholder. Cross-surface navigation (e.g., clicking a topology node to open Blast Radius) is not yet wired. Responsive layout at mobile breakpoints has not been audited.
+5. **Live validation of any kind.** Every "Passed" verdict in this registry means "passed against deterministic software evidence in the contract phase." It does not mean "validated against live hardware."
+
+---
+
 ## Truth Receipt Template
 
 ```

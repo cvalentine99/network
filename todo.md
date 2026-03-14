@@ -51,3 +51,8 @@
 - [x] Slice 22b.2 — Detail pane mount/unmount lifecycle: track mount/unmount counts per selection change, ensure clean teardown, tests
 - [x] Slice 22b.3 — Tab switch rerender count: measure rerenders during inspector tab/selection changes, enforce budget, tests
 - [x] Slice 22b.4 — Large payload memoization: verify memoization guards on device-detail, detection-detail, alert-detail payloads, tests
+- [x] Build doc honesty update: document Impact Deck decomposed architecture deviation from original single-route plan
+- [x] Build doc honesty update: document Appliance Settings as extra scope beyond original cockpit path
+- [x] Build doc honesty update: document Help as still a placeholder nav item
+- [x] Build doc honesty update: document performance budget proof as bounded to sandbox fixture-backed harness, not a universal production claim
+- [x] Build doc honesty update: frame overall status as material alignment with remaining documented deviations, not exact conformance

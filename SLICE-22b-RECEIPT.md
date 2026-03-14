@@ -77,4 +77,4 @@ Not attempted. Deferred by contract: live hardware / appliance / packet store / 
 **Passed.** All four investigation areas are contract-proven with shared types, Zod validators, deterministic fixtures, 116 passing tests, 4 screenshots, and written observations. The render path, mount lifecycle, rerender budget, and memoization audit are fully documented and validated against source code contracts. No live hardware was required or claimed.
 
 ## COMMIT
-(pending checkpoint)
+f6473275
