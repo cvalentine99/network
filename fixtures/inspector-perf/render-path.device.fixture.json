@@ -1,0 +1,21 @@
+{
+  "description": "Render path fixture for device entity kind. Traces the component tree from InspectorShell to DeviceDetailPane terminal states.",
+  "kind": "device",
+  "steps": [
+    { "component": "InspectorShell", "renders": true, "testId": "inspector-shell", "fetchesBff": false, "readsContext": false },
+    { "component": "InspectorBreadcrumb", "renders": true, "testId": "inspector-breadcrumb", "fetchesBff": false, "readsContext": true },
+    { "component": "InspectorContent", "renders": true, "testId": null, "fetchesBff": false, "readsContext": false },
+    { "component": "DeviceDetailPane", "renders": true, "testId": null, "fetchesBff": true, "readsContext": false },
+    { "component": "DeviceDetailPane.LoadingState", "renders": true, "testId": "device-detail-loading", "fetchesBff": false, "readsContext": false },
+    { "component": "DeviceDetailPane.PopulatedState", "renders": true, "testId": "device-detail-populated", "fetchesBff": false, "readsContext": true }
+  ],
+  "terminalTestIds": [
+    "device-detail-loading",
+    "device-detail-populated",
+    "device-detail-quiet",
+    "device-detail-error",
+    "device-detail-not-found",
+    "device-detail-malformed"
+  ],
+  "totalComponents": 6
+}

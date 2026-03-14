@@ -1,0 +1,21 @@
+{
+  "description": "Render path fixture for alert entity kind. Traces the component tree from InspectorShell to AlertDetailPane terminal states.",
+  "kind": "alert",
+  "steps": [
+    { "component": "InspectorShell", "renders": true, "testId": "inspector-shell", "fetchesBff": false, "readsContext": false },
+    { "component": "InspectorBreadcrumb", "renders": true, "testId": "inspector-breadcrumb", "fetchesBff": false, "readsContext": true },
+    { "component": "InspectorContent", "renders": true, "testId": null, "fetchesBff": false, "readsContext": false },
+    { "component": "AlertDetailPane", "renders": true, "testId": null, "fetchesBff": true, "readsContext": false },
+    { "component": "AlertDetailPane.LoadingState", "renders": true, "testId": "alert-detail-loading", "fetchesBff": false, "readsContext": false },
+    { "component": "AlertDetailPane.PopulatedState", "renders": true, "testId": "alert-detail-populated", "fetchesBff": false, "readsContext": true }
+  ],
+  "terminalTestIds": [
+    "alert-detail-loading",
+    "alert-detail-populated",
+    "alert-detail-quiet",
+    "alert-detail-error",
+    "alert-detail-not-found",
+    "alert-detail-malformed"
+  ],
+  "totalComponents": 6
+}

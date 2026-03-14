@@ -46,3 +46,8 @@
 - [x] Slice 21 receipt correction: (1) commit hash updated from "(pending checkpoint)" to fac9d48b; (2) screenshot evidence now distinguishes 5 local PNG screenshots + 1 CDN-hosted large-scale screenshot reference
 - [x] Slice 22 — Performance Budget Validation: formal timing proof across all major surfaces (Impact Deck <2s, Flow Theater <5s, Blast Radius <3s, Correlation <2s, Topology <4s, Inspector tab switch <200ms), measurement harness, budget constants, shared types/validators, Vitest tests, timing evidence capture, screenshots, truth receipt
 - [x] Slice 22 receipt correction: status updated to "Provisionally Passed — screenshot evidence missing from bundle"; ZIP re-bundled to include screenshots/*.png files
+- [x] Slice 22b — Inspector Performance Deep-Dive: render path tracing, detail pane mount/unmount lifecycle, tab switch rerender count, large payload memoization
+- [x] Slice 22b.1 — Inspector render path: trace the full component tree from selection to rendered pane, shared types, validators, tests
+- [x] Slice 22b.2 — Detail pane mount/unmount lifecycle: track mount/unmount counts per selection change, ensure clean teardown, tests
+- [x] Slice 22b.3 — Tab switch rerender count: measure rerenders during inspector tab/selection changes, enforce budget, tests
+- [x] Slice 22b.4 — Large payload memoization: verify memoization guards on device-detail, detection-detail, alert-detail payloads, tests
