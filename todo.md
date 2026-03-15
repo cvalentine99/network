@@ -286,3 +286,38 @@ These items are tracked here for the live integration phase.
 - [x] Full test suite verification: 2,314 tests passing across 34 files — zero regressions
 - [x] New test file: slice29-extrahop-integration.test.ts (113 tests)
 - [x] Existing test file: slice29-live-integration.test.ts (55 tests)
+
+# FACT_DEVICE_ACTIVITY ETL PIPELINE (Slice 30)
+
+## Phase 1: Contract definition
+- [x] Review fact_device_activity table schema in drizzle/schema.ts
+- [x] Review getDeviceActivity helper in server/db.ts
+- [x] Review how DeviceDetailPane consumes activity data
+- [x] Define ETL data contract — shared/device-activity-contract.ts (Zod schemas for EH response, normalized row, summary, ETL result)
+
+## Phase 2: ETL implementation
+- [x] Build normalizeDeviceActivity — server/extrahop-normalizers.ts (raw EH → DeviceActivityRecord[])
+- [x] Build computeActivitySummary — server/extrahop-normalizers.ts (records → activitySummary shape)
+- [x] Build upsertDeviceActivity — server/db.ts (batch upsert with ON DUPLICATE KEY UPDATE, 50-row batches)
+- [x] Build getDeviceActivitySummary — server/db.ts (COUNT DISTINCT stat_name, COUNT *)
+- [x] Wire ETL into live-mode device-detail route — server/routes/impact.ts Step 5 (GET /api/v1/devices/{id}/activity → normalize → upsert → compute summary)
+- [x] Fallback: if activity API fails, query DB summary; if DB also fails, return zeros
+- [ ] Wire ETL into a periodic background job (scheduled refresh) — DEFERRED: on-demand backfill is sufficient for current phase
+- [x] Fixture-mode ETL bypass: fixture files return pre-built activitySummary (no ETL needed)
+
+## Phase 3: Tests
+- [x] Write normalizeDeviceActivity tests (12 tests: populated, empty, non-array, null entries, id=0, empty stat_name, deduplication, malformed, NaN/Infinity, camelCase, schema validation)
+- [x] Write computeActivitySummary tests (6 tests: populated, empty, null firstSeen/lastSeen, schema validation, duplicate protocols)
+- [x] Write DeviceActivityEtlResultSchema tests (2 tests: valid, negative rejection)
+- [x] Write fixture file validation tests (6 tests: populated/quiet/malformed existence and normalization)
+- [x] Write BFF route integration tests (3 tests: populated activitySummary, non-negative integers, quiet device)
+- [x] Write NaN/Infinity guard tests (3 tests: no NaN, no Infinity, no NaN/Infinity in summary)
+- [x] Write edge case tests (4 tests: 100 records, single record, same stat_name, default polledAt)
+- [x] Write EhDeviceActivityRecordSchema validation tests (5 tests)
+- [x] Full test suite verification: 2,358 tests across 35 files — zero regressions
+- [x] New test file: slice30-device-activity-etl.test.ts (44 tests)
+
+## Phase 4: Documentation and truth receipt
+- [x] Update DEPLOY.md with ETL pipeline documentation
+- [x] Update todo.md with completion status
+- [ ] Produce truth receipt

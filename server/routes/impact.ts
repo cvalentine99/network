@@ -35,8 +35,11 @@ import {
   normalizeDetection,
   normalizeAlert,
   normalizeApplianceStatus,
+  normalizeDeviceActivity,
+  computeActivitySummary,
   buildMetricsRequest,
 } from '../extrahop-normalizers';
+import { upsertDeviceActivity, getDeviceActivitySummary } from '../db';
 
 const impactRouter = Router();
 
@@ -839,6 +842,52 @@ impactRouter.get('/device-detail', async (req, res) => {
         // Non-fatal — return empty alerts
       }
 
+      // Step 5: Fetch device activity (ETL — Slice 30)
+      // GET /api/v1/devices/{id}/activity → normalize → upsert to fact_device_activity
+      let activitySummary = {
+        firstSeen: device.discoverTimeIso,
+        lastSeen: device.lastSeenIso,
+        totalProtocols: 0,
+        totalConnections: 0,
+        peakThroughputBps: null as number | null,
+      };
+
+      try {
+        const activityResponse = await ehRequest<any[]>({
+          method: 'GET',
+          path: `/api/v1/devices/${deviceId}/activity`,
+          cacheTtlMs: METRICS_CACHE_TTL,
+        });
+
+        const rawActivity = Array.isArray(activityResponse.data) ? activityResponse.data : [];
+        const normalizedRecords = normalizeDeviceActivity(rawActivity, deviceId);
+
+        // Upsert to DB (non-blocking — fire and forget, but await for consistency)
+        if (normalizedRecords.length > 0) {
+          try {
+            await upsertDeviceActivity(normalizedRecords);
+          } catch {
+            // DB upsert failure is non-fatal — we still have the in-memory records
+          }
+        }
+
+        // Compute summary from the freshly fetched records
+        activitySummary = computeActivitySummary(
+          normalizedRecords,
+          device.discoverTimeIso,
+          device.lastSeenIso
+        );
+      } catch {
+        // Non-fatal — try to get summary from DB if available
+        try {
+          const dbSummary = await getDeviceActivitySummary(deviceId);
+          activitySummary.totalProtocols = dbSummary.totalProtocols;
+          activitySummary.totalConnections = dbSummary.totalConnections;
+        } catch {
+          // DB also unavailable — keep zeros
+        }
+      }
+
       const deviceDetail = {
         device,
         traffic: {
@@ -851,13 +900,7 @@ impactRouter.get('/device-detail', async (req, res) => {
         protocols: [], // ExtraHop doesn't have a direct protocol breakdown endpoint
         associatedDetections,
         associatedAlerts,
-        activitySummary: {
-          firstSeen: device.discoverTimeIso,
-          lastSeen: device.lastSeenIso,
-          totalProtocols: 0,
-          totalConnections: 0,
-          peakThroughputBps: null,
-        },
+        activitySummary,
       };
 
       const validation = DeviceDetailSchema.safeParse(deviceDetail);

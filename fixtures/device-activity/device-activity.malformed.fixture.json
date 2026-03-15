@@ -1,0 +1,31 @@
+{
+  "description": "Malformed ExtraHop GET /api/v1/devices/{id}/activity response. Contains records with invalid types, missing fields, and edge-case values. Used by Slice 30 ETL pipeline tests to verify graceful degradation.",
+  "ehResponse": [
+    {
+      "id": "not-a-number",
+      "stat_name": 123,
+      "from_time": "bad",
+      "until_time": null,
+      "mod_time": true
+    },
+    {
+      "id": 10020,
+      "stat_name": "",
+      "from_time": 1741795200000,
+      "until_time": 1741795500000,
+      "mod_time": 1741795500000
+    },
+    null,
+    {
+      "stat_name": "net",
+      "from_time": 1741795200000
+    },
+    {
+      "id": 10021,
+      "stat_name": "http_server",
+      "from_time": 1741795200000,
+      "until_time": 1741795500000,
+      "mod_time": 1741795500000
+    }
+  ]
+}

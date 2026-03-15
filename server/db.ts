@@ -281,6 +281,70 @@ export async function getDeviceActivity(deviceId: number, limit = 20) {
     .limit(limit);
 }
 
+/**
+ * Upsert device activity records from ExtraHop GET /api/v1/devices/{id}/activity.
+ * Uses activity_id (= raw ExtraHop record id) as the deduplication key.
+ * Returns the count of rows upserted.
+ */
+export async function upsertDeviceActivity(
+  records: Array<{
+    rawId: number;
+    activityId: number;
+    deviceId: number;
+    fromTime: number;
+    untilTime: number;
+    modTime: number;
+    statName: string;
+    polledAt: Date;
+  }>
+): Promise<number> {
+  const db = await getDb();
+  if (!db || records.length === 0) return 0;
+
+  let upserted = 0;
+  // Process in batches of 50 to avoid query size limits
+  const BATCH_SIZE = 50;
+  for (let i = 0; i < records.length; i += BATCH_SIZE) {
+    const batch = records.slice(i, i + BATCH_SIZE);
+    await db.insert(factDeviceActivity).values(batch).onDuplicateKeyUpdate({
+      set: {
+        fromTime: sql`VALUES(from_time)`,
+        untilTime: sql`VALUES(until_time)`,
+        modTime: sql`VALUES(mod_time)`,
+        statName: sql`VALUES(stat_name)`,
+        polledAt: sql`VALUES(polled_at)`,
+      },
+    });
+    upserted += batch.length;
+  }
+  return upserted;
+}
+
+/**
+ * Compute activity summary for a device from fact_device_activity.
+ * Returns totalProtocols (distinct stat_name count) and totalConnections (total records).
+ */
+export async function getDeviceActivitySummary(deviceId: number): Promise<{
+  totalProtocols: number;
+  totalConnections: number;
+}> {
+  const db = await getDb();
+  if (!db) return { totalProtocols: 0, totalConnections: 0 };
+
+  const [result] = await db
+    .select({
+      totalProtocols: sql<number>`COUNT(DISTINCT ${factDeviceActivity.statName})`,
+      totalConnections: sql<number>`COUNT(*)`,
+    })
+    .from(factDeviceActivity)
+    .where(eq(factDeviceActivity.deviceId, deviceId));
+
+  return {
+    totalProtocols: Number(result?.totalProtocols) || 0,
+    totalConnections: Number(result?.totalConnections) || 0,
+  };
+}
+
 /* ─────────────────────────── Alerts ─────────────────────────── */
 
 export async function getAlerts(opts?: {

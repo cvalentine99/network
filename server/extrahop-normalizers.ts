@@ -435,6 +435,97 @@ export function normalizeApplianceStatus(
   };
 }
 
+// ─── Device Activity Normalizer ─────────────────────────────────────────
+/**
+ * GET /api/v1/devices/{id}/activity response:
+ * [
+ *   {
+ *     "id": <number>,
+ *     "stat_name": "net" | "http_client" | "dns_client" | ...,
+ *     "from_time": <epochMs>,
+ *     "until_time": <epochMs>,
+ *     "mod_time": <epochMs>
+ *   }
+ * ]
+ *
+ * Normalizes into rows ready for fact_device_activity upsert.
+ */
+export interface DeviceActivityRecord {
+  rawId: number;
+  activityId: number;
+  deviceId: number;
+  fromTime: number;
+  untilTime: number;
+  modTime: number;
+  statName: string;
+  polledAt: Date;
+}
+
+export function normalizeDeviceActivity(
+  rawRecords: any[],
+  deviceId: number,
+  polledAt: Date = new Date()
+): DeviceActivityRecord[] {
+  if (!Array.isArray(rawRecords)) return [];
+
+  const records: DeviceActivityRecord[] = [];
+  const seenIds = new Set<number>();
+
+  for (const raw of rawRecords) {
+    if (!raw || typeof raw !== 'object') continue;
+
+    const rawId = safeNum(raw.id);
+    // Skip records with no valid id or duplicate ids in the same batch
+    if (rawId === 0 || seenIds.has(rawId)) continue;
+    seenIds.add(rawId);
+
+    const statName = safeStr(raw.stat_name ?? raw.statName);
+    if (!statName) continue; // stat_name is required
+
+    records.push({
+      rawId,
+      activityId: rawId, // ExtraHop activity record ID is the dedup key
+      deviceId,
+      fromTime: safeNum(raw.from_time ?? raw.fromTime),
+      untilTime: safeNum(raw.until_time ?? raw.untilTime),
+      modTime: safeNum(raw.mod_time ?? raw.modTime),
+      statName,
+      polledAt,
+    });
+  }
+
+  return records;
+}
+
+/**
+ * Compute an activity summary from normalized activity records.
+ * Used by the device-detail route to populate the activitySummary field.
+ */
+export function computeActivitySummary(
+  records: DeviceActivityRecord[],
+  firstSeen: string | null,
+  lastSeen: string | null
+): {
+  firstSeen: string | null;
+  lastSeen: string | null;
+  totalProtocols: number;
+  totalConnections: number;
+  peakThroughputBps: number | null;
+} {
+  const distinctProtocols = new Set<string>();
+  for (const r of records) {
+    if (r.statName) distinctProtocols.add(r.statName);
+  }
+
+  return {
+    firstSeen,
+    lastSeen,
+    totalProtocols: distinctProtocols.size,
+    totalConnections: records.length,
+    peakThroughputBps: null, // Not derivable from the activity endpoint alone
+  };
+}
+
 // ─── Metrics Request Builder ─────────────────────────────────────────────
 /**
  * Build the standard ExtraHop POST /api/v1/metrics request body.
