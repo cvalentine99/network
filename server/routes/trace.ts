@@ -525,7 +525,7 @@ function selectFixture(mode: TraceEntryMode, value: string): string {
 /**
  * POST /api/bff/trace/run
  */
-traceRouter.post('/run', (req, res) => {
+traceRouter.post('/run', async (req, res) => {
   // Validate the request body
   const parseResult = TraceIntentSchema.safeParse(req.body);
   if (!parseResult.success) {
@@ -547,7 +547,7 @@ traceRouter.post('/run', (req, res) => {
   res.flushHeaders();
 
   // ── LIVE MODE ──
-  if (!isFixtureMode()) {
+  if (!(await isFixtureMode())) {
     executeLiveTrace(
       res,
       intent.mode,
@@ -613,13 +613,13 @@ traceRouter.post('/run', (req, res) => {
  * Returns the list of available fixture files for testing/development.
  * NOT available in production.
  */
-traceRouter.get('/fixtures', (_req, res) => {
+traceRouter.get('/fixtures', async (_req, res) => {
   if (!isDev) {
     res.status(404).json({ error: 'Not available in production' });
     return;
   }
 
-  if (!isFixtureMode()) {
+  if (!(await isFixtureMode())) {
     res.json({ fixtures: [], mode: 'live' });
     return;
   }

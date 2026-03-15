@@ -407,3 +407,11 @@ These items are tracked here for the live integration phase.
 - [x] Prove with curl: /api/bff/impact/headline returns NETWORK_ERROR when DB credentials exist (CORRECT — attempts live call)
 - [x] Fix 11 test failures: add await to all isFixtureMode() assertions in test files
 - [x] Full test suite: 2,398 tests across 36 files — zero regressions
+
+# TRACE.TS ASYNC isFixtureMode() BUG (Slice 34b)
+- [x] BUG: trace.ts line 550 and 622 called isFixtureMode() without await — Promise is always truthy, so !isFixtureMode() was always false, live-mode branch never executed
+- [x] Patch: line 528 handler made async, line 550 changed to if (!(await isFixtureMode())); line 616 handler made async, line 622 changed to if (!(await isFixtureMode()))
+- [x] Full codebase audit: all 22 runtime isFixtureMode() calls across 7 route files confirmed to use await; only isFixtureModeSync() (ETL scheduler startup) is intentionally sync with documented contract
+- [x] Prove with runtime curl: /api/bff/trace/run enters live mode when DB credentials exist — returns SSE with NETWORK_ERROR (correct: attempts live ExtraHop call)
+- [x] Prove with runtime curl: /api/bff/trace/fixtures returns {fixtures:[], mode:'live'} when DB credentials exist; returns fixture list with mode:'fixture' when no credentials
+- [x] Trace tests: 56 passed (slice17-bff + decontamination); full suite: 2,398 passed across 36 files, zero regressions
