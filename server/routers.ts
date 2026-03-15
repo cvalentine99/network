@@ -172,6 +172,77 @@ const topologyRouter = router({
   }),
 });
 
+/* ─────────────────────────── Saved Topology Views (Slice 35E) ─────────────────────────── */
+
+/** Local-only user ID — no Manus OAuth required */
+const LOCAL_USER_ID = 'local';
+
+const savedViewsRouter = router({
+  list: publicProcedure.query(async () => {
+    return db.getSavedTopologyViews(LOCAL_USER_ID);
+  }),
+
+  get: publicProcedure
+    .input(z.object({ id: z.number().int().positive() }))
+    .query(async ({ input }) => {
+      return db.getSavedTopologyViewById(input.id, LOCAL_USER_ID);
+    }),
+
+  create: publicProcedure
+    .input(z.object({
+      name: z.string().min(1).max(100),
+      viewMode: z.string().default('constellation'),
+      zoom: z.number().positive().max(10).default(1),
+      panX: z.number().finite().default(0),
+      panY: z.number().finite().default(0),
+      collapsedSubnets: z.array(z.string()).default([]),
+      roleFilters: z.array(z.string()).default([]),
+      protocolFilters: z.array(z.string()).default([]),
+      anomalyOverlayEnabled: z.boolean().default(false),
+      anomalyThreshold: z.number().positive().default(50),
+      criticalPathSource: z.number().int().positive().nullable().default(null),
+      criticalPathDestination: z.number().int().positive().nullable().default(null),
+      searchTerm: z.string().default(''),
+    }))
+    .mutation(async ({ input }) => {
+      const id = await db.createSavedTopologyView({
+        userId: LOCAL_USER_ID,
+        ...input,
+      });
+      return { id };
+    }),
+
+  update: publicProcedure
+    .input(z.object({
+      id: z.number().int().positive(),
+      name: z.string().min(1).max(100).optional(),
+      viewMode: z.string().optional(),
+      zoom: z.number().positive().max(10).optional(),
+      panX: z.number().finite().optional(),
+      panY: z.number().finite().optional(),
+      collapsedSubnets: z.array(z.string()).optional(),
+      roleFilters: z.array(z.string()).optional(),
+      protocolFilters: z.array(z.string()).optional(),
+      anomalyOverlayEnabled: z.boolean().optional(),
+      anomalyThreshold: z.number().positive().optional(),
+      criticalPathSource: z.number().int().positive().nullable().optional(),
+      criticalPathDestination: z.number().int().positive().nullable().optional(),
+      searchTerm: z.string().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const { id, ...rest } = input;
+      const ok = await db.updateSavedTopologyView(id, LOCAL_USER_ID, rest);
+      return { success: ok };
+    }),
+
+  delete: publicProcedure
+    .input(z.object({ id: z.number().int().positive() }))
+    .mutation(async ({ input }) => {
+      const ok = await db.deleteSavedTopologyView(input.id, LOCAL_USER_ID);
+      return { success: ok };
+    }),
+});
+
 /* ─────────────────────────── Reference Data ─────────────────────────── */
 
 const referenceRouter = router({
@@ -359,6 +430,7 @@ export const appRouter = router({
   detections: detectionsRouter,
   metrics: metricsRouter,
   topology: topologyRouter,
+  savedViews: savedViewsRouter,
   reference: referenceRouter,
   schema: schemaRouter,
   applianceConfig: applianceConfigRouter,

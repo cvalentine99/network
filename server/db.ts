@@ -34,6 +34,7 @@ import {
   bridgeAlertNetwork,
   schemaDriftLog,
   applianceConfig,
+  savedTopologyViews,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -689,4 +690,91 @@ export async function getLatestDriftLog() {
   if (!db) return null;
   const [latest] = await db.select().from(schemaDriftLog).orderBy(desc(schemaDriftLog.runAt)).limit(1);
   return latest ?? null;
+}
+
+/* ─────────────────────────── Saved Topology Views (Slice 35E) ─────────────────────────── */
+
+export async function getSavedTopologyViews(userId: string) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(savedTopologyViews)
+    .where(eq(savedTopologyViews.userId, userId))
+    .orderBy(desc(savedTopologyViews.updatedAt));
+}
+
+export async function getSavedTopologyViewById(id: number, userId: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const [view] = await db.select().from(savedTopologyViews)
+    .where(and(eq(savedTopologyViews.id, id), eq(savedTopologyViews.userId, userId)))
+    .limit(1);
+  return view ?? null;
+}
+
+export async function createSavedTopologyView(input: {
+  userId: string;
+  name: string;
+  viewMode: string;
+  zoom: number;
+  panX: number;
+  panY: number;
+  collapsedSubnets: string[];
+  roleFilters: string[];
+  protocolFilters: string[];
+  anomalyOverlayEnabled: boolean;
+  anomalyThreshold: number;
+  criticalPathSource: number | null;
+  criticalPathDestination: number | null;
+  searchTerm: string;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+  const [result] = await db.insert(savedTopologyViews).values({
+    userId: input.userId,
+    name: input.name,
+    viewMode: input.viewMode,
+    zoom: input.zoom,
+    panX: input.panX,
+    panY: input.panY,
+    collapsedSubnets: input.collapsedSubnets,
+    roleFilters: input.roleFilters,
+    protocolFilters: input.protocolFilters,
+    anomalyOverlayEnabled: input.anomalyOverlayEnabled,
+    anomalyThreshold: input.anomalyThreshold,
+    criticalPathSource: input.criticalPathSource,
+    criticalPathDestination: input.criticalPathDestination,
+    searchTerm: input.searchTerm,
+  });
+  return result.insertId;
+}
+
+export async function updateSavedTopologyView(id: number, userId: string, input: {
+  name?: string;
+  viewMode?: string;
+  zoom?: number;
+  panX?: number;
+  panY?: number;
+  collapsedSubnets?: string[];
+  roleFilters?: string[];
+  protocolFilters?: string[];
+  anomalyOverlayEnabled?: boolean;
+  anomalyThreshold?: number;
+  criticalPathSource?: number | null;
+  criticalPathDestination?: number | null;
+  searchTerm?: string;
+}) {
+  const db = await getDb();
+  if (!db) return false;
+  const [result] = await db.update(savedTopologyViews)
+    .set(input)
+    .where(and(eq(savedTopologyViews.id, id), eq(savedTopologyViews.userId, userId)));
+  return result.affectedRows > 0;
+}
+
+export async function deleteSavedTopologyView(id: number, userId: string) {
+  const db = await getDb();
+  if (!db) return false;
+  const [result] = await db.delete(savedTopologyViews)
+    .where(and(eq(savedTopologyViews.id, id), eq(savedTopologyViews.userId, userId)));
+  return result.affectedRows > 0;
 }

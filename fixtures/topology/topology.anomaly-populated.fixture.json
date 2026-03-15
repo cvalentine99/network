@@ -1,0 +1,56 @@
+{
+  "_meta": {
+    "fixture": "topology.anomaly-populated.fixture.json",
+    "generatedAt": "2026-03-15T01:00:00.000Z",
+    "purpose": "Current topology with anomalous traffic patterns. Compare against baseline fixture to detect deviations."
+  },
+  "intent": "populated",
+  "payload": {
+    "nodes": [
+      { "id": 1, "displayName": "core-switch-01", "ipaddr": "10.1.10.1", "macaddr": "00:1A:2B:3C:4D:01", "role": "gateway", "critical": true, "activeDetections": 1, "activeAlerts": 1, "totalBytes": 15000000, "clusterId": "subnet-10.1.10" },
+      { "id": 2, "displayName": "web-server-01", "ipaddr": "10.1.10.10", "macaddr": "00:1A:2B:3C:4D:02", "role": "server", "critical": true, "activeDetections": 2, "activeAlerts": 0, "totalBytes": 12000000, "clusterId": "subnet-10.1.10" },
+      { "id": 3, "displayName": "db-primary", "ipaddr": "10.1.10.20", "macaddr": "00:1A:2B:3C:4D:03", "role": "db_server", "critical": true, "activeDetections": 0, "activeAlerts": 0, "totalBytes": 2100000, "clusterId": "subnet-10.1.10" },
+      { "id": 4, "displayName": "app-server-01", "ipaddr": "10.1.10.30", "macaddr": "00:1A:2B:3C:4D:04", "role": "server", "critical": false, "activeDetections": 0, "activeAlerts": 0, "totalBytes": 1600000, "clusterId": "subnet-10.1.10" },
+      { "id": 5, "displayName": "workstation-01", "ipaddr": "10.1.20.10", "macaddr": "00:1A:2B:3C:4D:05", "role": "client", "critical": false, "activeDetections": 0, "activeAlerts": 0, "totalBytes": 5000000, "clusterId": "subnet-10.1.20" },
+      { "id": 6, "displayName": "workstation-02", "ipaddr": "10.1.20.11", "macaddr": "00:1A:2B:3C:4D:06", "role": "client", "critical": false, "activeDetections": 0, "activeAlerts": 0, "totalBytes": 100000, "clusterId": "subnet-10.1.20" },
+      { "id": 7, "displayName": "dns-server-01", "ipaddr": "10.1.30.1", "macaddr": "00:1A:2B:3C:4D:07", "role": "dns_server", "critical": true, "activeDetections": 0, "activeAlerts": 0, "totalBytes": 850000, "clusterId": "subnet-10.1.30" },
+      { "id": 8, "displayName": "fw-perimeter", "ipaddr": "10.1.30.254", "macaddr": "00:1A:2B:3C:4D:08", "role": "firewall", "critical": true, "activeDetections": 0, "activeAlerts": 0, "totalBytes": 4200000, "clusterId": "subnet-10.1.30" },
+      { "id": 9, "displayName": "printer-floor2", "ipaddr": "10.1.20.50", "macaddr": "00:1A:2B:3C:4D:09", "role": "printer", "critical": false, "activeDetections": 0, "activeAlerts": 0, "totalBytes": 55000, "clusterId": "subnet-10.1.20" },
+      { "id": 10, "displayName": "voip-pbx", "ipaddr": "10.1.30.10", "macaddr": "00:1A:2B:3C:4D:10", "role": "voip", "critical": false, "activeDetections": 0, "activeAlerts": 0, "totalBytes": 580000, "clusterId": "subnet-10.1.30" }
+    ],
+    "edges": [
+      { "sourceId": 1, "targetId": 2, "protocol": "TCP", "bytes": 8000000, "hasDetection": true, "latencyMs": 5.8 },
+      { "sourceId": 1, "targetId": 3, "protocol": "TCP", "bytes": 1600000, "hasDetection": false, "latencyMs": 0.9 },
+      { "sourceId": 2, "targetId": 3, "protocol": "TCP", "bytes": 4000000, "hasDetection": true, "latencyMs": 1.2 },
+      { "sourceId": 1, "targetId": 4, "protocol": "TCP", "bytes": 850000, "hasDetection": false, "latencyMs": 1.1 },
+      { "sourceId": 2, "targetId": 4, "protocol": "HTTP", "bytes": 650000, "hasDetection": false, "latencyMs": 2.3 },
+      { "sourceId": 5, "targetId": 1, "protocol": "TCP", "bytes": 3500000, "hasDetection": false, "latencyMs": 4.0 },
+      { "sourceId": 6, "targetId": 1, "protocol": "TCP", "bytes": 50000, "hasDetection": false, "latencyMs": 3.0 },
+      { "sourceId": 5, "targetId": 7, "protocol": "DNS", "bytes": 55000, "hasDetection": false, "latencyMs": 0.3 },
+      { "sourceId": 6, "targetId": 7, "protocol": "DNS", "bytes": 42000, "hasDetection": false, "latencyMs": 0.4 },
+      { "sourceId": 8, "targetId": 1, "protocol": "TCP", "bytes": 3200000, "hasDetection": false, "latencyMs": 0.7 },
+      { "sourceId": 8, "targetId": 10, "protocol": "UDP", "bytes": 420000, "hasDetection": false, "latencyMs": 1.6 },
+      { "sourceId": 9, "targetId": 6, "protocol": "TCP", "bytes": 32000, "hasDetection": false, "latencyMs": 5.2 }
+    ],
+    "clusters": [
+      { "id": "subnet-10.1.10", "label": "10.1.10.0/24 (Server Farm)", "groupBy": "subnet", "nodeCount": 4 },
+      { "id": "subnet-10.1.20", "label": "10.1.20.0/24 (Workstations)", "groupBy": "subnet", "nodeCount": 3 },
+      { "id": "subnet-10.1.30", "label": "10.1.30.0/24 (Infrastructure)", "groupBy": "subnet", "nodeCount": 3 }
+    ],
+    "summary": {
+      "totalNodes": 10,
+      "totalEdges": 12,
+      "totalClusters": 3,
+      "nodesWithDetections": 2,
+      "nodesWithAlerts": 1,
+      "totalBytes": 41485000,
+      "truncated": false,
+      "maxNodes": 200
+    },
+    "timeWindow": {
+      "fromMs": 1710378000000,
+      "toMs": 1710381600000
+    }
+  },
+  "error": null
+}

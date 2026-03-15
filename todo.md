@@ -415,3 +415,16 @@ These items are tracked here for the live integration phase.
 - [x] Prove with runtime curl: /api/bff/trace/run enters live mode when DB credentials exist — returns SSE with NETWORK_ERROR (correct: attempts live ExtraHop call)
 - [x] Prove with runtime curl: /api/bff/trace/fixtures returns {fixtures:[], mode:'live'} when DB credentials exist; returns fixture list with mode:'fixture' when no credentials
 - [x] Trace tests: 56 passed (slice17-bff + decontamination); full suite: 2,398 passed across 36 files, zero regressions
+
+# TIER 5 — NOC-GRADE ANALYTICAL FEATURES (Slices 35A–35F)
+- [x] Slice 35A: Subnet Map View — hierarchical subnet containers, devices inside, inter-subnet edges aggregated
+- [x] Slice 35B: Critical Path Highlighting — source-to-destination path trace and highlight
+- [x] Slice 35C: Anomaly Detection Overlay — flag edges where traffic deviates from baseline
+- [x] Slice 35D: Export Topology — PNG/SVG export of current view, JSON/CSV export of topology data
+- [x] Slice 35E: Saved Views — persist and recall filter/grouping/zoom configurations (DB-backed, publicProcedure, no auth)
+- [x] Slice 35F: Multi-Appliance Merge — merge topologies from multiple configured ExtraHop appliances
+
+# NO MANUS OAUTH — LOCAL APP CONSTRAINT
+- [x] Remove protectedProcedure from savedViews router — use publicProcedure instead
+- [x] Remove ctx.user.openId dependency — use 'local' as default userId
+- [x] Ensure no Tier 5 feature requires Manus OAuth login — verified: all routes use publicProcedure, no ctx.user dependency

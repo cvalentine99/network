@@ -3,6 +3,7 @@ import {
   boolean,
   char,
   datetime,
+  double,
   int,
   json,
   mysqlEnum,
@@ -496,3 +497,28 @@ export const schemaDriftLog = mysqlTable("schema_drift_log", {
   exitCode: tinyint("exit_code").notNull().default(0),
   reportJson: json("report_json"),
 });
+
+/* ─────────────────────────── Saved Topology Views (Slice 35E) ─────────────────────────── */
+
+export const savedTopologyViews = mysqlTable("saved_topology_views", {
+  id: int("id", { unsigned: true }).autoincrement().primaryKey(),
+  userId: varchar("user_id", { length: 255 }).notNull(),
+  name: varchar("name", { length: 100 }).notNull(),
+  viewMode: varchar("view_mode", { length: 20 }).notNull().default("constellation"),
+  zoom: double("zoom").notNull().default(1),
+  panX: double("pan_x").notNull().default(0),
+  panY: double("pan_y").notNull().default(0),
+  collapsedSubnets: json("collapsed_subnets").$type<string[]>().notNull(),
+  roleFilters: json("role_filters").$type<string[]>().notNull(),
+  protocolFilters: json("protocol_filters").$type<string[]>().notNull(),
+  anomalyOverlayEnabled: boolean("anomaly_overlay_enabled").notNull().default(false),
+  anomalyThreshold: double("anomaly_threshold").notNull().default(50),
+  criticalPathSource: int("critical_path_source"),
+  criticalPathDestination: int("critical_path_destination"),
+  searchTerm: varchar("search_term", { length: 255 }).notNull().default(""),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SavedTopologyViewRow = typeof savedTopologyViews.$inferSelect;
+export type InsertSavedTopologyViewRow = typeof savedTopologyViews.$inferInsert;

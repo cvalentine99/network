@@ -1,0 +1,50 @@
+{
+  "_meta": {
+    "fixture": "topology.multi-appliance.fixture.json",
+    "generatedAt": "2026-03-15T02:00:00.000Z",
+    "purpose": "Two appliance topologies for testing multi-appliance merge. Appliance A covers 10.1.10.0/24, Appliance B covers 10.1.20.0/24, with shared gateway node 10.1.10.1."
+  },
+  "applianceA": {
+    "applianceId": 1,
+    "label": "EH-HQ-01 (Headquarters)",
+    "payload": {
+      "nodes": [
+        { "id": 1, "displayName": "core-switch-01", "ipaddr": "10.1.10.1", "macaddr": "00:1A:2B:3C:4D:01", "role": "gateway", "critical": true, "activeDetections": 0, "activeAlerts": 0, "totalBytes": 5000000, "clusterId": "subnet-10.1.10" },
+        { "id": 2, "displayName": "web-server-01", "ipaddr": "10.1.10.10", "macaddr": "00:1A:2B:3C:4D:02", "role": "server", "critical": true, "activeDetections": 0, "activeAlerts": 0, "totalBytes": 3000000, "clusterId": "subnet-10.1.10" },
+        { "id": 3, "displayName": "db-primary", "ipaddr": "10.1.10.20", "macaddr": "00:1A:2B:3C:4D:03", "role": "db_server", "critical": true, "activeDetections": 0, "activeAlerts": 0, "totalBytes": 2000000, "clusterId": "subnet-10.1.10" }
+      ],
+      "edges": [
+        { "sourceId": 1, "targetId": 2, "protocol": "TCP", "bytes": 2000000, "hasDetection": false, "latencyMs": 1.2 },
+        { "sourceId": 1, "targetId": 3, "protocol": "TCP", "bytes": 1500000, "hasDetection": false, "latencyMs": 0.8 },
+        { "sourceId": 2, "targetId": 3, "protocol": "TCP", "bytes": 1000000, "hasDetection": false, "latencyMs": 0.5 }
+      ],
+      "clusters": [
+        { "id": "subnet-10.1.10", "label": "10.1.10.0/24 (Server Farm)", "groupBy": "subnet", "nodeCount": 3 }
+      ],
+      "summary": { "totalNodes": 3, "totalEdges": 3, "totalClusters": 1, "nodesWithDetections": 0, "nodesWithAlerts": 0, "totalBytes": 10000000, "truncated": false, "maxNodes": 200 },
+      "timeWindow": { "fromMs": 1710374400000, "toMs": 1710378000000 }
+    }
+  },
+  "applianceB": {
+    "applianceId": 2,
+    "label": "EH-BR-01 (Branch Office)",
+    "payload": {
+      "nodes": [
+        { "id": 101, "displayName": "branch-gw", "ipaddr": "10.1.10.1", "macaddr": "00:1A:2B:3C:4D:01", "role": "gateway", "critical": true, "activeDetections": 0, "activeAlerts": 0, "totalBytes": 2000000, "clusterId": "subnet-10.1.20" },
+        { "id": 102, "displayName": "workstation-01", "ipaddr": "10.1.20.10", "macaddr": "00:1A:2B:3C:4D:05", "role": "client", "critical": false, "activeDetections": 0, "activeAlerts": 0, "totalBytes": 500000, "clusterId": "subnet-10.1.20" },
+        { "id": 103, "displayName": "workstation-02", "ipaddr": "10.1.20.11", "macaddr": "00:1A:2B:3C:4D:06", "role": "client", "critical": false, "activeDetections": 0, "activeAlerts": 0, "totalBytes": 400000, "clusterId": "subnet-10.1.20" },
+        { "id": 104, "displayName": "branch-printer", "ipaddr": "10.1.20.50", "macaddr": "00:1A:2B:3C:4D:09", "role": "printer", "critical": false, "activeDetections": 0, "activeAlerts": 0, "totalBytes": 50000, "clusterId": "subnet-10.1.20" }
+      ],
+      "edges": [
+        { "sourceId": 101, "targetId": 102, "protocol": "TCP", "bytes": 300000, "hasDetection": false, "latencyMs": 3.5 },
+        { "sourceId": 101, "targetId": 103, "protocol": "TCP", "bytes": 250000, "hasDetection": false, "latencyMs": 3.2 },
+        { "sourceId": 103, "targetId": 104, "protocol": "TCP", "bytes": 30000, "hasDetection": false, "latencyMs": 5.0 }
+      ],
+      "clusters": [
+        { "id": "subnet-10.1.20", "label": "10.1.20.0/24 (Branch)", "groupBy": "subnet", "nodeCount": 4 }
+      ],
+      "summary": { "totalNodes": 4, "totalEdges": 3, "totalClusters": 1, "nodesWithDetections": 0, "nodesWithAlerts": 0, "totalBytes": 2950000, "truncated": false, "maxNodes": 200 },
+      "timeWindow": { "fromMs": 1710374400000, "toMs": 1710378000000 }
+    }
+  }
+}

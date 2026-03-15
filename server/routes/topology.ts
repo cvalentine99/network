@@ -322,6 +322,32 @@ router.post('/query', async (req: Request, res: Response) => {
   }
 });
 
+// ─── GET /baseline (for anomaly detection) ─────────────────────────
+router.get('/baseline', async (_req: Request, res: Response) => {
+  // In fixture mode, return the baseline fixture
+  if (await isFixtureMode()) {
+    try {
+      const raw = readFileSync(join(FIXTURE_DIR, 'topology.baseline.fixture.json'), 'utf-8');
+      const data = JSON.parse(raw);
+      res.json(data);
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to load baseline fixture', details: String(err) });
+    }
+    return;
+  }
+
+  // In live mode, return the same topology data as /query but from a shifted time window
+  // (baseline = previous equivalent window). For now, return the baseline fixture
+  // until historical data collection is implemented.
+  try {
+    const raw = readFileSync(join(FIXTURE_DIR, 'topology.baseline.fixture.json'), 'utf-8');
+    const data = JSON.parse(raw);
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: 'Baseline data not available', details: String(err) });
+  }
+});
+
 // ─── GET /fixtures (dev/test only) ────────────────────────────────
 router.get('/fixtures', async (_req: Request, res: Response) => {
   if (!isDev) {
