@@ -65,12 +65,44 @@ run_as_user() {
 }
 
 # ─── Resolve project root ───
+# bootstrap.sh lives at <project>/deploy/bootstrap.sh
+# It can be invoked as:
+#   sudo ./deploy/bootstrap.sh          (from project root)
+#   cd deploy && sudo ./bootstrap.sh    (from deploy/ dir)
+#   sudo /absolute/path/to/bootstrap.sh (from anywhere)
+# In all cases, SCRIPT_DIR is the deploy/ directory and PROJECT_ROOT is its parent.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 if [ ! -f "$PROJECT_ROOT/package.json" ]; then
-  fail "Cannot find package.json at $PROJECT_ROOT. Run this script from deploy/ inside the project."
+  echo ""
+  echo -e "${RED}ERROR: Cannot find package.json at $PROJECT_ROOT${NC}"
+  echo ""
+  echo "  This script must run from within the FULL project source tree."
+  echo "  The deploy/ directory alone is not sufficient — bootstrap.sh needs"
+  echo "  package.json, source code, and fixtures/ to build and run the app."
+  echo ""
+  echo "  Expected directory structure:"
+  echo "    <project-root>/"
+  echo "      package.json"
+  echo "      server/"
+  echo "      client/"
+  echo "      fixtures/"
+  echo "      deploy/"
+  echo "        bootstrap.sh   ← you are here"
+  echo ""
+  echo "  If you only have the deploy/ bundle, you need the full source ZIP."
+  echo "  Extract it, then run:  cd <project-root> && sudo ./deploy/bootstrap.sh"
+  echo ""
+  fail "Missing project source tree. See above for required structure."
 fi
+
+# Verify critical directories exist
+for DIR_CHECK in server client fixtures shared; do
+  if [ ! -d "$PROJECT_ROOT/$DIR_CHECK" ]; then
+    fail "Missing required directory: $PROJECT_ROOT/$DIR_CHECK. Is this the full project source?"
+  fi
+done
 
 # ─── Config ───
 DB_NAME="netperf_app"

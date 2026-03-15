@@ -144,3 +144,47 @@
 - [x] MODERATE: DEPLOY.md said '14+ checks', actual is 16
 - [x] LOW: Added OWNER_NAME to Dockerfile and docker-compose.yml for consistency
 - [x] LOW: Synced 01-schema.sql legacy comment block to match full-schema.sql
+
+# Bootstrap Path Fix (Slice 27c)
+
+- [x] CRITICAL: bootstrap.sh fails with "Cannot find package.json" when user extracts deploy-only ZIP and runs from ~/deploy/ — script resolves PROJECT_ROOT to parent of deploy/ which has no project files
+- [x] FIX: Added clear multi-line error message explaining that full source tree is required, not just deploy/ directory
+- [x] FIX: Added directory structure check for server/, client/, fixtures/, shared/ after package.json check
+- [x] FIX: Updated DEPLOY.md with explicit instructions to extract full source ZIP first
+- [x] VERIFIED: Standalone deploy/ extraction now shows clear error with instructions
+- [x] VERIFIED: Full source ZIP extraction works correctly with bootstrap.sh
+
+# Live Data Contamination Report Findings (from user audit)
+
+## Critical (C1-C4) — acknowledged, deferred by contract
+- [ ] C1: topology.ts has no isFixtureMode() gate — always returns fixtures unconditionally
+- [ ] C2: correlation.ts has no isFixtureMode() gate — always returns fixtures unconditionally
+- [ ] C3: Impact "live mode" silently returns zeros instead of honest error (looks like quiet network)
+- [ ] C4: Appliance status mixes real DB data with fixture metadata (hostname real, firmware/license fake)
+
+## High (H1-H4) — acknowledged, deferred by contract
+- [ ] H1: Sentinel ID routing (1042, 4001, 101) makes only magic IDs return populated fixtures
+- [ ] H2: Help page hardcodes "Fixture Mode" — not dynamically determined
+- [ ] H3: Hardcoded PCAP metadata (74 bytes)
+- [ ] H4: Fixture file listing endpoints (/api/bff/*/fixtures) exposed in production
+
+## Medium (M1-M5) — acknowledged, deferred by contract
+- [ ] M1: Sentinel value routing in topology and correlation (test harness logic in production)
+- [ ] M2: Health route returns 'degraded' in live mode without checking anything
+- [ ] M3: Hardcoded cache constants in health response
+- [ ] M4: Blast radius sentinel values in production
+- [ ] M5: Trace sentinel values in production
+
+## Low (L1) — acknowledged
+- [ ] L1: readFileSync used in request handlers (blocks event loop)
+
+## UI Honesty — acknowledged, deferred by contract
+- [ ] All surfaces need visible data source indicator (Fixture Mode vs Live)
+- [ ] Impact Deck: live mode shows quiet/empty instead of honest error — DISHONEST
+- [ ] Topology: cannot reach honest state — always fixtures — DISHONEST
+- [ ] Correlation: cannot reach honest state — always fixtures — DISHONEST
+
+NOTE: All contamination findings are accurate. This is a frontend/BFF contract phase.
+All BFF routes are fixture-driven by design. Live ExtraHop integration is deferred by contract.
+The contamination report correctly identifies what needs to change for live integration.
+These items are tracked here for the live integration phase.

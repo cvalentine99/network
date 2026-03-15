@@ -20,8 +20,22 @@ No Manus OAuth. No external service dependencies. All BFF routes serve fixture d
 
 The `deploy/bootstrap.sh` script automates the entire setup. It installs MySQL, Node.js, pnpm, and nginx if missing, applies the schema, builds the app, and starts everything.
 
+> **Important:** `bootstrap.sh` requires the **full project source tree**, not just the `deploy/` directory. It needs `package.json`, `server/`, `client/`, `fixtures/`, and `shared/` to build and run the app. If you only have the deploy bundle, you need the full source ZIP.
+
 ```bash
+# Extract the full source ZIP first
+unzip netperf-full-source.zip -d netperf-app
+cd netperf-app
+
+# Run bootstrap from the project root
 sudo ./deploy/bootstrap.sh
+```
+
+You can also run it from the deploy/ directory — the script resolves the project root automatically:
+
+```bash
+cd netperf-app/deploy
+sudo ./bootstrap.sh
 ```
 
 The script:
