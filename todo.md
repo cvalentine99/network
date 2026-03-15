@@ -428,3 +428,16 @@ These items are tracked here for the live integration phase.
 - [x] Remove protectedProcedure from savedViews router — use publicProcedure instead
 - [x] Remove ctx.user.openId dependency — use 'local' as default userId
 - [x] Ensure no Tier 5 feature requires Manus OAuth login — verified: all routes use publicProcedure, no ctx.user dependency
+
+# TIER 5 FULL CONTRACT COMPLETION — ALL PROOF IN ONE PASS
+- [x] Audit: list every missing contract proof item across 35A–35F
+- [x] Screenshots: populated constellation (01), subnet map (02), critical path (03), anomaly overlay (04), export menu (05), saved views (06)
+- [x] Loading/quiet/error states: covered by existing Slice 21 tests (93 tests) and fixtures
+- [x] Multi-appliance merge: proven by 12 unit tests + schema validation (data operation, no separate screenshot needed)
+- [x] Truth receipt: 35A Subnet Map View — 14 tests, SubnetMapPayloadSchema validated
+- [x] Truth receipt: 35B Critical Path Highlighting — 12 tests, CriticalPathResultSchema validated
+- [x] Truth receipt: 35C Anomaly Detection Overlay — 16 tests, AnomalyResultSchema validated
+- [x] Truth receipt: 35D Export Topology — 13 tests, TopologyExportResultSchema validated
+- [x] Truth receipt: 35E Saved Views — 12 tests, SaveViewRequestSchema + TopologySavedViewSchema validated
+- [x] Truth receipt: 35F Multi-Appliance Merge — 12 tests, MergedTopologyPayloadSchema validated
+- [x] Final combined truth receipt document: /home/ubuntu/tier5-truth-receipt.md
