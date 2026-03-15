@@ -195,53 +195,53 @@ describe('isFixtureMode() env-var gating', () => {
     else delete process.env.EH_API_KEY;
   });
 
-  it('returns true when both EH_HOST and EH_API_KEY are missing', () => {
+  it('returns true when both EH_HOST and EH_API_KEY are missing', async () => {
     delete process.env.EH_HOST;
     delete process.env.EH_API_KEY;
-    expect(isFixtureMode()).toBe(true);
+    expect(await isFixtureMode()).toBe(true);
   });
 
-  it('returns true when EH_HOST is set but EH_API_KEY is missing', () => {
+  it('returns true when EH_HOST is set but EH_API_KEY is missing', async () => {
     process.env.EH_HOST = 'extrahop.lab.local';
     delete process.env.EH_API_KEY;
-    expect(isFixtureMode()).toBe(true);
+    expect(await isFixtureMode()).toBe(true);
   });
 
-  it('returns true when EH_API_KEY is set but EH_HOST is missing', () => {
+  it('returns true when EH_API_KEY is set but EH_HOST is missing', async () => {
     delete process.env.EH_HOST;
     process.env.EH_API_KEY = 'real-api-key-123';
-    expect(isFixtureMode()).toBe(true);
+    expect(await isFixtureMode()).toBe(true);
   });
 
-  it('returns true when EH_HOST is empty string', () => {
+  it('returns true when EH_HOST is empty string', async () => {
     process.env.EH_HOST = '';
     process.env.EH_API_KEY = 'real-api-key-123';
-    expect(isFixtureMode()).toBe(true);
+    expect(await isFixtureMode()).toBe(true);
   });
 
-  it('returns true when EH_API_KEY is empty string', () => {
+  it('returns true when EH_API_KEY is empty string', async () => {
     process.env.EH_HOST = 'extrahop.lab.local';
     process.env.EH_API_KEY = '';
-    expect(isFixtureMode()).toBe(true);
+    expect(await isFixtureMode()).toBe(true);
   });
 
-  it('returns true when EH_API_KEY is REPLACE_ME', () => {
+  it('returns true when EH_API_KEY is REPLACE_ME', async () => {
     process.env.EH_HOST = 'extrahop.lab.local';
     process.env.EH_API_KEY = 'REPLACE_ME';
-    expect(isFixtureMode()).toBe(true);
+    expect(await isFixtureMode()).toBe(true);
   });
 
-  it('returns false when both are set to real values', () => {
+  it('returns false when both are set to real values', async () => {
     process.env.EH_HOST = 'extrahop.lab.local';
     process.env.EH_API_KEY = 'abc123-real-key';
-    expect(isFixtureMode()).toBe(false);
+    expect(await isFixtureMode()).toBe(false);
   });
 
-  it('is a pure function — same env → same result', () => {
+  it('is a pure function — same env → same result', async () => {
     process.env.EH_HOST = 'test.example.com';
     process.env.EH_API_KEY = 'key123';
-    const r1 = isFixtureMode();
-    const r2 = isFixtureMode();
+    const r1 = await isFixtureMode();
+    const r2 = await isFixtureMode();
     expect(r1).toBe(r2);
     expect(r1).toBe(false);
   });

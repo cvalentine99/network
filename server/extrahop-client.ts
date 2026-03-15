@@ -154,13 +154,60 @@ async function getConfig(): Promise<ExtraHopClientConfig | null> {
 }
 
 /**
- * Check if the system is in fixture mode (no live ExtraHop configured).
- * Uses env vars as the gate — same logic as all route files.
+ * Check if usable credentials exist from EITHER source:
+ *   1. ENV vars: EH_HOST + EH_API_KEY
+ *   2. DB: appliance_config row with non-empty hostname + apiKey
+ *
+ * Returns true only when NEITHER source has usable credentials.
+ * This is synchronous for env-var check and caches the DB result.
  */
-export function isFixtureMode(): boolean {
+let _dbConfigCache: { config: ExtraHopClientConfig | null; checkedAt: number } | null = null;
+const DB_CONFIG_CACHE_TTL_MS = 10_000; // Re-check DB every 10s
+
+function hasEnvCredentials(): boolean {
   const host = process.env.EH_HOST;
   const key = process.env.EH_API_KEY;
-  return !host || !key || host === '' || key === '' || key === 'REPLACE_ME';
+  return !!host && host !== '' && !!key && key !== '' && key !== 'REPLACE_ME';
+}
+
+/**
+ * Async check: is the system in fixture mode?
+ * Returns true only when NO usable credentials exist in env OR DB.
+ */
+export async function isFixtureMode(): Promise<boolean> {
+  // Fast path: env vars are set → live mode
+  if (hasEnvCredentials()) return false;
+
+  // Check DB (with short TTL cache to avoid hammering DB on every request)
+  const now = Date.now();
+  if (_dbConfigCache && (now - _dbConfigCache.checkedAt) < DB_CONFIG_CACHE_TTL_MS) {
+    return _dbConfigCache.config === null;
+  }
+
+  const config = await getConfig();
+  _dbConfigCache = { config, checkedAt: now };
+  return config === null;
+}
+
+/**
+ * Synchronous check for env-only credentials.
+ * Used ONLY in startup paths (ETL scheduler init) where async is not available.
+ * For route-level gating, always use the async isFixtureMode().
+ */
+export function isFixtureModeSync(): boolean {
+  if (hasEnvCredentials()) return false;
+  // If we have a recent DB cache, use it
+  if (_dbConfigCache && (Date.now() - _dbConfigCache.checkedAt) < DB_CONFIG_CACHE_TTL_MS) {
+    return _dbConfigCache.config === null;
+  }
+  // No cache available — conservatively assume fixture mode for sync callers
+  // The async version will populate the cache on first request
+  return true;
+}
+
+/** Clear the DB config cache. Used when appliance config is saved. */
+export function clearConfigCache(): void {
+  _dbConfigCache = null;
 }
 
 /**

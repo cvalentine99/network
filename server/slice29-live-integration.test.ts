@@ -70,23 +70,23 @@ describe('ExtraHop Client Cache', () => {
 // ─── isFixtureMode Tests ────────────────────────────────────────────────
 
 describe('isFixtureMode', () => {
-  it('returns true when EH_HOST is not set', () => {
+  it('returns true when EH_HOST is not set', async () => {
     const origHost = process.env.EH_HOST;
     const origKey = process.env.EH_API_KEY;
     delete process.env.EH_HOST;
     delete process.env.EH_API_KEY;
-    expect(isFixtureMode()).toBe(true);
+    expect(await isFixtureMode()).toBe(true);
     // Restore
     if (origHost !== undefined) process.env.EH_HOST = origHost;
     if (origKey !== undefined) process.env.EH_API_KEY = origKey;
   });
 
-  it('returns true when EH_API_KEY is REPLACE_ME', () => {
+  it('returns true when EH_API_KEY is REPLACE_ME', async () => {
     const origHost = process.env.EH_HOST;
     const origKey = process.env.EH_API_KEY;
     process.env.EH_HOST = 'extrahop.example.com';
     process.env.EH_API_KEY = 'REPLACE_ME';
-    expect(isFixtureMode()).toBe(true);
+    expect(await isFixtureMode()).toBe(true);
     // Restore
     if (origHost !== undefined) process.env.EH_HOST = origHost;
     else delete process.env.EH_HOST;
@@ -94,12 +94,12 @@ describe('isFixtureMode', () => {
     else delete process.env.EH_API_KEY;
   });
 
-  it('returns true when EH_HOST is empty string', () => {
+  it('returns true when EH_HOST is empty string', async () => {
     const origHost = process.env.EH_HOST;
     const origKey = process.env.EH_API_KEY;
     process.env.EH_HOST = '';
     process.env.EH_API_KEY = 'somekey';
-    expect(isFixtureMode()).toBe(true);
+    expect(await isFixtureMode()).toBe(true);
     if (origHost !== undefined) process.env.EH_HOST = origHost;
     else delete process.env.EH_HOST;
     if (origKey !== undefined) process.env.EH_API_KEY = origKey;

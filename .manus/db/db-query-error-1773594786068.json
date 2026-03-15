@@ -1,0 +1,8 @@
+{
+  "query": "INSERT INTO appliance_config (id, hostname, api_key, verify_ssl, cloud_enabled, updated_at) VALUES (1, '192.168.50.157', 'test-api-key-for-verification', 0, 0, NOW()) ON DUPLICATE KEY UPDATE hostname = '192.168.50.157', api_key = 'test-api-key-for-verification', verify_ssl = 0, updated_at = NOW();",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3xenzgJ3NGNThF2.e615124e9d05 --database FAgcVHDa53BkVwvRfvbPzh --execute INSERT INTO appliance_config (id, hostname, api_key, verify_ssl, cloud_enabled, updated_at) VALUES (1, '192.168.50.157', 'test-api-key-for-verification', 0, 0, NOW()) ON DUPLICATE KEY UPDATE hostname = '192.168.50.157', api_key = 'test-api-key-for-verification', verify_ssl = 0, updated_at = NOW();",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'cloud_enabled' in 'field list'"
+  ]
+}

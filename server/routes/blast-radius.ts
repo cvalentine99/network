@@ -90,7 +90,7 @@ blastRadiusRouter.post('/query', async (req, res) => {
     const { fromMs, untilMs, durationMs, cycle } = timeWindow;
 
     // ── FIXTURE MODE ──
-    if (isFixtureMode()) {
+    if (await isFixtureMode()) {
       const { fixture: fixtureName, isError } = selectFixture(mode, value);
       const fixtureData = loadFixture(fixtureName);
 
@@ -392,13 +392,12 @@ blastRadiusRouter.post('/query', async (req, res) => {
  *
  * Dev/test only — lists available fixture files.
  */
-blastRadiusRouter.get('/fixtures', (_req, res) => {
+blastRadiusRouter.get('/fixtures', async (_req, res) => {
   if (!isDev) {
     res.status(404).json({ error: 'Not available in production' });
     return;
   }
-
-  if (!isFixtureMode()) {
+  if (!(await isFixtureMode())) {
     res.json({ fixtures: [], mode: 'live' });
     return;
   }

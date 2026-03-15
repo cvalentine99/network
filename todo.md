@@ -397,3 +397,13 @@ These items are tracked here for the live integration phase.
 - [x] Update Settings page SSL toggle hint to clarify HTTP vs HTTPS behavior
 - [x] Full test suite: 2,398 tests across 36 files — zero regressions
 - [x] Deliver updated ZIP
+
+# SPLIT-BRAIN MODE FIX (Slice 34)
+- [x] ROOT CAUSE: isFixtureMode() checks env vars only; credential resolution checks DB only
+- [x] Unify isFixtureMode() to async — checks env vars (fast path) then DB appliance_config with 10s TTL cache
+- [x] Update all 11 route files to await isFixtureMode()
+- [x] Update health route to report not_configured only when NO credentials exist anywhere (env OR DB)
+- [x] Prove with curl: /api/bff/health returns 'degraded' when DB credentials exist (CORRECT — appliance unreachable from sandbox)
+- [x] Prove with curl: /api/bff/impact/headline returns NETWORK_ERROR when DB credentials exist (CORRECT — attempts live call)
+- [x] Fix 11 test failures: add await to all isFixtureMode() assertions in test files
+- [x] Full test suite: 2,398 tests across 36 files — zero regressions

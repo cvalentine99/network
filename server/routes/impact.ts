@@ -27,7 +27,7 @@ import type { ImpactOverviewPayload } from '../../shared/cockpit-types';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { getApplianceConfig } from '../db';
-import { ehRequest, ExtraHopClientError } from '../extrahop-client';
+import { ehRequest, isFixtureMode, ExtraHopClientError } from '../extrahop-client';
 import {
   normalizeHeadline,
   normalizeTimeseries,
@@ -52,14 +52,7 @@ const DETECTION_CACHE_TTL = 30_000; // 30s for detections
 const ALERT_CACHE_TTL = 60_000;     // 60s for alert configs
 const APPLIANCE_CACHE_TTL = 120_000; // 2min for appliance identity
 
-/**
- * Determine if we are in fixture mode.
- */
-function isFixtureMode(): boolean {
-  const host = process.env.EH_HOST;
-  const key = process.env.EH_API_KEY;
-  return !host || !key || host === '' || key === '' || key === 'REPLACE_ME';
-}
+// isFixtureMode() is now imported from extrahop-client.ts (unified async DB + env check)
 
 /**
  * Format ExtraHop client errors into HTTP responses.
@@ -181,7 +174,7 @@ impactRouter.get('/headline', async (req, res) => {
     const timeWindow = resolveTimeWindow(from, until, cycle);
 
     // ── LIVE MODE ──
-    if (!isFixtureMode()) {
+    if (!(await isFixtureMode())) {
       const metricsBody = buildMetricsRequest({
         from: timeWindow.fromMs,
         until: timeWindow.untilMs,
@@ -264,7 +257,7 @@ impactRouter.get('/timeseries', async (req, res) => {
     const timeWindow = resolveTimeWindow(from, until, cycle);
 
     // ── LIVE MODE ──
-    if (!isFixtureMode()) {
+    if (!(await isFixtureMode())) {
       const metricsBody = buildMetricsRequest({
         from: timeWindow.fromMs,
         until: timeWindow.untilMs,
@@ -349,7 +342,7 @@ impactRouter.get('/top-talkers', async (req, res) => {
     const timeWindow = resolveTimeWindow(from, until, cycle);
 
     // ── LIVE MODE ──
-    if (!isFixtureMode()) {
+    if (!(await isFixtureMode())) {
       // Step 1: Get per-device metrics with top_n
       const metricsBody = buildMetricsRequest({
         from: timeWindow.fromMs,
@@ -496,7 +489,7 @@ impactRouter.get('/detections', async (req, res) => {
     const timeWindow = resolveTimeWindow(from, until, cycle);
 
     // ── LIVE MODE ──
-    if (!isFixtureMode()) {
+    if (!(await isFixtureMode())) {
       // GET /api/v1/detections with time filter
       const response = await ehRequest<any[]>({
         method: 'GET',
@@ -566,7 +559,7 @@ impactRouter.get('/alerts', async (req, res) => {
     const timeWindow = resolveTimeWindow(from, until, cycle);
 
     // ── LIVE MODE ──
-    if (!isFixtureMode()) {
+    if (!(await isFixtureMode())) {
       // GET /api/v1/alerts — returns all configured alerts (not time-filtered)
       const response = await ehRequest<any[]>({
         method: 'GET',
@@ -627,7 +620,7 @@ impactRouter.get('/appliance-status', async (_req, res) => {
     const dbConfig = await getApplianceConfig().catch(() => null);
 
     // ── LIVE MODE ──
-    if (!isFixtureMode()) {
+    if (!(await isFixtureMode())) {
       try {
         // Probe the appliance for real metadata
         const ehResponse = await ehRequest<any>({
@@ -764,7 +757,7 @@ impactRouter.get('/device-detail', async (req, res) => {
     const deviceId = Number(idParam);
 
     // ── LIVE MODE ──
-    if (!isFixtureMode()) {
+    if (!(await isFixtureMode())) {
       // Step 1: Get device identity
       const deviceResponse = await ehRequest<any>({
         method: 'GET',
@@ -964,7 +957,7 @@ impactRouter.get('/detection-detail', async (req, res) => {
     const detectionId = Number(idParam);
 
     // ── LIVE MODE ──
-    if (!isFixtureMode()) {
+    if (!(await isFixtureMode())) {
       // Get the detection
       const detectionResponse = await ehRequest<any>({
         method: 'GET',
@@ -1068,7 +1061,7 @@ impactRouter.get('/alert-detail', async (req, res) => {
     const alertId = Number(idParam);
 
     // ── LIVE MODE ──
-    if (!isFixtureMode()) {
+    if (!(await isFixtureMode())) {
       // Get the alert
       const alertResponse = await ehRequest<any>({
         method: 'GET',
@@ -1195,7 +1188,7 @@ impactRouter.get('/device-activity', async (req, res) => {
     const limit = Math.min(Math.max(Number(req.query.limit) || 50, 1), 200);
 
     // ── LIVE MODE ──
-    if (!isFixtureMode()) {
+    if (!(await isFixtureMode())) {
       // Fetch fresh activity from ExtraHop
       let activityRows: Array<{
         activityId: number;

@@ -4,6 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
+import { clearConfigCache } from "./extrahop-client";
 
 /* ─────────────────────────── Dashboard Overview ─────────────────────────── */
 
@@ -238,6 +239,8 @@ const applianceConfigRouter = router({
     .mutation(async ({ input }) => {
       const row = await db.upsertApplianceConfig(input);
       if (!row) throw new Error('Failed to save appliance config');
+      // Bust the fixture-mode cache so routes immediately see the new config
+      clearConfigCache();
       return {
         id: row.id,
         hostname: row.hostname,

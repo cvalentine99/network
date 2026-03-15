@@ -84,7 +84,7 @@ router.post('/query', async (req: Request, res: Response) => {
   }
 
   // ── FIXTURE MODE ──
-  if (isFixtureMode()) {
+  if (await isFixtureMode()) {
     const { fromMs } = parsed.data;
     const fixtureName = (isDev && SENTINEL_MAP[fromMs])
       ? SENTINEL_MAP[fromMs]
@@ -323,7 +323,7 @@ router.post('/query', async (req: Request, res: Response) => {
 });
 
 // ─── GET /fixtures (dev/test only) ────────────────────────────────
-router.get('/fixtures', (_req: Request, res: Response) => {
+router.get('/fixtures', async (_req: Request, res: Response) => {
   if (!isDev) {
     res.status(404).json({ error: 'Not available in production' });
     return;
@@ -331,7 +331,7 @@ router.get('/fixtures', (_req: Request, res: Response) => {
 
   try {
     const files = readdirSync(FIXTURE_DIR).filter((f) => f.endsWith('.fixture.json'));
-    res.json({ fixtures: files, mode: isFixtureMode() ? 'fixture' : 'live' });
+    res.json({ fixtures: files, mode: (await isFixtureMode()) ? 'fixture' : 'live' });
   } catch (err) {
     res.status(500).json({ error: 'Failed to list fixtures', details: String(err) });
   }

@@ -13,7 +13,7 @@
  *   - Graceful shutdown via stopEtlScheduler()
  */
 
-import { isFixtureMode, ehRequest } from './extrahop-client';
+import { isFixtureModeSync, ehRequest } from './extrahop-client';
 import { normalizeDeviceActivity } from './extrahop-normalizers';
 import { upsertDeviceActivity } from './db';
 import { getDb } from './db';
@@ -144,7 +144,7 @@ export async function runEtlCycle(): Promise<{
  * Runs the first cycle immediately, then repeats at the configured interval.
  */
 export function startEtlScheduler(): void {
-  if (isFixtureMode()) {
+  if (isFixtureModeSync()) {
     console.log('[ETL] Fixture mode — background ETL scheduler not started.');
     return;
   }

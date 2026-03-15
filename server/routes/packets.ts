@@ -92,7 +92,7 @@ packetsRouter.post('/metadata', async (req, res) => {
     }
 
     // 3. In fixture mode, return fixture metadata
-    if (isFixtureMode()) {
+    if (await isFixtureMode()) {
       const filename = generateFilename(ip, fromMs, untilMs, bpfFilter);
       const metadata = {
         filename,
@@ -211,7 +211,7 @@ packetsRouter.post('/download', async (req, res) => {
     }
 
     // 3. In fixture mode, return fixture PCAP binary
-    if (isFixtureMode()) {
+    if (await isFixtureMode()) {
       const pcapBuffer = loadPcapFixture('pcap-download.populated.fixture.pcap');
       if (!pcapBuffer) {
         return res.status(500).json({

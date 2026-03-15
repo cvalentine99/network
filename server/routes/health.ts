@@ -81,7 +81,7 @@ healthRouter.get('/', async (_req, res) => {
     const etlStatus = getEtlStatus();
 
     // ── FIXTURE MODE ──
-    if (isFixtureMode()) {
+    if (await isFixtureMode()) {
       const response: BffHealthResponse = {
         status: 'not_configured',
         bff: {

@@ -56,7 +56,7 @@ router.post('/events', async (req: Request, res: Response) => {
   }
 
   // ── FIXTURE MODE ──
-  if (isFixtureMode()) {
+  if (await isFixtureMode()) {
     const intent = parsed.data;
     const fromMs = intent.fromMs;
 
@@ -238,7 +238,7 @@ router.post('/events', async (req: Request, res: Response) => {
 });
 
 // ─── GET /fixtures (dev/test only) ────────────────────────────────
-router.get('/fixtures', (_req: Request, res: Response) => {
+router.get('/fixtures', async (_req: Request, res: Response) => {
   if (!isDev) {
     res.status(404).json({ error: 'Not available in production' });
     return;
@@ -246,7 +246,7 @@ router.get('/fixtures', (_req: Request, res: Response) => {
 
   try {
     const files = readdirSync(FIXTURE_DIR).filter((f) => f.endsWith('.fixture.json'));
-    res.json({ fixtures: files, mode: isFixtureMode() ? 'fixture' : 'live' });
+    res.json({ fixtures: files, mode: (await isFixtureMode()) ? 'fixture' : 'live' });
   } catch {
     res.json({ fixtures: [] });
   }
