@@ -82,15 +82,15 @@ All fixture listing endpoints (`GET /api/bff/*/fixtures`) are gated behind `isDe
 ## TESTS
 
 - `server/decontamination.test.ts`: 38 tests — ALL PASSING
-  - Health: status, no hardcoded degraded, honest cache, real uptime, valid timestamp
-  - Topology: fixture data, invalid body rejection, fixture listing
-  - Correlation: fixture data, invalid body rejection
-  - Impact: headline, timeseries, top-talkers, detections, alerts, appliance-status
-  - Blast radius: fixture data, invalid body rejection
-  - Trace: SSE events, invalid body rejection
-  - Packets: fixture PCAP or valid error
-  - Cross-cutting: isFixtureMode consistency across all routes
-  - Code structure: 16 source code assertions (isFixtureMode gates, LIVE_NOT_IMPLEMENTED, isDev gates, fixture listing gates)
+  - Health: status, no hardcoded degraded, honest cache, real uptime, valid timestamp (BEHAVIORAL — real HTTP calls)
+  - Topology: fixture data, invalid body rejection, fixture listing (BEHAVIORAL — real HTTP calls)
+  - Correlation: fixture data, invalid body rejection (BEHAVIORAL — real HTTP calls)
+  - Impact: headline, timeseries, top-talkers, detections, alerts, appliance-status (BEHAVIORAL — real HTTP calls)
+  - Blast radius: fixture data, invalid body rejection (BEHAVIORAL — real HTTP calls)
+  - Trace: SSE events, invalid body rejection (BEHAVIORAL — real HTTP calls)
+  - Packets: fixture PCAP or valid error (BEHAVIORAL — real HTTP calls)
+  - Cross-cutting: isFixtureMode consistency across all routes (BEHAVIORAL — real HTTP calls)
+  - Code structure: 16 SOURCE-STRING assertions (read .ts files, check substring presence — NOT behavioral proof of runtime correctness)
 
 ## FULL TEST SUITE
 
@@ -110,8 +110,14 @@ Deferred by contract: live hardware / appliance / packet store / environment acc
 
 ## MERGE BLOCKERS
 
-None. All tests pass. All routes are honest in both fixture and live mode.
+Source-string assertions (16 of 38 tests) verify code patterns exist but do not prove runtime correctness. All behavioral tests (22 of 38) pass against the running dev server in fixture mode. Live mode behavior is NOT tested — deferred by contract.
 
 ## VERDICT
 
-**PASSED.** Every user-visible route now either serves fixture data (when EH credentials are absent) or returns an explicit 503 LIVE_NOT_IMPLEMENTED error (when EH credentials are present). No route silently returns fake populated data in live mode. No route mixes real DB identity with fixture metadata. No sentinel routing or fixture listing endpoint is accessible in production. A visible mode indicator appears on every surface.
+**PASSED with caveats.** Every user-visible route now either serves fixture data (when EH credentials are absent) or attempts a live ExtraHop API call (when credentials are present). No route silently returns fake populated data in live mode. No route mixes real DB identity with fixture metadata. Sentinel routing and fixture listing endpoints are gated behind isDev. A visible mode indicator appears on every surface.
+
+**Caveats:**
+- Live ExtraHop API integration has NOT been tested against a real appliance (deferred by contract)
+- 16 of 38 tests are source-string assertions, not behavioral tests
+- All behavioral tests run in fixture mode only
+- Security posture is not production-ready (no auth, test-grade secrets)

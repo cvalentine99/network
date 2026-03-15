@@ -598,6 +598,28 @@ CREATE TABLE IF NOT EXISTS `performance_metrics` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Saved Topology Views (Tier 5)
+CREATE TABLE IF NOT EXISTS `saved_topology_views` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(255) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `view_mode` varchar(20) NOT NULL DEFAULT 'constellation',
+  `zoom` double NOT NULL DEFAULT 1,
+  `pan_x` double NOT NULL DEFAULT 0,
+  `pan_y` double NOT NULL DEFAULT 0,
+  `collapsed_subnets` json NOT NULL,
+  `role_filters` json NOT NULL,
+  `protocol_filters` json NOT NULL,
+  `anomaly_overlay_enabled` boolean NOT NULL DEFAULT false,
+  `anomaly_threshold` double NOT NULL DEFAULT 50,
+  `critical_path_source` int DEFAULT NULL,
+  `critical_path_destination` int DEFAULT NULL,
+  `search_term` varchar(255) NOT NULL DEFAULT '',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Record this migration
 INSERT INTO `schema_version` (`filename`, `checksum`, `applied_at`, `applied_by`)
-VALUES ('full-schema-deploy.sql', SHA2('contract-phase-full-schema-2026-03-14', 256), NOW(3), 'deploy-script');
+VALUES ('full-schema-deploy.sql', SHA2('contract-phase-full-schema-2026-03-15-tier5', 256), NOW(3), 'deploy-script');

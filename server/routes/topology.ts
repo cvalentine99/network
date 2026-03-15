@@ -336,16 +336,17 @@ router.get('/baseline', async (_req: Request, res: Response) => {
     return;
   }
 
-  // In live mode, return the same topology data as /query but from a shifted time window
-  // (baseline = previous equivalent window). For now, return the baseline fixture
-  // until historical data collection is implemented.
-  try {
-    const raw = readFileSync(join(FIXTURE_DIR, 'topology.baseline.fixture.json'), 'utf-8');
-    const data = JSON.parse(raw);
-    res.json(data);
-  } catch (err) {
-    res.status(500).json({ error: 'Baseline data not available', details: String(err) });
-  }
+  // HONEST STATUS: In live mode, historical baseline collection is NOT implemented.
+  // Instead of silently returning fixture data (which would be dishonest), return
+  // an explicit error so the caller knows baseline comparison is not yet available.
+  res.status(501).json({
+    error: 'BASELINE_NOT_IMPLEMENTED',
+    message: 'Historical baseline collection is not yet implemented. '
+      + 'The anomaly detection overlay requires a baseline snapshot from a previous '
+      + 'time window, which requires the ETL scheduler to persist historical topology data. '
+      + 'This feature is deferred until historical data collection is built.',
+    mode: 'live',
+  });
 });
 
 // ─── GET /fixtures (dev/test only) ────────────────────────────────

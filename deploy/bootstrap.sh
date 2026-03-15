@@ -9,15 +9,16 @@
 #   0. Checks prerequisites (curl, build-essential)
 #   1. Installs MySQL 8 if missing
 #   2. Creates database + user
-#   3. Applies full schema (38 tables)
+#   3. Applies full schema (39 tables)
 #   4. Verifies all tables exist
 #   5. Installs Node.js 22 + pnpm if missing
 #   6. Installs dependencies + builds production bundle (as invoking user)
 #   7. Creates systemd service for the app (auto-restart on reboot)
 #   8. Installs + configures nginx on port 3013 → 3020
-#   9. Verifies the entire stack end-to-end (17 checks)
+#   9. Runs verification checks (fixture-mode only — does NOT prove live ExtraHop connectivity)
 #
-# Fails hard on any partial setup. No silent failures.
+# Fails hard on any partial setup. Verification proves the stack runs in fixture mode.
+# It does NOT prove live ExtraHop connectivity or production readiness.
 #
 # Prereqs: Ubuntu 22.04+ with sudo access and internet
 # Auth:    None (no Manus OAuth)
@@ -25,7 +26,7 @@
 # NOTE: The schema includes 4 legacy tables (alerts, devices, interfaces,
 #       performance_metrics) from the initial Drizzle migration. They are not
 #       referenced by current application code but are retained for migration
-#       compatibility. The active schema has 34 tables; total count is 38.
+#       compatibility. The active schema has 35 tables; total count is 39.
 ###############################################################################
 
 set -euo pipefail
@@ -115,7 +116,7 @@ SCHEMA_FILE="$SCRIPT_DIR/full-schema.sql"
 APP_LOG="/var/log/netperf-app.log"
 SERVICE_NAME="netperf-app"
 
-EXPECTED_TABLES=38
+EXPECTED_TABLES=39
 PASS_COUNT=0
 FAIL_COUNT=0
 
@@ -343,6 +344,9 @@ Environment=BUILT_IN_FORGE_API_URL=
 Environment=BUILT_IN_FORGE_API_KEY=
 
 # ExtraHop configuration (uncomment and set when connecting to a real appliance)
+# SECURITY NOTE: EH_VERIFY_SSL=false keeps HTTPS but skips TLS certificate verification.
+# This accepts self-signed certs. Use only in lab environments with trusted networks.
+# For production, use EH_VERIFY_SSL=true with a valid TLS certificate.
 # Environment=EH_HOST=extrahop.lab.local
 # Environment=EH_API_KEY=your-api-key-here
 # Environment=EH_VERIFY_SSL=false
@@ -534,20 +538,38 @@ verify "BFF /impact/detections"     "http://localhost:${NGINX_PORT}/api/bff/impa
 verify "BFF /impact/alerts"         "http://localhost:${NGINX_PORT}/api/bff/impact/alerts"
 verify "BFF /impact/appliance-status" "http://localhost:${NGINX_PORT}/api/bff/impact/appliance-status"
 verify "BFF /impact/device-activity" "http://localhost:${NGINX_PORT}/api/bff/impact/device-activity?id=1042"
-verify "BFF /topology/fixtures"     "http://localhost:${NGINX_PORT}/api/bff/topology/fixtures"
-verify "BFF /blast-radius/fixtures" "http://localhost:${NGINX_PORT}/api/bff/blast-radius/fixtures"
-verify "BFF /correlation/fixtures"  "http://localhost:${NGINX_PORT}/api/bff/correlation/fixtures"
+# NOTE: /fixtures endpoints are gated behind NODE_ENV=development in production.
+# These checks verify fixture-mode availability only.
+verify "BFF /topology/query"        "http://localhost:${NGINX_PORT}/api/bff/topology/query" 
+verify "BFF /blast-radius/query"    "http://localhost:${NGINX_PORT}/api/bff/blast-radius/query"
+verify "BFF /correlation/events"    "http://localhost:${NGINX_PORT}/api/bff/correlation/events"
 
 # tRPC via nginx
 verify "tRPC via nginx" "http://localhost:${NGINX_PORT}/api/trpc/dashboard.stats"
 
-# No auth blocking
+# Auth check — WARNING: no authentication means anyone with network access can reach all routes
 AUTH_CODE=$(curl -sf -o /dev/null -w "%{http_code}" "http://localhost:${NGINX_PORT}/api/bff/impact/headline" 2>/dev/null || echo "000")
 if [ "$AUTH_CODE" != "401" ] && [ "$AUTH_CODE" != "403" ]; then
-  pass "No auth blocking (no 401/403)"
+  echo -e "  ${YELLOW}⚠${NC} No auth blocking (no 401/403) — SECURITY WARNING: all routes are publicly accessible"
   PASS_COUNT=$((PASS_COUNT + 1))
 else
   echo -e "  ${RED}✗${NC} Auth blocking detected: HTTP $AUTH_CODE"
+  FAIL_COUNT=$((FAIL_COUNT + 1))
+fi
+
+# Health body check — verify health endpoint reports actual status
+HEALTH_STATUS=$(curl -sf "http://localhost:${NGINX_PORT}/api/bff/health" 2>/dev/null | python3 -c "import sys,json; print(json.load(sys.stdin).get('status','unknown'))" 2>/dev/null || echo "unreachable")
+if [ "$HEALTH_STATUS" = "ok" ]; then
+  pass "Health: status=ok (appliance connected)"
+  PASS_COUNT=$((PASS_COUNT + 1))
+elif [ "$HEALTH_STATUS" = "degraded" ]; then
+  echo -e "  ${YELLOW}⚠${NC} Health: status=degraded (credentials configured but appliance unreachable)"
+  PASS_COUNT=$((PASS_COUNT + 1))
+elif [ "$HEALTH_STATUS" = "not_configured" ]; then
+  echo -e "  ${YELLOW}⚠${NC} Health: status=not_configured — running in FIXTURE MODE (demo data)"
+  PASS_COUNT=$((PASS_COUNT + 1))
+else
+  echo -e "  ${RED}✗${NC} Health: unexpected status='$HEALTH_STATUS'"
   FAIL_COUNT=$((FAIL_COUNT + 1))
 fi
 
@@ -556,7 +578,15 @@ echo "========================================="
 if [ "$FAIL_COUNT" -eq 0 ]; then
   echo -e "  ${GREEN}ALL $PASS_COUNT CHECKS PASSED${NC}"
   echo ""
-  echo "  Stack is ready at: http://localhost:${NGINX_PORT}"
+  if [ "$HEALTH_STATUS" = "not_configured" ]; then
+    echo -e "  Stack is ${YELLOW}RUNNING IN FIXTURE MODE${NC} at: http://localhost:${NGINX_PORT}"
+    echo "  Configure an ExtraHop appliance via Settings or env vars for live data."
+  elif [ "$HEALTH_STATUS" = "degraded" ]; then
+    echo -e "  Stack is ${YELLOW}RUNNING IN DEGRADED MODE${NC} at: http://localhost:${NGINX_PORT}"
+    echo "  Credentials configured but appliance is unreachable."
+  else
+    echo -e "  Stack is running at: http://localhost:${NGINX_PORT}"
+  fi
   echo ""
   echo "  Surfaces:"
   echo "    Impact Deck:   http://localhost:${NGINX_PORT}/"
@@ -604,5 +634,7 @@ echo "    - App auto-restarts on failure and on system reboot"
 echo "    - 4 legacy tables (alerts, devices, interfaces, performance_metrics) exist but are unused"
 echo "    - All BFF routes serve fixture data until an ExtraHop appliance is configured"
 echo "    - No Manus OAuth — all surfaces are accessible without login"
-echo "    - Background ETL scheduler activates automatically when ExtraHop is configured"
+echo "    - Background ETL scheduler activates when ExtraHop is configured (requires app restart)
+    - SECURITY: No authentication — all routes are publicly accessible on this port
+    - SECURITY: EH_VERIFY_SSL=false keeps HTTPS but skips cert verification — use only in lab environments"
 echo ""

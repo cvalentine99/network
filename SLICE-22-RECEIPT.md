@@ -198,4 +198,4 @@ Deferred by contract: live hardware / appliance / packet store / environment acc
 
 ## VERDICT
 
-**PASSED.** All 6 surfaces render within budget. 58 tests pass. Report fixture validates. Consistency validators confirm. Screenshots captured. Budget contract formally proven for sandbox fixture-backed conditions.
+**PASSED.** All 6 surfaces render within budget. 58 tests pass. Report fixture validates. Consistency validators confirm. Screenshots captured. Budget contract proven against fixtures for sandbox fixture-backed conditions.

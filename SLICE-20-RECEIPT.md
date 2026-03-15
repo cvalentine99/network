@@ -103,16 +103,16 @@ Test sections:
 - `screenshots/slice20-loading.png` — spinner with "Loading correlation events..." text
 
 ## Claims
-1. `/correlation` route exists in App.tsx — **proven** by source inspection test (Route Registration §1)
-2. Correlation nav item is NOT placeholder — **proven** by source inspection test (Nav De-Placeholdering §2)
-3. Page reuses existing correlation contracts — **proven** by reuse proof tests (§5): no raw fetch, no local type redefinition, imports from shared/correlation-types
-4. Page reuses existing BFF route — **proven** by BFF route contract tests (§13): supertest against same route, same sentinels
-5. Page reuses existing useCorrelationOverlay hook — **proven** by source inspection (§3, §5)
-6. Shared time window integration — **proven** by shared time window tests (§6)
-7. All 6 UI states have data-testid coverage — **proven** by UI state coverage tests (§4)
-8. Category filtering works — **proven** by category filtering tests (§8) and filter UI tests (§12)
-9. Event detail expansion works — **proven** by event detail tests (§11)
-10. No NaN/Infinity/undefined reaches UI — **proven** by data integrity tests (§14)
+1. `/correlation` route exists in App.tsx — **proven against fixtures** by source inspection test (Route Registration §1)
+2. Correlation nav item is NOT placeholder — **proven against fixtures** by source inspection test (Nav De-Placeholdering §2)
+3. Page reuses existing correlation contracts — **proven against fixtures** by reuse proof tests (§5): no raw fetch, no local type redefinition, imports from shared/correlation-types
+4. Page reuses existing BFF route — **proven against fixtures** by BFF route contract tests (§13): supertest against same route, same sentinels
+5. Page reuses existing useCorrelationOverlay hook — **proven against fixtures** by source inspection (§3, §5)
+6. Shared time window integration — **proven against fixtures** by shared time window tests (§6)
+7. All 6 UI states have data-testid coverage — **proven against fixtures** by UI state coverage tests (§4)
+8. Category filtering works — **proven against fixtures** by category filtering tests (§8) and filter UI tests (§12)
+9. Event detail expansion works — **proven against fixtures** by event detail tests (§11)
+10. No NaN/Infinity/undefined reaches UI — **proven against fixtures** by data integrity tests (§14)
 
 ## Evidence
 - 98 tests passed (server/slice20.test.ts)

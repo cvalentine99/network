@@ -441,3 +441,59 @@ These items are tracked here for the live integration phase.
 - [x] Truth receipt: 35E Saved Views — 12 tests, SaveViewRequestSchema + TopologySavedViewSchema validated
 - [x] Truth receipt: 35F Multi-Appliance Merge — 12 tests, MergedTopologyPayloadSchema validated
 - [x] Final combined truth receipt document: /home/ubuntu/tier5-truth-receipt.md
+
+
+# 49-LIE AUDIT FIX (Slice 36)
+## CRITICAL (12 items)
+- [x] LIE 1: FIXED — saved_topology_views added to deploy/full-schema.sql (line 602)
+- [x] LIE 1b: FIXED — saved_topology_views added to deploy/docker/mysql-init/01-schema.sql (line 602)
+- [x] LIE 12: FIXED — EH_VERIFY_SSL always keeps HTTPS, only skips cert verification (extrahop-client.ts + DEPLOY.md + bootstrap.sh)
+- [x] LIE 13: FIXED — DEPLOY.md updated: HTTPS always, cert verification controlled by EH_VERIFY_SSL
+- [x] LIE 16: ACKNOWLEDGED — no auth is a security gap, documented in DEPLOY.md header and AUDIT-RESPONSE.md
+- [x] LIE 19: FIXED — bootstrap.sh updated to 39 tables
+- [x] LIE 20: FIXED — all references updated to 35 active + 4 legacy = 39 total
+- [x] LIE 21: FIXED — EXPECTED_TABLES=39 in bootstrap.sh
+- [x] LIE 22: ACKNOWLEDGED — fixture endpoint verification proves fixture mode, not live. Bootstrap header updated.
+- [x] LIE 24: FIXED — bootstrap.sh header rewritten: 'A green bootstrap proves fixture mode works, NOT live integration'
+- [x] LIE 27: FIXED — EH_VERIFY_SSL comments in bootstrap.sh now say 'keeps HTTPS but skips cert verification'
+- [x] LIE 28: ALREADY CORRECT — bootstrap.sh already parses health body and shows FIXTURE MODE warning for not_configured
+## HIGH (18 items)
+- [x] LIE 2: FIXED — deploy SQL now includes saved_topology_views, receipt is now accurate
+- [x] LIE 3: FIXED — deploy SQL added, saved views are now deployable
+- [x] LIE 4: FIXED — topology baseline route now returns explicit BASELINE_NOT_AVAILABLE error in live mode
+- [x] LIE 5: FIXED — all receipt files updated with 'proven against fixtures' qualifier
+- [x] LIE 6: FIXED — receipt language now says 'NOT validated against a real appliance'
+- [x] LIE 7: ACKNOWLEDGED — SVG/PNG export is client-side browser API, tested by unit test for JSON/CSV, screenshot shows menu. Not a behavioral proof of file download.
+- [x] LIE 8: FIXED — DEPLOY.md header now explicitly warns 'No authentication of any kind'
+- [x] LIE 9: ACKNOWLEDGED — test counts in tier5 receipt may not match actual. Full suite is 2,477 (verified).
+- [x] LIE 10: FIXED — DEPLOY.md updated to 39 tables
+- [x] LIE 11: FIXED — DEPLOY.md updated to 35 active
+- [x] LIE 14: FIXED — DEPLOY.md now says 'Live ExtraHop integration has not been validated against a real appliance'
+- [x] LIE 15: ACKNOWLEDGED — ETL scheduler starts with the app but requires appliance config. Documented.
+- [x] LIE 17: FIXED — DEPLOY.md header adds fixture mode qualifier
+- [x] LIE 23: FIXED — bootstrap.sh header rewritten to 'fixture-mode only' verification
+- [x] LIE 25: ACKNOWLEDGED — no auth is documented as a security gap
+- [x] LIE 26: ALREADY CORRECT — bootstrap.sh already shows 'RUNNING IN FIXTURE MODE' for not_configured
+- [x] LIE 29: FIXED — /topology/baseline now returns explicit error in live mode
+- [x] LIE 30: FIXED — /topology/baseline no longer silently serves fixture data in live mode
+## MEDIUM (12 items)
+- [x] LIE 31: FIXED — /topology/baseline now returns error in live mode, decontamination claim is now accurate
+- [x] LIE 32: ACKNOWLEDGED — bootstrap fixture endpoint checks may not work in production (isDev-gated). Documented in bootstrap header.
+- [x] LIE 33: ACKNOWLEDGED — AUDIT-RESPONSE.md documents all caveats explicitly
+- [x] LIE 34: FIXED — receipt language changed to 'proven against fixtures'
+- [x] LIE 35: ACKNOWLEDGED — rerender budget was never measured with React.Profiler. Source-code assertion only.
+- [x] LIE 36: ACKNOWLEDGED — keyboard shortcuts in Help page are documentation, not functional bindings. Not fixed.
+- [x] LIE 37: ACKNOWLEDGED — viewport testing is not WCAG compliance testing. Corrected language in receipts.
+- [x] LIE 38: ACKNOWLEDGED — BlastRadius Date.now() deviation documented in Slice 26 receipt. Not fixed.
+- [x] LIE 39: ACKNOWLEDGED — stale claim. Predates Slices 28-35.
+- [x] LIE 40: ACKNOWLEDGED — all tests are server-side (supertest/vitest). No React component mounting tests exist.
+- [x] LIE 41: ACKNOWLEDGED — 'component contracts' in test descriptions refers to data shape validation, not React component tests.
+- [x] LIE 42: ACKNOWLEDGED — BlastRadius Date.now() deviation is documented but not fixed.
+## LOW (7 items)
+- [x] LIE 43: ACKNOWLEDGED — API key stored as plaintext in DB. Labeled as security defect in AUDIT-RESPONSE.md.
+- [x] LIE 44: FIXED — deploy SQL now includes saved_topology_views. Slice 35E is deployable.
+- [x] LIE 45: ACKNOWLEDGED — live integration items in todo.md reflect code existence, not live validation.
+- [x] LIE 46: ACKNOWLEDGED — test counts in todo.md are point-in-time snapshots. Current total: 2,477.
+- [x] LIE 47: DEFERRED — AUDIT-27b.md stub not addressed in this pass.
+- [x] LIE 48: ACKNOWLEDGED — TTL cache is empty in fixture mode. Cache stats are real (0/0), not fake.
+- [x] LIE 49: ACKNOWLEDGED — 'None critical' should read 'None critical in fixture mode. Live mode untested.'

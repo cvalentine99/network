@@ -15,6 +15,7 @@
  */
 
 import { getApplianceConfig } from './db';
+import https from 'node:https';
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
@@ -247,10 +248,9 @@ export async function ehRequest<T = unknown>(
     );
   }
 
-  // Build URL — use http:// when SSL verification is disabled (lab/self-signed),
-  // https:// when SSL is enabled (production)
-  const protocol = config.verifySsl ? 'https' : 'http';
-  const url = `${protocol}://${config.hostname}${path}`;
+  // Always use HTTPS — EH_VERIFY_SSL only controls certificate verification,
+  // it does NOT downgrade to plaintext HTTP
+  const url = `https://${config.hostname}${path}`;
 
   // Build headers
   const headers: Record<string, string> = {
@@ -267,12 +267,26 @@ export async function ehRequest<T = unknown>(
   const start = Date.now();
 
   try {
-    const response = await fetch(url, {
-      method,
-      headers,
-      body: body ? JSON.stringify(body) : undefined,
-      signal: controller.signal,
-    });
+    // When verifySsl=false, skip TLS certificate verification but KEEP HTTPS.
+    // We temporarily set NODE_TLS_REJECT_UNAUTHORIZED because Node.js fetch
+    // does not support per-request rejectUnauthorized.
+    const tlsWasRelaxed = !config.verifySsl;
+    if (tlsWasRelaxed) {
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+    }
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        method,
+        headers,
+        body: body ? JSON.stringify(body) : undefined,
+        signal: controller.signal,
+      });
+    } finally {
+      if (tlsWasRelaxed) {
+        process.env.NODE_TLS_REJECT_UNAUTHORIZED = '1';
+      }
+    }
     clearTimeout(timeout);
     const latencyMs = Date.now() - start;
 
@@ -346,9 +360,8 @@ export async function ehBinaryRequest(
     );
   }
 
-  // Use http:// when SSL verification is disabled, https:// when enabled
-  const protocol = config.verifySsl ? 'https' : 'http';
-  const url = `${protocol}://${config.hostname}${path}`;
+  // Always use HTTPS — EH_VERIFY_SSL only controls certificate verification
+  const url = `https://${config.hostname}${path}`;
   const headers: Record<string, string> = {
     'Authorization': `ExtraHop apikey=${config.apiKey}`,
     'Accept': 'application/vnd.tcpdump.pcap',
@@ -362,12 +375,24 @@ export async function ehBinaryRequest(
   const start = Date.now();
 
   try {
-    const response = await fetch(url, {
-      method,
-      headers,
-      body: body ? JSON.stringify(body) : undefined,
-      signal: controller.signal,
-    });
+    // TLS bypass for self-signed certs (same pattern as ehRequest)
+    const tlsWasRelaxed = !config.verifySsl;
+    if (tlsWasRelaxed) {
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+    }
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        method,
+        headers,
+        body: body ? JSON.stringify(body) : undefined,
+        signal: controller.signal,
+      });
+    } finally {
+      if (tlsWasRelaxed) {
+        process.env.NODE_TLS_REJECT_UNAUTHORIZED = '1';
+      }
+    }
     clearTimeout(timeout);
     const latencyMs = Date.now() - start;
 

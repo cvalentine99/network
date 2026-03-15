@@ -2,7 +2,7 @@
 
 This document covers standing up the full application stack on your own machine. The stack is: **nginx (port 3013) → Node.js app (port 3020) → MySQL**.
 
-No Manus OAuth. No external service dependencies. All BFF routes serve fixture data until an ExtraHop appliance is configured via Settings.
+No Manus OAuth. No authentication of any kind — all routes are publicly accessible to anyone with network access. All BFF routes serve fixture data (demo data) until an ExtraHop appliance is configured via Settings. Live ExtraHop integration has not been validated against a real appliance.
 
 ---
 
@@ -41,13 +41,13 @@ sudo ./bootstrap.sh
 The script:
 - Detects the invoking user (`SUDO_USER`) and runs the build and app server as that user (not root)
 - Installs MySQL 8 and creates the `netperf_app` database
-- Applies all 38 tables from `deploy/full-schema.sql`
+- Applies all 39 tables from `deploy/full-schema.sql`
 - Verifies 12 critical tables including `fact_device_activity`
 - Installs Node.js 22 and pnpm if missing
 - Builds the production bundle (owned by the invoking user)
 - Creates a **systemd service** (`netperf-app.service`) for automatic restart and boot persistence
 - Configures nginx on port 3013 → 3020
-- Runs 17 verification checks and fails hard on any failure
+- Runs verification checks (fixture-mode only — does NOT prove live ExtraHop connectivity)
 
 After completion, open **http://localhost:3013** in your browser.
 
@@ -119,6 +119,8 @@ To enable live ExtraHop integration, uncomment and set the environment variables
 environment:
   EH_HOST: "extrahop.lab.local"
   EH_API_KEY: "your-api-key-here"
+  # SECURITY NOTE: EH_VERIFY_SSL=false keeps HTTPS but skips TLS certificate verification.
+  # This accepts self-signed certs. Use only in lab environments with trusted networks.
   EH_VERIFY_SSL: "false"
   ETL_INTERVAL_MS: "300000"
 ```
@@ -184,7 +186,7 @@ mysql -u netperf -pnetperf_test_2026 netperf_app -e "SELECT 'MySQL OK' AS status
 
 ### Step 2: Apply Schema
 
-The file `deploy/full-schema.sql` contains all 38 tables (34 active + 4 legacy). Apply it:
+The file `deploy/full-schema.sql` contains all 39 tables (35 active + 4 legacy). Apply it:
 
 ```bash
 mysql -u netperf -pnetperf_test_2026 netperf_app < deploy/full-schema.sql
@@ -355,7 +357,7 @@ All surfaces render fixture data by default. To connect to a live ExtraHop appli
 |----------|---------|-------------|
 | `EH_HOST` | (none) | ExtraHop appliance hostname (e.g., `extrahop.lab.local`) |
 | `EH_API_KEY` | (none) | ExtraHop API key (from ExtraHop Admin → API Access) |
-| `EH_VERIFY_SSL` | `true` | Set to `false` for self-signed certs in lab environments |
+| `EH_VERIFY_SSL` | `true` | Setting to `false` keeps HTTPS but skips TLS certificate verification (accepts self-signed certs). Use only in lab environments. For production, keep `true` with valid certificates. |
 
 ### ETL Scheduler (optional)
 
@@ -395,6 +397,8 @@ Add under `[Service]`:
 ```ini
 Environment=EH_HOST=extrahop.lab.local
 Environment=EH_API_KEY=your-api-key-here
+# SECURITY NOTE: EH_VERIFY_SSL=false keeps HTTPS but skips TLS certificate verification.
+# Accepts self-signed certs. Use only in lab environments.
 Environment=EH_VERIFY_SSL=false
 ```
 
@@ -438,16 +442,20 @@ All BFF routes use the shared `server/extrahop-client.ts` client:
 ### Network Requirements
 
 - The **server** (Node.js) connects to ExtraHop — the browser never contacts ExtraHop directly
-- HTTPS (port 443) from the server to the ExtraHop appliance
-- If SSL verification is disabled, self-signed certs are accepted
+- HTTPS (port 443) from the server to the ExtraHop appliance when `EH_VERIFY_SSL=true`
+- When `EH_VERIFY_SSL=false`, the connection stays HTTPS but skips TLS certificate verification (accepts self-signed certs). Use only in lab environments.
+- Transport remains encrypted even with verification disabled
 - The ExtraHop API key must have read access to metrics, devices, detections, alerts, and packets
 
 ### Live Integration Status
 
-All routes are wired with live ExtraHop API calls. However:
+All routes contain code paths for live ExtraHop API calls. However:
 
-- **Live integration has not been tested against a real ExtraHop appliance** — this is deferred by contract
-- All route implementations are validated against fixtures and schema validators
+- **Live integration has NOT been tested against a real ExtraHop appliance** — this is deferred by contract
+- All route implementations are validated against fixtures and schema validators only
+- A passing bootstrap does NOT prove live connectivity — it only proves the stack runs in fixture mode
+- The topology baseline endpoint returns fixture data until historical collection is implemented
+- Source-string decontamination tests verify code patterns but do NOT prove runtime production correctness
 - The ExtraHop client, cache, and normalizers have 168 passing tests (55 + 113)
 - Error handling covers NO_CONFIG, API_ERROR, TIMEOUT, and NETWORK_ERROR scenarios
 
@@ -502,9 +510,9 @@ Returns raw activity rows for the Activity Timeline component. In live mode, fet
 
 ## Schema Notes
 
-The `deploy/full-schema.sql` file contains 38 `CREATE TABLE` statements:
+The `deploy/full-schema.sql` file contains 39 `CREATE TABLE` statements:
 
-- **34 active tables** — referenced by current application code (Drizzle ORM schema, BFF routes, tRPC procedures)
+- **35 active tables** — referenced by current application code (Drizzle ORM schema, BFF routes, tRPC procedures), including `saved_topology_views` added in Tier 5
 - **4 legacy tables** (`alerts`, `devices`, `interfaces`, `performance_metrics`) — from the initial Drizzle migration, not referenced by current code
 
 The `fact_device_activity` table is populated by the background ETL scheduler (when ExtraHop is configured) and by on-demand fetches in the device-detail route. In fixture mode, it remains empty and the device inspector shows fixture-backed activity data.

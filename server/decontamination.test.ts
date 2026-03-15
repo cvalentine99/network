@@ -1,17 +1,20 @@
 /**
  * Slice 28 — Runtime Decontamination Tests
  *
- * Verifies that:
- * 1. In fixture mode (no EH_HOST/EH_API_KEY), routes return fixture data
- * 2. isFixtureMode() logic is consistent across all routes
- * 3. Sentinel routing is gated behind NODE_ENV !== 'production'
- * 4. Fixture listing endpoints are gated behind NODE_ENV !== 'production'
- * 5. Health route returns honest status
- * 6. No route silently returns fake populated data when it should return an error
+ * HONEST SCOPE DECLARATION:
+ * - Tests in "Health Route" through "Packets Route" sections are BEHAVIORAL tests
+ *   that make real HTTP calls to the running dev server in fixture mode.
+ * - Tests in "Code structure verification" section are SOURCE-STRING assertions
+ *   that read .ts files and check for substring presence. These verify code patterns
+ *   exist but do NOT prove runtime correctness, edge-case handling, or live-appliance
+ *   compatibility. They are guard rails against accidental deletion, not proof of
+ *   production readiness.
  *
- * NOTE: We cannot test live mode (EH_HOST set) in this test suite because
- * setting env vars would affect the running dev server. These tests verify
- * fixture mode behavior and code structure.
+ * WHAT THESE TESTS DO NOT PROVE:
+ * - Live ExtraHop connectivity (not tested, deferred by contract)
+ * - Production-mode behavior (all tests run in dev/fixture mode)
+ * - Security posture (no auth tests, no TLS verification tests)
+ * - Concurrent request handling or performance under load
  */
 
 import { describe, it, expect, beforeAll } from 'vitest';
@@ -321,9 +324,14 @@ describe('Decontamination: isFixtureMode consistency', () => {
   });
 });
 
-// ─── Code structure: verify no unconditional fixture loading ────────────
+// ─── Code structure: SOURCE-STRING assertions (NOT behavioral tests) ──────
+// HONEST LABEL: These tests read source files and check for substring presence.
+// They prove a string exists in a file. They do NOT prove the code executes
+// correctly at runtime, handles edge cases, or works against a real appliance.
+// They are useful as guard rails against accidental code deletion but inflate
+// confidence if counted alongside behavioral tests without this distinction.
 
-describe('Decontamination: Code structure verification', () => {
+describe('Decontamination: Code structure verification (source-string assertions)', () => {
   let topologySource: string;
   let correlationSource: string;
   let impactSource: string;

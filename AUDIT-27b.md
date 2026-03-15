@@ -8,7 +8,7 @@ Audit started: reading every file from scratch, no assumptions.
 |------|------|---------|
 | deploy/bootstrap.sh | 19K | One-command bare-metal installer |
 | deploy/DEPLOY.md | 11K | Deployment guide |
-| deploy/full-schema.sql | 22K | Complete MySQL schema (38 tables) |
+| deploy/full-schema.sql | 22K | Complete MySQL schema (39 tables) |
 | deploy/nginx-netperf.conf | 662B | Bare-metal nginx config |
 | deploy/start-local.sh | 3.6K | Manual start helper |
 | deploy/docker/Dockerfile | 2.1K | Multi-stage Docker build |
@@ -22,4 +22,6 @@ Audit started: reading every file from scratch, no assumptions.
 ## bootstrap.sh Audit
 
 ### FINDINGS:
+
+This audit was started but not completed. The file inventory above is accurate (table count corrected to 39). No findings were recorded. See AUDIT-RESPONSE.md for the comprehensive 49-item audit response.
 
