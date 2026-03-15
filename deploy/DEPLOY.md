@@ -18,7 +18,7 @@ No Manus OAuth. No external service dependencies. All BFF routes serve fixture d
 
 ## Option A: One-Command Bootstrap (Recommended)
 
-The `deploy/bootstrap.sh` script automates the entire setup. It installs MySQL, Node.js, pnpm, and nginx if missing, applies the schema, builds the app, and starts everything.
+The `deploy/bootstrap.sh` script automates the entire setup. It installs MySQL, Node.js, pnpm, and nginx if missing, applies the schema, builds the app, creates a systemd service, and verifies everything.
 
 > **Important:** `bootstrap.sh` requires the **full project source tree**, not just the `deploy/` directory. It needs `package.json`, `server/`, `client/`, `fixtures/`, and `shared/` to build and run the app. If you only have the deploy bundle, you need the full source ZIP.
 
@@ -42,18 +42,44 @@ The script:
 - Detects the invoking user (`SUDO_USER`) and runs the build and app server as that user (not root)
 - Installs MySQL 8 and creates the `netperf_app` database
 - Applies all 38 tables from `deploy/full-schema.sql`
+- Verifies 12 critical tables including `fact_device_activity`
 - Installs Node.js 22 and pnpm if missing
 - Builds the production bundle (owned by the invoking user)
-- Starts the app on port 3020 as the invoking user
+- Creates a **systemd service** (`netperf-app.service`) for automatic restart and boot persistence
 - Configures nginx on port 3013 → 3020
-- Runs 16 verification checks and fails hard on any failure
+- Runs 17 verification checks and fails hard on any failure
 
 After completion, open **http://localhost:3013** in your browser.
 
-### Security notes
+### Service Management
+
+The app runs as a systemd service, which means it auto-restarts on failure and survives reboots:
+
+```bash
+# Check status
+sudo systemctl status netperf-app
+
+# Stop the app
+sudo systemctl stop netperf-app
+
+# Start the app
+sudo systemctl start netperf-app
+
+# Restart the app
+sudo systemctl restart netperf-app
+
+# View live logs
+sudo journalctl -u netperf-app -f
+
+# View app log file
+tail -f /var/log/netperf-app.log
+```
+
+### Security Notes
 - The app runs as the invoking user, not root
 - The build output (`dist/`) is owned by the invoking user, not root
 - Only system-level operations (apt-get, nginx config, MySQL setup) run as root
+- The systemd service runs the Node.js process as the invoking user
 
 ---
 
@@ -75,7 +101,7 @@ deploy/docker/
 └── down.sh                 # Stop script
 ```
 
-### Quick start
+### Quick Start
 
 ```bash
 cd deploy/docker
@@ -84,6 +110,18 @@ docker compose up --build
 ```
 
 Access at **http://localhost:3013**.
+
+### ExtraHop in Docker
+
+To enable live ExtraHop integration, uncomment and set the environment variables in `docker-compose.yml`:
+
+```yaml
+environment:
+  EH_HOST: "extrahop.lab.local"
+  EH_API_KEY: "your-api-key-here"
+  EH_VERIFY_SSL: "false"
+  ETL_INTERVAL_MS: "300000"
+```
 
 ### Architecture
 
@@ -214,6 +252,12 @@ To run in background:
 NODE_ENV=production PORT=3020 DATABASE_URL="mysql://netperf:netperf_test_2026@localhost:3306/netperf_app" JWT_SECRET="local-test-jwt-secret-not-for-production" VITE_APP_ID="local-test" OAUTH_SERVER_URL="" OWNER_OPEN_ID="local-test-owner" OWNER_NAME="Local Tester" BUILT_IN_FORGE_API_URL="" BUILT_IN_FORGE_API_KEY="" node dist/index.js &
 ```
 
+Or use the convenience script:
+
+```bash
+./deploy/start-local.sh
+```
+
 Verify the app responds:
 
 ```bash
@@ -255,8 +299,8 @@ curl -sf http://localhost:3013/ | head -1
 # Expected: <!doctype html>
 
 # BFF routes respond through nginx
-for route in health impact/headline impact/timeseries impact/top-talkers impact/detections impact/alerts impact/appliance-status topology/fixtures blast-radius/fixtures correlation/fixtures; do
-  printf "  /api/bff/%-30s " "$route:"
+for route in health impact/headline impact/timeseries impact/top-talkers impact/detections impact/alerts impact/appliance-status "impact/device-activity?id=1042" topology/fixtures blast-radius/fixtures correlation/fixtures; do
+  printf "  /api/bff/%-45s " "$route:"
   curl -sf -o /dev/null -w "%{http_code}\n" "http://localhost:3013/api/bff/$route"
 done
 # All should return 200
@@ -288,7 +332,40 @@ All surfaces render fixture data by default. To connect to a live ExtraHop appli
 
 ---
 
-## ExtraHop Live Integration (Slice 29)
+## Environment Variables
+
+### Required (set by bootstrap.sh or docker-compose)
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `NODE_ENV` | `production` | Runtime mode |
+| `PORT` | `3020` | App server port |
+| `DATABASE_URL` | `mysql://netperf:netperf_test_2026@localhost:3306/netperf_app` | MySQL connection string |
+| `JWT_SECRET` | `local-test-jwt-secret-not-for-production` | Session signing key (no auth in local deploy) |
+| `VITE_APP_ID` | `local-test` | OAuth app ID (unused in local deploy) |
+| `OAUTH_SERVER_URL` | (empty) | OAuth server (unused in local deploy) |
+| `OWNER_OPEN_ID` | `local-test-owner` | Owner identifier |
+| `OWNER_NAME` | `Local Tester` | Owner display name |
+| `BUILT_IN_FORGE_API_URL` | (empty) | Manus API URL (unused in local deploy) |
+| `BUILT_IN_FORGE_API_KEY` | (empty) | Manus API key (unused in local deploy) |
+
+### ExtraHop Integration (optional)
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `EH_HOST` | (none) | ExtraHop appliance hostname (e.g., `extrahop.lab.local`) |
+| `EH_API_KEY` | (none) | ExtraHop API key (from ExtraHop Admin → API Access) |
+| `EH_VERIFY_SSL` | `true` | Set to `false` for self-signed certs in lab environments |
+
+### ETL Scheduler (optional)
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `ETL_INTERVAL_MS` | `300000` (5 min) | Background ETL polling interval in milliseconds |
+
+---
+
+## ExtraHop Live Integration
 
 The application supports two operating modes:
 
@@ -299,18 +376,40 @@ The application supports two operating modes:
 
 ### Configuring Live Mode
 
+**Option 1: Via the Settings page (recommended)**
+
 1. Navigate to **Settings** in the sidebar
 2. Enter the ExtraHop appliance hostname (e.g., `extrahop.lab.local`)
 3. Enter the ExtraHop API key (generated from ExtraHop Admin → API Access)
 4. Optionally toggle SSL verification (disable for self-signed certs in lab environments)
 5. Click **Save** — the configuration is stored in the `appliance_config` database table
 
+**Option 2: Via systemd environment variables**
+
+```bash
+sudo systemctl edit netperf-app
+```
+
+Add under `[Service]`:
+
+```ini
+Environment=EH_HOST=extrahop.lab.local
+Environment=EH_API_KEY=your-api-key-here
+Environment=EH_VERIFY_SSL=false
+```
+
+Then restart:
+
+```bash
+sudo systemctl restart netperf-app
+```
+
 ### How Live Mode Works
 
 All BFF routes use the shared `server/extrahop-client.ts` client:
 
 - **Authentication**: `ExtraHop apikey=<key>` header on every request
-- **TTL Cache**: 500-entry LRU cache with per-endpoint TTL (reduces appliance load)
+- **TTL Cache**: 30-second cache with max 500 entries to reduce API load
 - **Error Handling**: `ExtraHopClientError` with codes: `NO_CONFIG`, `API_ERROR`, `TIMEOUT`, `NETWORK_ERROR`
 - **Normalization**: `server/extrahop-normalizers.ts` transforms raw ExtraHop JSON into shared types
 
@@ -328,6 +427,7 @@ All BFF routes use the shared `server/extrahop-client.ts` client:
 | `GET /api/bff/impact/device-detail` | `GET /api/v1/devices/{id}` + metrics + detections + alerts |
 | `GET /api/bff/impact/detection-detail` | `GET /api/v1/detections/{id}` + participant devices |
 | `GET /api/bff/impact/alert-detail` | `GET /api/v1/alerts/{id}` + associated detections/devices |
+| `GET /api/bff/impact/device-activity` | `GET /api/v1/devices/{id}/activity` → normalize → upsert to DB |
 | `POST /api/bff/topology/query` | `GET /api/v1/devices` + `POST /api/v1/metrics` + detections + alerts |
 | `POST /api/bff/correlation/events` | `GET /api/v1/detections` + `GET /api/v1/alerts` (merged event stream) |
 | `POST /api/bff/blast-radius/query` | `GET /api/v1/devices/{id}` + peers + metrics + detections |
@@ -353,47 +453,17 @@ All routes are wired with live ExtraHop API calls. However:
 
 ---
 
-## Schema Notes
+## Background ETL Scheduler
 
-The `deploy/full-schema.sql` file contains 38 `CREATE TABLE` statements:
+When a live ExtraHop appliance is configured, the server starts a background ETL job that periodically polls device activity data from ExtraHop and upserts it into the `fact_device_activity` table. This pre-populates the Activity Timeline in the Device Inspector.
 
-- **34 active tables** — referenced by current application code (Drizzle ORM schema, BFF routes, tRPC procedures)
-- **4 legacy tables** (`alerts`, `devices`, `interfaces`, `performance_metrics`) — from the initial Drizzle migration, not referenced by current code
-- **1 table with no live data path yet** (`fact_device_activity`) — defined in `drizzle/schema.ts`, present in the schema, and referenced by the `getDeviceActivity()` helper in `server/db.ts` (called by the device detail tRPC procedure). However, no ETL or BFF route currently populates this table, so it will return empty results until live ExtraHop integration writes activity data into it.
+### How It Works
 
----
-
-## Stopping
-
-```bash
-# Find and kill the Node.js process
-kill $(lsof -ti:3020) 2>/dev/null
-
-# Stop nginx (optional)
-sudo systemctl stop nginx
-```
-
----
-
-## Background ETL Scheduler (Slice 31)
-
-When a live ExtraHop appliance is configured (`EH_HOST` + `EH_API_KEY`), the server starts a background ETL job that periodically polls device activity data from ExtraHop and upserts it into the `fact_device_activity` table.
-
-### Configuration
-
-| Env Variable | Default | Description |
-|---|---|---|
-| `ETL_INTERVAL_MS` | `300000` (5 min) | Polling interval in milliseconds |
-| `EH_HOST` | (none) | ExtraHop appliance hostname — ETL only runs when set |
-| `EH_API_KEY` | (none) | ExtraHop API key — ETL only runs when set |
-
-### ETL Cycle
-
-Each cycle:
-1. Queries all known devices from `dim_device` table
+Each ETL cycle:
+1. Queries all known devices from the `dim_device` table
 2. For each device, calls `GET /api/v1/devices/{id}/activity` on the ExtraHop appliance
 3. Normalizes the response via `normalizeDeviceActivity()`
-4. Upserts records into `fact_device_activity` (batch of 50, ON DUPLICATE KEY UPDATE)
+4. Upserts records into `fact_device_activity` (batches of 50, ON DUPLICATE KEY UPDATE)
 5. Reports status via the health endpoint (`/api/bff/health` → `etl` field)
 
 ### Error Isolation
@@ -402,7 +472,7 @@ Failures are isolated per-device. If one device's activity fetch fails, the cycl
 
 ### Health Endpoint ETL Status
 
-The `/api/bff/health` response now includes an `etl` field (null when ETL is not running):
+The `/api/bff/health` response includes an `etl` field (null when ETL is not running):
 
 ```json
 {
@@ -422,11 +492,39 @@ The `/api/bff/health` response now includes an `etl` field (null when ETL is not
 }
 ```
 
-### BFF Route: Device Activity Rows
+### Device Activity Route
 
 `GET /api/bff/impact/device-activity?id=<deviceId>&limit=50`
 
-Returns raw activity rows for the timeline component. In live mode, fetches fresh data from ExtraHop and upserts to DB. Falls back to DB if ExtraHop is unreachable. In fixture mode, returns fixture data.
+Returns raw activity rows for the Activity Timeline component. In live mode, fetches fresh data from ExtraHop and upserts to DB. Falls back to DB if ExtraHop is unreachable. In fixture mode, returns fixture data.
+
+---
+
+## Schema Notes
+
+The `deploy/full-schema.sql` file contains 38 `CREATE TABLE` statements:
+
+- **34 active tables** — referenced by current application code (Drizzle ORM schema, BFF routes, tRPC procedures)
+- **4 legacy tables** (`alerts`, `devices`, `interfaces`, `performance_metrics`) — from the initial Drizzle migration, not referenced by current code
+
+The `fact_device_activity` table is populated by the background ETL scheduler (when ExtraHop is configured) and by on-demand fetches in the device-detail route. In fixture mode, it remains empty and the device inspector shows fixture-backed activity data.
+
+The `appliance_config` table will be empty on fresh install. This is correct — the app renders a "not configured" quiet state until you configure an ExtraHop appliance via the Settings page.
+
+---
+
+## Stopping
+
+```bash
+# If using systemd (bootstrap.sh)
+sudo systemctl stop netperf-app
+
+# If using manual start
+kill $(lsof -ti:3020) 2>/dev/null
+
+# Stop nginx (optional)
+sudo systemctl stop nginx
+```
 
 ---
 
@@ -436,10 +534,14 @@ Returns raw activity rows for the timeline component. In live mode, fetches fres
 
 **"dist/index.js not found"** — Run `pnpm build` first.
 
-**nginx returns 502 Bad Gateway** — The app on port 3020 is not running. Start it first.
+**nginx returns 502 Bad Gateway** — The app on port 3020 is not running. Start it first: `sudo systemctl start netperf-app`
 
 **OAuth ERROR in console** — Expected and harmless. No routes require authentication.
 
 **BFF routes return HTML instead of JSON** — You are hitting a route path that does not exist. The SPA fallback serves `index.html` for unknown paths. Check the route name (e.g., `/headline` not `/kpi`).
+
+**App doesn't start after reboot** — Check that the systemd service is enabled: `sudo systemctl enable netperf-app`
+
+**ETL not running** — Check the health endpoint: `curl -s http://localhost:3013/api/bff/health | python3 -m json.tool`. The `etl` field should show `running: true`. If null, no ExtraHop appliance is configured.
 
 **Docker Compose issues** — The Docker stack is untested. If services fail to start, check `docker compose logs <service>` for details. Common issues: MySQL not ready before app starts (increase `start_period`), port conflicts on 3013/3020/3306.

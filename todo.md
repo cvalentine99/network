@@ -361,3 +361,33 @@ These items are tracked here for the live integration phase.
 - [x] Update DEPLOY.md with background ETL documentation
 - [x] Update todo.md with completion status
 - [ ] Produce truth receipt
+
+# DEPLOYMENT PACKAGE REBUILD (Slice 32)
+
+## Phase 1: Auto-install script rebuild
+- [x] MySQL 8 install + database creation (idempotent, CREATE IF NOT EXISTS)
+- [x] Schema application (38 tables) with verification (12 critical tables checked)
+- [x] Node.js 22 + pnpm install (detects existing installs)
+- [x] App build (pnpm install --frozen-lockfile + pnpm build, as invoking user)
+- [x] Nginx reverse proxy configuration (inline config, no external file dependency)
+- [x] systemd service file for the app (auto-restart, boot persistence)
+- [x] ExtraHop environment variable configuration (EH_HOST, EH_API_KEY, EH_VERIFY_SSL)
+- [x] ETL scheduler configuration (ETL_INTERVAL_MS, default 300000)
+- [x] Health check verification (17 checks: MySQL, all BFF routes, tRPC, no auth blocking)
+- [x] Non-root app execution (detects SUDO_USER, runs as invoking user)
+- [x] PID management (systemd-managed, MainPID reported)
+
+## Phase 2: DEPLOY.md rewrite
+- [x] Clean rewrite of DEPLOY.md with 3 deployment options (bootstrap, Docker, manual)
+- [x] Document all environment variables (required + ExtraHop + ETL)
+- [x] Document all 16 BFF-to-ExtraHop API endpoint mappings in table format
+- [x] Document ETL scheduler configuration and health endpoint reporting
+- [x] Document troubleshooting steps (7 common issues)
+
+## Phase 3: Testing and delivery
+- [x] Validate script syntax (bash -n: both scripts pass)
+- [x] Validate all file paths and references (schema match, table count match)
+- [x] Full test suite: 2,398 tests across 36 files — zero regressions
+- [x] All 12 BFF routes verified via curl (all 200)
+- [x] Source ZIP created and uploaded to CDN
+- [x] Checkpoint and deliver

@@ -53,6 +53,12 @@ services:
       OWNER_NAME: "Local Tester"
       BUILT_IN_FORGE_API_URL: ""
       BUILT_IN_FORGE_API_KEY: ""
+      # ExtraHop configuration (uncomment to enable live mode)
+      # EH_HOST: "extrahop.lab.local"
+      # EH_API_KEY: "your-api-key-here"
+      # EH_VERIFY_SSL: "false"
+      # ETL scheduler configuration (default: 5 minutes)
+      # ETL_INTERVAL_MS: "300000"
     depends_on:
       mysql:
         condition: service_healthy

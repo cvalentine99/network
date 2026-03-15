@@ -18,8 +18,17 @@ export JWT_SECRET="local-test-jwt-secret-not-for-production"
 export VITE_APP_ID="local-test"
 export OAUTH_SERVER_URL=""
 export OWNER_OPEN_ID="local-test-owner"
+export OWNER_NAME="Local Tester"
 export BUILT_IN_FORGE_API_URL=""
 export BUILT_IN_FORGE_API_KEY=""
+
+# ExtraHop configuration (uncomment to enable live mode)
+# export EH_HOST="extrahop.lab.local"
+# export EH_API_KEY="your-api-key-here"
+# export EH_VERIFY_SSL="false"
+
+# ETL scheduler configuration (default: 5 minutes)
+# export ETL_INTERVAL_MS="300000"
 
 echo "=== NetPerf NOC — Local Test Deployment ==="
 echo "Project:    $PROJECT_DIR"
@@ -87,13 +96,13 @@ echo ""
 echo "[5/5] Verifying BFF routes..."
 PASS=0
 FAIL=0
-for route in health impact/headline impact/timeseries impact/top-talkers impact/detections impact/alerts impact/appliance-status topology/fixtures blast-radius/fixtures correlation/fixtures; do
+for route in health impact/headline impact/timeseries impact/top-talkers impact/detections impact/alerts impact/appliance-status "impact/device-activity?id=1042" topology/fixtures blast-radius/fixtures correlation/fixtures; do
   CODE=$(curl -sf -o /dev/null -w "%{http_code}" "http://localhost:$PORT/api/bff/$route" 2>/dev/null)
   if [ "$CODE" = "200" ]; then
-    printf "  %-35s %s\n" "/api/bff/$route" "200 OK"
+    printf "  %-45s %s\n" "/api/bff/$route" "200 OK"
     PASS=$((PASS + 1))
   else
-    printf "  %-35s %s FAIL\n" "/api/bff/$route" "$CODE"
+    printf "  %-45s %s FAIL\n" "/api/bff/$route" "$CODE"
     FAIL=$((FAIL + 1))
   fi
 done

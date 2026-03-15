@@ -64,6 +64,14 @@ ENV OWNER_NAME="Local Tester"
 ENV BUILT_IN_FORGE_API_URL=""
 ENV BUILT_IN_FORGE_API_KEY=""
 
+# ExtraHop configuration (override at runtime via docker-compose or -e flags)
+# ENV EH_HOST=extrahop.lab.local
+# ENV EH_API_KEY=your-api-key-here
+# ENV EH_VERIFY_SSL=false
+
+# ETL scheduler configuration (default: 5 minutes)
+# ENV ETL_INTERVAL_MS=300000
+
 EXPOSE 3020
 
 # Run as non-root
