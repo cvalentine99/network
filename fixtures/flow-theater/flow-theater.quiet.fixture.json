@@ -1,0 +1,73 @@
+{
+  "_meta": {
+    "fixture": "flow-theater.quiet",
+    "description": "SSE event sequence for a trace that resolves the device but finds no meaningful data (quiet terminal state).",
+    "entryMode": "hostname",
+    "terminalStatus": "quiet",
+    "totalEvents": 17,
+    "totalSteps": 8
+  },
+  "intent": {
+    "mode": "hostname",
+    "value": "idle-printer-01.lab.local",
+    "timeWindow": {
+      "fromMs": 1710000000000,
+      "untilMs": 1710001800000,
+      "durationMs": 1800000,
+      "cycle": "30sec"
+    }
+  },
+  "events": [
+    { "type": "step", "stepId": "input-accepted", "status": "running", "detail": "Validating hostname idle-printer-01.lab.local", "durationMs": null, "count": null, "timestamp": 1710001800100 },
+    { "type": "step", "stepId": "input-accepted", "status": "complete", "detail": "Hostname accepted", "durationMs": 40, "count": null, "timestamp": 1710001800140 },
+    { "type": "step", "stepId": "entry-resolution", "status": "running", "detail": "Resolving hostname to device", "durationMs": null, "count": null, "timestamp": 1710001800145 },
+    { "type": "step", "stepId": "entry-resolution", "status": "complete", "detail": "Resolved to device 3001", "durationMs": 100, "count": null, "timestamp": 1710001800245 },
+    { "type": "step", "stepId": "device-resolved", "status": "running", "detail": "Loading device identity", "durationMs": null, "count": null, "timestamp": 1710001800250 },
+    { "type": "step", "stepId": "device-resolved", "status": "complete", "detail": "idle-printer-01.lab.local (10.1.20.201)", "durationMs": 70, "count": null, "timestamp": 1710001800320 },
+    { "type": "step", "stepId": "activity-timeline", "status": "running", "detail": "Querying activity records", "durationMs": null, "count": null, "timestamp": 1710001800325 },
+    { "type": "step", "stepId": "metric-timeline", "status": "running", "detail": "Querying metric data points", "durationMs": null, "count": null, "timestamp": 1710001800325 },
+    { "type": "step", "stepId": "records-search", "status": "running", "detail": "Searching records", "durationMs": null, "count": null, "timestamp": 1710001800325 },
+    { "type": "step", "stepId": "detection-alert", "status": "running", "detail": "Querying detections and alerts", "durationMs": null, "count": null, "timestamp": 1710001800325 },
+    { "type": "step", "stepId": "trace-assembly", "status": "running", "detail": "Assembling trace results", "durationMs": null, "count": null, "timestamp": 1710001800325 },
+    { "type": "step", "stepId": "activity-timeline", "status": "quiet", "detail": "No activity records", "durationMs": 180, "count": 0, "timestamp": 1710001800505 },
+    { "type": "step", "stepId": "metric-timeline", "status": "quiet", "detail": "No metric data points", "durationMs": 200, "count": 0, "timestamp": 1710001800525 },
+    { "type": "step", "stepId": "records-search", "status": "quiet", "detail": "No records found", "durationMs": 140, "count": 0, "timestamp": 1710001800465 },
+    { "type": "step", "stepId": "detection-alert", "status": "quiet", "detail": "No detections or alerts", "durationMs": 120, "count": 0, "timestamp": 1710001800445 },
+    { "type": "step", "stepId": "trace-assembly", "status": "quiet", "detail": "No data to assemble", "durationMs": 250, "count": null, "timestamp": 1710001800575 },
+    {
+      "type": "complete",
+      "terminalStatus": "quiet",
+      "totalDurationMs": 480,
+      "timestamp": 1710001800580,
+      "summary": {
+        "resolvedDevice": {
+          "resolvedVia": "hostname",
+          "originalInput": "idle-printer-01.lab.local",
+          "device": {
+            "id": 3001,
+            "displayName": "idle-printer-01.lab.local",
+            "ipaddr": "10.1.20.201",
+            "macaddr": "00:50:56:E7:8F:9A",
+            "role": "other",
+            "vendor": "HP"
+          }
+        },
+        "activityCount": 0,
+        "metricPointCount": 0,
+        "recordCount": 0,
+        "detectionCount": 0,
+        "alertCount": 0,
+        "stepTimings": [
+          { "stepId": "input-accepted", "status": "complete", "durationMs": 40 },
+          { "stepId": "entry-resolution", "status": "complete", "durationMs": 100 },
+          { "stepId": "device-resolved", "status": "complete", "durationMs": 70 },
+          { "stepId": "activity-timeline", "status": "quiet", "durationMs": 180 },
+          { "stepId": "metric-timeline", "status": "quiet", "durationMs": 200 },
+          { "stepId": "records-search", "status": "quiet", "durationMs": 140 },
+          { "stepId": "detection-alert", "status": "quiet", "durationMs": 120 },
+          { "stepId": "trace-assembly", "status": "quiet", "durationMs": 250 }
+        ]
+      }
+    }
+  ]
+}

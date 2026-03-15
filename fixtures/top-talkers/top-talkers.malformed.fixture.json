@@ -1,0 +1,20 @@
+{
+  "description": "Malformed top talkers — missing required fields, wrong types. Should fail TopTalkerRowSchema validation.",
+  "topTalkers": [
+    {
+      "device": "not-an-object",
+      "bytesIn": "not-a-number",
+      "bytesOut": -100,
+      "totalBytes": null
+    },
+    {
+      "device": { "id": "string-id", "displayName": 12345 },
+      "bytesIn": 100,
+      "bytesOut": 200,
+      "totalBytes": 300,
+      "pktsIn": 10,
+      "pktsOut": 20,
+      "sparkline": "not-an-array"
+    }
+  ]
+}

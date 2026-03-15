@@ -1,0 +1,26 @@
+{
+  "description": "Topology node → Blast Radius navigation fixture",
+  "sourceNode": {
+    "id": 1042,
+    "displayName": "dc01.lab.local",
+    "ipaddr": "10.1.1.50",
+    "role": "server",
+    "clusterId": "datacenter-core",
+    "totalBytes": 5242880,
+    "activeDetections": 2,
+    "activeAlerts": 1,
+    "critical": true
+  },
+  "expectedLink": {
+    "label": "Blast Radius: dc01.lab.local",
+    "href": "/blast-radius?brMode=device-id&brValue=1042&brAuto=1",
+    "targetSurface": "blast-radius",
+    "sourceSurface": "topology",
+    "entityContext": "topology-node-1042"
+  },
+  "expectedParsed": {
+    "mode": "device-id",
+    "value": "1042",
+    "autoSubmit": true
+  }
+}

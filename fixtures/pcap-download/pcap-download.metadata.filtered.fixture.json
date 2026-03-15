@@ -1,0 +1,12 @@
+{
+  "metadata": {
+    "filename": "10.0.0.50_1710000000000_1710003600000_tcp-port-443.pcap",
+    "contentType": "application/vnd.tcpdump.pcap",
+    "estimatedBytes": 131072,
+    "sourceIp": "10.0.0.50",
+    "fromMs": 1710000000000,
+    "untilMs": 1710003600000,
+    "bpfFilter": "tcp port 443",
+    "packetStoreId": null
+  }
+}

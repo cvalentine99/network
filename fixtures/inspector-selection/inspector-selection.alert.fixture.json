@@ -1,0 +1,24 @@
+{
+  "description": "Inspector selection fixture — alert selected from Alerts card. Extracted from alerts.populated.fixture.json row 1 (High Packet Loss Detected, severity 0 = critical).",
+  "selection": {
+    "kind": "alert",
+    "alert": {
+      "id": 101,
+      "name": "High Packet Loss Detected",
+      "author": "ExtraHop",
+      "statName": "extrahop.device.net",
+      "fieldName": "pkts_dropped",
+      "fieldOp": null,
+      "fieldName2": null,
+      "operator": ">",
+      "operand": 500,
+      "severity": 0,
+      "severityLabel": "critical",
+      "type": "threshold",
+      "disabled": false,
+      "description": "Triggers when packet drops exceed 500 per interval on any device.",
+      "intervalLength": 30,
+      "refireInterval": 300
+    }
+  }
+}

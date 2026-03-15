@@ -1,0 +1,18 @@
+{
+  "headline": {
+    "totalBytes": "not_a_number",
+    "totalPackets": -1,
+    "bytesPerSecond": null,
+    "packetsPerSecond": "Infinity",
+    "baselineDeltaPct": "NaN"
+  },
+  "timeseries": "should_be_array",
+  "topTalkers": null,
+  "detections": 42,
+  "alerts": {},
+  "applianceVersion": 123,
+  "applianceEdition": null,
+  "appliancePlatform": true,
+  "captureName": [],
+  "licensedModules": "not_an_array"
+}

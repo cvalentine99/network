@@ -1,0 +1,118 @@
+{
+  "description": "Memoization audit report for inspector detail panes. Documents which components have memoization and which need it based on payload size analysis against fixtures.",
+  "entries": [
+    {
+      "component": "DeviceDetailPane",
+      "dataDescription": "Full DeviceDetail payload including protocols array, associated detections, associated alerts",
+      "isMemoized": false,
+      "isReactMemo": false,
+      "fixturePayloadSize": 5,
+      "isConcern": false,
+      "recommendation": "Current fixture has 5 protocols. No memoization concern at this size. Add React.memo if protocol count exceeds 20."
+    },
+    {
+      "component": "DeviceDetailPane.ProtocolBreakdownChart",
+      "dataDescription": "Protocol array passed to donut chart for visual breakdown",
+      "isMemoized": false,
+      "isReactMemo": false,
+      "fixturePayloadSize": 5,
+      "isConcern": false,
+      "recommendation": "Chart recalculates on every render. Add useMemo for arc computation when protocol count exceeds 20."
+    },
+    {
+      "component": "DeviceDetailPane.MiniDetectionRow",
+      "dataDescription": "Individual detection row in associated detections list",
+      "isMemoized": false,
+      "isReactMemo": false,
+      "fixturePayloadSize": 1,
+      "isConcern": false,
+      "recommendation": "Single detection in fixture. Add React.memo when list exceeds 50 items."
+    },
+    {
+      "component": "DeviceDetailPane.MiniAlertRow",
+      "dataDescription": "Individual alert row in associated alerts list",
+      "isMemoized": false,
+      "isReactMemo": false,
+      "fixturePayloadSize": 1,
+      "isConcern": false,
+      "recommendation": "Single alert in fixture. Add React.memo when list exceeds 30 items."
+    },
+    {
+      "component": "DetectionDetailPane",
+      "dataDescription": "Full DetectionDetail payload including related devices, related alerts, notes, timeline",
+      "isMemoized": false,
+      "isReactMemo": false,
+      "fixturePayloadSize": 8,
+      "isConcern": false,
+      "recommendation": "Current fixture has modest payload. No memoization concern at this size."
+    },
+    {
+      "component": "DetectionDetailPane.MiniDeviceRow",
+      "dataDescription": "Individual device row in related devices list",
+      "isMemoized": false,
+      "isReactMemo": false,
+      "fixturePayloadSize": 2,
+      "isConcern": false,
+      "recommendation": "Two devices in fixture. Add React.memo when list exceeds 20 items."
+    },
+    {
+      "component": "AlertDetailPane",
+      "dataDescription": "Full AlertDetail payload including trigger history, associated devices, associated detections",
+      "isMemoized": false,
+      "isReactMemo": false,
+      "fixturePayloadSize": 6,
+      "isConcern": false,
+      "recommendation": "Current fixture has modest payload. No memoization concern at this size."
+    },
+    {
+      "component": "AlertDetailPane.TriggerRow",
+      "dataDescription": "Individual trigger history entry",
+      "isMemoized": false,
+      "isReactMemo": false,
+      "fixturePayloadSize": 3,
+      "isConcern": false,
+      "recommendation": "Three triggers in fixture. Add React.memo when list exceeds 30 items."
+    },
+    {
+      "component": "useDeviceDetail",
+      "dataDescription": "BFF fetch result stored in useState. useCallback memoizes fetch function by deviceId.",
+      "isMemoized": true,
+      "isReactMemo": false,
+      "fixturePayloadSize": 1,
+      "isConcern": false,
+      "recommendation": "useCallback correctly memoizes fetch by deviceId. No additional memoization needed for the hook itself."
+    },
+    {
+      "component": "useDetectionDetail",
+      "dataDescription": "BFF fetch result stored in useState. useCallback memoizes fetch function by detectionId.",
+      "isMemoized": true,
+      "isReactMemo": false,
+      "fixturePayloadSize": 1,
+      "isConcern": false,
+      "recommendation": "useCallback correctly memoizes fetch by detectionId. No additional memoization needed for the hook itself."
+    },
+    {
+      "component": "useAlertDetail",
+      "dataDescription": "BFF fetch result stored in useState. useCallback memoizes fetch function by alertId.",
+      "isMemoized": true,
+      "isReactMemo": false,
+      "fixturePayloadSize": 1,
+      "isConcern": false,
+      "recommendation": "useCallback correctly memoizes fetch by alertId. No additional memoization needed for the hook itself."
+    },
+    {
+      "component": "InspectorBreadcrumb",
+      "dataDescription": "History array and selection from InspectorContext",
+      "isMemoized": false,
+      "isReactMemo": false,
+      "fixturePayloadSize": 10,
+      "isConcern": false,
+      "recommendation": "History capped at INSPECTOR_HISTORY_MAX_DEPTH (10). No memoization concern."
+    }
+  ],
+  "totalAudited": 12,
+  "concernCount": 0,
+  "memoizedCount": 3,
+  "needsMemoizationCount": 0,
+  "generatedAt": "2026-03-14T00:00:00.000Z"
+}

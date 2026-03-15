@@ -1,0 +1,15 @@
+{
+  "description": "All 7 dashboard surfaces with integration status",
+  "surfaceCount": 7,
+  "surfaces": [
+    { "name": "Impact Deck", "path": "/", "integrationStatus": "fixture-proven" },
+    { "name": "Flow Theater", "path": "/flow-theater", "integrationStatus": "fixture-proven" },
+    { "name": "Blast Radius", "path": "/blast-radius", "integrationStatus": "fixture-proven" },
+    { "name": "Correlation", "path": "/correlation", "integrationStatus": "fixture-proven" },
+    { "name": "Topology", "path": "/topology", "integrationStatus": "fixture-proven" },
+    { "name": "Settings", "path": "/settings", "integrationStatus": "fixture-proven" },
+    { "name": "Help", "path": "/help", "integrationStatus": "fixture-proven" }
+  ],
+  "allFixtureProven": true,
+  "noneLiveIntegrated": true
+}

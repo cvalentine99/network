@@ -1,0 +1,9 @@
+{
+  "_meta": {
+    "fixture": "topology.transport-error.fixture.json",
+    "generatedAt": "2026-03-14T12:00:00.000Z"
+  },
+  "intent": "transport-error",
+  "payload": null,
+  "error": "ECONNREFUSED: Connection refused to ExtraHop appliance at 10.1.1.100:443"
+}

@@ -1,0 +1,62 @@
+{
+  "description": "Quiet device detail — device identity exists but has zero traffic, no protocols, no associated detections or alerts. Represents a device that has been discovered but has not generated any activity in the current time window.",
+  "deviceDetail": {
+    "device": {
+      "id": 9999,
+      "displayName": "idle-printer-01",
+      "extrahopId": "0242ac110099",
+      "discoveryId": "0242ac110099",
+      "ipaddr4": "10.10.9.200",
+      "ipaddr6": null,
+      "macaddr": "02:42:AC:11:00:99",
+      "deviceClass": "node",
+      "role": null,
+      "autoRole": null,
+      "vendor": null,
+      "isL3": false,
+      "vlanid": null,
+      "parentId": null,
+      "nodeId": null,
+      "analysis": "standard",
+      "analysisLevel": 1,
+      "lastSeenTime": null,
+      "lastSeenIso": null,
+      "modTime": null,
+      "discoverTime": 1741000000000,
+      "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+      "onWatchlist": false,
+      "critical": false,
+      "customCriticality": null,
+      "isCustomDevice": false,
+      "customType": null,
+      "userModTime": null,
+      "description": null,
+      "cdp_name": null,
+      "dhcp_name": null,
+      "dns_name": null,
+      "netbios_name": null,
+      "custom_name": null,
+      "default_name": "idle-printer-01",
+      "model": null,
+      "modelOverride": null,
+      "software": null
+    },
+    "traffic": {
+      "bytesIn": 0,
+      "bytesOut": 0,
+      "totalBytes": 0,
+      "pktsIn": 0,
+      "pktsOut": 0
+    },
+    "protocols": [],
+    "associatedDetections": [],
+    "associatedAlerts": [],
+    "activitySummary": {
+      "firstSeen": "2026-03-03T14:26:40.000Z",
+      "lastSeen": null,
+      "totalProtocols": 0,
+      "totalConnections": 0,
+      "peakThroughputBps": null
+    }
+  }
+}

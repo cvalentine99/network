@@ -1,0 +1,23 @@
+{
+  "_fixture": "time-window-audit.edge-cases",
+  "_description": "Edge cases for time-window resolution: zero-width windows, very large offsets, boundary durations for cycle transitions.",
+  "anchorNow": 1710000000000,
+  "cycleBoundaries": [
+    { "durationMs": 1, "expectedCycle": "1sec", "label": "minimum positive duration" },
+    { "durationMs": 360000, "expectedCycle": "1sec", "label": "exact 6-min boundary (inclusive)" },
+    { "durationMs": 360001, "expectedCycle": "30sec", "label": "just past 6-min boundary" },
+    { "durationMs": 1800000, "expectedCycle": "30sec", "label": "exact 30-min boundary (inclusive)" },
+    { "durationMs": 1800001, "expectedCycle": "5min", "label": "just past 30-min boundary" },
+    { "durationMs": 21600000, "expectedCycle": "5min", "label": "exact 6-hr boundary (inclusive)" },
+    { "durationMs": 21600001, "expectedCycle": "1hr", "label": "just past 6-hr boundary" },
+    { "durationMs": 172800000, "expectedCycle": "1hr", "label": "exact 2-day boundary (inclusive)" },
+    { "durationMs": 172800001, "expectedCycle": "24hr", "label": "just past 2-day boundary" },
+    { "durationMs": 604800000, "expectedCycle": "24hr", "label": "7 days" },
+    { "durationMs": 2592000000, "expectedCycle": "24hr", "label": "30 days" }
+  ],
+  "invalidWindows": [
+    { "from": 1710000000000, "until": 1709999700000, "label": "from > until (inverted)" },
+    { "from": 1710000000000, "until": 1710000000000, "label": "from == until (zero width)" },
+    { "from": 0, "label": "from = 0 (epoch start, until = now)" }
+  ]
+}

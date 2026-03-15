@@ -1,0 +1,18 @@
+{
+  "headline": {
+    "totalBytes": 0,
+    "totalPackets": 0,
+    "bytesPerSecond": 0,
+    "packetsPerSecond": 0,
+    "baselineDeltaPct": null
+  },
+  "timeseries": [],
+  "topTalkers": [],
+  "detections": [],
+  "alerts": [],
+  "applianceVersion": "26.1.4.2814",
+  "applianceEdition": "Reveal(x) Enterprise",
+  "appliancePlatform": "extrahop",
+  "captureName": "Capture 00:1a:8c:10:00:01",
+  "licensedModules": ["wire_data"]
+}

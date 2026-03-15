@@ -1,0 +1,82 @@
+{
+  "description": "Mount/unmount lifecycle scenarios for inspector detail panes. Each scenario describes the expected mount/unmount/fetch behavior when the user changes selection.",
+  "scenarios": [
+    {
+      "name": "initial-device-selection",
+      "fromKind": null,
+      "fromId": null,
+      "toKind": "device",
+      "toId": 1042,
+      "expectUnmount": false,
+      "expectMount": true,
+      "expectFetch": true,
+      "rationale": "No previous pane exists. DeviceDetailPane mounts fresh and fetches."
+    },
+    {
+      "name": "same-kind-different-id-device",
+      "fromKind": "device",
+      "fromId": 1042,
+      "toKind": "device",
+      "toId": 2001,
+      "expectUnmount": false,
+      "expectMount": false,
+      "expectFetch": true,
+      "rationale": "Same kind (device→device). React reuses component instance. Hook refetches due to ID change."
+    },
+    {
+      "name": "same-kind-same-id-device",
+      "fromKind": "device",
+      "fromId": 1042,
+      "toKind": "device",
+      "toId": 1042,
+      "expectUnmount": false,
+      "expectMount": false,
+      "expectFetch": false,
+      "rationale": "Same kind, same ID. No state change. Hook useCallback dep unchanged, no refetch."
+    },
+    {
+      "name": "cross-kind-device-to-detection",
+      "fromKind": "device",
+      "fromId": 1042,
+      "toKind": "detection",
+      "toId": 4001,
+      "expectUnmount": true,
+      "expectMount": true,
+      "expectFetch": true,
+      "rationale": "Different kind. React unmounts DeviceDetailPane, mounts DetectionDetailPane."
+    },
+    {
+      "name": "cross-kind-detection-to-alert",
+      "fromKind": "detection",
+      "fromId": 4001,
+      "toKind": "alert",
+      "toId": 7001,
+      "expectUnmount": true,
+      "expectMount": true,
+      "expectFetch": true,
+      "rationale": "Different kind. React unmounts DetectionDetailPane, mounts AlertDetailPane."
+    },
+    {
+      "name": "cross-kind-alert-to-device",
+      "fromKind": "alert",
+      "fromId": 7001,
+      "toKind": "device",
+      "toId": 1042,
+      "expectUnmount": true,
+      "expectMount": true,
+      "expectFetch": true,
+      "rationale": "Different kind. React unmounts AlertDetailPane, mounts DeviceDetailPane."
+    },
+    {
+      "name": "clear-to-device",
+      "fromKind": null,
+      "fromId": null,
+      "toKind": "device",
+      "toId": 1042,
+      "expectUnmount": false,
+      "expectMount": true,
+      "expectFetch": true,
+      "rationale": "From cleared state. DeviceDetailPane mounts fresh."
+    }
+  ]
+}

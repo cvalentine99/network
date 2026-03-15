@@ -1,0 +1,21 @@
+{
+  "_fixture": "time-window-audit.synchronized",
+  "_description": "All 6 data panels report the same fromMs/untilMs/cycle. No drift.",
+  "anchorNow": 1710000000000,
+  "fromOffset": -300000,
+  "expectedWindow": {
+    "fromMs": 1709999700000,
+    "untilMs": 1710000000000,
+    "durationMs": 300000,
+    "cycle": "1sec"
+  },
+  "panelSnapshots": [
+    { "panelId": "headline", "fromMs": 1709999700000, "untilMs": 1710000000000, "cycle": "1sec", "capturedAt": 1710000000000 },
+    { "panelId": "timeseries", "fromMs": 1709999700000, "untilMs": 1710000000000, "cycle": "1sec", "capturedAt": 1710000000000 },
+    { "panelId": "topTalkers", "fromMs": 1709999700000, "untilMs": 1710000000000, "cycle": "1sec", "capturedAt": 1710000000000 },
+    { "panelId": "detections", "fromMs": 1709999700000, "untilMs": 1710000000000, "cycle": "1sec", "capturedAt": 1710000000000 },
+    { "panelId": "alerts", "fromMs": 1709999700000, "untilMs": 1710000000000, "cycle": "1sec", "capturedAt": 1710000000000 },
+    { "panelId": "deviceDetail", "fromMs": 1709999700000, "untilMs": 1710000000000, "cycle": "1sec", "capturedAt": 1710000000000 }
+  ],
+  "expectedDriftReports": []
+}

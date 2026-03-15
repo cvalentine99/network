@@ -1,0 +1,5 @@
+{
+  "error": "PCAP download failed",
+  "message": "Transport error: packet store unreachable",
+  "code": "PACKET_STORE_UNREACHABLE"
+}

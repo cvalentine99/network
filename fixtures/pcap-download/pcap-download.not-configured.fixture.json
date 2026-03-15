@@ -1,0 +1,5 @@
+{
+  "error": "Packet store not configured",
+  "message": "No packet store is connected to this appliance. PCAP download requires an ExtraHop Trace appliance or a connected packet store.",
+  "code": "NO_PACKET_STORE"
+}

@@ -1,0 +1,71 @@
+{
+  "description": "Populated ExtraHop GET /api/v1/devices/1042/activity response. Contains 8 activity records across 7 distinct protocols (net appears twice for different time windows). Used by Slice 30 ETL pipeline tests.",
+  "activityRows": [
+    { "activityId": 10001, "deviceId": 1042, "statName": "net", "fromTime": 1741795200000, "untilTime": 1741795500000, "modTime": 1741795500000 },
+    { "activityId": 10002, "deviceId": 1042, "statName": "http_client", "fromTime": 1741795200000, "untilTime": 1741795500000, "modTime": 1741795500000 },
+    { "activityId": 10003, "deviceId": 1042, "statName": "dns_client", "fromTime": 1741795200000, "untilTime": 1741795500000, "modTime": 1741795500000 },
+    { "activityId": 10004, "deviceId": 1042, "statName": "ssl_client", "fromTime": 1741795200000, "untilTime": 1741795500000, "modTime": 1741795500000 },
+    { "activityId": 10005, "deviceId": 1042, "statName": "smb_client", "fromTime": 1741795200000, "untilTime": 1741795500000, "modTime": 1741795500000 },
+    { "activityId": 10006, "deviceId": 1042, "statName": "net", "fromTime": 1741795500000, "untilTime": 1741795800000, "modTime": 1741795800000 },
+    { "activityId": 10007, "deviceId": 1042, "statName": "ldap_client", "fromTime": 1741795200000, "untilTime": 1741795500000, "modTime": 1741795500000 },
+    { "activityId": 10008, "deviceId": 1042, "statName": "kerberos_client", "fromTime": 1741795200000, "untilTime": 1741795500000, "modTime": 1741795500000 }
+  ],
+  "ehResponse": [
+    {
+      "id": 10001,
+      "stat_name": "net",
+      "from_time": 1741795200000,
+      "until_time": 1741795500000,
+      "mod_time": 1741795500000
+    },
+    {
+      "id": 10002,
+      "stat_name": "http_client",
+      "from_time": 1741795200000,
+      "until_time": 1741795500000,
+      "mod_time": 1741795500000
+    },
+    {
+      "id": 10003,
+      "stat_name": "dns_client",
+      "from_time": 1741795200000,
+      "until_time": 1741795500000,
+      "mod_time": 1741795500000
+    },
+    {
+      "id": 10004,
+      "stat_name": "ssl_client",
+      "from_time": 1741795200000,
+      "until_time": 1741795500000,
+      "mod_time": 1741795500000
+    },
+    {
+      "id": 10005,
+      "stat_name": "smb_client",
+      "from_time": 1741795200000,
+      "until_time": 1741795500000,
+      "mod_time": 1741795500000
+    },
+    {
+      "id": 10006,
+      "stat_name": "net",
+      "from_time": 1741795500000,
+      "until_time": 1741795800000,
+      "mod_time": 1741795800000
+    },
+    {
+      "id": 10007,
+      "stat_name": "ldap_client",
+      "from_time": 1741795200000,
+      "until_time": 1741795500000,
+      "mod_time": 1741795500000
+    },
+    {
+      "id": 10008,
+      "stat_name": "kerberos_client",
+      "from_time": 1741795200000,
+      "until_time": 1741795500000,
+      "mod_time": 1741795500000
+    }
+  ]
+}

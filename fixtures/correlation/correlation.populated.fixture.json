@@ -1,0 +1,136 @@
+{
+  "events": [
+    {
+      "id": "det-4401",
+      "category": "detection",
+      "title": "Lateral Movement via SMB",
+      "description": "SMB file share access from 10.1.2.50 to dc01.lab.local with unusual volume pattern",
+      "timestampMs": 1710000060000,
+      "timestampIso": "2024-03-09T16:01:00.000Z",
+      "durationMs": 45000,
+      "severity": "critical",
+      "riskScore": 92,
+      "source": { "kind": "device", "displayName": "dc01.lab.local", "id": 1042 },
+      "refs": [
+        { "kind": "detection", "id": "det-4401", "label": "Detection #4401" },
+        { "kind": "device", "id": 1042, "label": "dc01.lab.local" }
+      ]
+    },
+    {
+      "id": "alert-801",
+      "category": "alert",
+      "title": "Throughput Threshold Exceeded",
+      "description": "Inbound throughput on eth0 exceeded 800 Mbps for 30 seconds",
+      "timestampMs": 1710000090000,
+      "timestampIso": "2024-03-09T16:01:30.000Z",
+      "durationMs": 30000,
+      "severity": "high",
+      "riskScore": null,
+      "source": { "kind": "appliance", "displayName": "eda01.lab.local", "id": 1 },
+      "refs": [
+        { "kind": "alert", "id": "alert-801", "label": "Alert #801" }
+      ]
+    },
+    {
+      "id": "cfg-220",
+      "category": "config_change",
+      "title": "ACL Rule Modified on Core Switch",
+      "description": "Access control list 'PROD-SERVERS' updated: added permit rule for 10.1.5.0/24",
+      "timestampMs": 1710000120000,
+      "timestampIso": "2024-03-09T16:02:00.000Z",
+      "durationMs": 0,
+      "severity": "medium",
+      "riskScore": null,
+      "source": { "kind": "device", "displayName": "core-sw01.lab.local", "id": 2010 },
+      "refs": [
+        { "kind": "device", "id": 2010, "label": "core-sw01.lab.local" }
+      ]
+    },
+    {
+      "id": "topo-55",
+      "category": "topology",
+      "title": "New Device Discovered",
+      "description": "Device 10.1.2.99 appeared on VLAN 200, no prior record in device inventory",
+      "timestampMs": 1710000150000,
+      "timestampIso": "2024-03-09T16:02:30.000Z",
+      "durationMs": 0,
+      "severity": "low",
+      "riskScore": null,
+      "source": { "kind": "device", "displayName": "10.1.2.99", "id": 3050 },
+      "refs": [
+        { "kind": "device", "id": 3050, "label": "10.1.2.99" }
+      ]
+    },
+    {
+      "id": "det-4402",
+      "category": "detection",
+      "title": "DNS Tunneling Suspected",
+      "description": "High-entropy DNS TXT queries from workstation-14 to external resolver 8.8.8.8",
+      "timestampMs": 1710000180000,
+      "timestampIso": "2024-03-09T16:03:00.000Z",
+      "durationMs": 120000,
+      "severity": "high",
+      "riskScore": 78,
+      "source": { "kind": "device", "displayName": "workstation-14.lab.local", "id": 1088 },
+      "refs": [
+        { "kind": "detection", "id": "det-4402", "label": "Detection #4402" },
+        { "kind": "device", "id": 1088, "label": "workstation-14.lab.local" }
+      ]
+    },
+    {
+      "id": "fw-12",
+      "category": "firmware",
+      "title": "EDA Firmware Updated to 9.6.1",
+      "description": "Scheduled firmware update applied to eda01.lab.local, reboot completed",
+      "timestampMs": 1710000210000,
+      "timestampIso": "2024-03-09T16:03:30.000Z",
+      "durationMs": 180000,
+      "severity": null,
+      "riskScore": null,
+      "source": { "kind": "appliance", "displayName": "eda01.lab.local", "id": 1 },
+      "refs": []
+    },
+    {
+      "id": "thresh-90",
+      "category": "threshold",
+      "title": "Packet Loss > 2% on Uplink",
+      "description": "Packet loss rate on uplink port exceeded 2% threshold for 60 seconds",
+      "timestampMs": 1710000240000,
+      "timestampIso": "2024-03-09T16:04:00.000Z",
+      "durationMs": 60000,
+      "severity": "medium",
+      "riskScore": null,
+      "source": { "kind": "device", "displayName": "dist-sw02.lab.local", "id": 2020 },
+      "refs": [
+        { "kind": "device", "id": 2020, "label": "dist-sw02.lab.local" }
+      ]
+    },
+    {
+      "id": "ext-001",
+      "category": "external",
+      "title": "Maintenance Window Started",
+      "description": "Scheduled maintenance window MW-2024-0309 opened by NOC team",
+      "timestampMs": 1710000000000,
+      "timestampIso": "2024-03-09T16:00:00.000Z",
+      "durationMs": 3600000,
+      "severity": null,
+      "riskScore": null,
+      "source": { "kind": "external", "displayName": "NOC Scheduler", "id": null },
+      "refs": []
+    }
+  ],
+  "timeWindow": {
+    "fromMs": 1710000000000,
+    "untilMs": 1710000300000
+  },
+  "categoryCounts": {
+    "detection": 2,
+    "alert": 1,
+    "config_change": 1,
+    "firmware": 1,
+    "topology": 1,
+    "threshold": 1,
+    "external": 1
+  },
+  "totalCount": 8
+}

@@ -1,0 +1,8 @@
+{
+  "_meta": {
+    "description": "Simulates a transport-level failure. The BFF route returns HTTP 502 with this body.",
+    "httpStatus": 502
+  },
+  "error": "ExtraHop appliance error",
+  "ehStatus": 502
+}

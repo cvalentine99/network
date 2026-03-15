@@ -1,0 +1,13 @@
+{
+  "description": "Malformed alert detail — schema-violating data to test validation rejection.",
+  "alertDetail": {
+    "alert": {
+      "id": "not-a-number",
+      "name": null,
+      "severity": "should-be-number"
+    },
+    "triggerHistory": "should-be-array",
+    "associatedDevices": null,
+    "associatedDetections": [{ "missing": "required fields" }]
+  }
+}

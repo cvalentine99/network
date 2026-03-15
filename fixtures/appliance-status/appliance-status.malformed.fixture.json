@@ -1,0 +1,17 @@
+{
+  "applianceStatus": {
+    "hostname": 12345,
+    "displayHost": null,
+    "version": true,
+    "edition": "Reveal(x) Enterprise",
+    "platform": "extrahop",
+    "mgmtIpaddr": "192.168.50.157",
+    "captureStatus": "banana",
+    "captureInterface": "Capture 00:1a:8c:10:00:01",
+    "licenseStatus": "maybe",
+    "licensedModules": "not_an_array",
+    "uptimeSeconds": -100,
+    "connectionStatus": "connected",
+    "lastChecked": "2026-03-12T17:00:00.000Z"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "description": "buildMetricSeries — poison values (NaN, Infinity, undefined) must be sanitized to null. This fixture defines the raw input; the test must inject actual NaN/Infinity since JSON cannot represent them.",
+  "objectType": "device",
+  "objectId": 42,
+  "cycle": "1sec",
+  "fromMs": 1741795200000,
+  "untilMs": 1741795203000,
+  "specs": [
+    { "name": "bytes_in" },
+    { "name": "bytes_out" }
+  ],
+  "stats_description": "Row 0: [NaN, 100]. Row 1: [200, Infinity]. Row 2: [undefined, 300].",
+  "expectedAllValuesFiniteOrNull": true,
+  "expectedRow0": { "bytes_in": null, "bytes_out": 100 },
+  "expectedRow1": { "bytes_in": 200, "bytes_out": null },
+  "expectedRow2": { "bytes_in": null, "bytes_out": 300 }
+}

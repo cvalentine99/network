@@ -1,0 +1,15 @@
+{
+  "_fixture": "time-window-audit.cycle-mismatch",
+  "_description": "Simulated cycle mismatch: alerts panel reports 30sec cycle while others report 1sec. This should NEVER occur because cycle is derived deterministically from duration.",
+  "anchorNow": 1710000000000,
+  "panelSnapshots": [
+    { "panelId": "headline", "fromMs": 1709999700000, "untilMs": 1710000000000, "cycle": "1sec", "capturedAt": 1710000000000 },
+    { "panelId": "timeseries", "fromMs": 1709999700000, "untilMs": 1710000000000, "cycle": "1sec", "capturedAt": 1710000000000 },
+    { "panelId": "topTalkers", "fromMs": 1709999700000, "untilMs": 1710000000000, "cycle": "1sec", "capturedAt": 1710000000000 },
+    { "panelId": "detections", "fromMs": 1709999700000, "untilMs": 1710000000000, "cycle": "1sec", "capturedAt": 1710000000000 },
+    { "panelId": "alerts", "fromMs": 1709999700000, "untilMs": 1710000000000, "cycle": "30sec", "capturedAt": 1710000000000 },
+    { "panelId": "deviceDetail", "fromMs": 1709999700000, "untilMs": 1710000000000, "cycle": "1sec", "capturedAt": 1710000000000 }
+  ],
+  "expectedDriftCount": 5,
+  "expectedDriftPanelB": "alerts"
+}

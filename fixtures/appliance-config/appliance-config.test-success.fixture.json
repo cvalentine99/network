@@ -1,0 +1,24 @@
+{
+  "_fixture": "appliance-config.test-success",
+  "_description": "Appliance configuration exists and last connectivity test succeeded. Footer shows connected.",
+  "config": {
+    "id": 1,
+    "hostname": "eda01.lab.local",
+    "apiKeyHint": "ExHo••••3f2a",
+    "apiKeyConfigured": true,
+    "verifySsl": false,
+    "cloudServicesEnabled": false,
+    "nickname": "Lab EDA",
+    "createdAt": "2026-03-12T17:00:00.000Z",
+    "updatedAt": "2026-03-12T17:30:00.000Z",
+    "lastTestedAt": "2026-03-12T17:30:00.000Z",
+    "lastTestResult": "success",
+    "lastTestMessage": "Connected successfully (42ms)"
+  },
+  "testResult": {
+    "success": true,
+    "message": "Connected successfully (42ms)",
+    "latencyMs": 42,
+    "testedAt": "2026-03-12T17:30:00.000Z"
+  }
+}

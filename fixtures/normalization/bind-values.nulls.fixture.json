@@ -1,0 +1,30 @@
+{
+  "description": "Positional binding test — null in values[], missing positions, and extra values",
+  "specs": [
+    { "name": "bytes_in" },
+    { "name": "bytes_out" },
+    { "name": "pkts_in" },
+    { "name": "pkts_out" }
+  ],
+  "values_with_nulls": [1048576, null, 12000, null],
+  "expected_with_nulls": {
+    "bytes_in": 1048576,
+    "bytes_out": null,
+    "pkts_in": 12000,
+    "pkts_out": null
+  },
+  "values_short": [1048576, 524288],
+  "expected_short": {
+    "bytes_in": 1048576,
+    "bytes_out": 524288,
+    "pkts_in": null,
+    "pkts_out": null
+  },
+  "values_extra": [1048576, 524288, 12000, 6000, 99999],
+  "expected_extra": {
+    "bytes_in": 1048576,
+    "bytes_out": 524288,
+    "pkts_in": 12000,
+    "pkts_out": 6000
+  }
+}

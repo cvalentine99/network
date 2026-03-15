@@ -1,0 +1,21 @@
+{
+  "_fixture": "protocol-chart.single-protocol",
+  "_description": "Single protocol — edge case. Chart should render a full donut with one slice at 100%.",
+  "input": [
+    {
+      "protocol": "HTTP",
+      "bytesIn": 500000000,
+      "bytesOut": 300000000,
+      "totalBytes": 800000000,
+      "connections": 4500,
+      "lastSeen": "2026-03-12T15:00:00.000Z"
+    }
+  ],
+  "expected": {
+    "protocolCount": 1,
+    "isEmpty": false,
+    "sortOrder": ["HTTP"],
+    "hasOtherBucket": false,
+    "firstEntryPct": 100
+  }
+}

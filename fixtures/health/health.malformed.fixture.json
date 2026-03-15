@@ -1,0 +1,10 @@
+{
+  "status": "ok",
+  "bff": {
+    "uptime": "not_a_number",
+    "memoryMB": -5,
+    "cache": "invalid"
+  },
+  "appliance": "should_be_object_or_null",
+  "timestamp": 12345
+}

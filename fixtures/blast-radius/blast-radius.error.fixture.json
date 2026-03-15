@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "fixture": "blast-radius.error",
+    "description": "Blast radius query for a non-existent device (unknown.invalid). The BFF returns a structured error indicating device resolution failed.",
+    "entryMode": "hostname",
+    "entryValue": "unknown.invalid",
+    "expectedStatus": "error",
+    "expectedError": "Device not found: unknown.invalid"
+  },
+  "intent": {
+    "mode": "hostname",
+    "value": "unknown.invalid",
+    "timeWindow": {
+      "fromMs": 1710000000000,
+      "untilMs": 1710001800000,
+      "durationMs": 1800000,
+      "cycle": "30sec"
+    }
+  },
+  "error": {
+    "code": "DEVICE_NOT_FOUND",
+    "message": "Device not found: unknown.invalid",
+    "status": 404
+  }
+}

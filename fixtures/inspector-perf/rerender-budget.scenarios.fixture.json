@@ -1,0 +1,55 @@
+{
+  "description": "Rerender budget scenarios for inspector tab/selection switches. Each scenario defines the maximum allowed rerenders for the inspector subtree.",
+  "tabSwitchRerenderBudget": 8,
+  "componentsImmuneToInspectorChange": [
+    "KPIStrip",
+    "GhostedTimeline",
+    "TopTalkersTable",
+    "DetectionsTable",
+    "AlertsPanel",
+    "ApplianceFooter",
+    "TimeWindowSelector"
+  ],
+  "componentsAffectedByInspectorChange": [
+    "InspectorShell",
+    "InspectorBreadcrumb",
+    "InspectorContent"
+  ],
+  "scenarios": [
+    {
+      "name": "same-kind-switch",
+      "action": "Click a different device in Top Talkers while inspector is open",
+      "maxRerenders": 8,
+      "parentRerenders": true,
+      "rationale": "InspectorProvider is in ImpactDeckContent, so selection change causes parent rerender. Inspector subtree rerenders. Detail pane hook refetches."
+    },
+    {
+      "name": "cross-kind-switch",
+      "action": "Click a detection while viewing a device in inspector",
+      "maxRerenders": 8,
+      "parentRerenders": true,
+      "rationale": "Kind change causes unmount/mount cycle. One extra render for the mount."
+    },
+    {
+      "name": "close-inspector",
+      "action": "Click X to close the inspector",
+      "maxRerenders": 4,
+      "parentRerenders": true,
+      "rationale": "clear() sets selection=null, isOpen=false, history=[]. Shell returns null. Minimal render."
+    },
+    {
+      "name": "open-from-closed",
+      "action": "Click a table row when inspector is closed",
+      "maxRerenders": 8,
+      "parentRerenders": true,
+      "rationale": "Selection set + isOpen=true. Full inspector subtree mounts."
+    },
+    {
+      "name": "breadcrumb-navigation",
+      "action": "Click a breadcrumb entry to navigate back in history",
+      "maxRerenders": 8,
+      "parentRerenders": true,
+      "rationale": "goToIndex updates history + selection. Inspector subtree rerenders. May cause kind change."
+    }
+  ]
+}

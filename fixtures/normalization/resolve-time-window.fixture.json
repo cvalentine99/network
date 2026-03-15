@@ -1,0 +1,73 @@
+{
+  "description": "resolveTimeWindow test cases — all use a fixed 'now' anchor to be deterministic",
+  "anchor": 1741795500000,
+  "cases": [
+    {
+      "label": "Relative from (-300000), no until → 5 min window ending at anchor",
+      "from": -300000,
+      "expectedFromMs": 1741795200000,
+      "expectedUntilMs": 1741795500000,
+      "expectedDurationMs": 300000,
+      "expectedCycle": "1sec"
+    },
+    {
+      "label": "Relative from (-1800000) → 30 min window, auto-cycle = 30sec",
+      "from": -1800000,
+      "expectedFromMs": 1741793700000,
+      "expectedUntilMs": 1741795500000,
+      "expectedDurationMs": 1800000,
+      "expectedCycle": "30sec"
+    },
+    {
+      "label": "Relative from (-21600000) → 6 hr window, auto-cycle = 5min",
+      "from": -21600000,
+      "expectedFromMs": 1741773900000,
+      "expectedUntilMs": 1741795500000,
+      "expectedDurationMs": 21600000,
+      "expectedCycle": "5min"
+    },
+    {
+      "label": "Relative from (-172800000) → 2 day window, auto-cycle = 1hr",
+      "from": -172800000,
+      "expectedFromMs": 1741622700000,
+      "expectedUntilMs": 1741795500000,
+      "expectedDurationMs": 172800000,
+      "expectedCycle": "1hr"
+    },
+    {
+      "label": "Relative from (-604800000) → 7 day window, auto-cycle = 24hr",
+      "from": -604800000,
+      "expectedFromMs": 1741190700000,
+      "expectedUntilMs": 1741795500000,
+      "expectedDurationMs": 604800000,
+      "expectedCycle": "24hr"
+    },
+    {
+      "label": "Absolute from and until",
+      "from": 1741795200000,
+      "until": 1741795500000,
+      "expectedFromMs": 1741795200000,
+      "expectedUntilMs": 1741795500000,
+      "expectedDurationMs": 300000,
+      "expectedCycle": "1sec"
+    },
+    {
+      "label": "Explicit cycle override (not auto)",
+      "from": -300000,
+      "cycle": "5min",
+      "expectedFromMs": 1741795200000,
+      "expectedUntilMs": 1741795500000,
+      "expectedDurationMs": 300000,
+      "expectedCycle": "5min"
+    },
+    {
+      "label": "Invalid window (from > until) → zero-width, durationMs = 0",
+      "from": 1741795500000,
+      "until": 1741795200000,
+      "expectedFromMs": 1741795500000,
+      "expectedUntilMs": 1741795500000,
+      "expectedDurationMs": 0,
+      "expectedCycle": "1sec"
+    }
+  ]
+}

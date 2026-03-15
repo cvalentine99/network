@@ -1,0 +1,5 @@
+{
+  "description": "Not-found fixture — detection ID does not exist.",
+  "error": "Detection not found",
+  "message": "No detection with id 99999 exists"
+}

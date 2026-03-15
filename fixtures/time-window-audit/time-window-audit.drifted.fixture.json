@@ -1,0 +1,17 @@
+{
+  "_fixture": "time-window-audit.drifted",
+  "_description": "Simulated drift scenario: headline and timeseries have different untilMs. This should NEVER occur in production because all panels read from the same context.",
+  "anchorNow": 1710000000000,
+  "panelSnapshots": [
+    { "panelId": "headline", "fromMs": 1709999700000, "untilMs": 1710000000000, "cycle": "1sec", "capturedAt": 1710000000000 },
+    { "panelId": "timeseries", "fromMs": 1709999700000, "untilMs": 1710000005000, "cycle": "1sec", "capturedAt": 1710000005000 },
+    { "panelId": "topTalkers", "fromMs": 1709999700000, "untilMs": 1710000000000, "cycle": "1sec", "capturedAt": 1710000000000 },
+    { "panelId": "detections", "fromMs": 1709999700000, "untilMs": 1710000000000, "cycle": "1sec", "capturedAt": 1710000000000 },
+    { "panelId": "alerts", "fromMs": 1709999700000, "untilMs": 1710000000000, "cycle": "1sec", "capturedAt": 1710000000000 },
+    { "panelId": "deviceDetail", "fromMs": 1709999700000, "untilMs": 1710000000000, "cycle": "1sec", "capturedAt": 1710000000000 }
+  ],
+  "expectedDriftCount": 1,
+  "expectedDriftPairs": [
+    { "panelA": "headline", "panelB": "timeseries" }
+  ]
+}

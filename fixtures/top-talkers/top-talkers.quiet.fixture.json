@@ -1,0 +1,4 @@
+{
+  "description": "Quiet top talkers — no traffic data. Valid state when no metric responses exist for device/net.",
+  "topTalkers": []
+}

@@ -1,0 +1,29 @@
+{
+  "description": "Flow Theater resolved device → Blast Radius navigation fixture",
+  "scenarios": [
+    {
+      "name": "device with known ID",
+      "displayName": "dc01.lab.local",
+      "deviceId": 1042,
+      "expectedLink": {
+        "label": "Blast Radius: dc01.lab.local",
+        "href": "/blast-radius?brMode=device-id&brValue=1042&brAuto=1",
+        "targetSurface": "blast-radius",
+        "sourceSurface": "flow-theater",
+        "entityContext": "flow-theater-device-dc01.lab.local"
+      }
+    },
+    {
+      "name": "device without known ID (hostname fallback)",
+      "displayName": "unknown-host.lab.local",
+      "deviceId": null,
+      "expectedLink": {
+        "label": "Blast Radius: unknown-host.lab.local",
+        "href": "/blast-radius?brMode=hostname&brValue=unknown-host.lab.local&brAuto=1",
+        "targetSurface": "blast-radius",
+        "sourceSurface": "flow-theater",
+        "entityContext": "flow-theater-device-unknown-host.lab.local"
+      }
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "_fixture": "time-window-audit.presets",
+  "_description": "All TIME_WINDOW_PRESETS from cockpit-constants must produce valid TimeWindows when resolved. Each preset is a negative offset that resolves to a concrete fromMs/untilMs pair.",
+  "anchorNow": 1710000000000,
+  "presets": [
+    { "label": "Last 5 minutes", "value": -300000, "expectedCycle": "1sec" },
+    { "label": "Last 30 minutes", "value": -1800000, "expectedCycle": "30sec" },
+    { "label": "Last 1 hour", "value": -3600000, "expectedCycle": "5min" },
+    { "label": "Last 6 hours", "value": -21600000, "expectedCycle": "5min" },
+    { "label": "Last 24 hours", "value": -86400000, "expectedCycle": "1hr" },
+    { "label": "Last 2 days", "value": -172800000, "expectedCycle": "1hr" },
+    { "label": "Last 7 days", "value": -604800000, "expectedCycle": "24hr" }
+  ]
+}

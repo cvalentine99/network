@@ -1,0 +1,21 @@
+{
+  "description": "Render path fixture for detection entity kind. Traces the component tree from InspectorShell to DetectionDetailPane terminal states.",
+  "kind": "detection",
+  "steps": [
+    { "component": "InspectorShell", "renders": true, "testId": "inspector-shell", "fetchesBff": false, "readsContext": false },
+    { "component": "InspectorBreadcrumb", "renders": true, "testId": "inspector-breadcrumb", "fetchesBff": false, "readsContext": true },
+    { "component": "InspectorContent", "renders": true, "testId": null, "fetchesBff": false, "readsContext": false },
+    { "component": "DetectionDetailPane", "renders": true, "testId": null, "fetchesBff": true, "readsContext": false },
+    { "component": "DetectionDetailPane.LoadingState", "renders": true, "testId": "detection-detail-loading", "fetchesBff": false, "readsContext": false },
+    { "component": "DetectionDetailPane.PopulatedState", "renders": true, "testId": "detection-detail-populated", "fetchesBff": false, "readsContext": true }
+  ],
+  "terminalTestIds": [
+    "detection-detail-loading",
+    "detection-detail-populated",
+    "detection-detail-quiet",
+    "detection-detail-error",
+    "detection-detail-not-found",
+    "detection-detail-malformed"
+  ],
+  "totalComponents": 6
+}

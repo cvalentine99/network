@@ -1,0 +1,6 @@
+{
+  "description": "Transport error fixture for ExtraHop GET /api/v1/devices/{id}/activity. Simulates a network failure or appliance timeout. Used by Slice 30 ETL pipeline tests.",
+  "error": "ExtraHop API request failed: ECONNREFUSED",
+  "code": "NETWORK_ERROR",
+  "httpStatus": 0
+}

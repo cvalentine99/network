@@ -1,0 +1,57 @@
+{
+  "description": "computeActualCoverage test cases",
+  "cases": [
+    {
+      "label": "Full coverage — 5 × 30sec buckets covering 150sec window",
+      "fromMs": 1741795200000,
+      "untilMs": 1741795350000,
+      "points": [
+        { "t": 1741795200000, "durationMs": 30000 },
+        { "t": 1741795230000, "durationMs": 30000 },
+        { "t": 1741795260000, "durationMs": 30000 },
+        { "t": 1741795290000, "durationMs": 30000 },
+        { "t": 1741795320000, "durationMs": 30000 }
+      ],
+      "expectedCoverage": 1.0
+    },
+    {
+      "label": "Half coverage — 3 × 30sec buckets in 180sec window",
+      "fromMs": 1741795200000,
+      "untilMs": 1741795380000,
+      "points": [
+        { "t": 1741795200000, "durationMs": 30000 },
+        { "t": 1741795230000, "durationMs": 30000 },
+        { "t": 1741795260000, "durationMs": 30000 }
+      ],
+      "expectedCoverage": 0.5
+    },
+    {
+      "label": "No points — 0 coverage",
+      "fromMs": 1741795200000,
+      "untilMs": 1741795350000,
+      "points": [],
+      "expectedCoverage": 0
+    },
+    {
+      "label": "Zero-width window — 0 coverage",
+      "fromMs": 1741795200000,
+      "untilMs": 1741795200000,
+      "points": [
+        { "t": 1741795200000, "durationMs": 30000 }
+      ],
+      "expectedCoverage": 0
+    },
+    {
+      "label": "Points outside window are excluded",
+      "fromMs": 1741795200000,
+      "untilMs": 1741795260000,
+      "points": [
+        { "t": 1741795200000, "durationMs": 30000 },
+        { "t": 1741795230000, "durationMs": 30000 },
+        { "t": 1741795260000, "durationMs": 30000 },
+        { "t": 1741795290000, "durationMs": 30000 }
+      ],
+      "expectedCoverage": 1.0
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "description": "Cross-surface navigation malformed input fixture — invalid params that must be rejected",
+  "scenarios": [
+    {
+      "name": "XSS attempt in value",
+      "queryString": "brMode=device-id&brValue=<script>alert(1)</script>",
+      "note": "Parser returns the raw value; sanitization is the consumer's responsibility. Parser itself does not reject."
+    },
+    {
+      "name": "SQL injection attempt in value",
+      "queryString": "brMode=device-id&brValue=1042; DROP TABLE devices;",
+      "note": "Parser returns the raw value. BFF must parameterize queries."
+    },
+    {
+      "name": "empty value string",
+      "queryString": "brMode=device-id&brValue=",
+      "parsedBlastRadius": null,
+      "note": "Empty value is treated as missing — parser returns null"
+    },
+    {
+      "name": "mode with extra whitespace",
+      "queryString": "brMode= device-id &brValue=1042",
+      "parsedBlastRadius": null,
+      "note": "URLSearchParams preserves whitespace; Zod enum rejects ' device-id '"
+    }
+  ]
+}

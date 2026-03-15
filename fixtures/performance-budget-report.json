@@ -1,0 +1,100 @@
+{
+  "measurements": [
+    {
+      "surfaceId": "impact-deck",
+      "budgetMs": 2000,
+      "actualMs": 937,
+      "passed": true,
+      "terminalSelector": "[data-testid='kpi-strip-populated'], [data-testid='kpi-strip-quiet'], [data-testid='kpi-strip-error'], [data-testid='kpi-strip-malformed'], [data-testid='kpi-strip-loading']",
+      "measuredAt": "2026-03-14T17:09:42.374Z",
+      "runs": 3,
+      "runTimes": [
+        1052,
+        935,
+        824
+      ],
+      "stdDevMs": 93
+    },
+    {
+      "surfaceId": "flow-theater",
+      "budgetMs": 5000,
+      "actualMs": 547,
+      "passed": true,
+      "terminalSelector": "[data-testid='flow-theater-page']",
+      "measuredAt": "2026-03-14T17:09:44.147Z",
+      "runs": 3,
+      "runTimes": [
+        553,
+        536,
+        553
+      ],
+      "stdDevMs": 8
+    },
+    {
+      "surfaceId": "blast-radius",
+      "budgetMs": 3000,
+      "actualMs": 487,
+      "passed": true,
+      "terminalSelector": "[data-testid='blast-radius-surface']",
+      "measuredAt": "2026-03-14T17:09:45.718Z",
+      "runs": 3,
+      "runTimes": [
+        497,
+        496,
+        467
+      ],
+      "stdDevMs": 14
+    },
+    {
+      "surfaceId": "correlation",
+      "budgetMs": 2000,
+      "actualMs": 574,
+      "passed": true,
+      "terminalSelector": "[data-testid='correlation-page-populated'], [data-testid='correlation-page-quiet'], [data-testid='correlation-page-error'], [data-testid='correlation-page-malformed'], [data-testid='correlation-page-loading'], [data-testid='correlation-page-idle']",
+      "measuredAt": "2026-03-14T17:09:47.535Z",
+      "runs": 3,
+      "runTimes": [
+        589,
+        549,
+        585
+      ],
+      "stdDevMs": 18
+    },
+    {
+      "surfaceId": "topology",
+      "budgetMs": 4000,
+      "actualMs": 530,
+      "passed": true,
+      "terminalSelector": "[data-testid='topology-populated'], [data-testid='topology-quiet'], [data-testid='topology-loading'], [data-testid='topology-error'], [data-testid='topology-malformed']",
+      "measuredAt": "2026-03-14T17:09:49.219Z",
+      "runs": 3,
+      "runTimes": [
+        568,
+        503,
+        518
+      ],
+      "stdDevMs": 28
+    },
+    {
+      "surfaceId": "inspector-tab-switch",
+      "budgetMs": 200,
+      "actualMs": 112,
+      "passed": true,
+      "terminalSelector": "[data-testid='inspector-shell']",
+      "measuredAt": "2026-03-14T17:09:51.123Z",
+      "runs": 3,
+      "runTimes": [
+        161,
+        95,
+        80
+      ],
+      "stdDevMs": 35
+    }
+  ],
+  "allPassed": true,
+  "totalSurfaces": 6,
+  "passedCount": 6,
+  "failedCount": 0,
+  "generatedAt": "2026-03-14T17:09:51.196Z",
+  "environment": "Sandbox Chromium headless, fixture-backed BFF, dev server"
+}

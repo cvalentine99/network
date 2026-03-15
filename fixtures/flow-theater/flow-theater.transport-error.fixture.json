@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "fixture": "flow-theater.transport-error",
+    "description": "Represents a transport-level failure where the BFF route returns HTTP 502 or the connection drops. No SSE events are received.",
+    "entryMode": "hostname",
+    "terminalStatus": "error",
+    "totalEvents": 0,
+    "totalSteps": 0
+  },
+  "intent": {
+    "mode": "hostname",
+    "value": "dc01.lab.local",
+    "timeWindow": {
+      "fromMs": 1710000000000,
+      "untilMs": 1710001800000,
+      "durationMs": 1800000,
+      "cycle": "30sec"
+    }
+  },
+  "events": [],
+  "expectedError": {
+    "status": 502,
+    "message": "HTTP 502: Bad Gateway"
+  }
+}

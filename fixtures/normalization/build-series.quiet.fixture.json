@@ -1,0 +1,15 @@
+{
+  "description": "buildMetricSeries — empty stats array. This is valid quiet state, not an error.",
+  "objectType": "network",
+  "objectId": 1,
+  "cycle": "30sec",
+  "fromMs": 1741795200000,
+  "untilMs": 1741795350000,
+  "specs": [
+    { "name": "bytes" },
+    { "name": "pkts" }
+  ],
+  "stats": [],
+  "expectedPointCount": 0,
+  "expectedCoverage": 0
+}

@@ -1,0 +1,29 @@
+{
+  "headline": {
+    "totalBytes": 8547321600,
+    "totalPackets": 12450000,
+    "bytesPerSecond": 28491072,
+    "packetsPerSecond": 41500,
+    "baselineDeltaPct": 12.3
+  },
+  "timeseries": [
+    { "t": 1741795200000, "tIso": "2026-03-12T16:00:00.000Z", "durationMs": 30000, "values": { "bytes": 854732160, "pkts": 1245000 } },
+    { "t": 1741795230000, "tIso": "2026-03-12T16:00:30.000Z", "durationMs": 30000, "values": { "bytes": 912345600, "pkts": 1312000 } },
+    { "t": 1741795260000, "tIso": "2026-03-12T16:01:00.000Z", "durationMs": 30000, "values": { "bytes": 789012480, "pkts": 1180000 } },
+    { "t": 1741795290000, "tIso": "2026-03-12T16:01:30.000Z", "durationMs": 30000, "values": { "bytes": 945678080, "pkts": 1390000 } },
+    { "t": 1741795320000, "tIso": "2026-03-12T16:02:00.000Z", "durationMs": 30000, "values": { "bytes": 1023456000, "pkts": 1456000 } },
+    { "t": 1741795350000, "tIso": "2026-03-12T16:02:30.000Z", "durationMs": 30000, "values": { "bytes": 876543200, "pkts": 1278000 } },
+    { "t": 1741795380000, "tIso": "2026-03-12T16:03:00.000Z", "durationMs": 30000, "values": { "bytes": 967890400, "pkts": 1345000 } },
+    { "t": 1741795410000, "tIso": "2026-03-12T16:03:30.000Z", "durationMs": 30000, "values": { "bytes": 1100234560, "pkts": 1520000 } },
+    { "t": 1741795440000, "tIso": "2026-03-12T16:04:00.000Z", "durationMs": 30000, "values": { "bytes": 834567800, "pkts": 1200000 } },
+    { "t": 1741795470000, "tIso": "2026-03-12T16:04:30.000Z", "durationMs": 30000, "values": { "bytes": 1042861000, "pkts": 1524000 } }
+  ],
+  "topTalkers": [],
+  "detections": [],
+  "alerts": [],
+  "applianceVersion": "26.1.4.2814",
+  "applianceEdition": "Reveal(x) Enterprise",
+  "appliancePlatform": "extrahop",
+  "captureName": "Capture 00:1a:8c:10:00:01",
+  "licensedModules": ["wire_data", "eca", "ndr"]
+}

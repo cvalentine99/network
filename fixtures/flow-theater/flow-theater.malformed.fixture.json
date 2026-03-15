@@ -1,0 +1,27 @@
+{
+  "_meta": {
+    "fixture": "flow-theater.malformed",
+    "description": "SSE event sequence containing malformed JSON lines and events with missing required fields. Tests client-side resilience.",
+    "entryMode": "hostname",
+    "terminalStatus": "error",
+    "totalEvents": 5,
+    "malformedEvents": 3
+  },
+  "intent": {
+    "mode": "hostname",
+    "value": "dc01.lab.local",
+    "timeWindow": {
+      "fromMs": 1710000000000,
+      "untilMs": 1710001800000,
+      "durationMs": 1800000,
+      "cycle": "30sec"
+    }
+  },
+  "events": [
+    { "type": "step", "stepId": "input-accepted", "status": "running", "detail": "Validating hostname dc01.lab.local", "durationMs": null, "count": null, "timestamp": 1710001800100 },
+    "THIS IS NOT VALID JSON EVENT",
+    { "type": "step", "status": "complete", "detail": "Missing stepId field" },
+    { "type": "unknown-event-type", "timestamp": 1710001800200 },
+    { "type": "step", "stepId": "input-accepted", "status": "complete", "detail": "Hostname accepted", "durationMs": 45, "count": null, "timestamp": 1710001800145 }
+  ]
+}

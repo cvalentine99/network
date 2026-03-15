@@ -1,0 +1,5 @@
+{
+  "description": "Transport error fixture — simulates BFF unable to reach ExtraHop for alert detail.",
+  "error": "Transport error",
+  "message": "Failed to fetch alert detail from ExtraHop appliance: ECONNREFUSED 10.1.0.1:443"
+}

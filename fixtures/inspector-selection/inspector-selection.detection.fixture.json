@@ -1,0 +1,33 @@
+{
+  "description": "Inspector selection fixture — detection selected from Detections row. Extracted from detections.populated.fixture.json row 1 (Lateral Movement via SMB, riskScore 92).",
+  "selection": {
+    "kind": "detection",
+    "detection": {
+      "id": 4001,
+      "title": "Lateral Movement via SMB",
+      "type": "lateral_movement",
+      "displayName": "Lateral Movement via SMB",
+      "categories": ["sec.lateral"],
+      "participants": [
+        { "object_type": "device", "object_id": 101, "role": "offender" },
+        { "object_type": "device", "object_id": 205, "role": "victim" }
+      ],
+      "riskScore": 92,
+      "startTime": 1710200000000,
+      "startTimeIso": "2024-03-11T22:13:20.000Z",
+      "endTime": 1710203600000,
+      "endTimeIso": "2024-03-11T23:13:20.000Z",
+      "createTime": 1710200100000,
+      "createTimeIso": "2024-03-11T22:15:00.000Z",
+      "status": "new",
+      "resolution": null,
+      "assignee": null,
+      "ticketId": null,
+      "mitreTactics": ["Lateral Movement"],
+      "mitreTechniques": ["T1021.002"],
+      "isUserCreated": false,
+      "properties": {},
+      "url": null
+    }
+  }
+}

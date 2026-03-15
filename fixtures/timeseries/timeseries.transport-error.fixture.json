@@ -1,0 +1,5 @@
+{
+  "description": "Transport error — simulates what the BFF returns when it cannot reach the appliance or an internal error occurs.",
+  "error": "Impact timeseries fetch failed",
+  "message": "ECONNREFUSED 192.168.50.157:443"
+}

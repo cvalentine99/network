@@ -1,0 +1,121 @@
+{
+  "_meta": {
+    "fixture": "blast-radius.hostname-entry",
+    "description": "Blast radius query via hostname entry mode for mail-relay.lab.local. Shows 3 peers with SMTP-focused traffic and 2 detections.",
+    "entryMode": "hostname",
+    "entryValue": "mail-relay.lab.local",
+    "expectedStatus": "populated",
+    "peerCount": 3,
+    "detectionCount": 2
+  },
+  "intent": {
+    "mode": "hostname",
+    "value": "mail-relay.lab.local",
+    "timeWindow": {
+      "fromMs": 1710000000000,
+      "untilMs": 1710001800000,
+      "durationMs": 1800000,
+      "cycle": "30sec"
+    }
+  },
+  "payload": {
+    "source": {
+      "deviceId": 2003,
+      "displayName": "mail-relay.lab.local",
+      "ipaddr": "10.1.20.25",
+      "macaddr": "00:1a:8c:10:00:19",
+      "role": "server",
+      "deviceClass": "node",
+      "critical": false
+    },
+    "peers": [
+      {
+        "deviceId": 1042,
+        "displayName": "dc01.lab.local",
+        "ipaddr": "10.1.20.42",
+        "role": "domain_controller",
+        "critical": true,
+        "protocols": [
+          { "name": "SMTP", "port": 25, "bytesSent": 33554432, "bytesReceived": 67108864, "hasDetections": true },
+          { "name": "DNS", "port": 53, "bytesSent": 2097152, "bytesReceived": 1048576, "hasDetections": false }
+        ],
+        "detections": [
+          {
+            "id": 5004,
+            "title": "Suspicious SMTP Relay Activity",
+            "type": "threat",
+            "riskScore": 75,
+            "severity": "high",
+            "startTime": 1710001200000,
+            "participants": ["mail-relay.lab.local", "dc01.lab.local"]
+          }
+        ],
+        "totalBytes": 103809024,
+        "impactScore": 162.52,
+        "firstSeen": 1710000100000,
+        "lastSeen": 1710001600000
+      },
+      {
+        "deviceId": 3001,
+        "displayName": "ext-mail.partner.com",
+        "ipaddr": "203.0.113.50",
+        "role": null,
+        "critical": false,
+        "protocols": [
+          { "name": "SMTP", "port": 25, "bytesSent": 134217728, "bytesReceived": 67108864, "hasDetections": true }
+        ],
+        "detections": [
+          {
+            "id": 5008,
+            "title": "Outbound SMTP to External Host",
+            "type": "anomaly",
+            "riskScore": 55,
+            "severity": "medium",
+            "startTime": 1710001500000,
+            "participants": ["mail-relay.lab.local", "ext-mail.partner.com"]
+          }
+        ],
+        "totalBytes": 201326592,
+        "impactScore": 75.83,
+        "firstSeen": 1710000300000,
+        "lastSeen": 1710001700000
+      },
+      {
+        "deviceId": 3002,
+        "displayName": "spam-filter.lab.local",
+        "ipaddr": "10.1.20.26",
+        "role": "server",
+        "critical": false,
+        "protocols": [
+          { "name": "SMTP", "port": 25, "bytesSent": 16777216, "bytesReceived": 8388608, "hasDetections": false }
+        ],
+        "detections": [],
+        "totalBytes": 25165824,
+        "impactScore": 7.4,
+        "firstSeen": 1710000000000,
+        "lastSeen": 1710001800000
+      }
+    ],
+    "summary": {
+      "peerCount": 3,
+      "affectedPeerCount": 2,
+      "totalDetections": 2,
+      "uniqueProtocols": 2,
+      "totalBytes": 330301440,
+      "maxImpactScore": 162.52,
+      "severityDistribution": {
+        "critical": 0,
+        "high": 1,
+        "medium": 1,
+        "low": 0,
+        "info": 0
+      }
+    },
+    "timeWindow": {
+      "fromMs": 1710000000000,
+      "untilMs": 1710001800000,
+      "durationMs": 1800000,
+      "cycle": "30sec"
+    }
+  }
+}

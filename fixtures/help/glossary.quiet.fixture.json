@@ -1,0 +1,6 @@
+{
+  "description": "Glossary search with no matching results",
+  "searchTerm": "xyznonexistent",
+  "matchCount": 0,
+  "expectedState": "glossary-empty testid visible with 'No glossary entries match' message"
+}

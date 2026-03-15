@@ -1,0 +1,4 @@
+{
+  "description": "Quiet timeseries — no data points. Valid state when appliance has no traffic data for the window.",
+  "timeseries": []
+}

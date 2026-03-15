@@ -1,0 +1,96 @@
+{
+  "events": [
+    {
+      "id": "det-5001",
+      "category": "detection",
+      "title": "Brute Force SSH Attempt",
+      "description": "Multiple failed SSH login attempts from 10.1.3.80 to db-primary.lab.local",
+      "timestampMs": 1710000060000,
+      "timestampIso": "2024-03-09T16:01:00.000Z",
+      "durationMs": 30000,
+      "severity": "critical",
+      "riskScore": 88,
+      "source": { "kind": "device", "displayName": "db-primary.lab.local", "id": 1055 },
+      "refs": [
+        { "kind": "detection", "id": "det-5001", "label": "Detection #5001" },
+        { "kind": "device", "id": 1055, "label": "db-primary.lab.local" }
+      ]
+    },
+    {
+      "id": "alert-901",
+      "category": "alert",
+      "title": "Connection Rate Spike",
+      "description": "New TCP connections per second exceeded 500/s threshold on db-primary",
+      "timestampMs": 1710000062000,
+      "timestampIso": "2024-03-09T16:01:02.000Z",
+      "durationMs": 15000,
+      "severity": "high",
+      "riskScore": null,
+      "source": { "kind": "device", "displayName": "db-primary.lab.local", "id": 1055 },
+      "refs": [
+        { "kind": "alert", "id": "alert-901", "label": "Alert #901" },
+        { "kind": "device", "id": 1055, "label": "db-primary.lab.local" }
+      ]
+    },
+    {
+      "id": "cfg-330",
+      "category": "config_change",
+      "title": "Firewall Rule Added",
+      "description": "Emergency block rule added for 10.1.3.80 on perimeter firewall",
+      "timestampMs": 1710000065000,
+      "timestampIso": "2024-03-09T16:01:05.000Z",
+      "durationMs": 0,
+      "severity": "medium",
+      "riskScore": null,
+      "source": { "kind": "device", "displayName": "fw-perimeter.lab.local", "id": 2050 },
+      "refs": [
+        { "kind": "device", "id": 2050, "label": "fw-perimeter.lab.local" }
+      ]
+    },
+    {
+      "id": "det-5002",
+      "category": "detection",
+      "title": "Data Exfiltration via HTTPS",
+      "description": "Unusual outbound HTTPS volume from workstation-22 to external IP 203.0.113.45",
+      "timestampMs": 1710000180000,
+      "timestampIso": "2024-03-09T16:03:00.000Z",
+      "durationMs": 90000,
+      "severity": "high",
+      "riskScore": 75,
+      "source": { "kind": "device", "displayName": "workstation-22.lab.local", "id": 1092 },
+      "refs": [
+        { "kind": "detection", "id": "det-5002", "label": "Detection #5002" },
+        { "kind": "device", "id": 1092, "label": "workstation-22.lab.local" }
+      ]
+    },
+    {
+      "id": "thresh-120",
+      "category": "threshold",
+      "title": "Latency > 50ms on DB Queries",
+      "description": "Average MySQL query latency exceeded 50ms threshold for 120 seconds",
+      "timestampMs": 1710000182000,
+      "timestampIso": "2024-03-09T16:03:02.000Z",
+      "durationMs": 120000,
+      "severity": "medium",
+      "riskScore": null,
+      "source": { "kind": "device", "displayName": "db-primary.lab.local", "id": 1055 },
+      "refs": [
+        { "kind": "device", "id": 1055, "label": "db-primary.lab.local" }
+      ]
+    }
+  ],
+  "timeWindow": {
+    "fromMs": 1710000000000,
+    "untilMs": 1710000300000
+  },
+  "categoryCounts": {
+    "detection": 2,
+    "alert": 1,
+    "config_change": 1,
+    "firmware": 0,
+    "topology": 0,
+    "threshold": 1,
+    "external": 0
+  },
+  "totalCount": 5
+}

@@ -1,0 +1,4 @@
+{
+  "description": "Quiet/empty ExtraHop GET /api/v1/devices/{id}/activity response. Device exists but has no observed activity records. Used by Slice 30 ETL pipeline tests.",
+  "ehResponse": []
+}

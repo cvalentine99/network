@@ -1,0 +1,150 @@
+{
+  "description": "Populated device detail for dc01.lab.local (id: 1042). Includes full identity, traffic summary, protocol breakdown, associated detections, associated alerts, and activity summary. Used by Slice 09 tests and BFF route fixture backing.",
+  "deviceDetail": {
+    "device": {
+      "id": 1042,
+      "displayName": "dc01.lab.local",
+      "extrahopId": "0242ac110002",
+      "discoveryId": "0242ac110002",
+      "ipaddr4": "10.10.1.50",
+      "ipaddr6": null,
+      "macaddr": "02:42:AC:11:00:02",
+      "deviceClass": "node",
+      "role": "domain_controller",
+      "autoRole": "domain_controller",
+      "vendor": "Microsoft",
+      "isL3": true,
+      "vlanid": null,
+      "parentId": null,
+      "nodeId": null,
+      "analysis": "advanced",
+      "analysisLevel": 2,
+      "lastSeenTime": 1741795470000,
+      "lastSeenIso": "2026-03-12T16:04:30.000Z",
+      "modTime": 1741795200000,
+      "discoverTime": 1741000000000,
+      "discoverTimeIso": "2026-03-03T14:26:40.000Z",
+      "onWatchlist": true,
+      "critical": true,
+      "customCriticality": null,
+      "isCustomDevice": false,
+      "customType": null,
+      "userModTime": null,
+      "description": null,
+      "cdp_name": null,
+      "dhcp_name": null,
+      "dns_name": "dc01.lab.local",
+      "netbios_name": "DC01",
+      "custom_name": null,
+      "default_name": "DC01",
+      "model": null,
+      "modelOverride": null,
+      "software": "Windows Server 2022"
+    },
+    "traffic": {
+      "bytesIn": 1245678900,
+      "bytesOut": 987654321,
+      "totalBytes": 2233333221,
+      "pktsIn": 1890000,
+      "pktsOut": 1456000
+    },
+    "protocols": [
+      {
+        "protocol": "SMB",
+        "bytesIn": 524288000,
+        "bytesOut": 412876800,
+        "totalBytes": 937164800,
+        "connections": 847,
+        "lastSeen": "2026-03-12T16:04:28.000Z"
+      },
+      {
+        "protocol": "DNS",
+        "bytesIn": 312400000,
+        "bytesOut": 198700000,
+        "totalBytes": 511100000,
+        "connections": 12450,
+        "lastSeen": "2026-03-12T16:04:30.000Z"
+      },
+      {
+        "protocol": "LDAP",
+        "bytesIn": 198000000,
+        "bytesOut": 156000000,
+        "totalBytes": 354000000,
+        "connections": 3200,
+        "lastSeen": "2026-03-12T16:04:25.000Z"
+      },
+      {
+        "protocol": "Kerberos",
+        "bytesIn": 145600000,
+        "bytesOut": 112400000,
+        "totalBytes": 258000000,
+        "connections": 5680,
+        "lastSeen": "2026-03-12T16:04:29.000Z"
+      },
+      {
+        "protocol": "TLS",
+        "bytesIn": 65390900,
+        "bytesOut": 107677521,
+        "totalBytes": 173068421,
+        "connections": 1240,
+        "lastSeen": "2026-03-12T16:03:55.000Z"
+      }
+    ],
+    "associatedDetections": [
+      {
+        "id": 4001,
+        "title": "Lateral Movement via SMB",
+        "type": "lateral_movement",
+        "displayName": "Lateral Movement via SMB",
+        "categories": ["sec.lateral"],
+        "participants": [
+          { "object_type": "device", "object_id": 1042, "role": "offender" },
+          { "object_type": "device", "object_id": 205, "role": "victim" }
+        ],
+        "riskScore": 92,
+        "startTime": 1710200000000,
+        "startTimeIso": "2024-03-11T22:13:20.000Z",
+        "endTime": 1710203600000,
+        "endTimeIso": "2024-03-11T23:13:20.000Z",
+        "createTime": 1710200100000,
+        "createTimeIso": "2024-03-11T22:15:00.000Z",
+        "status": "new",
+        "resolution": null,
+        "assignee": null,
+        "ticketId": null,
+        "mitreTactics": ["Lateral Movement"],
+        "mitreTechniques": ["T1021.002"],
+        "isUserCreated": false,
+        "properties": {},
+        "url": null
+      }
+    ],
+    "associatedAlerts": [
+      {
+        "id": 7001,
+        "name": "High Packet Loss Detected",
+        "author": "ExtraHop",
+        "statName": "extrahop.device.net",
+        "fieldName": "pkts_dropped",
+        "fieldOp": null,
+        "fieldName2": null,
+        "operator": ">",
+        "operand": 500,
+        "severity": 7,
+        "severityLabel": "critical",
+        "type": "threshold",
+        "disabled": false,
+        "description": "Triggers when packet drops exceed 500 per interval on any device.",
+        "intervalLength": 30,
+        "refireInterval": 300
+      }
+    ],
+    "activitySummary": {
+      "firstSeen": "2026-03-03T14:26:40.000Z",
+      "lastSeen": "2026-03-12T16:04:30.000Z",
+      "totalProtocols": 5,
+      "totalConnections": 23417,
+      "peakThroughputBps": 89400000
+    }
+  }
+}

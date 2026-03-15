@@ -1,0 +1,28 @@
+{
+  "description": "Blast Radius peer → Flow Theater navigation fixture",
+  "sourcePeer": {
+    "deviceId": 3001,
+    "displayName": "fileserver.lab.local",
+    "ipaddr": "10.1.2.30",
+    "protocols": [
+      { "name": "SMB", "port": 445, "bytesSent": 1048576, "bytesReceived": 2097152, "hasDetections": false },
+      { "name": "DNS", "port": 53, "bytesSent": 4096, "bytesReceived": 8192, "hasDetections": false }
+    ],
+    "totalBytes": 3153920,
+    "detections": [],
+    "impactScore": 12.5,
+    "critical": false
+  },
+  "expectedLink": {
+    "label": "Trace: fileserver.lab.local",
+    "href": "/flow-theater?ftMode=hostname&ftValue=fileserver.lab.local&ftAuto=1",
+    "targetSurface": "flow-theater",
+    "sourceSurface": "blast-radius",
+    "entityContext": "blast-radius-peer-3001"
+  },
+  "expectedParsed": {
+    "mode": "hostname",
+    "value": "fileserver.lab.local",
+    "autoSubmit": true
+  }
+}

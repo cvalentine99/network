@@ -1,0 +1,4 @@
+{
+  "error": "Appliance status fetch failed",
+  "message": "ECONNREFUSED 192.168.50.157:443"
+}

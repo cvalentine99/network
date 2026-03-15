@@ -1,0 +1,14 @@
+{"type":"step","stepId":"input-accepted","status":"running","detail":"Validating hostname dc01.lab.local","durationMs":null,"count":null,"timestamp":1710001800100}
+{"type":"step","stepId":"input-accepted","status":"complete","detail":"Hostname accepted","durationMs":42,"count":null,"timestamp":1710001800142}
+{"type":"step","stepId":"entry-resolution","status":"running","detail":"Resolving hostname to device","durationMs":null,"count":null,"timestamp":1710001800147}
+{"type":"step","stepId":"entry-resolution","status":"complete","detail":"Resolved to device 1042","durationMs":115,"count":null,"timestamp":1710001800262}
+{"type":"step","stepId":"device-resolved","status":"running","detail":"Loading device identity","durationMs":null,"count":null,"timestamp":1710001800267}
+{"type":"step","stepId":"device-resolved","status":"complete","detail":"dc01.lab.local (10.1.20.42)","durationMs":78,"count":null,"timestamp":1710001800345}
+{"type":"step","stepId":"activity-timeline","status":"running","detail":"Querying activity records","durationMs":null,"count":null,"timestamp":1710001800350}
+{"type":"step","stepId":"metric-timeline","status":"running","detail":"Querying metric data points","durationMs":null,"count":null,"timestamp":1710001800350}
+{"type":"step","stepId":"records-search","status":"running","detail":"Searching records","durationMs":null,"count":null,"timestamp":1710001800350}
+{"type":"step","stepId":"detection-alert","status":"running","detail":"Querying detections and alerts","durationMs":null,"count":null,"timestamp":1710001800350}
+{"type":"step","stepId":"trace-assembly","status":"running","detail":"Assembling trace results","durationMs":null,"count":null,"timestamp":1710001800350}
+{"type":"step","stepId":"activity-timeline","status":"complete","detail":"142 activity records","durationMs":330,"count":142,"timestamp":1710001800680}
+{"type":"step","stepId":"records-search","status":"error","detail":"Records API timeout after 5000ms","durationMs":5000,"count":null,"timestamp":1710001805350}
+{"type":"error","message":"Trace terminated: records-search step failed with timeout after 5000ms","failedStepId":"records-search","timestamp":1710001805355}

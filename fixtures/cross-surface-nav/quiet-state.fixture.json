@@ -1,0 +1,41 @@
+{
+  "description": "Cross-surface navigation quiet/empty state fixture — no nav params present",
+  "scenarios": [
+    {
+      "name": "empty query string for Blast Radius",
+      "queryString": "",
+      "parsedBlastRadius": null,
+      "parsedFlowTheater": null
+    },
+    {
+      "name": "missing value param for Blast Radius",
+      "queryString": "brMode=device-id",
+      "parsedBlastRadius": null,
+      "parsedFlowTheater": null
+    },
+    {
+      "name": "missing mode param for Blast Radius",
+      "queryString": "brValue=1042",
+      "parsedBlastRadius": null,
+      "parsedFlowTheater": null
+    },
+    {
+      "name": "invalid mode for Blast Radius",
+      "queryString": "brMode=invalid&brValue=1042",
+      "parsedBlastRadius": null,
+      "parsedFlowTheater": null
+    },
+    {
+      "name": "empty query string for Flow Theater",
+      "queryString": "",
+      "parsedBlastRadius": null,
+      "parsedFlowTheater": null
+    },
+    {
+      "name": "invalid mode for Flow Theater",
+      "queryString": "ftMode=invalid&ftValue=test",
+      "parsedBlastRadius": null,
+      "parsedFlowTheater": null
+    }
+  ]
+}

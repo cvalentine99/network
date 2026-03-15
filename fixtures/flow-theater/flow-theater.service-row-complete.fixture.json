@@ -1,0 +1,75 @@
+{
+  "_meta": {
+    "fixture": "flow-theater.service-row-complete",
+    "description": "SSE event sequence for a service-row entry trace that completes successfully.",
+    "entryMode": "service-row",
+    "terminalStatus": "complete",
+    "totalEvents": 19,
+    "totalSteps": 8
+  },
+  "intent": {
+    "mode": "service-row",
+    "value": "SMB::1042",
+    "timeWindow": {
+      "fromMs": 1710000000000,
+      "untilMs": 1710001800000,
+      "durationMs": 1800000,
+      "cycle": "30sec"
+    }
+  },
+  "events": [
+    { "type": "step", "stepId": "input-accepted", "status": "running", "detail": "Validating service row SMB::1042", "durationMs": null, "count": null, "timestamp": 1710001800100 },
+    { "type": "step", "stepId": "input-accepted", "status": "complete", "detail": "Service row accepted", "durationMs": 35, "count": null, "timestamp": 1710001800135 },
+    { "type": "step", "stepId": "entry-resolution", "status": "running", "detail": "Resolving service row to device", "durationMs": null, "count": null, "timestamp": 1710001800140 },
+    { "type": "heartbeat", "timestamp": 1710001800200, "activeSteps": 1 },
+    { "type": "step", "stepId": "entry-resolution", "status": "complete", "detail": "Resolved to device 1042 via SMB service", "durationMs": 110, "count": null, "timestamp": 1710001800250 },
+    { "type": "step", "stepId": "device-resolved", "status": "running", "detail": "Loading device identity", "durationMs": null, "count": null, "timestamp": 1710001800255 },
+    { "type": "step", "stepId": "device-resolved", "status": "complete", "detail": "dc01.lab.local (10.1.20.42)", "durationMs": 75, "count": null, "timestamp": 1710001800330 },
+    { "type": "step", "stepId": "activity-timeline", "status": "running", "detail": "Querying activity records", "durationMs": null, "count": null, "timestamp": 1710001800335 },
+    { "type": "step", "stepId": "metric-timeline", "status": "running", "detail": "Querying metric data points", "durationMs": null, "count": null, "timestamp": 1710001800335 },
+    { "type": "step", "stepId": "records-search", "status": "running", "detail": "Searching records", "durationMs": null, "count": null, "timestamp": 1710001800335 },
+    { "type": "step", "stepId": "detection-alert", "status": "running", "detail": "Querying detections and alerts", "durationMs": null, "count": null, "timestamp": 1710001800335 },
+    { "type": "step", "stepId": "trace-assembly", "status": "running", "detail": "Assembling trace results", "durationMs": null, "count": null, "timestamp": 1710001800335 },
+    { "type": "heartbeat", "timestamp": 1710001800500, "activeSteps": 5 },
+    { "type": "step", "stepId": "activity-timeline", "status": "complete", "detail": "89 activity records", "durationMs": 290, "count": 89, "timestamp": 1710001800625 },
+    { "type": "step", "stepId": "metric-timeline", "status": "complete", "detail": "1,204 metric data points", "durationMs": 370, "count": 1204, "timestamp": 1710001800705 },
+    { "type": "step", "stepId": "records-search", "status": "complete", "detail": "24 records found", "durationMs": 210, "count": 24, "timestamp": 1710001800545 },
+    { "type": "step", "stepId": "detection-alert", "status": "complete", "detail": "1 detection, 0 alerts", "durationMs": 190, "count": 1, "timestamp": 1710001800525 },
+    { "type": "step", "stepId": "trace-assembly", "status": "complete", "detail": "Trace assembled", "durationMs": 420, "count": null, "timestamp": 1710001800755 },
+    {
+      "type": "complete",
+      "terminalStatus": "complete",
+      "totalDurationMs": 655,
+      "timestamp": 1710001800760,
+      "summary": {
+        "resolvedDevice": {
+          "resolvedVia": "service-row",
+          "originalInput": "SMB::1042",
+          "device": {
+            "id": 1042,
+            "displayName": "dc01.lab.local",
+            "ipaddr": "10.1.20.42",
+            "macaddr": "00:50:56:A1:2B:3C",
+            "role": "domain_controller",
+            "vendor": "VMware"
+          }
+        },
+        "activityCount": 89,
+        "metricPointCount": 1204,
+        "recordCount": 24,
+        "detectionCount": 1,
+        "alertCount": 0,
+        "stepTimings": [
+          { "stepId": "input-accepted", "status": "complete", "durationMs": 35 },
+          { "stepId": "entry-resolution", "status": "complete", "durationMs": 110 },
+          { "stepId": "device-resolved", "status": "complete", "durationMs": 75 },
+          { "stepId": "activity-timeline", "status": "complete", "durationMs": 290 },
+          { "stepId": "metric-timeline", "status": "complete", "durationMs": 370 },
+          { "stepId": "records-search", "status": "complete", "durationMs": 210 },
+          { "stepId": "detection-alert", "status": "complete", "durationMs": 190 },
+          { "stepId": "trace-assembly", "status": "complete", "durationMs": 420 }
+        ]
+      }
+    }
+  ]
+}

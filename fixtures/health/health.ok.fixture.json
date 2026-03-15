@@ -1,0 +1,43 @@
+{
+  "status": "ok",
+  "bff": {
+    "uptime": 3600.5,
+    "memoryMB": 48,
+    "cache": {
+      "size": 12,
+      "maxSize": 500
+    }
+  },
+  "appliance": {
+    "version": "26.1.4.2814",
+    "edition": "Reveal(x) Enterprise",
+    "platform": "extrahop",
+    "hostname": "eda01",
+    "mgmtIpaddr": "192.168.50.157",
+    "displayHost": "eda01.lab.local",
+    "captureName": "Capture 00:1a:8c:10:00:01",
+    "captureMac": "00:1a:8c:10:00:01",
+    "licensedModules": [
+      "wire_data",
+      "eca",
+      "ndr"
+    ],
+    "licensedOptions": [
+      "ssl_decryption"
+    ],
+    "processCount": 42,
+    "services": {
+      "bridge": {
+        "enabled": true
+      },
+      "capture": {
+        "enabled": true
+      },
+      "webserver": {
+        "enabled": true
+      }
+    }
+  },
+  "timestamp": "2026-03-12T17:00:00.000Z",
+  "etl": null
+}

@@ -1,0 +1,16 @@
+{
+  "description": "Positional binding test — 4 specs, 4 values, all present",
+  "specs": [
+    { "name": "bytes_in" },
+    { "name": "bytes_out" },
+    { "name": "pkts_in" },
+    { "name": "pkts_out" }
+  ],
+  "values": [1048576, 524288, 12000, 6000],
+  "expected": {
+    "bytes_in": 1048576,
+    "bytes_out": 524288,
+    "pkts_in": 12000,
+    "pkts_out": 6000
+  }
+}

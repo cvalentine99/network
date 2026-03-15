@@ -1,0 +1,17 @@
+{
+  "applianceStatus": {
+    "hostname": "",
+    "displayHost": "",
+    "version": "",
+    "edition": "",
+    "platform": "",
+    "mgmtIpaddr": "",
+    "captureStatus": "unknown",
+    "captureInterface": "",
+    "licenseStatus": "unknown",
+    "licensedModules": [],
+    "uptimeSeconds": 0,
+    "connectionStatus": "not_configured",
+    "lastChecked": "2026-03-12T17:00:00.000Z"
+  }
+}
