@@ -200,9 +200,9 @@ Two error paths: (1) step-level error (e.g., device resolution fails) — the st
 
 ## Known Limitations
 
-1. **Error state screenshot not captured.** The error banner component (`data-testid="trace-error-banner"`) exists and renders when `traceState.status === "error"`. Error behavior is proven by 5 error-related tests and the error fixture SSE replay.
+1. **Error state screenshot not captured.** The error banner component (`data-testid="trace-error-banner"`) exists and renders when `traceState.status === "error"`. Error behavior is proven against fixtures by 5 error-related tests and the error fixture SSE replay.
 
-2. **Quiet state screenshot not captured.** The quiet banner component (`data-testid="trace-quiet-banner"`) exists and renders when `traceState.status === "quiet"`. Quiet behavior is proven by 4 quiet-related tests and the quiet fixture SSE replay.
+2. **Quiet state screenshot not captured.** The quiet banner component (`data-testid="trace-quiet-banner"`) exists and renders when `traceState.status === "quiet"`. Quiet behavior is proven against fixtures by 4 quiet-related tests and the quiet fixture SSE replay.
 
 3. **SSE replay interval is 150ms.** BFF tests take ~30 seconds total due to real-time SSE streaming. This is by design for realistic pacing but makes the BFF test suite slower than the unit tests.
 
@@ -225,7 +225,7 @@ During this slice, a critical SSE bug was discovered and fixed. The trace route 
 1. Live ExtraHop SSE integration — deferred by contract.
 2. Real device resolution against ExtraHop appliance — deferred by contract.
 3. Performance under real network conditions — deferred by contract.
-4. Error/quiet state screenshots — behavior proven by tests and fixtures, visual capture deferred.
+4. Error/quiet state screenshots — behavior proven against fixtures by tests and fixtures, visual capture deferred.
 
 ---
 

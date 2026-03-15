@@ -3,7 +3,7 @@
 ## TRUTH RECEIPT
 
 **Slice:** 28 — Runtime Decontamination  
-**Status:** PASSED  
+**Status:** PASSED with caveats  
 
 ---
 

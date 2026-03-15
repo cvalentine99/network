@@ -73,7 +73,7 @@ The following files have been updated to remove "live integration" claims:
 - `server/routes/topology.ts` baseline route: in live mode, now returns an explicit error:
   ```json
   {
-    "error": "BASELINE_NOT_AVAILABLE",
+    "error": "BASELINE_NOT_IMPLEMENTED",
     "message": "Historical baseline collection is not yet implemented. Anomaly detection requires baseline data from periodic ETL snapshots.",
     "mode": "live"
   }

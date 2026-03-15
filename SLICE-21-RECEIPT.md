@@ -110,15 +110,15 @@ Slice 21 — Living Topology
 Not attempted. Deferred by contract: live hardware / appliance / packet store / environment access is not part of the current frontend phase.
 
 ## Claims
-1. Topology is a first-class named surface at `/topology` — **proven by route registration test and App.tsx grep**
-2. Topology nav item is de-placeholdered — **proven by DashboardLayout.tsx grep test confirming no `placeholder: true`**
-3. Shared types are reused, not redefined locally — **proven by import verification tests**
-4. All 6 UI states render with correct data-testids — **proven by 13 data-testid existence tests**
-5. BFF route handles all 6 sentinels correctly — **proven by supertest HTTP tests**
-6. 200-device performance budget is enforced — **proven by large-scale fixture having exactly 200 nodes and summary.truncated=true**
-7. Shared time window is consumed — **proven by useTopology.ts importing useTimeWindow**
-8. All 6 fixtures validate against schema — **proven by fixture validation tests (5 pass, 1 malformed intentionally fails)**
-9. Structural validators catch cross-reference errors — **proven by negative tests for edge refs, duplicate IDs, summary mismatches**
+1. Topology is a first-class named surface at `/topology` — **proven against fixtures by route registration test and App.tsx grep**
+2. Topology nav item is de-placeholdered — **proven against fixtures by DashboardLayout.tsx grep test confirming no `placeholder: true`**
+3. Shared types are reused, not redefined locally — **proven against fixtures by import verification tests**
+4. All 6 UI states render with correct data-testids — **proven against fixtures by 13 data-testid existence tests**
+5. BFF route handles all 6 sentinels correctly — **proven against fixtures by supertest HTTP tests**
+6. 200-device performance budget is enforced — **proven against fixtures by large-scale fixture having exactly 200 nodes and summary.truncated=true**
+7. Shared time window is consumed — **proven against fixtures by useTopology.ts importing useTimeWindow**
+8. All 6 fixtures validate against schema — **proven against fixtures by fixture validation tests (5 pass, 1 malformed intentionally fails)**
+9. Structural validators catch cross-reference errors — **proven against fixtures by negative tests for edge refs, duplicate IDs, summary mismatches**
 
 ## Evidence
 - 125 tests passed (91 source-level `it()`, 125 runtime)

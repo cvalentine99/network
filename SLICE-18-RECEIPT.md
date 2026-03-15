@@ -100,14 +100,14 @@ cc93c660 (initial), correction checkpoint pending
 Not attempted. Deferred by contract: live hardware / appliance / packet store / environment access is not part of the current frontend phase.
 
 ## Claims
-1. All 13 Zod schemas validate inputs and reject malformed data — **proven by 32 schema tests**
-2. All 5 pure functions produce correct outputs — **proven by 22 pure function tests**
-3. All 7 fixtures pass or fail schema validation as expected — **proven by 28 fixture tests**
-4. BFF route returns correct HTTP status codes and payloads for all sentinels — **proven by 12 BFF route tests**
-5. UI renders 5 distinct states (idle, populated, quiet, error, transport-error) — **proven by 6 screenshots**
-6. Quiet state is visually distinct from error state — **proven by screenshots (amber vs red banners)**
-7. No NaN/Infinity reaches the UI — **proven by fixture invariant tests**
-8. Browser does not contact ExtraHop directly — **proven by BFF route architecture (all queries go through /api/bff/blast-radius/query)**
+1. All 13 Zod schemas validate inputs and reject malformed data — **proven against fixtures by 32 schema tests**
+2. All 5 pure functions produce correct outputs — **proven against fixtures by 22 pure function tests**
+3. All 7 fixtures pass or fail schema validation as expected — **proven against fixtures by 28 fixture tests**
+4. BFF route returns correct HTTP status codes and payloads for all sentinels — **proven against fixtures by 12 BFF route tests**
+5. UI renders 5 distinct states (idle, populated, quiet, error, transport-error) — **proven against fixtures by 6 screenshots**
+6. Quiet state is visually distinct from error state — **proven against fixtures by screenshots (amber vs red banners)**
+7. No NaN/Infinity reaches the UI — **proven against fixtures by fixture invariant tests**
+8. Browser does not contact ExtraHop directly — **proven against fixtures by BFF route architecture (all queries go through /api/bff/blast-radius/query)**
 
 ## Evidence
 - 94 tests passed (server/slice18.test.ts)

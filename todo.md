@@ -497,3 +497,19 @@ These items are tracked here for the live integration phase.
 - [x] LIE 47: DEFERRED — AUDIT-27b.md stub not addressed in this pass.
 - [x] LIE 48: ACKNOWLEDGED — TTL cache is empty in fixture mode. Cache stats are real (0/0), not fake.
 - [x] LIE 49: ACKNOWLEDGED — 'None critical' should read 'None critical in fixture mode. Live mode untested.'
+
+# AUDIT VERIFICATION REPORT FIXES (Slice 37)
+## Finding 1: SLICE-18-RECEIPT.md receipt language — 8 instances of "proven by" not corrected
+- [x] Replace all 8 instances of "proven by" with "proven against fixtures by" in SLICE-18-RECEIPT.md
+## Finding 2: SLICE-21-RECEIPT.md receipt language — 9 instances of "proven by" not corrected
+- [x] Replace all 9 instances of "proven by" with "proven against fixtures by" in SLICE-21-RECEIPT.md
+## Finding 3: SLICE-28-RECEIPT.md header status still says PASSED (contradicts body "PASSED with caveats")
+- [x] Update SLICE-28-RECEIPT.md line 6: change Status from "PASSED" to "PASSED with caveats"
+## Finding 4: deploy/docker/up.sh table threshold still 38 (should be 39)
+- [x] Update deploy/docker/up.sh: change table threshold from 38 to 39
+## Finding 5: deploy/start-local.sh table threshold still 38 (should be 39)
+- [x] Update deploy/start-local.sh: change table threshold from 38 to 39
+## Finding 6: AUDIT-RESPONSE.md misquotes error constant as BASELINE_NOT_AVAILABLE (actual: BASELINE_NOT_IMPLEMENTED)
+- [x] Fix AUDIT-RESPONSE.md: correct BASELINE_NOT_AVAILABLE to BASELINE_NOT_IMPLEMENTED
+## Finding 7: All corrections verified with grep proof before delivery
+- [x] Run grep proof for every fix and include output in delivery — SLICE-37-GREP-PROOF.md

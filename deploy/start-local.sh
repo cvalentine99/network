@@ -52,8 +52,8 @@ echo ""
 echo "[2/5] Checking schema..."
 TABLE_COUNT=$(mysql -u netperf -pnetperf_test_2026 netperf_app -N -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='netperf_app';" 2>/dev/null)
 echo "Tables: $TABLE_COUNT"
-if [ "$TABLE_COUNT" -lt 38 ]; then
-  echo "WARNING: Expected 38 tables, found $TABLE_COUNT. Schema may be incomplete."
+if [ "$TABLE_COUNT" -lt 39 ]; then
+  echo "WARNING: Expected 39 tables, found $TABLE_COUNT. Schema may be incomplete."
   echo "  Apply schema: mysql -u netperf -pnetperf_test_2026 netperf_app < deploy/full-schema.sql"
 fi
 echo ""
