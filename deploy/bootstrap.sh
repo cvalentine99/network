@@ -284,11 +284,10 @@ if [ "$RUN_USER" != "root" ]; then
   chown "$RUN_USER":"$(id -gn "$RUN_USER")" "$APP_LOG"
 fi
 
-# Ensure PID file is writable by the invoking user
-touch "$PID_FILE"
-if [ "$RUN_USER" != "root" ]; then
-  chown "$RUN_USER":"$(id -gn "$RUN_USER")" "$PID_FILE"
-fi
+# NOTE: Do NOT chown the PID file before writing — fs.protected_regular=2 on
+# Ubuntu 22.04+ prevents root from writing to files in /tmp owned by other users.
+# We write the PID as root first, then chown afterward.
+rm -f "$PID_FILE"
 
 # Start the app as the invoking user (not root)
 if [ "$RUN_USER" != "root" ]; then
@@ -305,8 +304,15 @@ if [ "$RUN_USER" != "root" ]; then
     BUILT_IN_FORGE_API_URL='' \
     BUILT_IN_FORGE_API_KEY='' \
     nohup node dist/index.js > $APP_LOG 2>&1 &
-    echo \$! > $PID_FILE
   "
+  # Wait briefly for node to fork, then capture the actual node PID (not the bash wrapper)
+  sleep 1
+  NODE_PID=$(pgrep -f 'node dist/index.js' -u "$RUN_USER" | tail -1)
+  if [ -z "$NODE_PID" ]; then
+    fail "Node process did not start"
+  fi
+  echo "$NODE_PID" > "$PID_FILE"
+  chown "$RUN_USER":"$(id -gn "$RUN_USER")" "$PID_FILE"
 else
   DATABASE_URL="mysql://${DB_USER}:${DB_PASS}@localhost:3306/${DB_NAME}" \
   NODE_ENV=production \

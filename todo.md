@@ -122,3 +122,25 @@
 - [x] Fix #13: bootstrap.sh verification expanded from 14 to 16 checks
 - [x] Clean-room re-test: DB dropped, user dropped, bootstrap.sh re-run from scratch — ALL 16 CHECKS PASSED
 - [x] Full test suite: 2,108 tests passing across 31 files — no regressions
+
+# Fresh Deployment Bundle Audit (Slice 27b)
+
+- [x] Read and audit every deploy file from scratch (no prior assumptions)
+- [x] Audit bootstrap.sh line-by-line
+- [x] Audit Dockerfile line-by-line
+- [x] Audit docker-compose.yml and all Docker support files
+- [x] Audit full-schema.sql against drizzle/schema.ts
+- [x] Audit DEPLOY.md for accuracy against actual files
+- [x] Clean-room test: destroy DB, kill processes, run bootstrap from scratch (3 runs, 2 bugs found and fixed)
+- [x] Verify app runtime behavior after bootstrap (PID kill test confirmed)
+- [x] Write and deliver audit report
+
+## Bugs Found and Fixed in Fresh Audit
+- [x] CRITICAL: PID file captured bash wrapper PID (208711), not node PID (208712) — kill left orphan process running
+- [x] CRITICAL: fs.protected_regular=2 on Ubuntu 22.04 blocked root from writing to /tmp/netperf-app.pid after chown to ubuntu
+- [x] MODERATE: DEPLOY.md falsely claimed fact_device_activity unreferenced (it IS used by getDeviceActivity in db.ts)
+- [x] MODERATE: docker-compose.yml exposed MySQL port 3306 to host network (security)
+- [x] MODERATE: start-local.sh table count threshold was 30 instead of 38
+- [x] MODERATE: DEPLOY.md said '14+ checks', actual is 16
+- [x] LOW: Added OWNER_NAME to Dockerfile and docker-compose.yml for consistency
+- [x] LOW: Synced 01-schema.sql legacy comment block to match full-schema.sql

@@ -60,6 +60,7 @@ ENV OAUTH_SERVER_URL=""
 ENV VITE_APP_ID="local-test"
 ENV JWT_SECRET="local-test-jwt-secret-not-for-production"
 ENV OWNER_OPEN_ID="local-test-owner"
+ENV OWNER_NAME="Local Tester"
 ENV BUILT_IN_FORGE_API_URL=""
 ENV BUILT_IN_FORGE_API_KEY=""
 

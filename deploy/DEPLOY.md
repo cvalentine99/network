@@ -32,7 +32,7 @@ The script:
 - Builds the production bundle (owned by the invoking user)
 - Starts the app on port 3020 as the invoking user
 - Configures nginx on port 3013 → 3020
-- Runs 14+ verification checks and fails hard on any failure
+- Runs 16 verification checks and fails hard on any failure
 
 After completion, open **http://localhost:3013** in your browser.
 
@@ -280,7 +280,7 @@ The `deploy/full-schema.sql` file contains 38 `CREATE TABLE` statements:
 
 - **34 active tables** — referenced by current application code (Drizzle ORM schema, BFF routes, tRPC procedures)
 - **4 legacy tables** (`alerts`, `devices`, `interfaces`, `performance_metrics`) — from the initial Drizzle migration, not referenced by current code
-- **1 intentionally unused table** (`fact_device_activity`) — defined in `drizzle/schema.ts` and present in the schema, but not yet referenced by any BFF route or tRPC procedure. Reserved for future device activity tracking.
+- **1 table with no live data path yet** (`fact_device_activity`) — defined in `drizzle/schema.ts`, present in the schema, and referenced by the `getDeviceActivity()` helper in `server/db.ts` (called by the device detail tRPC procedure). However, no ETL or BFF route currently populates this table, so it will return empty results until live ExtraHop integration writes activity data into it.
 
 ---
 
