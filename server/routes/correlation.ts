@@ -1,42 +1,50 @@
 /**
- * Correlation Overlay — BFF Route (Slice 19)
+ * Slice 22 — Correlation Timeline: BFF Route
  *
- * CONTRACT:
- * - POST /api/bff/correlation/events — query correlation events for a time window
- * - GET  /api/bff/correlation/fixtures — list available fixture files (dev/test only)
- * - Validates intent via CorrelationIntentSchema
- * - Browser never contacts ExtraHop directly
- * - Returns proper HTTP status codes: 200 for data, 400 for invalid intent, 502 for upstream errors
+ * POST /api/bff/correlation/events  — returns correlated events for a time window
+ * GET  /api/bff/correlation/fixtures — lists available fixture files (dev/test only)
  *
- * DECONTAMINATION (Slice 28):
- *   - isFixtureMode() gate added: live mode returns explicit 503 LIVE_NOT_IMPLEMENTED
- *   - Sentinel routing removed from production: only available when NODE_ENV !== 'production'
- *   - Fixture listing endpoint gated behind NODE_ENV !== 'production'
- *   - No fixture file is ever loaded when EH_HOST + EH_API_KEY are configured
+ * LIVE MODE:
+ *   - GET /api/v1/detections → detections with participants, risk scores
+ *   - GET /api/v1/alerts → configured alerts
+ *   - Normalizes both into a unified CorrelationEvent stream
+ *   - Computes categoryCounts from the event stream
+ *
+ * FIXTURE MODE:
+ *   - Loads deterministic fixture files from fixtures/correlation/
+ *   - Sentinel routing available in dev/test only
  */
 
 import { Router, type Request, type Response } from 'express';
 import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 import { CorrelationIntentSchema } from '../../shared/correlation-validators';
+import { ehRequest, isFixtureMode, ExtraHopClientError } from '../extrahop-client';
 
 const router = Router();
 const FIXTURE_DIR = join(process.cwd(), 'fixtures', 'correlation');
-
-/**
- * Determine if we are in fixture mode (no live ExtraHop configured).
- */
-function isFixtureMode(): boolean {
-  const host = process.env.EH_HOST;
-  const key = process.env.EH_API_KEY;
-  return !host || !key || host === '' || key === '' || key === 'REPLACE_ME';
-}
-
 const isDev = process.env.NODE_ENV !== 'production';
 
-// ─── POST /api/bff/correlation/events ─────────────────────────────────────
-router.post('/events', (req: Request, res: Response) => {
-  // Validate intent
+// ─── Sentinel Map (dev/test only) ─────────────────────────────────
+// These are only used in fixture mode + dev environment
+const SENTINEL_MAP: Record<number, { file: string; status: number }> = {
+  9999999999999: { file: 'correlation.error.fixture.json', status: 502 },
+  8888888888888: { file: 'correlation.transport-error.fixture.json', status: 504 },
+  7777777777777: { file: 'correlation.malformed.fixture.json', status: 200 },
+};
+
+// ─── Severity Mapping ──────────────────────────────────────────────
+function mapSeverity(riskScore: number | null | undefined): string {
+  if (riskScore == null) return 'info';
+  if (riskScore >= 80) return 'critical';
+  if (riskScore >= 60) return 'high';
+  if (riskScore >= 40) return 'medium';
+  if (riskScore >= 20) return 'low';
+  return 'info';
+}
+
+// ─── POST /events ──────────────────────────────────────────────────
+router.post('/events', async (req: Request, res: Response) => {
   const parsed = CorrelationIntentSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({
@@ -47,68 +55,189 @@ router.post('/events', (req: Request, res: Response) => {
     return;
   }
 
-  // ── LIVE MODE GATE ──
-  // When EH_HOST + EH_API_KEY are configured, do NOT load fixtures.
-  // Return explicit error until real ExtraHop integration is wired.
-  if (!isFixtureMode()) {
-    res.status(503).json({
-      error: 'LIVE_NOT_IMPLEMENTED',
-      message: 'Live correlation integration not yet implemented. ExtraHop API calls for correlation events are not wired.',
-      code: 'LIVE_NOT_IMPLEMENTED',
+  // ── FIXTURE MODE ──
+  if (isFixtureMode()) {
+    const intent = parsed.data;
+    const fromMs = intent.fromMs;
+
+    // Sentinel routing: only in dev/test, never in production
+    if (isDev && SENTINEL_MAP[fromMs]) {
+      const sentinel = SENTINEL_MAP[fromMs];
+      const fixture = loadFixture(sentinel.file);
+      res.status(sentinel.status).json(fixture);
+      return;
+    }
+
+    // Quiet state
+    const untilMs = intent.untilMs;
+    if (fromMs === 0 && untilMs === 0) {
+      const fixture = loadFixture('correlation.quiet.fixture.json');
+      res.status(200).json(fixture);
+      return;
+    }
+
+    // Clustered fixture (dev/test only)
+    if (
+      isDev &&
+      intent.categories &&
+      intent.categories.length > 0 &&
+      fromMs === 1710000000000 &&
+      intent.untilMs === 1710000300000
+    ) {
+      const fixture = loadFixture('correlation.clustered.fixture.json');
+      res.status(200).json(fixture);
+      return;
+    }
+
+    // Default: populated fixture
+    const fixture = loadFixture('correlation.populated.fixture.json');
+    res.status(200).json(fixture);
+    return;
+  }
+
+  // ── LIVE MODE ──
+  const intent = parsed.data;
+  const fromMs = intent.fromMs;
+  const untilMs = intent.untilMs;
+
+  if (!fromMs || !untilMs) {
+    res.status(400).json({
+      error: 'Missing time window',
+      message: 'fromMs and untilMs are required',
     });
     return;
   }
 
-  // ── FIXTURE MODE ──
-  const intent = parsed.data;
+  try {
+    const events: any[] = [];
+    const categoryCounts: Record<string, number> = {};
+    const categories = intent.categories;
 
-  // Sentinel routing: only in dev/test, never in production
-  if (isDev) {
-    if (intent.fromMs === 9999999999999) {
-      const fixture = loadFixture('correlation.error.fixture.json');
-      res.status(502).json(fixture);
-      return;
+    // 1. Fetch detections if category filter includes 'detection' or no filter
+    const wantDetections = !categories || categories.length === 0 || categories.includes('detection');
+    if (wantDetections) {
+      const detectionsResp = await ehRequest<any[]>({
+        method: 'GET',
+        path: `/api/v1/detections?from=${fromMs}&until=${untilMs}`,
+        cacheTtlMs: 30_000,
+      });
+
+      const rawDetections = Array.isArray(detectionsResp.data) ? detectionsResp.data : [];
+      let detCount = 0;
+
+      for (const det of rawDetections) {
+        const timestampMs = det.start_time ?? det.mod_time ?? fromMs;
+        const endTime = det.end_time ?? det.update_time ?? timestampMs;
+        const durationMs = endTime > timestampMs ? endTime - timestampMs : 0;
+        const riskScore = typeof det.risk_score === 'number' ? det.risk_score : null;
+
+        // Build source from first participant
+        let source: any = { kind: 'appliance', displayName: 'ExtraHop', id: 1 };
+        if (Array.isArray(det.participants) && det.participants.length > 0) {
+          const p = det.participants[0];
+          if (p.object_type === 'device') {
+            source = {
+              kind: 'device',
+              displayName: p.hostname || p.object_value || `Device ${p.object_id}`,
+              id: p.object_id,
+            };
+          }
+        }
+
+        // Build refs
+        const refs: any[] = [
+          { kind: 'detection', id: `det-${det.id}`, label: `Detection #${det.id}` },
+        ];
+        if (source.kind === 'device') {
+          refs.push({ kind: 'device', id: source.id, label: source.displayName });
+        }
+
+        events.push({
+          id: `det-${det.id}`,
+          category: 'detection',
+          title: det.title || det.type || 'Unknown Detection',
+          description: det.description || '',
+          timestampMs,
+          timestampIso: new Date(timestampMs).toISOString(),
+          durationMs,
+          severity: mapSeverity(riskScore),
+          riskScore,
+          source,
+          refs,
+        });
+        detCount++;
+      }
+      categoryCounts['detection'] = detCount;
     }
 
-    if (intent.fromMs === 8888888888888) {
-      const fixture = loadFixture('correlation.transport-error.fixture.json');
-      res.status(504).json(fixture);
-      return;
+    // 2. Fetch alerts if category filter includes 'alert' or no filter
+    const wantAlerts = !categories || categories.length === 0 || categories.includes('alert');
+    if (wantAlerts) {
+      const alertsResp = await ehRequest<any[]>({
+        method: 'GET',
+        path: '/api/v1/alerts',
+        cacheTtlMs: 60_000,
+      });
+
+      const rawAlerts = Array.isArray(alertsResp.data) ? alertsResp.data : [];
+      let alertCount = 0;
+
+      for (const alert of rawAlerts) {
+        if (alert.disabled) continue;
+
+        const timestampMs = alert.mod_time ?? alert.create_time ?? fromMs;
+
+        events.push({
+          id: `alert-${alert.id}`,
+          category: 'alert',
+          title: alert.name || 'Unknown Alert',
+          description: alert.description || '',
+          timestampMs,
+          timestampIso: new Date(timestampMs).toISOString(),
+          durationMs: 0,
+          severity: mapSeverity(alert.severity ?? 50),
+          riskScore: null,
+          source: {
+            kind: 'appliance',
+            displayName: 'ExtraHop',
+            id: 1,
+          },
+          refs: [
+            { kind: 'alert', id: `alert-${alert.id}`, label: `Alert #${alert.id}` },
+          ],
+        });
+        alertCount++;
+      }
+      categoryCounts['alert'] = alertCount;
     }
 
-    if (intent.fromMs === 7777777777777) {
-      const fixture = loadFixture('correlation.malformed.fixture.json');
-      res.status(200).json(fixture);
+    // 3. Sort events by timestamp descending
+    events.sort((a, b) => b.timestampMs - a.timestampMs);
+
+    // 4. Return in the BFF response format
+    res.json({
+      events,
+      timeWindow: { fromMs, untilMs },
+      categoryCounts,
+      totalCount: events.length,
+    });
+  } catch (err: any) {
+    if (err instanceof ExtraHopClientError) {
+      res.status(502).json({
+        error: 'ExtraHop API error',
+        message: err.message,
+        code: err.code,
+      });
       return;
     }
+    res.status(500).json({
+      error: 'Correlation fetch failed',
+      message: err.message || 'Unknown error',
+    });
   }
-
-  if (intent.fromMs === 0 && intent.untilMs === 0) {
-    const fixture = loadFixture('correlation.quiet.fixture.json');
-    res.status(200).json(fixture);
-    return;
-  }
-
-  // Clustered fixture: when categories filter is provided (dev/test only for sentinel matching)
-  if (
-    isDev &&
-    intent.categories &&
-    intent.categories.length > 0 &&
-    intent.fromMs === 1710000000000 &&
-    intent.untilMs === 1710000300000
-  ) {
-    const fixture = loadFixture('correlation.clustered.fixture.json');
-    res.status(200).json(fixture);
-    return;
-  }
-
-  // Default: populated fixture
-  const fixture = loadFixture('correlation.populated.fixture.json');
-  res.status(200).json(fixture);
 });
 
-// ─── GET /api/bff/correlation/fixtures (dev/test only) ───────────────────
-// This endpoint is NOT available in production.
+// ─── GET /fixtures (dev/test only) ────────────────────────────────
 router.get('/fixtures', (_req: Request, res: Response) => {
   if (!isDev) {
     res.status(404).json({ error: 'Not available in production' });

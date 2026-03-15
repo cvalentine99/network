@@ -4,58 +4,138 @@
  * Returns normalized appliance identity and BFF status.
  * Shape conforms to BffHealthResponse from shared/cockpit-types.ts.
  *
- * DECONTAMINATION (Slice 28):
+ * LIVE INTEGRATION (Slice 29):
  *   - Fixture mode: status = 'not_configured', appliance = null
- *   - Live mode: status = 'ok' (we can reach the BFF; actual ExtraHop
- *     reachability is NOT tested here because no live API calls are wired yet).
- *     When live ExtraHop integration is wired, this route should attempt a
- *     lightweight ping to the appliance and return 'degraded' if it fails.
- *   - Removed hardcoded 'degraded' — that was dishonest because we never
- *     actually tested appliance reachability.
- *   - cache.size and cache.maxSize report 0 because no BFF cache is
- *     implemented yet. Previously hardcoded maxSize: 500 was fake.
+ *   - Live mode: pings GET /api/v1/extrahop on the configured appliance.
+ *     If reachable: status = 'ok', appliance = normalized identity.
+ *     If unreachable: status = 'degraded', appliance = null.
+ *   - Cache stats from the shared ExtraHop client cache.
+ *
+ * ExtraHop API call:
+ *   GET /api/v1/extrahop
+ *   Response shape (from ExtraHop REST API):
+ *   {
+ *     "version": "9.4.0.1234",
+ *     "edition": "Reveal(x) Enterprise",
+ *     "platform": "extrahop",
+ *     "hostname": "extrahop.lab.local",
+ *     "mgmt_ipaddr": "10.1.20.1",
+ *     "display_host": "extrahop.lab.local",
+ *     "capture_name": "Default",
+ *     "capture_mac": "00:1A:2B:3C:4D:5E",
+ *     "licensed_modules": ["wire_data", "eda"],
+ *     "licensed_options": ["ssl_decryption"],
+ *     "process_count": 4,
+ *     "services": { "extrahop": { "enabled": true }, "bridge": { "enabled": true } }
+ *   }
  *
  * Contract: browser calls /api/bff/health, never ExtraHop directly.
  */
 import { Router } from 'express';
-import type { BffHealthResponse } from '../../shared/cockpit-types';
+import type { BffHealthResponse, ApplianceIdentity } from '../../shared/cockpit-types';
 import { BffHealthResponseSchema } from '../../shared/cockpit-validators';
+import { ehRequest, isFixtureMode, getCacheStats, ExtraHopClientError } from '../extrahop-client';
 
 const healthRouter = Router();
 
 /**
- * Determine if we are in fixture mode.
- * Fixture mode is active when EH_HOST or EH_API_KEY are not configured.
+ * Normalize the raw ExtraHop /api/v1/extrahop response into ApplianceIdentity.
+ * The ExtraHop API uses snake_case; our shared types use camelCase.
  */
-function isFixtureMode(): boolean {
-  const host = process.env.EH_HOST;
-  const key = process.env.EH_API_KEY;
-  return !host || !key || host === '' || key === '' || key === 'REPLACE_ME';
+function normalizeApplianceIdentity(raw: any): ApplianceIdentity {
+  return {
+    version: raw.version ?? '',
+    edition: raw.edition ?? '',
+    platform: raw.platform ?? '',
+    hostname: raw.hostname ?? '',
+    mgmtIpaddr: raw.mgmt_ipaddr ?? raw.mgmtIpaddr ?? '',
+    displayHost: raw.display_host ?? raw.displayHost ?? '',
+    captureName: raw.capture_name ?? raw.captureName ?? '',
+    captureMac: raw.capture_mac ?? raw.captureMac ?? '',
+    licensedModules: Array.isArray(raw.licensed_modules)
+      ? raw.licensed_modules
+      : Array.isArray(raw.licensedModules)
+        ? raw.licensedModules
+        : [],
+    licensedOptions: Array.isArray(raw.licensed_options)
+      ? raw.licensed_options
+      : Array.isArray(raw.licensedOptions)
+        ? raw.licensedOptions
+        : [],
+    processCount: typeof raw.process_count === 'number'
+      ? raw.process_count
+      : typeof raw.processCount === 'number'
+        ? raw.processCount
+        : 0,
+    services: raw.services && typeof raw.services === 'object'
+      ? raw.services
+      : {},
+  };
 }
 
-healthRouter.get('/', (_req, res) => {
+healthRouter.get('/', async (_req, res) => {
   try {
-    // In fixture mode: not_configured.
-    // In live mode: 'ok' because the BFF itself is running.
-    // NOTE: When ExtraHop API integration is wired, this should attempt
-    // a lightweight appliance ping and return 'degraded' if unreachable.
-    // Until then, 'ok' means "BFF is running and credentials are configured"
-    // — it does NOT mean "ExtraHop appliance is reachable and responding."
-    const status = isFixtureMode() ? 'not_configured' : 'ok';
+    const cacheStats = getCacheStats();
+
+    // ── FIXTURE MODE ──
+    if (isFixtureMode()) {
+      const response: BffHealthResponse = {
+        status: 'not_configured',
+        bff: {
+          uptime: process.uptime(),
+          memoryMB: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
+          cache: { size: cacheStats.size, maxSize: cacheStats.maxSize },
+        },
+        appliance: null,
+        timestamp: new Date().toISOString(),
+      };
+
+      const validated = BffHealthResponseSchema.safeParse(response);
+      if (!validated.success) {
+        return res.status(500).json({
+          error: 'Health response failed schema validation',
+          details: validated.error.issues,
+        });
+      }
+      return res.json(validated.data);
+    }
+
+    // ── LIVE MODE ──
+    // Attempt a lightweight probe to GET /api/v1/extrahop
+    let appliance: ApplianceIdentity | null = null;
+    let status: 'ok' | 'degraded' = 'degraded';
+
+    try {
+      const probeResult = await ehRequest<any>({
+        method: 'GET',
+        path: '/api/v1/extrahop',
+        cacheTtlMs: 30_000, // Cache appliance identity for 30s
+        timeoutMs: 10_000,
+      });
+
+      if (probeResult.ok && probeResult.data) {
+        appliance = normalizeApplianceIdentity(probeResult.data);
+        status = 'ok';
+      }
+    } catch (err) {
+      // Appliance unreachable — status stays 'degraded', appliance stays null
+      // This is honest: we tried and failed.
+      if (err instanceof ExtraHopClientError) {
+        console.warn(`[health] Appliance probe failed: ${err.code} — ${err.message}`);
+      }
+    }
 
     const response: BffHealthResponse = {
       status,
       bff: {
         uptime: process.uptime(),
         memoryMB: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
-        // No BFF cache is implemented. Report zeros honestly.
-        cache: { size: 0, maxSize: 0 },
+        cache: { size: cacheStats.size, maxSize: cacheStats.maxSize },
       },
-      appliance: null,
+      appliance,
       timestamp: new Date().toISOString(),
     };
 
-    // Validate our own output before sending
     const validated = BffHealthResponseSchema.safeParse(response);
     if (!validated.success) {
       return res.status(500).json({

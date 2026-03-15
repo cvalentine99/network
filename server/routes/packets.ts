@@ -11,8 +11,11 @@
  *   The /download route MUST return Content-Type: application/vnd.tcpdump.pcap
  *   and raw binary bytes. It MUST NOT wrap PCAP bytes in JSON.
  *
- * In fixture mode (no live appliance), returns deterministic fixture PCAP files.
- * In live mode, proxies to ExtraHop POST /api/v1/packets/search.
+ * LIVE INTEGRATION (Slice 29):
+ *   - Live mode proxies to ExtraHop POST /api/v1/packets/search
+ *   - Metadata route queries packet store availability first
+ *   - Download route streams raw binary PCAP from ExtraHop
+ *   - Fixture mode returns deterministic fixture PCAP files
  *
  * Contract: browser calls /api/bff/packets/*, never ExtraHop directly.
  */
@@ -20,17 +23,14 @@ import { Router } from 'express';
 import { PcapRequestSchema, PcapMetadataSchema } from '../../shared/cockpit-validators';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import {
+  isFixtureMode,
+  ehRequest,
+  ehBinaryRequest,
+  ExtraHopClientError,
+} from '../extrahop-client';
 
 const packetsRouter = Router();
-
-/**
- * Determine if we are in fixture mode.
- */
-function isFixtureMode(): boolean {
-  const host = process.env.EH_HOST;
-  const key = process.env.EH_API_KEY;
-  return !host || !key || host === '' || key === '' || key === 'REPLACE_ME';
-}
 
 /**
  * Generate a deterministic filename from request params.
@@ -70,7 +70,7 @@ function loadPcapFixture(name: string): Buffer | null {
  * This is a pre-flight check that returns metadata about the prospective download
  * without actually initiating the binary transfer.
  */
-packetsRouter.post('/metadata', (req, res) => {
+packetsRouter.post('/metadata', async (req, res) => {
   try {
     // 1. Validate request body
     const bodyResult = PcapRequestSchema.safeParse(req.body);
@@ -81,7 +81,7 @@ packetsRouter.post('/metadata', (req, res) => {
       });
     }
 
-    const { ip, fromMs, untilMs, bpfFilter } = bodyResult.data;
+    const { ip, fromMs, untilMs, bpfFilter, limitBytes } = bodyResult.data;
 
     // 2. Validate time window
     if (untilMs <= fromMs) {
@@ -118,12 +118,47 @@ packetsRouter.post('/metadata', (req, res) => {
       return res.json({ metadata: validation.data });
     }
 
-    // 4. Live mode — placeholder
-    return res.status(503).json({
-      error: 'Packet store not configured',
-      message: 'No packet store is connected to this appliance. PCAP download requires an ExtraHop Trace appliance or a connected packet store.',
-      code: 'NO_PACKET_STORE',
-    });
+    // 4. Live mode — check packet store availability and return metadata
+    try {
+      // Probe the ExtraHop appliance to check if packet store is available
+      const ehInfo = await ehRequest<any>({
+        method: 'GET',
+        path: '/api/v1/extrahop',
+        cacheTtlMs: 60_000,
+      });
+
+      const filename = generateFilename(ip, fromMs, untilMs, bpfFilter);
+      const metadata = {
+        filename,
+        contentType: 'application/vnd.tcpdump.pcap' as const,
+        estimatedBytes: limitBytes || 10_485_760, // estimate based on limit
+        sourceIp: ip,
+        fromMs,
+        untilMs,
+        bpfFilter: bpfFilter || null,
+        packetStoreId: ehInfo.data?.id || null,
+      };
+
+      const validation = PcapMetadataSchema.safeParse(metadata);
+      if (!validation.success) {
+        return res.status(502).json({
+          error: 'Malformed metadata',
+          message: 'Generated metadata failed schema validation',
+          details: validation.error.issues,
+        });
+      }
+
+      return res.json({ metadata: validation.data });
+    } catch (err: any) {
+      if (err instanceof ExtraHopClientError && err.code === 'NO_CONFIG') {
+        return res.status(503).json({
+          error: 'Packet store not configured',
+          message: 'No ExtraHop appliance is configured. Save a configuration in Settings first.',
+          code: 'NO_PACKET_STORE',
+        });
+      }
+      throw err;
+    }
   } catch (err: any) {
     return res.status(500).json({
       error: 'PCAP metadata fetch failed',
@@ -154,7 +189,7 @@ packetsRouter.post('/metadata', (req, res) => {
  *   The Content-Type MUST be application/vnd.tcpdump.pcap.
  *   Error responses remain JSON.
  */
-packetsRouter.post('/download', (req, res) => {
+packetsRouter.post('/download', async (req, res) => {
   try {
     // 1. Validate request body
     const bodyResult = PcapRequestSchema.safeParse(req.body);
@@ -165,7 +200,7 @@ packetsRouter.post('/download', (req, res) => {
       });
     }
 
-    const { ip, fromMs, untilMs, bpfFilter } = bodyResult.data;
+    const { ip, fromMs, untilMs, bpfFilter, limitBytes, limitPackets } = bodyResult.data;
 
     // 2. Validate time window
     if (untilMs <= fromMs) {
@@ -202,12 +237,68 @@ packetsRouter.post('/download', (req, res) => {
       return res.end(pcapBuffer);
     }
 
-    // 4. Live mode — placeholder
-    return res.status(503).json({
-      error: 'Packet store not configured',
-      message: 'No packet store is connected to this appliance. PCAP download requires an ExtraHop Trace appliance or a connected packet store.',
-      code: 'NO_PACKET_STORE',
-    });
+    // 4. Live mode — proxy to ExtraHop POST /api/v1/packets/search
+    try {
+      // Build the ExtraHop packets/search request body
+      const ehBody: Record<string, unknown> = {
+        from: fromMs,
+        until: untilMs,
+        bpf: bpfFilter || `host ${ip}`,
+        output: 'pcap',
+      };
+      if (limitBytes) ehBody.limit_bytes = limitBytes;
+      if (limitPackets) ehBody.limit_pkts = limitPackets;
+
+      const binaryResp = await ehBinaryRequest({
+        method: 'POST',
+        path: '/api/v1/packets/search',
+        body: ehBody,
+        timeoutMs: 120_000, // PCAP downloads can be slow
+      });
+
+      if (!binaryResp.ok) {
+        // ExtraHop returned an error — try to parse as JSON error
+        try {
+          const errBody = JSON.parse(binaryResp.buffer.toString('utf-8'));
+          return res.status(binaryResp.status).json({
+            error: 'PCAP download failed',
+            message: errBody.error_message || errBody.message || `ExtraHop returned ${binaryResp.status}`,
+            code: 'EH_PACKETS_ERROR',
+          });
+        } catch {
+          return res.status(binaryResp.status).json({
+            error: 'PCAP download failed',
+            message: `ExtraHop returned ${binaryResp.status} ${binaryResp.statusText}`,
+            code: 'EH_PACKETS_ERROR',
+          });
+        }
+      }
+
+      const filename = generateFilename(ip, fromMs, untilMs, bpfFilter);
+
+      // Set binary response headers
+      res.setHeader('Content-Type', 'application/vnd.tcpdump.pcap');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.setHeader('Content-Length', binaryResp.buffer.length);
+      res.setHeader('X-Pcap-Source-Ip', ip);
+      res.setHeader('X-Pcap-From-Ms', String(fromMs));
+      res.setHeader('X-Pcap-Until-Ms', String(untilMs));
+      if (bpfFilter) {
+        res.setHeader('X-Pcap-Bpf-Filter', bpfFilter);
+      }
+
+      // Send raw binary — NOT JSON
+      return res.end(binaryResp.buffer);
+    } catch (err: any) {
+      if (err instanceof ExtraHopClientError && err.code === 'NO_CONFIG') {
+        return res.status(503).json({
+          error: 'Packet store not configured',
+          message: 'No ExtraHop appliance is configured. Save a configuration in Settings first.',
+          code: 'NO_PACKET_STORE',
+        });
+      }
+      throw err;
+    }
   } catch (err: any) {
     return res.status(500).json({
       error: 'PCAP download failed',

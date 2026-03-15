@@ -284,7 +284,72 @@ Then open **http://localhost:3013** in your browser. You should see the Impact D
 | Settings | `/settings` | Appliance config form (empty = not configured) |
 | Help | `/help` | Glossary, keyboard shortcuts, surface descriptions |
 
-All surfaces render fixture data. No live ExtraHop connection is required or expected during this test phase.
+All surfaces render fixture data by default. To connect to a live ExtraHop appliance, see the **ExtraHop Live Integration** section below.
+
+---
+
+## ExtraHop Live Integration (Slice 29)
+
+The application supports two operating modes:
+
+| Mode | Trigger | Behavior |
+|------|---------|----------|
+| **Fixture Mode** | No appliance configured in Settings | All BFF routes return deterministic fixture data |
+| **Live Mode** | Appliance hostname + API key saved in Settings | All BFF routes call the ExtraHop REST API via `server/extrahop-client.ts` |
+
+### Configuring Live Mode
+
+1. Navigate to **Settings** in the sidebar
+2. Enter the ExtraHop appliance hostname (e.g., `extrahop.lab.local`)
+3. Enter the ExtraHop API key (generated from ExtraHop Admin → API Access)
+4. Optionally toggle SSL verification (disable for self-signed certs in lab environments)
+5. Click **Save** — the configuration is stored in the `appliance_config` database table
+
+### How Live Mode Works
+
+All BFF routes use the shared `server/extrahop-client.ts` client:
+
+- **Authentication**: `ExtraHop apikey=<key>` header on every request
+- **TTL Cache**: 500-entry LRU cache with per-endpoint TTL (reduces appliance load)
+- **Error Handling**: `ExtraHopClientError` with codes: `NO_CONFIG`, `API_ERROR`, `TIMEOUT`, `NETWORK_ERROR`
+- **Normalization**: `server/extrahop-normalizers.ts` transforms raw ExtraHop JSON into shared types
+
+### ExtraHop API Endpoints Used
+
+| BFF Route | ExtraHop API Call(s) |
+|-----------|---------------------|
+| `GET /api/bff/health` | `GET /api/v1/extrahop` (appliance probe) |
+| `GET /api/bff/impact/headline` | `POST /api/v1/metrics` (net: bytes_in, bytes_out, pkts_in, pkts_out) |
+| `GET /api/bff/impact/timeseries` | `POST /api/v1/metrics` (net: bytes_in, bytes_out, pkts_in, pkts_out) |
+| `GET /api/bff/impact/top-talkers` | `POST /api/v1/metrics` (net: bytes_in, bytes_out) + `GET /api/v1/devices/{id}` |
+| `GET /api/bff/impact/detections` | `GET /api/v1/detections` (time-filtered) |
+| `GET /api/bff/impact/alerts` | `GET /api/v1/alerts` |
+| `GET /api/bff/impact/appliance-status` | `GET /api/v1/extrahop` |
+| `GET /api/bff/impact/device-detail` | `GET /api/v1/devices/{id}` + metrics + detections + alerts |
+| `GET /api/bff/impact/detection-detail` | `GET /api/v1/detections/{id}` + participant devices |
+| `GET /api/bff/impact/alert-detail` | `GET /api/v1/alerts/{id}` + associated detections/devices |
+| `POST /api/bff/topology/query` | `GET /api/v1/devices` + `POST /api/v1/metrics` + detections + alerts |
+| `POST /api/bff/correlation/events` | `GET /api/v1/detections` + `GET /api/v1/alerts` (merged event stream) |
+| `POST /api/bff/blast-radius/query` | `GET /api/v1/devices/{id}` + peers + metrics + detections |
+| `POST /api/bff/trace/run` | 8-step SSE: device lookup + metrics + detections + alerts + peers |
+| `POST /api/bff/packets/metadata` | `GET /api/v1/extrahop` (packet store probe) |
+| `POST /api/bff/packets/download` | `POST /api/v1/packets/search` (binary PCAP proxy) |
+
+### Network Requirements
+
+- The **server** (Node.js) connects to ExtraHop — the browser never contacts ExtraHop directly
+- HTTPS (port 443) from the server to the ExtraHop appliance
+- If SSL verification is disabled, self-signed certs are accepted
+- The ExtraHop API key must have read access to metrics, devices, detections, alerts, and packets
+
+### Live Integration Status
+
+All routes are wired with live ExtraHop API calls. However:
+
+- **Live integration has not been tested against a real ExtraHop appliance** — this is deferred by contract
+- All route implementations are validated against fixtures and schema validators
+- The ExtraHop client, cache, and normalizers have 168 passing tests (55 + 113)
+- Error handling covers NO_CONFIG, API_ERROR, TIMEOUT, and NETWORK_ERROR scenarios
 
 ---
 

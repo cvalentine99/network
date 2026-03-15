@@ -1,0 +1,13 @@
+{
+  "status": "not_configured",
+  "bff": {
+    "uptime": 1752.986475747,
+    "memoryMB": 93,
+    "cache": {
+      "size": 0,
+      "maxSize": 500
+    }
+  },
+  "appliance": null,
+  "timestamp": "2026-03-15T10:14:43.535Z"
+}

@@ -157,10 +157,10 @@
 # Live Data Contamination Report Findings (from user audit)
 
 ## Critical (C1-C4) — acknowledged, deferred by contract
-- [ ] C1: topology.ts has no isFixtureMode() gate — always returns fixtures unconditionally
-- [ ] C2: correlation.ts has no isFixtureMode() gate — always returns fixtures unconditionally
-- [ ] C3: Impact "live mode" silently returns zeros instead of honest error (looks like quiet network)
-- [ ] C4: Appliance status mixes real DB data with fixture metadata (hostname real, firmware/license fake)
+- [x] C1: topology.ts has isFixtureMode() gate — live mode wired to real ExtraHop API calls (Slice 28 + 29)
+- [x] C2: correlation.ts has isFixtureMode() gate — live mode wired to real ExtraHop API calls (Slice 28 + 29)
+- [x] C3: Impact live mode wired to real ExtraHop API calls — returns real data or honest error (Slice 28 + 29)
+- [x] C4: Appliance status live mode queries GET /api/v1/extrahop for real metadata (Slice 29)
 
 ## High (H1-H4) — acknowledged, deferred by contract
 - [ ] H1: Sentinel ID routing (1042, 4001, 101) makes only magic IDs return populated fixtures
@@ -170,8 +170,8 @@
 
 ## Medium (M1-M5) — acknowledged, deferred by contract
 - [ ] M1: Sentinel value routing in topology and correlation (test harness logic in production)
-- [ ] M2: Health route returns 'degraded' in live mode without checking anything
-- [ ] M3: Hardcoded cache constants in health response
+- [x] M2: Health route probes GET /api/v1/extrahop — returns 'ok' if reachable, 'degraded' if not (Slice 28 + 29)
+- [x] M3: Health route reports real getCacheStats() from TTL cache (maxSize 500, live size/hits/misses) (Slice 29)
 - [ ] M4: Blast radius sentinel values in production
 - [ ] M5: Trace sentinel values in production
 
@@ -238,3 +238,51 @@ These items are tracked here for the live integration phase.
 - [x] Fix alert-detail: unknown IDs now return quiet fixture, not populated
 - [x] Remove EH_HOST/EH_API_KEY from client-side code (useDataSourceMode.ts comment, Help.tsx)
 - [x] Full test suite: 2,146 tests passing across 32 files — zero regressions
+
+# LIVE EXTRAHOP INTEGRATION (Slice 29)
+
+## Phase 1: Shared ExtraHop API client + TTL cache
+- [x] Build server/extrahop-client.ts — shared HTTP client with auth, error handling, TTL cache
+- [x] Cache layer integrated into client (not separate file — simpler, same contract)
+- [x] Build server/extrahop-normalizers.ts — transforms raw EH responses into shared types
+- [ ] Add EH_HOST and EH_API_KEY to webdev secrets (deferred — reads from DB appliance_config)
+
+## Phase 2: Health route reachability probe
+- [x] Wire GET /api/v1/extrahop probe into health route
+- [x] Report real cache stats (size, maxSize) in health response
+
+## Phase 3: Impact routes
+- [x] Wire /headline — POST /api/v1/metrics for total bytes/packets/throughput
+- [x] Wire /timeseries — POST /api/v1/metrics with time_range for series data
+- [x] Wire /top-talkers — POST /api/v1/metrics with top_n grouping + device identity
+- [x] Wire /detections — GET /api/v1/detections with time filter
+- [x] Wire /alerts — GET /api/v1/alerts
+- [x] Wire /appliance-status — GET /api/v1/extrahop for real metadata
+
+## Phase 4: Impact detail routes
+- [x] Wire /device-detail — GET /api/v1/devices/{id} + metrics + detections + alerts
+- [x] Wire /detection-detail — GET /api/v1/detections/{id} + participant devices
+- [x] Wire /alert-detail — GET /api/v1/alerts/{id} + associated detections/devices
+
+## Phase 5: Topology route
+- [x] Wire /topology/query — GET /api/v1/devices + POST /api/v1/metrics + GET /api/v1/detections + GET /api/v1/alerts
+
+## Phase 6: Correlation route
+- [x] Wire /correlation/events — GET /api/v1/detections + GET /api/v1/alerts merged into unified event stream
+
+## Phase 7: Blast radius + trace + packets routes
+- [x] Wire /blast-radius/query — GET /api/v1/devices/{id} + /peers + POST /api/v1/metrics + /detections
+- [x] Wire /trace/run — 8-step SSE with real API calls per step (parallel steps 4-6)
+- [x] Wire /packets/download — POST /api/v1/packets/search (binary proxy via ehBinaryRequest)
+- [x] Wire /packets/metadata — pre-flight check with GET /api/v1/extrahop probe
+
+## Phase 9: Tests
+- [x] Write tests for ExtraHop client (ExtraHopClientError class, isFixtureMode, cache stats)
+- [x] Write tests for TTL cache behavior (clear, stats, maxSize, BffHealthResponse schema compliance)
+- [x] Write tests for live-mode normalizers (headline, timeseries, device, detection, alert, appliance identity, appliance status, buildMetricsRequest)
+- [x] Write tests for route-level fixture-mode schema validation (all routes)
+- [x] Write tests for route input validation (missing/invalid params)
+- [x] Write comprehensive NaN/Infinity guard tests
+- [x] Full test suite verification: 2,314 tests passing across 34 files — zero regressions
+- [x] New test file: slice29-extrahop-integration.test.ts (113 tests)
+- [x] Existing test file: slice29-live-integration.test.ts (55 tests)

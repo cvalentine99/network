@@ -48,10 +48,11 @@ describe('Decontamination: GET /api/bff/health', () => {
     expect(body.status).not.toBe('degraded');
   });
 
-  it('reports cache.maxSize as 0 (no fake cache)', async () => {
+  it('reports real cache stats from getCacheStats()', async () => {
     const { body } = await fetchJSON('/api/bff/health');
-    expect(body.bff.cache.maxSize).toBe(0);
-    expect(body.bff.cache.size).toBe(0);
+    // Now we have a real TTL cache with maxSize 500
+    expect(body.bff.cache.maxSize).toBe(500);
+    expect(typeof body.bff.cache.size).toBe('number');
   });
 
   it('reports real uptime and memory', async () => {
@@ -342,38 +343,47 @@ describe('Decontamination: Code structure verification', () => {
     healthSource = fs.readFileSync(path.join(routesDir, 'health.ts'), 'utf-8');
   });
 
-  it('topology.ts has isFixtureMode gate', () => {
+  it('topology.ts has isFixtureMode gate and live API calls', () => {
     expect(topologySource).toContain('isFixtureMode()');
-    expect(topologySource).toContain('LIVE_NOT_IMPLEMENTED');
+    // Now wired with live API calls instead of LIVE_NOT_IMPLEMENTED
+    expect(topologySource).toContain('ehRequest');
   });
 
-  it('correlation.ts has isFixtureMode gate', () => {
+  it('correlation.ts has isFixtureMode gate and live API calls', () => {
     expect(correlationSource).toContain('isFixtureMode()');
-    expect(correlationSource).toContain('LIVE_NOT_IMPLEMENTED');
+    // Now wired with live API calls instead of LIVE_NOT_IMPLEMENTED
+    expect(correlationSource).toContain('ehRequest');
   });
 
-  it('impact.ts has isFixtureMode gate', () => {
+  it('impact.ts has isFixtureMode gate and live API calls', () => {
     expect(impactSource).toContain('isFixtureMode()');
-    expect(impactSource).toContain('LIVE_NOT_IMPLEMENTED');
+    // Now wired with live API calls instead of LIVE_NOT_IMPLEMENTED
+    expect(impactSource).toContain('ehRequest');
   });
 
-  it('blast-radius.ts has isFixtureMode gate', () => {
+  it('blast-radius.ts has isFixtureMode gate and live API calls', () => {
     expect(blastRadiusSource).toContain('isFixtureMode()');
-    expect(blastRadiusSource).toContain('LIVE_NOT_IMPLEMENTED');
+    // Now wired with live API calls instead of LIVE_NOT_IMPLEMENTED
+    expect(blastRadiusSource).toContain('ehRequest');
   });
 
-  it('trace.ts has isFixtureMode gate', () => {
+  it('trace.ts has isFixtureMode gate and live API calls', () => {
     expect(traceSource).toContain('isFixtureMode()');
-    expect(traceSource).toContain('Live trace integration not yet implemented');
+    // Now wired with live API calls instead of stub error
+    expect(traceSource).toContain('ehRequest');
   });
 
-  it('health.ts does not hardcode degraded', () => {
-    // Should not have a hardcoded 'degraded' as the live-mode status
-    expect(healthSource).not.toMatch(/status.*=.*['"]degraded['"]/);
+  it('health.ts uses degraded as default that gets upgraded on successful probe', () => {
+    // Health route starts with 'degraded' as default and upgrades to 'ok' on successful probe
+    // This is honest: it's a let with a default, not a hardcoded final value
+    expect(healthSource).toContain("let status: 'ok' | 'degraded' = 'degraded'");
+    // And it upgrades to 'ok' when probe succeeds
+    expect(healthSource).toContain("status = 'ok'");
   });
 
-  it('health.ts reports honest cache (maxSize 0)', () => {
-    expect(healthSource).toContain('maxSize: 0');
+  it('health.ts reports real cache stats from getCacheStats()', () => {
+    // Health route now reads cache stats from the real cache via getCacheStats()
+    expect(healthSource).toContain('getCacheStats');
   });
 
   it('topology.ts gates sentinel routing behind isDev', () => {
