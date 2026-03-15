@@ -434,6 +434,20 @@ export interface InspectorHistoryEntry {
 }
 
 // ─── BFF Health Response ──────────────────────────────────────────────────
+export interface EtlJobHealthStatus {
+  running: boolean;
+  lastRunAt: string | null;
+  lastRunDurationMs: number;
+  lastRunDevicesPolled: number;
+  lastRunDevicesSucceeded: number;
+  lastRunDevicesFailed: number;
+  lastRunRecordsUpserted: number;
+  totalRuns: number;
+  totalErrors: number;
+  intervalMs: number;
+  nextRunAt: string | null;
+}
+
 export interface BffHealthResponse {
   status: 'ok' | 'degraded' | 'not_configured';
   bff: {
@@ -442,5 +456,6 @@ export interface BffHealthResponse {
     cache: { size: number; maxSize: number };
   };
   appliance: ApplianceIdentity | null;
+  etl: EtlJobHealthStatus | null;
   timestamp: IsoString;
 }

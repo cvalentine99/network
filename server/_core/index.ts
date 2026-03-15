@@ -14,6 +14,7 @@ import { default as correlationRouter } from "../routes/correlation";
 import topologyRouter from "../routes/topology";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { startEtlScheduler } from "../etl-scheduler";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -75,6 +76,8 @@ async function startServer() {
 
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
+    // Start background ETL after server is listening
+    startEtlScheduler();
   });
 }
 

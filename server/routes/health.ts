@@ -35,6 +35,7 @@ import { Router } from 'express';
 import type { BffHealthResponse, ApplianceIdentity } from '../../shared/cockpit-types';
 import { BffHealthResponseSchema } from '../../shared/cockpit-validators';
 import { ehRequest, isFixtureMode, getCacheStats, ExtraHopClientError } from '../extrahop-client';
+import { getEtlStatus } from '../etl-scheduler';
 
 const healthRouter = Router();
 
@@ -77,6 +78,8 @@ healthRouter.get('/', async (_req, res) => {
   try {
     const cacheStats = getCacheStats();
 
+    const etlStatus = getEtlStatus();
+
     // ── FIXTURE MODE ──
     if (isFixtureMode()) {
       const response: BffHealthResponse = {
@@ -87,6 +90,7 @@ healthRouter.get('/', async (_req, res) => {
           cache: { size: cacheStats.size, maxSize: cacheStats.maxSize },
         },
         appliance: null,
+        etl: etlStatus.running ? etlStatus : null,
         timestamp: new Date().toISOString(),
       };
 
@@ -133,6 +137,7 @@ healthRouter.get('/', async (_req, res) => {
         cache: { size: cacheStats.size, maxSize: cacheStats.maxSize },
       },
       appliance,
+      etl: etlStatus.running ? etlStatus : null,
       timestamp: new Date().toISOString(),
     };
 

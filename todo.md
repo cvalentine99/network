@@ -321,3 +321,43 @@ These items are tracked here for the live integration phase.
 - [x] Update DEPLOY.md with ETL pipeline documentation
 - [x] Update todo.md with completion status
 - [ ] Produce truth receipt
+
+# BACKGROUND ETL JOB + ACTIVITY TIMELINE (Slice 31)
+
+## Phase 1: Background ETL Job
+- [x] Review all known devices source (dim_device table) — getAllDevices() in db.ts
+- [x] Build background ETL scheduler — server/etl-scheduler.ts (setInterval, configurable via ETL_INTERVAL_MS env var)
+- [x] ETL loop: query all active devices from DB → fetch activity per device from ExtraHop → normalize → upsert
+- [x] Add isFixtureMode() gate — skip background ETL in fixture mode (scheduler.startEtlScheduler checks isFixtureMode)
+- [x] Add health endpoint reporting for ETL job status — getEtlStatus() → health route etl field
+- [x] Error handling: per-device failure isolation (try/catch per device in runEtlCycle)
+- [x] Configurable interval via ETL_INTERVAL_MS env var (default 300000 = 5 minutes)
+- [x] Wire scheduler into server startup — server/_core/index.ts calls startEtlScheduler()
+
+## Phase 2: Device Activity Timeline Component
+- [x] Build ActivityTimeline component — client/src/components/inspector/ActivityTimeline.tsx
+- [x] Wire into DeviceDetailPane — added below traffic section, above PCAP download
+- [x] Add BFF route GET /api/bff/impact/device-activity?id=<deviceId>&limit=<limit>
+- [x] Build useDeviceActivity hook — client/src/hooks/useDeviceActivity.ts
+- [x] Handle all UI states: loading (spinner), populated (timeline bars), quiet (empty message), error (error display)
+- [x] Protocol color mapping for 17 known protocols (net, http, dns, ssl, smb, ldap, kerberos, tcp, udp, dhcp)
+- [x] Time-axis labels showing global min/max of activity window
+- [x] Update health fixtures with etl: null field (health.ok, health.degraded, health.not-configured)
+- [x] Update device-activity populated fixture with activityRows field
+
+## Phase 3: Tests
+- [x] Write ETL scheduler tests — getEtlStatus(), stopEtlScheduler(), fixture-mode bypass (9 tests)
+- [x] Write EtlJobHealthStatusSchema validation tests (6 tests)
+- [x] Write BffHealthResponseSchema with etl field tests (3 tests)
+- [x] Write BFF /device-activity route tests — fixture mode, input validation, limit clamping (7 tests)
+- [x] Write health endpoint ETL status tests (2 tests)
+- [x] Write fixture file validation tests (5 tests)
+- [x] Write activity row edge case tests (5 tests)
+- [x] Write NaN/Infinity guard tests (3 tests)
+- [x] Full test suite verification: 2,398 tests across 36 files — zero regressions
+- [x] New test file: slice31-etl-scheduler-timeline.test.ts (40 tests)
+
+## Phase 4: Documentation and truth receipt
+- [x] Update DEPLOY.md with background ETL documentation
+- [x] Update todo.md with completion status
+- [ ] Produce truth receipt

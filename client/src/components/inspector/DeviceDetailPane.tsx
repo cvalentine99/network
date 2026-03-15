@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { PcapDownloadButton } from './PcapDownloadButton';
 import { ProtocolBreakdownChart } from './ProtocolBreakdownChart';
+import { ActivityTimeline } from './ActivityTimeline';
 import { useTimeWindow } from '@/lib/useTimeWindow';
 import { useInspector } from '@/contexts/InspectorContext';
 
@@ -293,6 +294,10 @@ function PopulatedState({ detail }: { detail: DeviceDetail }) {
       <FieldRow label="Total" value={formatBytes(detail.traffic.totalBytes)} mono />
       <FieldRow label="Pkts In" value={detail.traffic.pktsIn.toLocaleString()} mono />
       <FieldRow label="Pkts Out" value={detail.traffic.pktsOut.toLocaleString()} mono />
+
+      {/* Activity Timeline (Slice 31) */}
+      <SectionHeader icon={<Activity className="h-3.5 w-3.5" />} label="Activity Timeline" />
+      <ActivityTimeline deviceId={detail.device.id} />
 
       {/* PCAP Download (Slice 10) */}
       {detail.device.ipaddr4 && (

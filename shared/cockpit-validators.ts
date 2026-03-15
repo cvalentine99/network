@@ -47,6 +47,20 @@ export const ApplianceIdentitySchema = z.object({
 });
 
 // ─── BFF Health Response ──────────────────────────────────────────────────
+export const EtlJobHealthStatusSchema = z.object({
+  running: z.boolean(),
+  lastRunAt: z.string().nullable(),
+  lastRunDurationMs: z.number().nonnegative(),
+  lastRunDevicesPolled: z.number().int().nonnegative(),
+  lastRunDevicesSucceeded: z.number().int().nonnegative(),
+  lastRunDevicesFailed: z.number().int().nonnegative(),
+  lastRunRecordsUpserted: z.number().int().nonnegative(),
+  totalRuns: z.number().int().nonnegative(),
+  totalErrors: z.number().int().nonnegative(),
+  intervalMs: z.number().int().nonnegative(),
+  nextRunAt: z.string().nullable(),
+});
+
 export const BffHealthResponseSchema = z.object({
   status: z.enum(['ok', 'degraded', 'not_configured']),
   bff: z.object({
@@ -58,6 +72,7 @@ export const BffHealthResponseSchema = z.object({
     }),
   }),
   appliance: ApplianceIdentitySchema.nullable(),
+  etl: EtlJobHealthStatusSchema.nullable(),
   timestamp: z.string(),
 });
 

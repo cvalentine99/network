@@ -17,14 +17,27 @@
     "displayHost": "eda01.lab.local",
     "captureName": "Capture 00:1a:8c:10:00:01",
     "captureMac": "00:1a:8c:10:00:01",
-    "licensedModules": ["wire_data", "eca", "ndr"],
-    "licensedOptions": ["ssl_decryption"],
+    "licensedModules": [
+      "wire_data",
+      "eca",
+      "ndr"
+    ],
+    "licensedOptions": [
+      "ssl_decryption"
+    ],
     "processCount": 42,
     "services": {
-      "bridge": { "enabled": true },
-      "capture": { "enabled": true },
-      "webserver": { "enabled": true }
+      "bridge": {
+        "enabled": true
+      },
+      "capture": {
+        "enabled": true
+      },
+      "webserver": {
+        "enabled": true
+      }
     }
   },
-  "timestamp": "2026-03-12T17:00:00.000Z"
+  "timestamp": "2026-03-12T17:00:00.000Z",
+  "etl": null
 }

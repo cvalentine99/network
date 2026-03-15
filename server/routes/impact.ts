@@ -39,7 +39,7 @@ import {
   computeActivitySummary,
   buildMetricsRequest,
 } from '../extrahop-normalizers';
-import { upsertDeviceActivity, getDeviceActivitySummary } from '../db';
+import { upsertDeviceActivity, getDeviceActivitySummary, getDeviceActivity } from '../db';
 
 const impactRouter = Router();
 
@@ -1166,6 +1166,105 @@ impactRouter.get('/alert-detail', async (req, res) => {
     return res.json({ alertDetail: validation.data });
   } catch (err: any) {
     return handleEhError(res, err, 'alert-detail');
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+// ─── GET /device-activity — Activity timeline rows for a device ───────
+// ═══════════════════════════════════════════════════════════════════════
+/**
+ * Returns raw activity rows from fact_device_activity for the timeline component.
+ * In live mode: fetches fresh data from ExtraHop, upserts to DB, returns rows.
+ * In fixture mode: returns fixture data.
+ *
+ * Query params:
+ *   id: numeric device ID (required)
+ *   limit: max rows to return (optional, default 50)
+ */
+impactRouter.get('/device-activity', async (req, res) => {
+  try {
+    const idParam = req.query.id;
+    if (!idParam || isNaN(Number(idParam))) {
+      return res.status(400).json({
+        error: 'Invalid device ID',
+        message: 'Query param "id" must be a numeric device ID',
+      });
+    }
+
+    const deviceId = Number(idParam);
+    const limit = Math.min(Math.max(Number(req.query.limit) || 50, 1), 200);
+
+    // ── LIVE MODE ──
+    if (!isFixtureMode()) {
+      // Fetch fresh activity from ExtraHop
+      let activityRows: Array<{
+        activityId: number;
+        deviceId: number;
+        statName: string;
+        fromTime: number;
+        untilTime: number;
+        modTime: number;
+      }> = [];
+
+      try {
+        const activityResponse = await ehRequest<any[]>({
+          method: 'GET',
+          path: `/api/v1/devices/${deviceId}/activity`,
+          cacheTtlMs: METRICS_CACHE_TTL,
+        });
+
+        const rawActivity = Array.isArray(activityResponse.data) ? activityResponse.data : [];
+        const normalizedRecords = normalizeDeviceActivity(rawActivity, deviceId);
+
+        // Upsert to DB (non-blocking)
+        if (normalizedRecords.length > 0) {
+          try {
+            await upsertDeviceActivity(normalizedRecords);
+          } catch {
+            // Non-fatal
+          }
+        }
+
+        activityRows = normalizedRecords.slice(0, limit).map(r => ({
+          activityId: r.activityId,
+          deviceId: r.deviceId,
+          statName: r.statName,
+          fromTime: r.fromTime,
+          untilTime: r.untilTime,
+          modTime: r.modTime,
+        }));
+      } catch {
+        // Fallback to DB
+        try {
+          const dbRows = await getDeviceActivity(deviceId, limit);
+          activityRows = dbRows.map(r => ({
+            activityId: r.activityId,
+            deviceId: r.deviceId,
+            statName: r.statName,
+            fromTime: r.fromTime,
+            untilTime: r.untilTime,
+            modTime: r.modTime,
+          }));
+        } catch {
+          // Both unavailable — return empty
+        }
+      }
+
+      return res.json({ activityRows });
+    }
+
+    // ── FIXTURE MODE ──
+    try {
+      const fixturePath = join(process.cwd(), 'fixtures', 'device-activity', 'device-activity.populated.fixture.json');
+      const raw = readFileSync(fixturePath, 'utf-8');
+      const fixture = JSON.parse(raw);
+      const rows = Array.isArray(fixture.activityRows) ? fixture.activityRows.slice(0, limit) : [];
+      return res.json({ activityRows: rows });
+    } catch {
+      return res.json({ activityRows: [] });
+    }
+  } catch (err: any) {
+    return handleEhError(res, err, 'device-activity');
   }
 });
 

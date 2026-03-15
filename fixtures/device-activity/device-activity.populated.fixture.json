@@ -1,5 +1,15 @@
 {
   "description": "Populated ExtraHop GET /api/v1/devices/1042/activity response. Contains 8 activity records across 7 distinct protocols (net appears twice for different time windows). Used by Slice 30 ETL pipeline tests.",
+  "activityRows": [
+    { "activityId": 10001, "deviceId": 1042, "statName": "net", "fromTime": 1741795200000, "untilTime": 1741795500000, "modTime": 1741795500000 },
+    { "activityId": 10002, "deviceId": 1042, "statName": "http_client", "fromTime": 1741795200000, "untilTime": 1741795500000, "modTime": 1741795500000 },
+    { "activityId": 10003, "deviceId": 1042, "statName": "dns_client", "fromTime": 1741795200000, "untilTime": 1741795500000, "modTime": 1741795500000 },
+    { "activityId": 10004, "deviceId": 1042, "statName": "ssl_client", "fromTime": 1741795200000, "untilTime": 1741795500000, "modTime": 1741795500000 },
+    { "activityId": 10005, "deviceId": 1042, "statName": "smb_client", "fromTime": 1741795200000, "untilTime": 1741795500000, "modTime": 1741795500000 },
+    { "activityId": 10006, "deviceId": 1042, "statName": "net", "fromTime": 1741795500000, "untilTime": 1741795800000, "modTime": 1741795800000 },
+    { "activityId": 10007, "deviceId": 1042, "statName": "ldap_client", "fromTime": 1741795200000, "untilTime": 1741795500000, "modTime": 1741795500000 },
+    { "activityId": 10008, "deviceId": 1042, "statName": "kerberos_client", "fromTime": 1741795200000, "untilTime": 1741795500000, "modTime": 1741795500000 }
+  ],
   "ehResponse": [
     {
       "id": 10001,

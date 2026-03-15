@@ -375,6 +375,61 @@ sudo systemctl stop nginx
 
 ---
 
+## Background ETL Scheduler (Slice 31)
+
+When a live ExtraHop appliance is configured (`EH_HOST` + `EH_API_KEY`), the server starts a background ETL job that periodically polls device activity data from ExtraHop and upserts it into the `fact_device_activity` table.
+
+### Configuration
+
+| Env Variable | Default | Description |
+|---|---|---|
+| `ETL_INTERVAL_MS` | `300000` (5 min) | Polling interval in milliseconds |
+| `EH_HOST` | (none) | ExtraHop appliance hostname — ETL only runs when set |
+| `EH_API_KEY` | (none) | ExtraHop API key — ETL only runs when set |
+
+### ETL Cycle
+
+Each cycle:
+1. Queries all known devices from `dim_device` table
+2. For each device, calls `GET /api/v1/devices/{id}/activity` on the ExtraHop appliance
+3. Normalizes the response via `normalizeDeviceActivity()`
+4. Upserts records into `fact_device_activity` (batch of 50, ON DUPLICATE KEY UPDATE)
+5. Reports status via the health endpoint (`/api/bff/health` → `etl` field)
+
+### Error Isolation
+
+Failures are isolated per-device. If one device's activity fetch fails, the cycle continues with the remaining devices. The health endpoint reports `lastRunDevicesFailed` count.
+
+### Health Endpoint ETL Status
+
+The `/api/bff/health` response now includes an `etl` field (null when ETL is not running):
+
+```json
+{
+  "etl": {
+    "running": true,
+    "lastRunAt": "2026-03-15T10:00:00.000Z",
+    "lastRunDurationMs": 4523,
+    "lastRunDevicesPolled": 42,
+    "lastRunDevicesSucceeded": 40,
+    "lastRunDevicesFailed": 2,
+    "lastRunRecordsUpserted": 320,
+    "totalRuns": 15,
+    "totalErrors": 3,
+    "intervalMs": 300000,
+    "nextRunAt": "2026-03-15T10:05:00.000Z"
+  }
+}
+```
+
+### BFF Route: Device Activity Rows
+
+`GET /api/bff/impact/device-activity?id=<deviceId>&limit=50`
+
+Returns raw activity rows for the timeline component. In live mode, fetches fresh data from ExtraHop and upserts to DB. Falls back to DB if ExtraHop is unreachable. In fixture mode, returns fixture data.
+
+---
+
 ## Troubleshooting
 
 **"Cannot connect to MySQL"** — Ensure MySQL is running: `sudo systemctl status mysql`
