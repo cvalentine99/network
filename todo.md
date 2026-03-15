@@ -85,3 +85,14 @@
 - [x] BFF routes reachable via nginx on port 3013 (all 10 routes HTTP 200)
 - [x] Full stack validation passed
 - [x] Local deployment: no Manus OAuth — all surfaces accessible without authentication (no protectedProcedure, no auth gating)
+
+# Docker Compose Self-Bootstrapping Deployment
+
+- [x] Dockerfile for Node.js app (multi-stage: build + production)
+- [x] MySQL init script (auto-applies full-schema.sql on first run)
+- [x] nginx config for Docker (proxy 3013 → app:3020)
+- [x] docker-compose.yml with health checks and dependency ordering
+- [x] Bootstrap script — two paths: Docker Compose (untested in sandbox due to iptables) + bare-metal bootstrap.sh (tested, 14/14 checks passed)
+- [x] Verification script (built into bootstrap.sh — 14 checks, fails hard on partial setup)
+- [x] Test bare-metal bootstrap in sandbox (Docker Compose blocked by sandbox iptables kernel limitation)
+- [x] Package and deliver

@@ -1,0 +1,93 @@
+###############################################################################
+# NetPerf NOC — Docker Compose Stack
+# Usage: docker compose up --build
+# Access: http://localhost:3013
+# Stack:  nginx:3013 → app:3020 → mysql:3306
+# Schema: auto-applied on first MySQL start via /docker-entrypoint-initdb.d/
+# Auth:   none (no Manus OAuth)
+###############################################################################
+
+services:
+
+  # ─── MySQL 8 ───
+  mysql:
+    image: mysql:8.0
+    container_name: netperf-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: netperf_root_2026
+      MYSQL_DATABASE: netperf_app
+      MYSQL_USER: netperf
+      MYSQL_PASSWORD: netperf_test_2026
+    volumes:
+      # Schema auto-init: MySQL runs .sql files in this dir on first start
+      - ./mysql-init:/docker-entrypoint-initdb.d:ro
+      # Persist data across restarts
+      - mysql-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "netperf", "-pnetperf_test_2026"]
+      interval: 5s
+      timeout: 5s
+      start_period: 30s
+      retries: 10
+    networks:
+      - netperf
+
+  # ─── Node.js App ───
+  app:
+    container_name: netperf-app
+    build:
+      context: ../../
+      dockerfile: deploy/docker/Dockerfile
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: "3020"
+      DATABASE_URL: "mysql://netperf:netperf_test_2026@mysql:3306/netperf_app"
+      JWT_SECRET: "local-test-jwt-secret-not-for-production"
+      VITE_APP_ID: "local-test"
+      OAUTH_SERVER_URL: ""
+      OWNER_OPEN_ID: "local-test-owner"
+      BUILT_IN_FORGE_API_URL: ""
+      BUILT_IN_FORGE_API_KEY: ""
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:3020/api/bff/health"]
+      interval: 10s
+      timeout: 5s
+      start_period: 20s
+      retries: 5
+    networks:
+      - netperf
+
+  # ─── nginx Reverse Proxy ───
+  nginx:
+    image: nginx:alpine
+    container_name: netperf-nginx
+    restart: unless-stopped
+    ports:
+      - "3013:3013"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      app:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3013/"]
+      interval: 10s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+    networks:
+      - netperf
+
+volumes:
+  mysql-data:
+
+networks:
+  netperf:
+    driver: bridge
