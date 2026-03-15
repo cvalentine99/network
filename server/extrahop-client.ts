@@ -200,8 +200,10 @@ export async function ehRequest<T = unknown>(
     );
   }
 
-  // Build URL
-  const url = `https://${config.hostname}${path}`;
+  // Build URL — use http:// when SSL verification is disabled (lab/self-signed),
+  // https:// when SSL is enabled (production)
+  const protocol = config.verifySsl ? 'https' : 'http';
+  const url = `${protocol}://${config.hostname}${path}`;
 
   // Build headers
   const headers: Record<string, string> = {
@@ -297,7 +299,9 @@ export async function ehBinaryRequest(
     );
   }
 
-  const url = `https://${config.hostname}${path}`;
+  // Use http:// when SSL verification is disabled, https:// when enabled
+  const protocol = config.verifySsl ? 'https' : 'http';
+  const url = `${protocol}://${config.hostname}${path}`;
   const headers: Record<string, string> = {
     'Authorization': `ExtraHop apikey=${config.apiKey}`,
     'Accept': 'application/vnd.tcpdump.pcap',

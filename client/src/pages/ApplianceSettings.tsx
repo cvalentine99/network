@@ -16,7 +16,7 @@
  *   - Form validation uses ApplianceConfigInputSchema (shared Zod)
  *   - 5 UI states: loading, quiet (no config), populated (config exists), saving, testing
  *   - Delete resets to quiet state
- *   - Test Connection calls the BFF which attempts a real HTTPS call to the appliance
+ *   - Test Connection calls the BFF which attempts a real HTTP/HTTPS call to the appliance
  */
 import { useState, useEffect } from 'react';
 import { trpc } from '@/lib/trpc';
@@ -468,7 +468,7 @@ export default function ApplianceSettings() {
                 <Field
                   label="Verify SSL Certificate"
                   icon={verifySsl ? <Shield className="w-3.5 h-3.5" /> : <ShieldOff className="w-3.5 h-3.5" />}
-                  hint="Disable for self-signed certificates in lab environments"
+                   hint="When disabled: connects via HTTP (plain). When enabled: connects via HTTPS with certificate verification."
                 >
                   <Toggle
                     checked={verifySsl}

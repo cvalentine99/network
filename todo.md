@@ -391,3 +391,9 @@ These items are tracked here for the live integration phase.
 - [x] All 12 BFF routes verified via curl (all 200)
 - [x] Source ZIP created and uploaded to CDN
 - [x] Checkpoint and deliver
+# HTTP PROTOCOL SUPPORT FIX (Slice 33)
+- [x] Fix extrahop-client.ts to use http:// when verifySsl is false (both ehRequest and ehBinaryRequest)
+- [x] Fix routers.ts testConnection to use http:// when verifySsl is false (was hardcoded to https://)
+- [x] Update Settings page SSL toggle hint to clarify HTTP vs HTTPS behavior
+- [x] Full test suite: 2,398 tests across 36 files — zero regressions
+- [x] Deliver updated ZIP

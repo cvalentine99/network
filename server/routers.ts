@@ -266,15 +266,12 @@ const applianceConfigRouter = router({
       };
     }
 
-    // In the current frontend phase, we simulate the test.
-    // Live integration will replace this with an actual HTTPS call to the ExtraHop REST API.
-    // For now, we record the test attempt in the database.
     const testedAt = new Date().toISOString();
 
     // Attempt a basic connectivity check using the configured hostname
     const start = Date.now();
     try {
-      const protocol = config.verifySsl ? 'https' : 'https';
+      const protocol = config.verifySsl ? 'https' : 'http';
       const url = `${protocol}://${config.hostname}/api/v1/extrahop`;
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000);
