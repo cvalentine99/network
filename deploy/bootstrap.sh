@@ -11,8 +11,8 @@
 #   3. Applies full schema (38 tables)
 #   4. Verifies all tables exist
 #   5. Installs Node.js 22 + pnpm if missing
-#   6. Installs dependencies + builds production bundle
-#   7. Starts the app server on port 3020
+#   6. Installs dependencies + builds production bundle (as invoking user)
+#   7. Starts the app server on port 3020 (as invoking user)
 #   8. Installs + configures nginx on port 3013 → 3020
 #   9. Verifies the entire stack end-to-end
 #
@@ -20,6 +20,11 @@
 #
 # Prereqs: Ubuntu 22.04+ with sudo access and internet
 # Auth:    None (no Manus OAuth)
+#
+# NOTE: The schema includes 4 legacy tables (alerts, devices, interfaces,
+#       performance_metrics) from the initial Drizzle migration. They are not
+#       referenced by current application code but are retained for migration
+#       compatibility. The active schema has 34 tables; total count is 38.
 ###############################################################################
 
 set -euo pipefail
@@ -42,6 +47,23 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
+# ─── Detect the real invoking user (for non-root build/run) ───
+if [ -n "${SUDO_USER:-}" ] && [ "$SUDO_USER" != "root" ]; then
+  RUN_USER="$SUDO_USER"
+else
+  RUN_USER="$(logname 2>/dev/null || echo 'root')"
+fi
+info "Invoking user detected as: $RUN_USER"
+
+# Helper: run a command as the invoking user (not root)
+run_as_user() {
+  if [ "$RUN_USER" = "root" ]; then
+    "$@"
+  else
+    su - "$RUN_USER" -s /bin/bash -c "cd $PROJECT_ROOT && $*"
+  fi
+}
+
 # ─── Resolve project root ───
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -54,13 +76,11 @@ fi
 DB_NAME="netperf_app"
 DB_USER="netperf"
 DB_PASS="netperf_test_2026"
-DB_ROOT_PASS="netperf_root_2026"
 APP_PORT=3020
 NGINX_PORT=3013
 SCHEMA_FILE="$SCRIPT_DIR/full-schema.sql"
-NGINX_CONF="$SCRIPT_DIR/nginx-local.conf"
 APP_LOG="/var/log/netperf-app.log"
-PID_FILE="/var/run/netperf-app.pid"
+PID_FILE="/tmp/netperf-app.pid"
 
 EXPECTED_TABLES=38
 PASS_COUNT=0
@@ -70,6 +90,24 @@ echo ""
 echo "========================================="
 echo "  NetPerf NOC — Full Stack Bootstrap"
 echo "========================================="
+echo ""
+
+###############################################################################
+# PHASE 0: Prerequisites check
+###############################################################################
+echo "[0/6] Prerequisites..."
+
+# curl is required for health checks
+if ! command -v curl &> /dev/null; then
+  info "Installing curl..."
+  export DEBIAN_FRONTEND=noninteractive
+  apt-get update -qq
+  apt-get install -y -qq curl > /dev/null 2>&1
+  pass "curl installed"
+else
+  pass "curl available"
+fi
+
 echo ""
 
 ###############################################################################
@@ -89,7 +127,7 @@ fi
 
 # Start MySQL if not running
 if ! pgrep -x mysqld > /dev/null 2>&1; then
-  service mysql start || systemctl start mysql
+  systemctl start mysql 2>/dev/null || service mysql start 2>/dev/null
   sleep 2
 fi
 
@@ -145,8 +183,8 @@ if [ "$CURRENT_TABLES" -lt "$EXPECTED_TABLES" ] 2>/dev/null; then
   fail "Expected ≥${EXPECTED_TABLES} tables, got ${CURRENT_TABLES}. Schema is incomplete."
 fi
 
-# Verify critical tables
-for TABLE in users appliance_config dim_appliance snap_topology devices schema_version; do
+# Verify critical tables (active schema + legacy tables the app may touch)
+for TABLE in users appliance_config dim_appliance dim_device dim_alert dim_detection dim_network snap_topology snap_topology_node snap_topology_edge schema_version; do
   EXISTS=$(mysql -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" -N -e \
     "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='${DB_NAME}' AND table_name='${TABLE}';" 2>/dev/null || echo "0")
   if [ "$EXISTS" -eq 1 ]; then
@@ -184,32 +222,44 @@ fi
 echo ""
 
 ###############################################################################
-# PHASE 4: Build
+# PHASE 4: Build (as invoking user, not root)
 ###############################################################################
 echo "[4/6] Build..."
 
 cd "$PROJECT_ROOT"
 
+# Ensure the invoking user owns the project directory
+if [ "$RUN_USER" != "root" ]; then
+  chown -R "$RUN_USER":"$(id -gn "$RUN_USER")" "$PROJECT_ROOT"
+fi
+
 if [ ! -d "node_modules" ]; then
-  info "Installing dependencies..."
-  pnpm install --frozen-lockfile 2>&1 | tail -3
+  info "Installing dependencies (as $RUN_USER)..."
+  run_as_user pnpm install --frozen-lockfile 2>&1 | tail -3
   pass "Dependencies installed"
 else
   pass "Dependencies already installed"
 fi
 
-info "Building production bundle..."
-pnpm build 2>&1 | tail -5
+info "Building production bundle (as $RUN_USER)..."
+run_as_user pnpm build 2>&1 | tail -5
 
 if [ ! -f "dist/index.js" ]; then
   fail "Build failed: dist/index.js not found"
 fi
-pass "Production build complete"
+
+# Verify dist/ is owned by the invoking user (not root)
+DIST_OWNER=$(stat -c '%U' dist/index.js)
+if [ "$DIST_OWNER" = "root" ] && [ "$RUN_USER" != "root" ]; then
+  warn "dist/ owned by root, fixing ownership to $RUN_USER..."
+  chown -R "$RUN_USER":"$(id -gn "$RUN_USER")" dist/
+fi
+pass "Production build complete (owned by $RUN_USER)"
 
 echo ""
 
 ###############################################################################
-# PHASE 5: App server
+# PHASE 5: App server (as invoking user, not root)
 ###############################################################################
 echo "[5/6] App server..."
 
@@ -228,23 +278,54 @@ fi
 fuser -k ${APP_PORT}/tcp 2>/dev/null || true
 sleep 1
 
-# Start the app
-DATABASE_URL="mysql://${DB_USER}:${DB_PASS}@localhost:3306/${DB_NAME}" \
-NODE_ENV=production \
-PORT=${APP_PORT} \
-JWT_SECRET="local-test-jwt-secret-not-for-production" \
-VITE_APP_ID="local-test" \
-OAUTH_SERVER_URL="" \
-OWNER_OPEN_ID="local-test-owner" \
-BUILT_IN_FORGE_API_URL="" \
-BUILT_IN_FORGE_API_KEY="" \
-nohup node dist/index.js > "$APP_LOG" 2>&1 &
+# Ensure log file is writable by the invoking user
+touch "$APP_LOG"
+if [ "$RUN_USER" != "root" ]; then
+  chown "$RUN_USER":"$(id -gn "$RUN_USER")" "$APP_LOG"
+fi
 
-APP_PID=$!
-echo "$APP_PID" > "$PID_FILE"
+# Ensure PID file is writable by the invoking user
+touch "$PID_FILE"
+if [ "$RUN_USER" != "root" ]; then
+  chown "$RUN_USER":"$(id -gn "$RUN_USER")" "$PID_FILE"
+fi
+
+# Start the app as the invoking user (not root)
+if [ "$RUN_USER" != "root" ]; then
+  su - "$RUN_USER" -s /bin/bash -c "
+    cd $PROJECT_ROOT && \
+    DATABASE_URL='mysql://${DB_USER}:${DB_PASS}@localhost:3306/${DB_NAME}' \
+    NODE_ENV=production \
+    PORT=${APP_PORT} \
+    JWT_SECRET='local-test-jwt-secret-not-for-production' \
+    VITE_APP_ID='local-test' \
+    OAUTH_SERVER_URL='' \
+    OWNER_OPEN_ID='local-test-owner' \
+    OWNER_NAME='Local Tester' \
+    BUILT_IN_FORGE_API_URL='' \
+    BUILT_IN_FORGE_API_KEY='' \
+    nohup node dist/index.js > $APP_LOG 2>&1 &
+    echo \$! > $PID_FILE
+  "
+else
+  DATABASE_URL="mysql://${DB_USER}:${DB_PASS}@localhost:3306/${DB_NAME}" \
+  NODE_ENV=production \
+  PORT=${APP_PORT} \
+  JWT_SECRET="local-test-jwt-secret-not-for-production" \
+  VITE_APP_ID="local-test" \
+  OAUTH_SERVER_URL="" \
+  OWNER_OPEN_ID="local-test-owner" \
+  OWNER_NAME="Local Tester" \
+  BUILT_IN_FORGE_API_URL="" \
+  BUILT_IN_FORGE_API_KEY="" \
+  nohup node dist/index.js > "$APP_LOG" 2>&1 &
+  echo $! > "$PID_FILE"
+fi
+
+APP_PID=$(cat "$PID_FILE")
 
 # Wait for health
-info "Waiting for app to start (PID $APP_PID)..."
+info "Waiting for app to start (PID $APP_PID, user $RUN_USER)..."
 TRIES=0
 MAX_TRIES=30
 while [ $TRIES -lt $MAX_TRIES ]; do
@@ -260,7 +341,16 @@ if ! curl -sf http://localhost:${APP_PORT}/api/bff/health > /dev/null 2>&1; then
   tail -20 "$APP_LOG"
   fail "App server did not become healthy within ${MAX_TRIES}s"
 fi
-pass "App server running on port ${APP_PORT} (PID $APP_PID)"
+pass "App server running on port ${APP_PORT} (PID $APP_PID, user $RUN_USER)"
+
+# Verify the app can actually talk to MySQL
+DB_CHECK=$(curl -sf http://localhost:${APP_PORT}/api/trpc/dashboard.stats 2>/dev/null || echo "FAIL")
+if echo "$DB_CHECK" | grep -q '"result"'; then
+  pass "App ↔ MySQL connection verified (tRPC dashboard.stats responds)"
+else
+  warn "App started but tRPC dashboard.stats did not return expected result. DB connection may be degraded."
+  warn "Response: $(echo "$DB_CHECK" | head -c 200)"
+fi
 
 echo ""
 
@@ -279,7 +369,10 @@ else
 fi
 
 # Write nginx config inline (self-contained — no external file dependency)
-cat > /etc/nginx/sites-available/netperf <<NGINX_EOF
+# Handles both Ubuntu (sites-available) and other distros (conf.d)
+if [ -d /etc/nginx/sites-available ]; then
+  NGINX_SITE_FILE="/etc/nginx/sites-available/netperf"
+  cat > "$NGINX_SITE_FILE" <<NGINX_EOF
 server {
     listen ${NGINX_PORT};
     server_name _;
@@ -299,13 +392,38 @@ server {
     }
 }
 NGINX_EOF
+  ln -sf "$NGINX_SITE_FILE" /etc/nginx/sites-enabled/netperf
+  rm -f /etc/nginx/sites-enabled/default
+elif [ -d /etc/nginx/conf.d ]; then
+  cat > /etc/nginx/conf.d/netperf.conf <<NGINX_EOF
+server {
+    listen ${NGINX_PORT};
+    server_name _;
 
-# Enable site, disable default
-ln -sf /etc/nginx/sites-available/netperf /etc/nginx/sites-enabled/netperf
-rm -f /etc/nginx/sites-enabled/default
+    location / {
+        proxy_pass http://127.0.0.1:${APP_PORT};
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_cache_bypass \$http_upgrade;
+        proxy_buffering off;
+        proxy_read_timeout 300s;
+    }
+}
+NGINX_EOF
+  # Remove default config if it conflicts
+  rm -f /etc/nginx/conf.d/default.conf
+else
+  fail "Cannot find nginx config directory (/etc/nginx/sites-available or /etc/nginx/conf.d)"
+fi
 
 # Test config
 if ! nginx -t 2>/dev/null; then
+  nginx -t 2>&1
   fail "nginx config test failed"
 fi
 
@@ -359,6 +477,9 @@ fi
 # App direct
 verify "App /health (direct)" "http://localhost:${APP_PORT}/api/bff/health"
 
+# App ↔ MySQL (tRPC route that touches the database)
+verify "App ↔ MySQL (tRPC)" "http://localhost:${APP_PORT}/api/trpc/dashboard.stats"
+
 # Frontend via nginx
 verify "Frontend via nginx" "http://localhost:${NGINX_PORT}/"
 
@@ -373,6 +494,9 @@ verify "BFF /impact/appliance-status" "http://localhost:${NGINX_PORT}/api/bff/im
 verify "BFF /topology/fixtures" "http://localhost:${NGINX_PORT}/api/bff/topology/fixtures"
 verify "BFF /blast-radius/fixtures" "http://localhost:${NGINX_PORT}/api/bff/blast-radius/fixtures"
 verify "BFF /correlation/fixtures" "http://localhost:${NGINX_PORT}/api/bff/correlation/fixtures"
+
+# tRPC via nginx
+verify "tRPC via nginx" "http://localhost:${NGINX_PORT}/api/trpc/dashboard.stats"
 
 # No auth blocking
 AUTH_CODE=$(curl -sf -o /dev/null -w "%{http_code}" "http://localhost:${NGINX_PORT}/api/bff/impact/headline" 2>/dev/null || echo "000")
@@ -411,7 +535,13 @@ echo ""
 echo "  Management:"
 echo "    Stop app:     kill \$(cat $PID_FILE)"
 echo "    App log:      tail -f $APP_LOG"
-echo "    Restart app:  sudo ./bootstrap.sh"
+echo "    Restart:      sudo $SCRIPT_DIR/bootstrap.sh"
 echo "    Stop nginx:   sudo systemctl stop nginx"
-echo "    Reset DB:     mysql -u $DB_USER -p$DB_PASS -e 'DROP DATABASE $DB_NAME;' && sudo ./bootstrap.sh"
+echo "    Reset DB:     mysql -u $DB_USER -p'$DB_PASS' -e 'DROP DATABASE $DB_NAME;' && sudo $SCRIPT_DIR/bootstrap.sh"
+echo ""
+echo "  Notes:"
+echo "    - App runs as user '$RUN_USER' (not root)"
+echo "    - 4 legacy tables (alerts, devices, interfaces, performance_metrics) exist but are unused"
+echo "    - All BFF routes serve fixture data until an ExtraHop appliance is configured"
+echo "    - No Manus OAuth — all surfaces are accessible without login"
 echo ""

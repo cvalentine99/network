@@ -96,3 +96,29 @@
 - [x] Verification script (built into bootstrap.sh — 14 checks, fails hard on partial setup)
 - [x] Test bare-metal bootstrap in sandbox (Docker Compose blocked by sandbox iptables kernel limitation)
 - [x] Package and deliver
+
+# Deployment Audit
+
+- [x] Audit bootstrap.sh — every command, path, assumption, failure mode
+- [x] Audit Docker Compose stack — Dockerfile, compose, init scripts, nginx config
+- [x] Audit runtime dependencies — what the app actually needs at startup vs what's provided
+- [x] Clean-room test — tear down everything and re-run bootstrap from scratch
+- [x] Fix all issues found and re-test
+
+# Deployment Audit Fixes (Slice 27)
+
+- [x] Fix #1 (CRITICAL): Dockerfile healthcheck uses curl but node:22-slim doesn't include it — added `apt-get install curl` to production stage
+- [x] Fix #2 (CRITICAL): Dockerfile runs app as root — added non-root user `netperf` (UID 1001), `USER netperf` directive
+- [x] Fix #3 (CRITICAL): bootstrap.sh runs pnpm build as root — now detects SUDO_USER and runs build/app as invoking user
+- [x] Fix #4 (CRITICAL): bootstrap.sh runs Node app as root — now uses `su - $RUN_USER` for app startup
+- [x] Fix #5 (MODERATE): Dead variables DB_ROOT_PASS and NGINX_CONF in bootstrap.sh — removed
+- [x] Fix #6 (MODERATE): PID file in /var/run not writable by non-root user — moved to /tmp/netperf-app.pid with pre-touch + chown
+- [x] Fix #7 (MODERATE): 4 stale tables in full-schema.sql — added clear LEGACY TABLES documentation block
+- [x] Fix #8 (MODERATE): DEPLOY.md doesn't mention Docker Compose — added full Option B section with honest untested disclaimer
+- [x] Fix #9 (MODERATE): Duplicate .dockerignore files — removed deploy/docker/.dockerignore (Docker build context is project root)
+- [x] Fix #10 (MODERATE): fact_device_activity undocumented — documented in DEPLOY.md Schema Notes section
+- [x] Fix #11: bootstrap.sh critical table list expanded from 6 to 11 tables
+- [x] Fix #12: bootstrap.sh now has Phase 0 prerequisites check (curl)
+- [x] Fix #13: bootstrap.sh verification expanded from 14 to 16 checks
+- [x] Clean-room re-test: DB dropped, user dropped, bootstrap.sh re-run from scratch — ALL 16 CHECKS PASSED
+- [x] Full test suite: 2,108 tests passing across 31 files — no regressions

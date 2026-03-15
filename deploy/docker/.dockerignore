@@ -1,7 +1,0 @@
-node_modules
-.git
-.manus-logs
-.manus
-screenshots
-*.zip
-deploy/docker

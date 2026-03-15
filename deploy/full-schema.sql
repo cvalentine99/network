@@ -533,7 +533,13 @@ CREATE TABLE IF NOT EXISTS `schema_drift_log` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Legacy tables from early migrations (kept for compatibility)
+-- ─────────────────────────────────────────────────────────────────────────────
+-- LEGACY TABLES — from the initial Drizzle migration (0000_initial).
+-- These 4 tables (alerts, devices, interfaces, performance_metrics) are NOT
+-- referenced by current application code. They are retained so that existing
+-- databases created by the early migration do not fail a table-count check.
+-- They may be safely dropped once all environments have been re-provisioned.
+-- ─────────────────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS `alerts` (
   `id` int NOT NULL AUTO_INCREMENT,
   `deviceId` int,

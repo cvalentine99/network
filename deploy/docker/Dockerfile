@@ -23,6 +23,10 @@ FROM node:22-slim AS production
 
 WORKDIR /app
 
+# Install curl for healthcheck (node:22-slim does not include it)
+RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install pnpm for production install
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
@@ -35,7 +39,7 @@ RUN pnpm install --frozen-lockfile --prod
 # Copy built output from builder
 COPY --from=builder /app/dist ./dist
 
-# Copy fixtures (BFF routes load these at runtime via readFileSync)
+# Copy fixtures (BFF routes load these at runtime via readFileSync + process.cwd())
 COPY --from=builder /app/fixtures ./fixtures
 
 # Copy shared types (some routes import from shared/)
@@ -43,6 +47,11 @@ COPY --from=builder /app/shared ./shared
 
 # Copy drizzle schema (needed for db connection)
 COPY --from=builder /app/drizzle ./drizzle
+
+# Create non-root user for running the app
+RUN groupadd --gid 1001 netperf && \
+    useradd --uid 1001 --gid netperf --shell /bin/sh --create-home netperf && \
+    chown -R netperf:netperf /app
 
 # No OAuth — all surfaces accessible without authentication
 ENV NODE_ENV=production
@@ -55,6 +64,9 @@ ENV BUILT_IN_FORGE_API_URL=""
 ENV BUILT_IN_FORGE_API_KEY=""
 
 EXPOSE 3020
+
+# Run as non-root
+USER netperf
 
 # Health check: BFF health route
 HEALTHCHECK --interval=10s --timeout=5s --start-period=15s --retries=3 \
