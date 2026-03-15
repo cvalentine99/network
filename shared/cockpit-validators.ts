@@ -54,7 +54,7 @@ export const BffHealthResponseSchema = z.object({
     memoryMB: z.number().nonnegative(),
     cache: z.object({
       size: z.number().int().nonnegative(),
-      maxSize: z.number().int().positive(),
+      maxSize: z.number().int().nonnegative(),
     }),
   }),
   appliance: ApplianceIdentitySchema.nullable(),

@@ -188,3 +188,53 @@ NOTE: All contamination findings are accurate. This is a frontend/BFF contract p
 All BFF routes are fixture-driven by design. Live ExtraHop integration is deferred by contract.
 The contamination report correctly identifies what needs to change for live integration.
 These items are tracked here for the live integration phase.
+
+# RUNTIME DECONTAMINATION (Slice 28)
+
+## Priority 1: Live-mode gates
+- [x] topology.ts — add isFixtureMode() gate; live mode returns explicit 503 LIVE_NOT_IMPLEMENTED
+- [x] correlation.ts — add isFixtureMode() gate; live mode returns explicit 503 LIVE_NOT_IMPLEMENTED
+
+## Priority 2: Replace fake live-mode payloads
+- [x] impact.ts headline — replace silent zeros with 503 LIVE_NOT_IMPLEMENTED
+- [x] impact.ts timeseries — replace silent empty array with 503 LIVE_NOT_IMPLEMENTED
+- [x] impact.ts top-talkers — replace silent empty array with 503 LIVE_NOT_IMPLEMENTED
+- [x] impact.ts detections — replace silent empty array with 503 LIVE_NOT_IMPLEMENTED
+- [x] impact.ts alerts — replace silent empty array with 503 LIVE_NOT_IMPLEMENTED
+- [x] impact.ts device-detail — replace silent 404 with 503 LIVE_NOT_IMPLEMENTED
+- [x] impact.ts detection-detail — replace silent 404 with 503 LIVE_NOT_IMPLEMENTED
+- [x] impact.ts alert-detail — replace silent 404 with 503 LIVE_NOT_IMPLEMENTED
+
+## Priority 3: Decontaminate appliance-status
+- [x] Remove fixture metadata overlay (version, edition, platform, captureStatus, license)
+- [x] Live mode returns only DB-known fields; unknown fields = null
+
+## Priority 4: Decontaminate other routes
+- [x] blast-radius.ts — live mode returns 501 LIVE_NOT_IMPLEMENTED; sentinel gated behind isDev
+- [x] trace.ts — live mode returns error SSE event; sentinel gated behind isDev
+- [x] packets.ts — was already honest (503 NO_PACKET_STORE); no changes needed
+
+## Priority 5: Remove test harness from production
+- [x] Remove sentinel routing from topology.ts (SENTINEL_MAP) — gated behind isDev
+- [x] Remove sentinel routing from correlation.ts (sentinel fromMs values) — gated behind isDev
+- [x] Remove sentinel routing from blast-radius.ts (sentinel device names) — gated behind isDev
+- [x] Remove sentinel routing from trace.ts (sentinel hostnames) — gated behind isDev
+- [x] Remove sentinel routing from impact.ts (sentinel IDs 1042, 4001, 101) — gated behind isDev
+- [x] Remove/gate fixture listing endpoints (topology, correlation) behind NODE_ENV
+
+## Priority 6: UI honesty
+- [x] Add visible Fixture Mode / Live Mode indicator to every surface (DataSourceBadge in sidebar footer + mobile header)
+- [x] Make Help page integration labeling dynamic (query BFF health via useDataSourceMode hook)
+
+## Priority 7: Health route
+- [x] health.ts — live mode returns 'ok' (BFF running + creds configured), not hardcoded 'degraded'
+- [x] health.ts — cache reports 0/0 (no cache implemented), not fake 0/500
+
+## Priority 8: Tests
+- [x] Write decontamination.test.ts — 38 tests covering all 7 routes
+- [x] Fix cache.maxSize validator: changed from positive() to nonnegative() to allow honest 0
+- [x] Fix device-detail: unknown IDs now return quiet fixture, not populated
+- [x] Fix detection-detail: unknown IDs now return quiet fixture, not populated
+- [x] Fix alert-detail: unknown IDs now return quiet fixture, not populated
+- [x] Remove EH_HOST/EH_API_KEY from client-side code (useDataSourceMode.ts comment, Help.tsx)
+- [x] Full test suite: 2,146 tests passing across 32 files — zero regressions

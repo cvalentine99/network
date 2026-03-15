@@ -2,8 +2,18 @@
  * BFF Health Route — GET /api/bff/health
  *
  * Returns normalized appliance identity and BFF status.
- * In fixture mode (no live appliance configured), returns fixture data.
  * Shape conforms to BffHealthResponse from shared/cockpit-types.ts.
+ *
+ * DECONTAMINATION (Slice 28):
+ *   - Fixture mode: status = 'not_configured', appliance = null
+ *   - Live mode: status = 'ok' (we can reach the BFF; actual ExtraHop
+ *     reachability is NOT tested here because no live API calls are wired yet).
+ *     When live ExtraHop integration is wired, this route should attempt a
+ *     lightweight ping to the appliance and return 'degraded' if it fails.
+ *   - Removed hardcoded 'degraded' — that was dishonest because we never
+ *     actually tested appliance reachability.
+ *   - cache.size and cache.maxSize report 0 because no BFF cache is
+ *     implemented yet. Previously hardcoded maxSize: 500 was fake.
  *
  * Contract: browser calls /api/bff/health, never ExtraHop directly.
  */
@@ -25,14 +35,21 @@ function isFixtureMode(): boolean {
 
 healthRouter.get('/', (_req, res) => {
   try {
-    const status = isFixtureMode() ? 'not_configured' : 'degraded';
+    // In fixture mode: not_configured.
+    // In live mode: 'ok' because the BFF itself is running.
+    // NOTE: When ExtraHop API integration is wired, this should attempt
+    // a lightweight appliance ping and return 'degraded' if unreachable.
+    // Until then, 'ok' means "BFF is running and credentials are configured"
+    // — it does NOT mean "ExtraHop appliance is reachable and responding."
+    const status = isFixtureMode() ? 'not_configured' : 'ok';
 
     const response: BffHealthResponse = {
       status,
       bff: {
         uptime: process.uptime(),
         memoryMB: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
-        cache: { size: 0, maxSize: 500 },
+        // No BFF cache is implemented. Report zeros honestly.
+        cache: { size: 0, maxSize: 0 },
       },
       appliance: null,
       timestamp: new Date().toISOString(),

@@ -6,6 +6,7 @@
  */
 
 import { useState, useMemo } from 'react';
+import { useDataSourceMode } from '../hooks/useDataSourceMode';
 import {
   HelpCircle, BookOpen, Keyboard, Layout, Info,
   Search, ChevronDown, ChevronUp, ExternalLink,
@@ -223,6 +224,24 @@ function SurfacesSection() {
 // ─── Integration Mode Section ────────────────────────────────────────────
 
 function IntegrationModeSection() {
+  const { mode, label } = useDataSourceMode();
+
+  const isFixture = mode === 'fixture' || mode === 'loading';
+  const isLive = mode === 'live';
+
+  const currentModeColor = isLive ? GREEN : isFixture ? 'oklch(0.75 0.15 70)' : 'oklch(0.65 0.2 25)';
+  const currentModeLabel = mode === 'loading' ? 'Checking...' : label;
+
+  const fixtureDescription = 'All dashboard surfaces are currently operating against deterministic fixture data. Every BFF route returns pre-defined payloads that have been schema-validated and tested. This mode enables full UI development, testing, and contract verification without requiring access to a live ExtraHop appliance, packet store, or lab network.';
+  const liveDescription = 'ExtraHop appliance credentials are configured. BFF routes will attempt to proxy requests to the appliance REST API. Note: most routes currently return LIVE_NOT_IMPLEMENTED (503) because the ExtraHop API integration is not yet wired. The browser never contacts ExtraHop directly — all requests flow through the BFF layer.';
+  const errorDescription = 'Unable to determine data source mode. The BFF health endpoint did not respond successfully.';
+
+  const currentDescription = isLive ? liveDescription : isFixture ? fixtureDescription : errorDescription;
+  const otherModeLabel = isLive ? 'Fixture Mode' : 'Live Integration';
+  const otherModeDescription = isLive
+    ? 'Remove the appliance host and API key environment variables from server configuration to switch back to fixture mode for development and testing.'
+    : 'When a live ExtraHop appliance is configured via server-side environment variables, BFF routes will attempt to proxy requests to the appliance REST API. The browser will still never contact ExtraHop directly.';
+
   return (
     <div className="space-y-3" data-testid="integration-mode">
       <div
@@ -232,17 +251,14 @@ function IntegrationModeSection() {
         <div className="flex items-center gap-2 mb-3">
           <span
             className="text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded"
-            style={{ background: `color-mix(in oklch, ${GREEN} 15%, transparent)`, color: GREEN, border: `1px solid color-mix(in oklch, ${GREEN} 30%, transparent)` }}
+            style={{ background: `color-mix(in oklch, ${currentModeColor} 15%, transparent)`, color: currentModeColor, border: `1px solid color-mix(in oklch, ${currentModeColor} 30%, transparent)` }}
           >
             Current Mode
           </span>
-          <span className="text-sm font-semibold" style={{ color: GREEN }}>Fixture Mode</span>
+          <span className="text-sm font-semibold" style={{ color: currentModeColor }}>{currentModeLabel}</span>
         </div>
         <p className="text-sm leading-relaxed" style={{ color: MUTED }}>
-          All dashboard surfaces are currently operating against deterministic fixture data.
-          Every BFF route returns pre-defined payloads that have been schema-validated and tested.
-          This mode enables full UI development, testing, and contract verification without requiring
-          access to a live ExtraHop appliance, packet store, or lab network.
+          {currentDescription}
         </p>
       </div>
 
@@ -255,15 +271,12 @@ function IntegrationModeSection() {
             className="text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded"
             style={{ background: `color-mix(in oklch, ${MUTED} 15%, transparent)`, color: MUTED, border: `1px solid color-mix(in oklch, ${MUTED} 30%, transparent)` }}
           >
-            Future Mode
+            Other Mode
           </span>
-          <span className="text-sm font-semibold" style={{ color: MUTED }}>Live Integration</span>
+          <span className="text-sm font-semibold" style={{ color: MUTED }}>{otherModeLabel}</span>
         </div>
         <p className="text-sm leading-relaxed" style={{ color: MUTED }}>
-          When a live ExtraHop appliance is configured via Settings, BFF routes will proxy requests
-          to the appliance REST API. The browser will still never contact ExtraHop directly — all
-          requests flow through the BFF layer. Shared types, validators, and normalization logic
-          will remain identical; only the data source changes.
+          {otherModeDescription}
         </p>
       </div>
 

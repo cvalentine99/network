@@ -5,10 +5,11 @@
  * Returns the blast radius for a given device — all peer devices,
  * protocols, detections, and impact scores.
  *
- * In fixture mode (no live ExtraHop), returns deterministic fixture data.
- * In live mode (future), will query ExtraHop APIs for real peer data.
- *
- * Contract: browser calls /api/bff/blast-radius/query, never ExtraHop directly.
+ * DECONTAMINATION (Slice 28):
+ *   - Live mode already returns 501 NOT_IMPLEMENTED (was honest)
+ *   - Sentinel routing gated behind NODE_ENV !== 'production'
+ *   - Fixture listing endpoint gated behind NODE_ENV !== 'production'
+ *   - No fixture file is ever loaded when EH_HOST + EH_API_KEY are configured
  */
 
 import { Router } from 'express';
@@ -18,11 +19,15 @@ import { BlastRadiusIntentSchema, BlastRadiusPayloadSchema } from '../../shared/
 
 const blastRadiusRouter = Router();
 
+const isDev = process.env.NODE_ENV !== 'production';
+
 /**
  * Determine if we are in fixture mode (no live ExtraHop configured).
  */
 function isFixtureMode(): boolean {
-  return !process.env.EH_HOST || !process.env.EH_API_KEY;
+  const host = process.env.EH_HOST;
+  const key = process.env.EH_API_KEY;
+  return !host || !key || host === '' || key === '' || key === 'REPLACE_ME';
 }
 
 /**
@@ -42,22 +47,25 @@ function loadFixture(name: string): any | null {
 
 /**
  * Select the appropriate fixture based on entry mode and value.
- * Sentinel values route to specific fixtures for testing.
+ * Sentinel values are ONLY used in dev/test, never in production.
  */
 function selectFixture(mode: string, value: string): { fixture: string; isError: boolean } {
-  // Error sentinel: unknown device
-  if (value === 'unknown.invalid' || value === '0' || value === '0.0.0.0') {
-    return { fixture: 'blast-radius.error.fixture.json', isError: true };
-  }
+  // Sentinel routing: only in dev/test
+  if (isDev) {
+    // Error sentinel: unknown device
+    if (value === 'unknown.invalid' || value === '0' || value === '0.0.0.0') {
+      return { fixture: 'blast-radius.error.fixture.json', isError: true };
+    }
 
-  // Quiet sentinel: idle device
-  if (value === 'quiet.lab.local' || value === '9999' || value === '10.1.20.254') {
-    return { fixture: 'blast-radius.quiet.fixture.json', isError: false };
-  }
+    // Quiet sentinel: idle device
+    if (value === 'quiet.lab.local' || value === '9999' || value === '10.1.20.254') {
+      return { fixture: 'blast-radius.quiet.fixture.json', isError: false };
+    }
 
-  // Transport error sentinel
-  if (value === 'transport.fail' || value === '99999') {
-    return { fixture: 'blast-radius.transport-error.fixture.json', isError: true };
+    // Transport error sentinel
+    if (value === 'transport.fail' || value === '99999') {
+      return { fixture: 'blast-radius.transport-error.fixture.json', isError: true };
+    }
   }
 
   // Entry-mode-specific fixtures
@@ -74,9 +82,6 @@ function selectFixture(mode: string, value: string): { fixture: string; isError:
 
 /**
  * POST /api/bff/blast-radius/query
- *
- * Accepts a BlastRadiusIntent and returns the blast radius payload.
- * In fixture mode, returns deterministic fixture data.
  */
 blastRadiusRouter.post('/query', (req, res) => {
   // Validate the request body
@@ -92,55 +97,63 @@ blastRadiusRouter.post('/query', (req, res) => {
 
   const intent = parseResult.data;
 
-  if (isFixtureMode()) {
-    const { fixture: fixtureName, isError } = selectFixture(intent.mode, intent.value);
-    const fixtureData = loadFixture(fixtureName);
-
-    if (!fixtureData) {
-      res.status(500).json({
-        error: 'FIXTURE_NOT_FOUND',
-        message: `Fixture not found: ${fixtureName}`,
-      });
-      return;
-    }
-
-    // Error fixtures return the error shape
-    if (isError && fixtureData.error) {
-      res.status(fixtureData.error.status || 500).json({
-        error: fixtureData.error.code,
-        message: fixtureData.error.message,
-      });
-      return;
-    }
-
-    // Validate the payload before returning
-    const payloadResult = BlastRadiusPayloadSchema.safeParse(fixtureData.payload);
-    if (!payloadResult.success) {
-      res.status(500).json({
-        error: 'FIXTURE_VALIDATION_FAILED',
-        message: 'Fixture payload failed schema validation',
-        details: payloadResult.error.issues,
-      });
-      return;
-    }
-
-    res.json(payloadResult.data);
-  } else {
-    // Live mode — future integration point
+  // ── LIVE MODE GATE ──
+  if (!isFixtureMode()) {
     res.status(501).json({
-      error: 'NOT_IMPLEMENTED',
-      message: 'Live blast radius integration not yet implemented',
+      error: 'LIVE_NOT_IMPLEMENTED',
+      message: 'Live blast radius integration not yet implemented. ExtraHop API calls are not wired.',
+      code: 'LIVE_NOT_IMPLEMENTED',
     });
+    return;
   }
+
+  // ── FIXTURE MODE ──
+  const { fixture: fixtureName, isError } = selectFixture(intent.mode, intent.value);
+  const fixtureData = loadFixture(fixtureName);
+
+  if (!fixtureData) {
+    res.status(500).json({
+      error: 'FIXTURE_NOT_FOUND',
+      message: `Fixture not found: ${fixtureName}`,
+    });
+    return;
+  }
+
+  // Error fixtures return the error shape
+  if (isError && fixtureData.error) {
+    res.status(fixtureData.error.status || 500).json({
+      error: fixtureData.error.code,
+      message: fixtureData.error.message,
+    });
+    return;
+  }
+
+  // Validate the payload before returning
+  const payloadResult = BlastRadiusPayloadSchema.safeParse(fixtureData.payload);
+  if (!payloadResult.success) {
+    res.status(500).json({
+      error: 'FIXTURE_VALIDATION_FAILED',
+      message: 'Fixture payload failed schema validation',
+      details: payloadResult.error.issues,
+    });
+    return;
+  }
+
+  res.json(payloadResult.data);
 });
 
 /**
  * GET /api/bff/blast-radius/fixtures
  *
  * Returns the list of available fixture files for testing/development.
- * Only available in fixture mode.
+ * NOT available in production.
  */
 blastRadiusRouter.get('/fixtures', (_req, res) => {
+  if (!isDev) {
+    res.status(404).json({ error: 'Not available in production' });
+    return;
+  }
+
   if (!isFixtureMode()) {
     res.json({ fixtures: [], mode: 'live' });
     return;

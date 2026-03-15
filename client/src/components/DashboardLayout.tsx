@@ -27,6 +27,7 @@ import { CSSProperties, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
 import { GOLD, MUTED, BRIGHT, CYAN } from "./DashboardWidgets";
+import { DataSourceBadge } from "./DataSourceBadge";
 
 type MenuItem = {
   icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
@@ -236,7 +237,9 @@ function DashboardLayoutContent({
             ))}
           </SidebarContent>
 
-          <SidebarFooter className="p-3" />
+          <SidebarFooter className="p-3">
+            {!isCollapsed && <DataSourceBadge />}
+          </SidebarFooter>
         </Sidebar>
         <div
           className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/20 transition-colors ${isCollapsed ? "hidden" : ""}`}
@@ -265,6 +268,7 @@ function DashboardLayoutContent({
                 </span>
               </div>
             </div>
+            <DataSourceBadge />
           </div>
         )}
         <main className="flex-1 p-4 lg:p-6">{children}</main>
