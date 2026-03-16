@@ -901,6 +901,7 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
   const handleDragStart = useCallback(
     (event: { active: number }, d: SimNode) => {
       if (isLockedRef.current) return;
+      if (d.x == null || d.y == null) return; // guard: node not yet positioned by simulation
       if (!event.active) simulationRef.current?.alphaTarget(0.3).restart();
       d.fx = d.x;
       d.fy = d.y;
@@ -911,6 +912,7 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
   const handleDrag = useCallback(
     (event: { x: number; y: number }, d: SimNode) => {
       if (isLockedRef.current) return;
+      if (event.x == null || event.y == null) return; // guard: invalid drag coordinates
       d.fx = event.x;
       d.fy = event.y;
     },
@@ -921,6 +923,7 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
     (event: { active: number }, d: SimNode) => {
       if (isLockedRef.current) return;
       if (!event.active) simulationRef.current?.alphaTarget(0);
+      if (d.x == null || d.y == null) return; // guard: node not positioned
       d.fx = d.x;
       d.fy = d.y;
       if (d.x != null && d.y != null && Number.isFinite(d.x) && Number.isFinite(d.y)) {
