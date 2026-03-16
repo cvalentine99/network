@@ -609,3 +609,15 @@ These items are tracked here for the live integration phase.
 - [x] Edge bundling: auto-enable at threshold, manual toggle in toolbar
 - [x] Write tests for both features (37 tests passing)
 - [x] Generate truth receipt
+
+# SLICE 45 — Node Drag-to-Rearrange with Position Persistence
+
+- [x] Drag nodes to manually reposition them in the force graph
+- [x] Dragged nodes become pinned (fx/fy set) at their new position
+- [x] Pinned positions persist across page reloads (localStorage)
+- [x] Persistence keyed by topology view name to support multiple saved layouts
+- [x] "Reset layout" toolbar button clears all pinned positions including persisted ones
+- [x] Visual indicator on pinned/dragged nodes (dashed violet ring, #8b5cf6)
+- [x] Smooth drag interaction: node follows cursor, simulation reheats during drag
+- [x] Write tests for drag logic and position persistence (37 tests passing)
+- [x] Generate truth receipt

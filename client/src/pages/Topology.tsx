@@ -1459,6 +1459,7 @@ export default function Topology() {
               showAnomalyOverlay={showAnomalyOverlay}
               pulseEnabled={pulseEnabled}
               edgeBundlingEnabled={edgeBundlingEnabled}
+              viewKey="constellation"
               onTraceInFlowTheater={handleTraceInFlowTheater}
               onShowBlastRadius={handleShowBlastRadius}
             />

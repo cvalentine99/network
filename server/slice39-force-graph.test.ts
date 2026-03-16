@@ -746,8 +746,8 @@ describe('Slice 41 — ForceGraph Source Code Contract', () => {
     'utf-8'
   );
 
-  it('ForceGraph defines LAYOUT_STORAGE_KEY constant', () => {
-    expect(forceGraphSource).toContain("LAYOUT_STORAGE_KEY = 'topology-node-positions'");
+  it('ForceGraph defines LAYOUT_STORAGE_PREFIX constant (Slice 45 view-keyed)', () => {
+    expect(forceGraphSource).toContain("LAYOUT_STORAGE_PREFIX = 'topology-node-positions'");
   });
 
   it('ForceGraph exports resetLayout in ForceGraphHandle', () => {
@@ -758,16 +758,16 @@ describe('Slice 41 — ForceGraph Source Code Contract', () => {
     expect(forceGraphSource).toContain('hasCustomLayout: boolean');
   });
 
-  it('ForceGraph calls localStorage.setItem on drag end', () => {
-    expect(forceGraphSource).toContain('localStorage.setItem(LAYOUT_STORAGE_KEY');
+  it('ForceGraph calls localStorage.setItem via getStorageKey (Slice 45 view-keyed)', () => {
+    expect(forceGraphSource).toContain('localStorage.setItem(getStorageKey(viewKey)');
   });
 
-  it('ForceGraph calls localStorage.getItem on load', () => {
-    expect(forceGraphSource).toContain('localStorage.getItem(LAYOUT_STORAGE_KEY)');
+  it('ForceGraph calls localStorage.getItem via getStorageKey (Slice 45 view-keyed)', () => {
+    expect(forceGraphSource).toContain('localStorage.getItem(getStorageKey(viewKey)');
   });
 
-  it('ForceGraph calls localStorage.removeItem on reset', () => {
-    expect(forceGraphSource).toContain('localStorage.removeItem(LAYOUT_STORAGE_KEY)');
+  it('ForceGraph calls localStorage.removeItem via getStorageKey (Slice 45 view-keyed)', () => {
+    expect(forceGraphSource).toContain('localStorage.removeItem(getStorageKey(viewKey)');
   });
 
   it('ForceGraph pins restored nodes with fx/fy', () => {

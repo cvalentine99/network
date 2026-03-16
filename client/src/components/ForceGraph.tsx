@@ -20,6 +20,9 @@
  * - Real-time pulse animation: edge dash animation proportional to traffic (Slice 43)
  * - Right-click context menu: Trace in Flow Theater, Show Blast Radius, Copy IP, Pin/Unpin (Slice 44)
  * - Edge bundling: bundle parallel inter-cluster edges into single thick curved lines (Slice 44)
+ * - Node drag-to-rearrange: drag nodes to reposition, auto-pin at new location (Slice 45)
+ * - Position persistence: saved per-view to localStorage, survives page reload (Slice 45)
+ * - Visual pin indicator: dashed ring around pinned/dragged nodes (Slice 45)
  *
  * Live integration: deferred by contract.
  */
@@ -121,17 +124,23 @@ const CLUSTER_COLORS = [
   '#6366f1', '#ec4899', '#84cc16', '#14b8a6', '#ef4444',
 ];
 
-// ─── Layout persistence (Slice 41) ─────────────────────────────
-const LAYOUT_STORAGE_KEY = 'topology-node-positions';
+// ─── Layout persistence (Slice 41, enhanced Slice 45) ──────────
+// View-keyed persistence: each view name gets its own saved positions
+const LAYOUT_STORAGE_PREFIX = 'topology-node-positions';
+const LAYOUT_STORAGE_KEY = LAYOUT_STORAGE_PREFIX; // default fallback
 
 interface SavedPosition {
   x: number;
   y: number;
 }
 
-function loadSavedPositions(): Map<number, SavedPosition> {
+function getStorageKey(viewKey?: string): string {
+  return viewKey ? `${LAYOUT_STORAGE_PREFIX}:${viewKey}` : LAYOUT_STORAGE_KEY;
+}
+
+function loadSavedPositions(viewKey?: string): Map<number, SavedPosition> {
   try {
-    const raw = localStorage.getItem(LAYOUT_STORAGE_KEY);
+    const raw = localStorage.getItem(getStorageKey(viewKey));
     if (!raw) return new Map();
     const parsed = JSON.parse(raw) as Record<string, SavedPosition>;
     const m = new Map<number, SavedPosition>();
@@ -147,21 +156,21 @@ function loadSavedPositions(): Map<number, SavedPosition> {
   }
 }
 
-function saveSavedPositions(positions: Map<number, SavedPosition>): void {
+function saveSavedPositions(positions: Map<number, SavedPosition>, viewKey?: string): void {
   try {
     const obj: Record<string, SavedPosition> = {};
     positions.forEach((v, k) => {
       obj[String(k)] = v;
     });
-    localStorage.setItem(LAYOUT_STORAGE_KEY, JSON.stringify(obj));
+    localStorage.setItem(getStorageKey(viewKey), JSON.stringify(obj));
   } catch {
     // localStorage full or unavailable — silently ignore
   }
 }
 
-function clearSavedPositions(): void {
+function clearSavedPositions(viewKey?: string): void {
   try {
-    localStorage.removeItem(LAYOUT_STORAGE_KEY);
+    localStorage.removeItem(getStorageKey(viewKey));
   } catch {
     // silently ignore
   }
@@ -247,6 +256,8 @@ export interface ForceGraphProps {
   isLiveData?: boolean;
   /** Whether edge bundling is enabled (Slice 44) — auto-enables at 200+ nodes */
   edgeBundlingEnabled?: boolean;
+  /** View key for per-view position persistence (Slice 45) */
+  viewKey?: string;
   /** Callback when user selects "Trace in Flow Theater" from context menu (Slice 44) */
   onTraceInFlowTheater?: (nodeId: number, displayName: string) => void;
   /** Callback when user selects "Show Blast Radius" from context menu (Slice 44) */
@@ -292,11 +303,15 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
     pulseEnabled = false,
     isLiveData = false,
     edgeBundlingEnabled = false,
+    viewKey,
     onTraceInFlowTheater,
     onShowBlastRadius,
   },
   ref
 ) {
+  // Track viewKey in a ref so callbacks can access the latest value
+  const viewKeyRef = useRef(viewKey);
+  viewKeyRef.current = viewKey;
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const minimapCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -306,8 +321,23 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
   const [, forceRender] = useState(0);
   const nodesRef = useRef<SimNode[]>([]);
   const linksRef = useRef<SimLink[]>([]);
-  const savedPositionsRef = useRef<Map<number, SavedPosition>>(loadSavedPositions());
-  const [hasCustomLayout, setHasCustomLayout] = useState(() => loadSavedPositions().size > 0);
+  const savedPositionsRef = useRef<Map<number, SavedPosition>>(loadSavedPositions(viewKey));
+
+  // Reload saved positions when viewKey changes (Slice 45)
+  useEffect(() => {
+    savedPositionsRef.current = loadSavedPositions(viewKey);
+    // Apply loaded positions to existing nodes
+    for (const n of nodesRef.current) {
+      const saved = savedPositionsRef.current.get(n.id);
+      if (saved) {
+        n.fx = saved.x;
+        n.fy = saved.y;
+      }
+    }
+    setHasCustomLayout(savedPositionsRef.current.size > 0);
+    forceRender((v) => v + 1);
+  }, [viewKey]);
+  const [hasCustomLayout, setHasCustomLayout] = useState(() => loadSavedPositions(viewKey).size > 0);
   const [isLocked, setIsLocked] = useState(false);
 
   // ─── Collapsed clusters state (Slice 43) ──────────────────────
@@ -430,7 +460,7 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
       node.fx = null;
       node.fy = null;
       savedPositionsRef.current.delete(nodeId);
-      saveSavedPositions(savedPositionsRef.current);
+      saveSavedPositions(savedPositionsRef.current, viewKeyRef.current);
       simulationRef.current?.alpha(0.3).restart();
     } else {
       // Pin at current position
@@ -438,7 +468,7 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
       node.fy = node.y;
       if (node.x != null && node.y != null && Number.isFinite(node.x) && Number.isFinite(node.y)) {
         savedPositionsRef.current.set(nodeId, { x: node.x, y: node.y });
-        saveSavedPositions(savedPositionsRef.current);
+        saveSavedPositions(savedPositionsRef.current, viewKeyRef.current);
         setHasCustomLayout(true);
       }
     }
@@ -476,7 +506,7 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
       }
     },
     resetLayout: () => {
-      clearSavedPositions();
+      clearSavedPositions(viewKeyRef.current);
       savedPositionsRef.current = new Map();
       setHasCustomLayout(false);
       setIsLocked(false);
@@ -538,7 +568,7 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
         }
       }
       savedPositionsRef.current = posMap;
-      saveSavedPositions(posMap);
+      saveSavedPositions(posMap, viewKeyRef.current);
       setHasCustomLayout(posMap.size > 0);
       forceRender((v) => v + 1);
     },
@@ -895,7 +925,7 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
       d.fy = d.y;
       if (d.x != null && d.y != null && Number.isFinite(d.x) && Number.isFinite(d.y)) {
         savedPositionsRef.current.set(d.id, { x: d.x, y: d.y });
-        saveSavedPositions(savedPositionsRef.current);
+        saveSavedPositions(savedPositionsRef.current, viewKeyRef.current);
         setHasCustomLayout(true);
       }
     },
@@ -1657,6 +1687,18 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
                           strokeWidth={1}
                           strokeOpacity={0.3}
                           filter="url(#node-select-glow)"
+                        />
+                      )}
+                      {/* Pin indicator ring (Slice 45) — dashed violet ring for pinned/dragged nodes */}
+                      {simNode.fx != null && simNode.fy != null && !isOnPath && !isSelected && !nodeAnom && (
+                        <circle
+                          r={r + 5}
+                          fill="none"
+                          stroke="#8b5cf6"
+                          strokeWidth={1.5}
+                          strokeOpacity={0.5}
+                          strokeDasharray="3 3"
+                          data-testid={`pin-indicator-${n.id}`}
                         />
                       )}
                       {/* Node circle */}
