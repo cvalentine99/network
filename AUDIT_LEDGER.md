@@ -16,7 +16,7 @@ Audited against: commit dfbd40c6 (current dev sandbox)
 ## TIER 0 — CRITICAL / SECURITY
 
 ### T0-1: Manus Debug Collector (sendBeacon telemetry)
-**Status:** VERIFIED
+**Status:** FIXED
 **File:** `client/public/__manus__/debug-collector.js` (821 lines)
 **Evidence:** Lines 782-798: `navigator.sendBeacon(CONFIG.reportEndpoint, payloadStr)` — sends console logs, network requests, click/focus/scroll events, and session replay data to `/__manus__/logs` every 2 seconds.
 **Behavior:** Intercepts `console.*`, `fetch()`, `XMLHttpRequest`, `click`, `focusin`, `focusout`, `scroll`, `submit`, `change`, `keydown` events. Masks password fields but captures all other input values up to 200 chars.
@@ -24,7 +24,7 @@ Audited against: commit dfbd40c6 (current dev sandbox)
 **Severity:** CRITICAL
 
 ### T0-2: Manus Runtime Plugin (user info exfiltration)
-**Status:** VERIFIED
+**Status:** FIXED (neutralized — localStorage write removed, runtime plugin retained as dev-only platform tooling)
 **File:** `node_modules/vite-plugin-manus-runtime/runtime_dist/manus-runtime.js` (366KB)
 **Injection:** `vite.config.ts:7` imports `vitePluginManusRuntime`, which injects a `<script>` tag into every page via `transformIndexHtml`.
 **Evidence:** Runtime reads `localStorage.getItem("manus-runtime-user-info")` and includes it in error payloads sent to its container. The `useAuth.ts:46` hook writes user data to that exact key: `localStorage.setItem("manus-runtime-user-info", JSON.stringify(meQuery.data))`.
@@ -32,7 +32,7 @@ Audited against: commit dfbd40c6 (current dev sandbox)
 **Severity:** CRITICAL
 
 ### T0-3: Vite Debug Collector Injection
-**Status:** VERIFIED
+**Status:** FIXED
 **File:** `vite.config.ts:79-100`
 **Evidence:** Plugin `manus-debug-collector` injects `<script src="/__manus__/debug-collector.js" defer>` into every HTML page when `NODE_ENV !== 'production'`. Also mounts `/__manus__/logs` POST endpoint that writes browser telemetry to `.manus-logs/` directory.
 **Guard:** Only injects in non-production mode (line 81: `if (process.env.NODE_ENV === "production") return html`).
@@ -40,21 +40,21 @@ Audited against: commit dfbd40c6 (current dev sandbox)
 **Severity:** CRITICAL
 
 ### T0-4: useAuth localStorage Leak
-**Status:** VERIFIED
+**Status:** FIXED
 **File:** `client/src/_core/hooks/useAuth.ts:45-47`
 **Evidence:** `localStorage.setItem("manus-runtime-user-info", JSON.stringify(meQuery.data))` — writes full user object to localStorage on every auth state change, inside a `useMemo` (side effect in render path).
 **Impact:** User data persisted in plaintext localStorage, readable by any script on the domain, consumed by T0-2.
 **Severity:** CRITICAL
 
 ### T0-5: BFF Auth Middleware NODE_ENV Bypass
-**Status:** VERIFIED
+**Status:** FIXED
 **File:** `server/bff-auth-middleware.ts:39-56`
 **Evidence:** `const isProduction = process.env.NODE_ENV === 'production'` — in non-production mode, unauthenticated requests pass through with `next()` (line 56). Only production enforces 401.
 **Impact:** Any deployment where NODE_ENV is not exactly "production" has zero BFF auth. Attacker can access all ExtraHop data routes without authentication.
 **Severity:** CRITICAL
 
 ### T0-6: testConnection @ts-ignore with Non-Functional TLS Bypass
-**Status:** VERIFIED
+**Status:** FIXED
 **File:** `server/routers.ts:374`
 **Evidence:** `// @ts-ignore - Node fetch supports rejectUnauthorized via agent` — but the fetch call at line 367-378 does NOT pass an agent or dispatcher. The `@ts-ignore` suppresses the type error but the TLS bypass does nothing. Self-signed cert connections will fail.
 **Impact:** testConnection route cannot connect to self-signed ExtraHop appliances. The `verifySsl` config is read but never applied in this route.
@@ -79,7 +79,7 @@ Audited against: commit dfbd40c6 (current dev sandbox)
 **Severity:** LOW (by design, but needs documentation)
 
 ### T1-2: DashboardLayoutSkeleton Dead Component
-**Status:** VERIFIED
+**Status:** FIXED (deleted)
 **File:** `client/src/components/DashboardLayoutSkeleton.tsx`
 **Evidence:** Zero imports from any page or component. Only self-reference at line 3.
 **Impact:** Dead code. Minor.
@@ -97,7 +97,7 @@ Audited against: commit dfbd40c6 (current dev sandbox)
 ## TIER 2 — FRONTEND PERFORMANCE
 
 ### T2-1: 13 BFF Hooks Missing AbortController
-**Status:** VERIFIED
+**Status:** FIXED
 **Files:** All hooks in `client/src/hooks/` except `useDetections.ts`
 **Evidence:** Only `useDetections.ts` has AbortController. The other 13 hooks that call `fetch()` have no abort signal, no cleanup on unmount.
 **Missing in:** useAlertDetail, useAlerts, useApplianceStatus, useCorrelationOverlay, useDataSourceMode, useDetectionDetail, useDeviceActivity, useDeviceDetail, useImpactHeadline, useImpactTimeseries, usePcapDownload, useTopTalkers, useTopology
@@ -199,3 +199,58 @@ Audited against: commit dfbd40c6 (current dev sandbox)
 | Live DB | 35 + __drizzle_migrations | 16 | CURRENT_TIMESTAMP(3) | 0 | Synced |
 | deploy/full-schema.sql | 35 | 16 | per migration | 0 | Regenerated |
 | deploy/docker/mysql-init/01-schema.sql | 35 | 16 | per migration | 0 | Regenerated |
+
+---
+
+## TIER 4 — ARCHITECTURE / DOCUMENTATION
+
+### T4-1: SSRF Verification
+**Status:** VERIFIED (no defect)
+**Evidence:** All 46 BFF route calls use `ehRequest()` / `ehRequestBinary()` from `extrahop-client.ts`. URL construction uses DB config only (`https://${config.hostname}${path}`). Zero user-controlled params flow into URL construction. User params are used only for ExtraHop API path segments, query params, and request bodies — all Zod-validated.
+**Verdict:** No SSRF vectors exist.
+
+### T4-2: Architecture Documentation
+**Status:** FIXED
+**File:** `ARCHITECTURE.md` (new)
+**Evidence:** Documents data path (live vs fixture mode), SSRF verification, TLS handling, authentication model, encryption, schema, and framework plumbing.
+
+### T4-3: CI Schema-Drift Prevention
+**Status:** FIXED
+**Files:** `ci/check-schema-drift.sh`, `server/schema-drift.test.ts`
+**Evidence:** Shell script runs `drizzle-kit generate` and fails (exit 1) if new migration produced. 5 vitest tests verify sync, migration count, snapshot count, script existence, and script execution.
+**Proof:** Script returns "PASS: Schema is in sync. No drift detected." All 5 tests pass.
+
+---
+
+## FULL AUDIT SUMMARY
+
+| ID | Finding | Severity | Status |
+|----|---------|----------|--------|
+| T0-1 | Manus Debug Collector (sendBeacon) | CRITICAL | FIXED |
+| T0-2 | Manus Runtime Plugin (user info) | CRITICAL | FIXED (neutralized) |
+| T0-3 | Vite Debug Collector Injection | CRITICAL | FIXED |
+| T0-4 | useAuth localStorage Leak | CRITICAL | FIXED |
+| T0-5 | BFF Auth NODE_ENV Bypass | CRITICAL | FIXED |
+| T0-6 | testConnection @ts-ignore TLS | HIGH | FIXED |
+| T0-7 | Static PBKDF2 Salt | MEDIUM | VERIFIED (acceptable for lab) |
+| T1-1 | BFF Sentinel/Fixture isDev Gates | LOW | VERIFIED (by design, documented) |
+| T1-2 | DashboardLayoutSkeleton Dead | LOW | FIXED (deleted) |
+| T1-3 | notification.ts Unused | LOW | VERIFIED (framework plumbing, kept) |
+| T2-1 | 13 BFF Hooks Missing AbortController | HIGH | FIXED |
+| T2-2 | ForceGraph.tsx Complexity | MEDIUM | VERIFIED (functional, documented) |
+| T3-1 | deploy SQL Stale Tables | HIGH | FIXED |
+| T3-2 | deploy SQL Missing node_positions | MEDIUM | FIXED |
+| T3-3 | deploy SQL Missing Views | MEDIUM | FIXED |
+| T3-4 | polled_at Default Divergence | MEDIUM | FIXED |
+| T3-5 | View Hardcoded DB Name | MEDIUM | FIXED |
+| T3-6 | Migration Journal Sync | LOW | VERIFIED (in sync) |
+| T4-1 | SSRF Verification | N/A | VERIFIED (no defect) |
+| T4-2 | Architecture Documentation | N/A | FIXED (new doc) |
+| T4-3 | CI Schema-Drift Prevention | N/A | FIXED (new script + tests) |
+| R1-R8 | Rejected Claims | N/A | REJECTED (8 false claims) |
+
+**CRITICAL items: 5/5 FIXED**
+**HIGH items: 3/3 FIXED**
+**MEDIUM items: 5/5 FIXED or VERIFIED**
+**LOW items: 3/3 FIXED or VERIFIED**
+**Rejected claims: 8**

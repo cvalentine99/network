@@ -716,3 +716,32 @@ These items are tracked here for the live integration phase.
 ## Phase 4: Verification
 - [ ] Run full test suite — zero regressions
 - [ ] Generate truth receipt
+
+# TIER 3+ HOSTILE-REVIEW REPAIRS + CI DRIFT CHECK
+
+## Dead Code Removal (T1-2, T1-3)
+- [x] Delete DashboardLayoutSkeleton.tsx (zero imports, dead code) — DELETED
+- [x] notification.ts — KEPT: imported by systemRouter.ts (framework plumbing, provides health check + notifyOwner). Documented as platform requirement, not dead code.
+
+## SSRF Verification (T3B)
+- [x] Verify no SSRF vectors in BFF routes — VERIFIED: 46 ehRequest calls, zero direct fetch, hostname from DB config only, zero user-input-to-URL flows
+
+## Architecture Unification
+- [x] Document fixture-mode vs live-mode data path in ARCHITECTURE.md
+- [x] Document isFixtureMode() as DB-config-based (not NODE_ENV-based)
+
+## CI Schema-Drift Check
+- [x] Create ci/check-schema-drift.sh script
+- [x] Script runs drizzle-kit generate and fails if new migration produced
+- [x] Add vitest test for schema-drift check (5 tests: sync check, migration count, snapshot count, script exists, script passes)
+
+## MERGE_GATES Closure
+- [x] Close Gate 0: No Telemetry Exfiltration — PASS
+- [x] Close Gate 1: No Auth Bypass by Environment — PASS
+- [x] Close Gate 2: ExtraHop TLS Handling — PASS
+- [x] Close Gate 3: No Hardcoded Secrets — PASS
+- [x] Close Gate 4: No Dead Code — PASS
+- [x] Close Gate 5: All BFF Hooks Have AbortController — PASS
+- [x] Close Gate 6: TypeScript Clean — PASS (tsc --noEmit exit 0)
+- [x] Close Gate 7: Test Suite Green — PASS (41 files, 2,725 tests, 0 failures)
+- [x] Close Gate 8: Database Schema Matches Code — PASS (drizzle-kit: no pending changes)
