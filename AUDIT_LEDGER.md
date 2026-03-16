@@ -145,3 +145,57 @@ Audited against: commit dfbd40c6 (current dev sandbox)
 ### R8: "relations.ts is empty"
 **Status:** REJECTED (was true, already fixed)
 **Evidence:** `drizzle/relations.ts` now has 154 lines with 20 Drizzle relation definitions.
+
+---
+
+## TIER 3 — DB/ETL/SCHEMA REALITY
+
+### T3-1: deploy/full-schema.sql Contains 4 Stale Tables
+**Status:** FIXED
+**File:** `deploy/full-schema.sql`, `deploy/docker/mysql-init/01-schema.sql`
+**Evidence:** Both files contained CREATE TABLE statements for `alerts`, `devices`, `interfaces`, `performance_metrics` — tables from an earlier schema version that do not exist in `drizzle/schema.ts` and were already dropped from the live DB.
+**Fix:** Regenerated both files from the authoritative Drizzle migration SQL (0000 + 0001). Stale tables removed. 16 views added (with portable definitions — no hardcoded DB name). `node_positions` column now present in `saved_topology_views`.
+**Proof:** `grep -c "CREATE TABLE" deploy/full-schema.sql` = 35 (matches schema.ts). Zero references to stale table names.
+
+### T3-2: deploy/full-schema.sql Missing node_positions Column
+**Status:** FIXED
+**File:** `deploy/full-schema.sql`
+**Evidence:** `saved_topology_views` table definition was missing the `node_positions` column added in Slice 35E. The DB had the column; the deploy file did not.
+**Fix:** Regenerated deploy file from migration SQL which includes the column.
+**Proof:** `grep "node_positions" deploy/full-schema.sql` returns 1 match.
+
+### T3-3: deploy/full-schema.sql Missing All 16 Views
+**Status:** FIXED
+**File:** `deploy/full-schema.sql`
+**Evidence:** The old deploy file had zero CREATE VIEW statements. The 16 views existed in the live DB but were not captured in the deploy bundle.
+**Fix:** Extracted all 16 view definitions from the live DB, stripped hardcoded DB name prefix (`FAgcVHDa53BkVwvRfvbPzh`), and included them as portable CREATE OR REPLACE VIEW statements.
+**Proof:** `grep -c "CREATE OR REPLACE VIEW" deploy/full-schema.sql` = 16.
+
+### T3-4: polled_at Column Default Divergence (schema.ts vs DB)
+**Status:** FIXED
+**File:** `drizzle/schema.ts`
+**Evidence:** All 19 `polled_at` columns in schema.ts were defined as `.notNull()` with no default. The live DB had `DEFAULT CURRENT_TIMESTAMP(3)` on all of them (added via manual ALTER TABLE). This caused `drizzle-kit generate` to be unaware of the defaults.
+**Fix:** Added `.default(sql\`CURRENT_TIMESTAMP(3)\`)` to all 19 polled_at columns in schema.ts. Generated migration 0002 (`drizzle/0002_unique_speed_demon.sql`) and applied it. `drizzle-kit generate` now reports "No schema changes, nothing to migrate."
+**Proof:** `pnpm drizzle-kit generate` returns "No schema changes, nothing to migrate." All 2,720 tests pass.
+
+### T3-5: View Definitions Contain Hardcoded DB Name
+**Status:** FIXED
+**Evidence:** All 16 views in the live DB had `\`FAgcVHDa53BkVwvRfvbPzh\`.` prefixed to table references (MySQL default behavior when creating views). The deploy SQL now uses portable definitions without the prefix.
+**Impact:** Views created from the old deploy SQL would fail on a DB with a different name.
+**Fix:** Stripped DB name prefix from all view definitions in deploy/full-schema.sql.
+
+### T3-6: Drizzle Migration Journal Sync
+**Status:** VERIFIED (no action needed)
+**Evidence:** `drizzle-kit generate` reports "No schema changes, nothing to migrate" after all fixes. Migration journal (0000 + 0001 + 0002) matches schema.ts exactly. Column-level audit script confirmed zero divergences between migration SQL and live DB.
+
+---
+
+## SCHEMA DIVERGENCE AUDIT SUMMARY
+
+| Artifact | Tables | Views | polled_at Defaults | Stale Tables | Status |
+|----------|--------|-------|--------------------|--------------|--------|
+| drizzle/schema.ts | 35 | N/A | CURRENT_TIMESTAMP(3) | 0 | Source of truth |
+| drizzle migrations (0000+0001+0002) | 35 | N/A | CURRENT_TIMESTAMP(3) | 0 | Synced |
+| Live DB | 35 + __drizzle_migrations | 16 | CURRENT_TIMESTAMP(3) | 0 | Synced |
+| deploy/full-schema.sql | 35 | 16 | per migration | 0 | Regenerated |
+| deploy/docker/mysql-init/01-schema.sql | 35 | 16 | per migration | 0 | Regenerated |

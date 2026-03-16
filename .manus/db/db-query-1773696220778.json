@@ -1,0 +1,166 @@
+{
+  "query": "SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() ORDER BY TABLE_NAME;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3xenzgJ3NGNThF2.e615124e9d05 --database FAgcVHDa53BkVwvRfvbPzh --execute SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() ORDER BY TABLE_NAME;",
+  "rows": [
+    {
+      "TABLE_NAME": "__drizzle_migrations"
+    },
+    {
+      "TABLE_NAME": "appliance_config"
+    },
+    {
+      "TABLE_NAME": "bridge_alert_application"
+    },
+    {
+      "TABLE_NAME": "bridge_alert_device"
+    },
+    {
+      "TABLE_NAME": "bridge_alert_device_group"
+    },
+    {
+      "TABLE_NAME": "bridge_alert_network"
+    },
+    {
+      "TABLE_NAME": "bridge_device_device_group"
+    },
+    {
+      "TABLE_NAME": "bridge_device_tag"
+    },
+    {
+      "TABLE_NAME": "dim_activity_map"
+    },
+    {
+      "TABLE_NAME": "dim_alert"
+    },
+    {
+      "TABLE_NAME": "dim_appliance"
+    },
+    {
+      "TABLE_NAME": "dim_application"
+    },
+    {
+      "TABLE_NAME": "dim_detection"
+    },
+    {
+      "TABLE_NAME": "dim_detection_format"
+    },
+    {
+      "TABLE_NAME": "dim_device"
+    },
+    {
+      "TABLE_NAME": "dim_device_group"
+    },
+    {
+      "TABLE_NAME": "dim_network"
+    },
+    {
+      "TABLE_NAME": "dim_network_locality"
+    },
+    {
+      "TABLE_NAME": "dim_tag"
+    },
+    {
+      "TABLE_NAME": "dim_vlan"
+    },
+    {
+      "TABLE_NAME": "fact_device_activity"
+    },
+    {
+      "TABLE_NAME": "fact_metric_response"
+    },
+    {
+      "TABLE_NAME": "fact_metric_stat"
+    },
+    {
+      "TABLE_NAME": "fact_record"
+    },
+    {
+      "TABLE_NAME": "fact_record_search"
+    },
+    {
+      "TABLE_NAME": "raw_api_response"
+    },
+    {
+      "TABLE_NAME": "saved_topology_views"
+    },
+    {
+      "TABLE_NAME": "schema_drift_log"
+    },
+    {
+      "TABLE_NAME": "schema_version"
+    },
+    {
+      "TABLE_NAME": "snap_device_dnsname"
+    },
+    {
+      "TABLE_NAME": "snap_device_ipaddr"
+    },
+    {
+      "TABLE_NAME": "snap_device_software"
+    },
+    {
+      "TABLE_NAME": "snap_topology"
+    },
+    {
+      "TABLE_NAME": "snap_topology_edge"
+    },
+    {
+      "TABLE_NAME": "snap_topology_node"
+    },
+    {
+      "TABLE_NAME": "users"
+    },
+    {
+      "TABLE_NAME": "v_active_devices"
+    },
+    {
+      "TABLE_NAME": "v_alert_summary"
+    },
+    {
+      "TABLE_NAME": "v_appliance_overview"
+    },
+    {
+      "TABLE_NAME": "v_device_current_ips"
+    },
+    {
+      "TABLE_NAME": "v_device_group_membership"
+    },
+    {
+      "TABLE_NAME": "v_metric_responses"
+    },
+    {
+      "TABLE_NAME": "v_record_searches"
+    },
+    {
+      "TABLE_NAME": "vw_alert_assignments_current"
+    },
+    {
+      "TABLE_NAME": "vw_device_dns_current"
+    },
+    {
+      "TABLE_NAME": "vw_device_inventory_current"
+    },
+    {
+      "TABLE_NAME": "vw_device_ip_current"
+    },
+    {
+      "TABLE_NAME": "vw_metric_latest_by_object"
+    },
+    {
+      "TABLE_NAME": "vw_topology_edges_by_snapshot"
+    },
+    {
+      "TABLE_NAME": "vw_topology_latest_edges"
+    },
+    {
+      "TABLE_NAME": "vw_topology_latest_nodes"
+    },
+    {
+      "TABLE_NAME": "vw_topology_nodes_by_snapshot"
+    }
+  ],
+  "messages": [],
+  "stdout": "TABLE_NAME\n__drizzle_migrations\nappliance_config\nbridge_alert_application\nbridge_alert_device\nbridge_alert_device_group\nbridge_alert_network\nbridge_device_device_group\nbridge_device_tag\ndim_activity_map\ndim_alert\ndim_appliance\ndim_application\ndim_detection\ndim_detection_format\ndim_device\ndim_device_group\ndim_network\ndim_network_locality\ndim_tag\ndim_vlan\nfact_device_activity\nfact_metric_response\nfact_metric_stat\nfact_record\nfact_record_search\nraw_api_response\nsaved_topology_views\nschema_drift_log\nschema_version\nsnap_device_dnsname\nsnap_device_ipaddr\nsnap_device_software\nsnap_topology\nsnap_topology_edge\nsnap_topology_node\nusers\nv_active_devices\nv_alert_summary\nv_appliance_overview\nv_device_current_ips\nv_device_group_membership\nv_metric_responses\nv_record_searches\nvw_alert_assignments_current\nvw_device_dns_current\nvw_device_inventory_current\nvw_device_ip_current\nvw_metric_latest_by_object\nvw_topology_edges_by_snapshot\nvw_topology_latest_edges\nvw_topology_latest_nodes\nvw_topology_nodes_by_snapshot\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

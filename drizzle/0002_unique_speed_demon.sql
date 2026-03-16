@@ -1,0 +1,19 @@
+ALTER TABLE `dim_activity_map` MODIFY COLUMN `polled_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);--> statement-breakpoint
+ALTER TABLE `dim_alert` MODIFY COLUMN `polled_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);--> statement-breakpoint
+ALTER TABLE `dim_appliance` MODIFY COLUMN `polled_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);--> statement-breakpoint
+ALTER TABLE `dim_application` MODIFY COLUMN `polled_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);--> statement-breakpoint
+ALTER TABLE `dim_detection` MODIFY COLUMN `polled_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);--> statement-breakpoint
+ALTER TABLE `dim_detection_format` MODIFY COLUMN `polled_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);--> statement-breakpoint
+ALTER TABLE `dim_device` MODIFY COLUMN `polled_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);--> statement-breakpoint
+ALTER TABLE `dim_device_group` MODIFY COLUMN `polled_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);--> statement-breakpoint
+ALTER TABLE `dim_network` MODIFY COLUMN `polled_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);--> statement-breakpoint
+ALTER TABLE `dim_network_locality` MODIFY COLUMN `polled_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);--> statement-breakpoint
+ALTER TABLE `dim_tag` MODIFY COLUMN `polled_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);--> statement-breakpoint
+ALTER TABLE `dim_vlan` MODIFY COLUMN `polled_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);--> statement-breakpoint
+ALTER TABLE `fact_device_activity` MODIFY COLUMN `polled_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);--> statement-breakpoint
+ALTER TABLE `fact_metric_response` MODIFY COLUMN `polled_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);--> statement-breakpoint
+ALTER TABLE `fact_record_search` MODIFY COLUMN `polled_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);--> statement-breakpoint
+ALTER TABLE `snap_device_dnsname` MODIFY COLUMN `polled_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);--> statement-breakpoint
+ALTER TABLE `snap_device_ipaddr` MODIFY COLUMN `polled_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);--> statement-breakpoint
+ALTER TABLE `snap_device_software` MODIFY COLUMN `polled_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);--> statement-breakpoint
+ALTER TABLE `snap_topology` MODIFY COLUMN `polled_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);

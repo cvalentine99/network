@@ -15,6 +15,7 @@ import {
   tinyint,
   varchar,
 } from "drizzle-orm/mysql-core";
+import { sql } from "drizzle-orm";
 
 /* ─────────────────────────── Users (kept for framework) ─────────────────────────── */
 
@@ -77,7 +78,7 @@ export const dimAppliance = mysqlTable("dim_appliance", {
   analysisLevelsManaged: boolean("analysis_levels_managed").notNull(),
   nickname: varchar("nickname", { length: 255 }).notNull().default(""),
   displayName: varchar("display_name", { length: 255 }).notNull(),
-  polledAt: datetime("polled_at", { fsp: 3 }).notNull(),
+  polledAt: datetime("polled_at", { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP(3)`),
 });
 
 export const dimNetwork = mysqlTable("dim_network", {
@@ -89,7 +90,7 @@ export const dimNetwork = mysqlTable("dim_network", {
   description: text("description"),
   modTime: bigint("mod_time", { mode: "number" }).notNull(),
   idle: boolean("idle").notNull(),
-  polledAt: datetime("polled_at", { fsp: 3 }).notNull(),
+  polledAt: datetime("polled_at", { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP(3)`),
 });
 
 export const dimDevice = mysqlTable("dim_device", {
@@ -137,7 +138,7 @@ export const dimDevice = mysqlTable("dim_device", {
   cloudAccount: varchar("cloud_account", { length: 255 }),
   vpcId: varchar("vpc_id", { length: 255 }),
   subnetId: varchar("subnet_id", { length: 255 }),
-  polledAt: datetime("polled_at", { fsp: 3 }).notNull(),
+  polledAt: datetime("polled_at", { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP(3)`),
 });
 
 export const dimDeviceGroup = mysqlTable("dim_device_group", {
@@ -153,7 +154,7 @@ export const dimDeviceGroup = mysqlTable("dim_device_group", {
   value: varchar("value", { length: 255 }),
   filter: json("filter"),
   editors: json("editors"),
-  polledAt: datetime("polled_at", { fsp: 3 }).notNull(),
+  polledAt: datetime("polled_at", { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP(3)`),
 });
 
 export const dimVlan = mysqlTable("dim_vlan", {
@@ -165,7 +166,7 @@ export const dimVlan = mysqlTable("dim_vlan", {
   name: varchar("name", { length: 255 }),
   description: text("description"),
   modTime: bigint("mod_time", { mode: "number" }).notNull(),
-  polledAt: datetime("polled_at", { fsp: 3 }).notNull(),
+  polledAt: datetime("polled_at", { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP(3)`),
 });
 
 export const dimAlert = mysqlTable("dim_alert", {
@@ -192,7 +193,7 @@ export const dimAlert = mysqlTable("dim_alert", {
   param: json("param").notNull(),
   param2: json("param2").notNull(),
   cc: json("cc").notNull(),
-  polledAt: datetime("polled_at", { fsp: 3 }).notNull(),
+  polledAt: datetime("polled_at", { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP(3)`),
 });
 
 export const dimTag = mysqlTable("dim_tag", {
@@ -200,7 +201,7 @@ export const dimTag = mysqlTable("dim_tag", {
   rawId: bigint("raw_id", { mode: "number", unsigned: true }).notNull(),
   name: varchar("name", { length: 255 }).notNull().unique(),
   modTime: bigint("mod_time", { mode: "number" }).notNull(),
-  polledAt: datetime("polled_at", { fsp: 3 }).notNull(),
+  polledAt: datetime("polled_at", { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP(3)`),
 });
 
 export const dimApplication = mysqlTable("dim_application", {
@@ -214,7 +215,7 @@ export const dimApplication = mysqlTable("dim_application", {
   modTime: bigint("mod_time", { mode: "number" }).notNull(),
   userModTime: bigint("user_mod_time", { mode: "number" }).notNull(),
   nodeId: int("node_id"),
-  polledAt: datetime("polled_at", { fsp: 3 }).notNull(),
+  polledAt: datetime("polled_at", { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP(3)`),
 });
 
 export const dimNetworkLocality = mysqlTable("dim_network_locality", {
@@ -226,7 +227,7 @@ export const dimNetworkLocality = mysqlTable("dim_network_locality", {
   modTime: bigint("mod_time", { mode: "number" }).notNull(),
   network: varchar("network", { length: 50 }).notNull(),
   networks: json("networks").notNull(),
-  polledAt: datetime("polled_at", { fsp: 3 }).notNull(),
+  polledAt: datetime("polled_at", { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP(3)`),
 });
 
 export const dimActivityMap = mysqlTable("dim_activity_map", {
@@ -240,7 +241,7 @@ export const dimActivityMap = mysqlTable("dim_activity_map", {
   weighting: varchar("weighting", { length: 20 }),
   shortCode: varchar("short_code", { length: 50 }),
   walks: json("walks"),
-  polledAt: datetime("polled_at", { fsp: 3 }).notNull(),
+  polledAt: datetime("polled_at", { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP(3)`),
 });
 
 export const dimDetectionFormat = mysqlTable("dim_detection_format", {
@@ -254,7 +255,7 @@ export const dimDetectionFormat = mysqlTable("dim_detection_format", {
   properties: json("properties"),
   status: varchar("status", { length: 50 }),
   released: bigint("released", { mode: "number" }),
-  polledAt: datetime("polled_at", { fsp: 3 }).notNull(),
+  polledAt: datetime("polled_at", { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP(3)`),
 });
 
 export const dimDetection = mysqlTable("dim_detection", {
@@ -284,7 +285,7 @@ export const dimDetection = mysqlTable("dim_detection", {
   type: varchar("type", { length: 255 }).notNull(),
   url: varchar("url", { length: 2048 }),
   updateTime: bigint("update_time", { mode: "number" }),
-  polledAt: datetime("polled_at", { fsp: 3 }).notNull(),
+  polledAt: datetime("polled_at", { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP(3)`),
 });
 
 /* ─────────────────────────── Bridge Tables ─────────────────────────── */
@@ -344,7 +345,7 @@ export const factMetricResponse = mysqlTable("fact_metric_response", {
   metricCategory: varchar("metric_category", { length: 100 }).notNull(),
   objectType: varchar("object_type", { length: 20 }).notNull(),
   requestBody: json("request_body").notNull(),
-  polledAt: datetime("polled_at", { fsp: 3 }).notNull(),
+  polledAt: datetime("polled_at", { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP(3)`),
 });
 
 export const factMetricStat = mysqlTable("fact_metric_stat", {
@@ -366,7 +367,7 @@ export const factRecordSearch = mysqlTable("fact_record_search", {
   lookbackTruncated: boolean("lookback_truncated").notNull().default(false),
   lookbackExceeded: boolean("lookback_exceeded").notNull().default(false),
   requestBody: json("request_body").notNull(),
-  polledAt: datetime("polled_at", { fsp: 3 }).notNull(),
+  polledAt: datetime("polled_at", { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP(3)`),
 });
 
 export const factRecord = mysqlTable("fact_record", {
@@ -387,7 +388,7 @@ export const factDeviceActivity = mysqlTable("fact_device_activity", {
   untilTime: bigint("until_time", { mode: "number" }).notNull(),
   modTime: bigint("mod_time", { mode: "number" }).notNull(),
   statName: varchar("stat_name", { length: 255 }).notNull(),
-  polledAt: datetime("polled_at", { fsp: 3 }).notNull(),
+  polledAt: datetime("polled_at", { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP(3)`),
 });
 
 /* ─────────────────────────── Snapshot Tables ─────────────────────────── */
@@ -399,7 +400,7 @@ export const snapDeviceIpaddr = mysqlTable("snap_device_ipaddr", {
   ipaddr: varchar("ipaddr", { length: 45 }).notNull(),
   lastObservationTime: bigint("last_observation_time", { mode: "number" }),
   isCurrent: boolean("is_current").notNull().default(true),
-  polledAt: datetime("polled_at", { fsp: 3 }).notNull(),
+  polledAt: datetime("polled_at", { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP(3)`),
 });
 
 export const snapDeviceDnsname = mysqlTable("snap_device_dnsname", {
@@ -408,7 +409,7 @@ export const snapDeviceDnsname = mysqlTable("snap_device_dnsname", {
   deviceId: int("device_id").notNull(),
   dnsName: varchar("dns_name", { length: 255 }).notNull(),
   isCurrent: boolean("is_current").notNull().default(true),
-  polledAt: datetime("polled_at", { fsp: 3 }).notNull(),
+  polledAt: datetime("polled_at", { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP(3)`),
 });
 
 export const snapDeviceSoftware = mysqlTable("snap_device_software", {
@@ -417,7 +418,7 @@ export const snapDeviceSoftware = mysqlTable("snap_device_software", {
   deviceId: int("device_id").notNull(),
   softwareJson: json("software_json").notNull(),
   isCurrent: boolean("is_current").notNull().default(true),
-  polledAt: datetime("polled_at", { fsp: 3 }).notNull(),
+  polledAt: datetime("polled_at", { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP(3)`),
 });
 
 /* ─────────────────────────── Topology Tables ─────────────────────────── */
@@ -430,7 +431,7 @@ export const snapTopology = mysqlTable("snap_topology", {
   untilTime: bigint("until_time", { mode: "number" }).notNull(),
   nodeCount: int("node_count").notNull().default(0),
   edgeCount: int("edge_count").notNull().default(0),
-  polledAt: datetime("polled_at", { fsp: 3 }).notNull(),
+  polledAt: datetime("polled_at", { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP(3)`),
 });
 
 export const snapTopologyNode = mysqlTable("snap_topology_node", {

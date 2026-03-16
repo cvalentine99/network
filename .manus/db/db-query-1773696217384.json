@@ -1,0 +1,166 @@
+{
+  "query": "SHOW TABLES;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3xenzgJ3NGNThF2.e615124e9d05 --database FAgcVHDa53BkVwvRfvbPzh --execute SHOW TABLES;",
+  "rows": [
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "__drizzle_migrations"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "appliance_config"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "bridge_alert_application"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "bridge_alert_device"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "bridge_alert_device_group"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "bridge_alert_network"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "bridge_device_device_group"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "bridge_device_tag"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "dim_activity_map"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "dim_alert"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "dim_appliance"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "dim_application"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "dim_detection"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "dim_detection_format"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "dim_device"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "dim_device_group"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "dim_network"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "dim_network_locality"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "dim_tag"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "dim_vlan"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "fact_device_activity"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "fact_metric_response"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "fact_metric_stat"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "fact_record"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "fact_record_search"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "raw_api_response"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "saved_topology_views"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "schema_drift_log"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "schema_version"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "snap_device_dnsname"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "snap_device_ipaddr"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "snap_device_software"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "snap_topology"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "snap_topology_edge"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "snap_topology_node"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "users"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "v_active_devices"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "v_alert_summary"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "v_appliance_overview"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "v_device_current_ips"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "v_device_group_membership"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "v_metric_responses"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "v_record_searches"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "vw_alert_assignments_current"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "vw_device_dns_current"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "vw_device_inventory_current"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "vw_device_ip_current"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "vw_metric_latest_by_object"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "vw_topology_edges_by_snapshot"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "vw_topology_latest_edges"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "vw_topology_latest_nodes"
+    },
+    {
+      "Tables_in_FAgcVHDa53BkVwvRfvbPzh": "vw_topology_nodes_by_snapshot"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_FAgcVHDa53BkVwvRfvbPzh\n__drizzle_migrations\nappliance_config\nbridge_alert_application\nbridge_alert_device\nbridge_alert_device_group\nbridge_alert_network\nbridge_device_device_group\nbridge_device_tag\ndim_activity_map\ndim_alert\ndim_appliance\ndim_application\ndim_detection\ndim_detection_format\ndim_device\ndim_device_group\ndim_network\ndim_network_locality\ndim_tag\ndim_vlan\nfact_device_activity\nfact_metric_response\nfact_metric_stat\nfact_record\nfact_record_search\nraw_api_response\nsaved_topology_views\nschema_drift_log\nschema_version\nsnap_device_dnsname\nsnap_device_ipaddr\nsnap_device_software\nsnap_topology\nsnap_topology_edge\nsnap_topology_node\nusers\nv_active_devices\nv_alert_summary\nv_appliance_overview\nv_device_current_ips\nv_device_group_membership\nv_metric_responses\nv_record_searches\nvw_alert_assignments_current\nvw_device_dns_current\nvw_device_inventory_current\nvw_device_ip_current\nvw_metric_latest_by_object\nvw_topology_edges_by_snapshot\nvw_topology_latest_edges\nvw_topology_latest_nodes\nvw_topology_nodes_by_snapshot\n",
+  "stderr": "",
+  "execution_time_ms": 100
+}
