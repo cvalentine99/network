@@ -27,7 +27,6 @@ import {
 
 const blastRadiusRouter = Router();
 
-const isDev = process.env.NODE_ENV !== 'production';
 
 /**
  * Load a blast radius fixture file.
@@ -46,8 +45,8 @@ function loadFixture(name: string): any | null {
  * Select the appropriate fixture based on entry mode and value.
  * Sentinel values are ONLY used in dev/test.
  */
-function selectFixture(mode: string, value: string): { fixture: string; isError: boolean } {
-  if (isDev) {
+async function selectFixture(mode: string, value: string): Promise<{ fixture: string; isError: boolean }> {
+  if (await isFixtureMode()) {
     if (value === 'unknown.invalid' || value === '0' || value === '0.0.0.0') {
       return { fixture: 'blast-radius.error.fixture.json', isError: true };
     }
@@ -91,7 +90,7 @@ blastRadiusRouter.post('/query', async (req, res) => {
 
     // ── FIXTURE MODE ──
     if (await isFixtureMode()) {
-      const { fixture: fixtureName, isError } = selectFixture(mode, value);
+      const { fixture: fixtureName, isError } = await selectFixture(mode, value);
       const fixtureData = loadFixture(fixtureName);
 
       if (!fixtureData) {
@@ -393,7 +392,7 @@ blastRadiusRouter.post('/query', async (req, res) => {
  * Dev/test only — lists available fixture files.
  */
 blastRadiusRouter.get('/fixtures', async (_req, res) => {
-  if (!isDev) {
+  if (!(await isFixtureMode())) {
     res.status(404).json({ error: 'Not available in production' });
     return;
   }

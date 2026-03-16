@@ -10,8 +10,9 @@
  *   - Empty relatedDevices/relatedAlerts/notes/timeline arrays = quiet state (not error)
  *   - 404 = not-found state (distinct from error)
  *   - Refetches when detectionId changes
+ *   - AbortController cancels in-flight requests on unmount or detectionId change
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { DetectionDetailSchema } from '../../../shared/cockpit-validators';
 import type { DetectionDetail } from '../../../shared/cockpit-types';
 
@@ -40,70 +41,81 @@ export function isQuietDetection(detail: DetectionDetail): boolean {
 export function useDetectionDetail(detectionId: number | null): DetectionDetailState {
   const [state, setState] = useState<DetectionDetailState>({ status: 'loading' });
 
-  const fetchDetail = useCallback(async () => {
+  useEffect(() => {
     if (detectionId === null) {
       setState({ status: 'loading' });
       return;
     }
 
+    const controller = new AbortController();
     setState({ status: 'loading' });
 
-    try {
-      const res = await fetch(`/api/bff/impact/detection-detail?id=${detectionId}`);
-
-      // Handle 404 — detection not found
-      if (res.status === 404) {
-        const body = await res.json().catch(() => ({ error: 'Detection not found', message: `HTTP 404` }));
-        setState({
-          status: 'not-found',
-          error: body.error || 'Detection not found',
-          message: body.message || `No detection with id ${detectionId}`,
+    (async () => {
+      try {
+        const res = await fetch(`/api/bff/impact/detection-detail?id=${detectionId}`, {
+          signal: controller.signal,
         });
-        return;
-      }
+        if (controller.signal.aborted) return;
 
-      // Handle other non-OK statuses
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({ error: 'Transport error', message: `HTTP ${res.status}` }));
+        // Handle 404 — detection not found
+        if (res.status === 404) {
+          const body = await res.json().catch(() => ({ error: 'Detection not found', message: `HTTP 404` }));
+          if (controller.signal.aborted) return;
+          setState({
+            status: 'not-found',
+            error: body.error || 'Detection not found',
+            message: body.message || `No detection with id ${detectionId}`,
+          });
+          return;
+        }
+
+        // Handle other non-OK statuses
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({ error: 'Transport error', message: `HTTP ${res.status}` }));
+          if (controller.signal.aborted) return;
+          setState({
+            status: 'error',
+            error: body.error || 'Transport error',
+            message: body.message || `HTTP ${res.status}`,
+          });
+          return;
+        }
+
+        const body = await res.json();
+        if (controller.signal.aborted) return;
+
+        const validation = DetectionDetailSchema.safeParse(body.detectionDetail);
+
+        if (!validation.success) {
+          setState({
+            status: 'malformed',
+            error: 'Data contract violation',
+            message: 'Detection detail response failed schema validation',
+            details: validation.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('; '),
+          });
+          return;
+        }
+
+        // Determine quiet vs populated
+        if (isQuietDetection(validation.data)) {
+          setState({ status: 'quiet', detectionDetail: validation.data });
+        } else {
+          setState({ status: 'populated', detectionDetail: validation.data });
+        }
+      } catch (err: any) {
+        if (controller.signal.aborted) return;
         setState({
           status: 'error',
-          error: body.error || 'Transport error',
-          message: body.message || `HTTP ${res.status}`,
+          error: 'Network error',
+          message: err.message || 'Failed to fetch detection detail',
         });
-        return;
       }
+    })();
 
-      const body = await res.json();
-      const validation = DetectionDetailSchema.safeParse(body.detectionDetail);
-
-      if (!validation.success) {
-        setState({
-          status: 'malformed',
-          error: 'Data contract violation',
-          message: 'Detection detail response failed schema validation',
-          details: validation.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('; '),
-        });
-        return;
-      }
-
-      // Determine quiet vs populated
-      if (isQuietDetection(validation.data)) {
-        setState({ status: 'quiet', detectionDetail: validation.data });
-      } else {
-        setState({ status: 'populated', detectionDetail: validation.data });
-      }
-    } catch (err: any) {
-      setState({
-        status: 'error',
-        error: 'Network error',
-        message: err.message || 'Failed to fetch detection detail',
-      });
-    }
+    return () => {
+      controller.abort();
+    };
   }, [detectionId]);
-
-  useEffect(() => {
-    fetchDetail();
-  }, [fetchDetail]);
 
   return state;
 }

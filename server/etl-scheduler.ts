@@ -15,8 +15,7 @@
 
 import { isFixtureModeSync, ehRequest } from './extrahop-client';
 import { normalizeDeviceActivity } from './extrahop-normalizers';
-import { upsertDeviceActivity } from './db';
-import { getDb } from './db';
+import { upsertDeviceActivity, requireDb } from './db';
 import { dimDevice } from '../drizzle/schema';
 import { isNotNull } from 'drizzle-orm';
 
@@ -77,17 +76,7 @@ export async function runEtlCycle(): Promise<{
   let totalRecordsUpserted = 0;
 
   // Step 1: Get all active device IDs from dim_device
-  const db = await getDb();
-  if (!db) {
-    return {
-      devicesPolled: 0,
-      devicesSucceeded: 0,
-      devicesFailed: 0,
-      recordsUpserted: 0,
-      durationMs: Date.now() - start,
-      errors: [{ deviceId: 0, error: 'Database unavailable' }],
-    };
-  }
+  const db = await requireDb();
 
   const devices = await db
     .select({ id: dimDevice.id })

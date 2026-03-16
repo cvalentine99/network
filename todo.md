@@ -667,3 +667,29 @@ These items are tracked here for the live integration phase.
 - [x] Document: ImpactDeck IS the Home page (Home.tsx IS the Impact Deck)
 - [x] Document: Hooks DO call BFF (useImpactHeadline, useTopTalkers, etc.)
 - [x] Document: 160 fixture files exist, 2720 test cases across 40 files (all passing)
+
+# HOSTILE-SOURCE-TRUTH REPAIR — TIER 2: FRONTEND PERFORMANCE
+
+## AbortController fixes (memory leak prevention)
+- [x] useCorrelationOverlay.ts — AbortController + signal on fetch + abort on cleanup
+- [x] useDataSourceMode.ts — AbortController + signal on fetch + abort on cleanup
+- [x] useImpactHeadline.ts — AbortController + signal on fetch + abort on cleanup
+- [x] useImpactTimeseries.ts — AbortController + signal on fetch + abort on cleanup
+- [x] useTopTalkers.ts — AbortController + signal on fetch + abort on cleanup
+- [x] useTopology.ts — AbortController + signal on fetch + abort on cleanup
+- [x] useDetections.ts — AbortController + signal on fetch + abort on cleanup (pre-existing)
+- [x] useAlertDetail.ts — Restructured from useCallback to useEffect with AbortController
+- [x] useAlerts.ts — Restructured from useCallback to useEffect with AbortController
+- [x] useApplianceStatus.ts — Restructured from useCallback to useEffect with AbortController
+- [x] useDetectionDetail.ts — Restructured from useCallback to useEffect with AbortController
+- [x] useDeviceActivity.ts — Restructured from useCallback to useEffect with AbortController
+- [x] useDeviceDetail.ts — Restructured from useCallback to useEffect with AbortController
+- [x] usePcapDownload.ts — Reviewed: user-triggered download (useCallback), not auto-fetch; AbortController not applicable
+
+## BFF auth middleware fixture-mode bypass
+- [x] bff-auth-middleware.ts — Added isFixtureModeSync() bypass: fixture data is deterministic, no real telemetry to protect
+- [x] Live mode auth remains enforced in ALL environments (no NODE_ENV bypass)
+
+## Test updates
+- [x] slice22b.test.ts — Updated 3 source-code audit tests: useCallback → AbortController pattern checks
+- [x] All 2,720 tests passing across 40 test files — zero regressions

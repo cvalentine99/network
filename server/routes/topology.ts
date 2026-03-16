@@ -25,7 +25,6 @@ import { normalizeDeviceIdentity } from '../extrahop-normalizers';
 
 const router = Router();
 const FIXTURE_DIR = join(process.cwd(), 'fixtures', 'topology');
-const isDev = process.env.NODE_ENV !== 'production';
 
 // ─── Sentinel Map (dev/test only) ─────────────────────────────────
 const SENTINEL_MAP: Record<number, string> = {
@@ -86,7 +85,7 @@ router.post('/query', async (req: Request, res: Response) => {
   // ── FIXTURE MODE ──
   if (await isFixtureMode()) {
     const { fromMs } = parsed.data;
-    const fixtureName = (isDev && SENTINEL_MAP[fromMs])
+    const fixtureName = ((await isFixtureMode()) && SENTINEL_MAP[fromMs])
       ? SENTINEL_MAP[fromMs]
       : 'topology.populated.fixture.json';
 
@@ -370,7 +369,7 @@ router.get('/baseline', async (_req: Request, res: Response) => {
 
 // ─── GET /fixtures (dev/test only) ────────────────────────────────
 router.get('/fixtures', async (_req: Request, res: Response) => {
-  if (!isDev) {
+  if (!(await isFixtureMode())) {
     res.status(404).json({ error: 'Not available in production' });
     return;
   }

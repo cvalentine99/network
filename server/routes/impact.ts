@@ -43,7 +43,6 @@ import { upsertDeviceActivity, getDeviceActivitySummary, getDeviceActivity } fro
 
 const impactRouter = Router();
 
-const isDev = process.env.NODE_ENV !== 'production';
 
 // ─── Cache TTLs ───────────────────────────────────────────────────────
 const METRICS_CACHE_TTL = 30_000;   // 30s for metric queries
@@ -910,9 +909,9 @@ impactRouter.get('/device-detail', async (req, res) => {
 
     // ── FIXTURE MODE ──
     let fixtureName: string;
-    if (isDev && deviceId === 1042) {
+    if ((await isFixtureMode()) && deviceId === 1042) {
       fixtureName = 'device-detail.populated.fixture.json';
-    } else if (isDev && deviceId === 9999) {
+    } else if ((await isFixtureMode()) && deviceId === 9999) {
       fixtureName = 'device-detail.not-found.fixture.json';
     } else {
       fixtureName = 'device-detail.quiet.fixture.json';
@@ -1016,7 +1015,7 @@ impactRouter.get('/detection-detail', async (req, res) => {
 
     // ── FIXTURE MODE ──
     let fixtureName: string;
-    if (isDev && detectionId === 4001) {
+    if ((await isFixtureMode()) && detectionId === 4001) {
       fixtureName = 'detection-detail.populated.fixture.json';
     } else {
       fixtureName = 'detection-detail.quiet.fixture.json';
@@ -1133,7 +1132,7 @@ impactRouter.get('/alert-detail', async (req, res) => {
 
     // ── FIXTURE MODE ──
     let fixtureName: string;
-    if (isDev && alertId === 101) {
+    if ((await isFixtureMode()) && alertId === 101) {
       fixtureName = 'alert-detail.populated.fixture.json';
     } else {
       fixtureName = 'alert-detail.quiet.fixture.json';

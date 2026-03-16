@@ -30,13 +30,13 @@ export function useDataSourceMode(): DataSourceState {
   });
 
   useEffect(() => {
-    let cancelled = false;
+    const controller = new AbortController();
 
     async function check() {
       try {
-        const res = await fetch('/api/bff/health');
+        const res = await fetch('/api/bff/health', { signal: controller.signal });
         if (!res.ok) {
-          if (!cancelled) {
+          if (!controller.signal.aborted) {
             setState({
               mode: 'error',
               label: 'Health check failed',
@@ -47,7 +47,7 @@ export function useDataSourceMode(): DataSourceState {
         }
 
         const data = await res.json();
-        if (cancelled) return;
+        if (controller.signal.aborted) return;
 
         if (data.status === 'not_configured') {
           setState({
@@ -64,7 +64,7 @@ export function useDataSourceMode(): DataSourceState {
           });
         }
       } catch {
-        if (!cancelled) {
+        if (!controller.signal.aborted) {
           setState({
             mode: 'error',
             label: 'Health check failed',
@@ -80,7 +80,7 @@ export function useDataSourceMode(): DataSourceState {
     const interval = setInterval(check, 60_000);
 
     return () => {
-      cancelled = true;
+      controller.abort();
       clearInterval(interval);
     };
   }, []);

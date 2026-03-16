@@ -23,7 +23,6 @@ import { ehRequest, isFixtureMode, ExtraHopClientError } from '../extrahop-clien
 
 const router = Router();
 const FIXTURE_DIR = join(process.cwd(), 'fixtures', 'correlation');
-const isDev = process.env.NODE_ENV !== 'production';
 
 // ─── Sentinel Map (dev/test only) ─────────────────────────────────
 // These are only used in fixture mode + dev environment
@@ -61,7 +60,7 @@ router.post('/events', async (req: Request, res: Response) => {
     const fromMs = intent.fromMs;
 
     // Sentinel routing: only in dev/test, never in production
-    if (isDev && SENTINEL_MAP[fromMs]) {
+    if ((await isFixtureMode()) && SENTINEL_MAP[fromMs]) {
       const sentinel = SENTINEL_MAP[fromMs];
       const fixture = loadFixture(sentinel.file);
       res.status(sentinel.status).json(fixture);
@@ -78,7 +77,7 @@ router.post('/events', async (req: Request, res: Response) => {
 
     // Clustered fixture (dev/test only)
     if (
-      isDev &&
+      (await isFixtureMode()) &&
       intent.categories &&
       intent.categories.length > 0 &&
       fromMs === 1710000000000 &&
@@ -251,7 +250,7 @@ router.post('/events', async (req: Request, res: Response) => {
 
 // ─── GET /fixtures (dev/test only) ────────────────────────────────
 router.get('/fixtures', async (_req: Request, res: Response) => {
-  if (!isDev) {
+  if (!(await isFixtureMode())) {
     res.status(404).json({ error: 'Not available in production' });
     return;
   }

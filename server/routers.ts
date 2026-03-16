@@ -6,6 +6,22 @@ import { z } from "zod";
 import * as db from "./db";
 import { clearConfigCache } from "./extrahop-client";
 
+// Per-request TLS bypass for testConnection — same pattern as extrahop-client.ts
+let _testUndiciAgent: unknown = null;
+async function getTestUndiciAgent(): Promise<unknown> {
+  if (_testUndiciAgent) return _testUndiciAgent;
+  try {
+    // @ts-expect-error — undici is bundled with Node.js 18+ but has no types in this project
+    const undici = await import('undici');
+    _testUndiciAgent = new undici.Agent({
+      connect: { rejectUnauthorized: false },
+    });
+  } catch {
+    _testUndiciAgent = null;
+  }
+  return _testUndiciAgent;
+}
+
 /* ─────────────────────────── Dashboard Overview ─────────────────────────── */
 
 const dashboardRouter = router({
@@ -364,15 +380,20 @@ const applianceConfigRouter = router({
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000);
 
-      const res = await fetch(url, {
+      // Build fetch options with per-request TLS bypass when verifySsl=false
+      // Uses undici dispatcher — same pattern as extrahop-client.ts (no @ts-ignore, no global bypass)
+      const fetchOpts: RequestInit & { dispatcher?: unknown } = {
         method: 'GET',
         headers: {
           'Authorization': `ExtraHop apikey=${config.apiKey}`,
           'Accept': 'application/json',
         },
         signal: controller.signal,
-        // @ts-ignore - Node fetch supports rejectUnauthorized via agent
-      }).catch((err: Error) => {
+      };
+      if (!config.verifySsl) {
+        fetchOpts.dispatcher = await getTestUndiciAgent();
+      }
+      const res = await fetch(url, fetchOpts).catch((err: Error) => {
         clearTimeout(timeout);
         throw err;
       });

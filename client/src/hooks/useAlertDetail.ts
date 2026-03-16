@@ -10,8 +10,9 @@
  *   - Empty triggerHistory/associatedDevices/associatedDetections arrays = quiet state (not error)
  *   - 404 = not-found state (distinct from error)
  *   - Refetches when alertId changes
+ *   - AbortController cancels in-flight requests on unmount or alertId change
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { AlertDetailSchema } from '../../../shared/cockpit-validators';
 import type { AlertDetail } from '../../../shared/cockpit-types';
 
@@ -39,70 +40,81 @@ export function isQuietAlert(detail: AlertDetail): boolean {
 export function useAlertDetail(alertId: number | null): AlertDetailState {
   const [state, setState] = useState<AlertDetailState>({ status: 'loading' });
 
-  const fetchDetail = useCallback(async () => {
+  useEffect(() => {
     if (alertId === null) {
       setState({ status: 'loading' });
       return;
     }
 
+    const controller = new AbortController();
     setState({ status: 'loading' });
 
-    try {
-      const res = await fetch(`/api/bff/impact/alert-detail?id=${alertId}`);
-
-      // Handle 404 — alert not found
-      if (res.status === 404) {
-        const body = await res.json().catch(() => ({ error: 'Alert not found', message: `HTTP 404` }));
-        setState({
-          status: 'not-found',
-          error: body.error || 'Alert not found',
-          message: body.message || `No alert with id ${alertId}`,
+    (async () => {
+      try {
+        const res = await fetch(`/api/bff/impact/alert-detail?id=${alertId}`, {
+          signal: controller.signal,
         });
-        return;
-      }
+        if (controller.signal.aborted) return;
 
-      // Handle other non-OK statuses
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({ error: 'Transport error', message: `HTTP ${res.status}` }));
+        // Handle 404 — alert not found
+        if (res.status === 404) {
+          const body = await res.json().catch(() => ({ error: 'Alert not found', message: `HTTP 404` }));
+          if (controller.signal.aborted) return;
+          setState({
+            status: 'not-found',
+            error: body.error || 'Alert not found',
+            message: body.message || `No alert with id ${alertId}`,
+          });
+          return;
+        }
+
+        // Handle other non-OK statuses
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({ error: 'Transport error', message: `HTTP ${res.status}` }));
+          if (controller.signal.aborted) return;
+          setState({
+            status: 'error',
+            error: body.error || 'Transport error',
+            message: body.message || `HTTP ${res.status}`,
+          });
+          return;
+        }
+
+        const body = await res.json();
+        if (controller.signal.aborted) return;
+
+        const validation = AlertDetailSchema.safeParse(body.alertDetail);
+
+        if (!validation.success) {
+          setState({
+            status: 'malformed',
+            error: 'Data contract violation',
+            message: 'Alert detail response failed schema validation',
+            details: validation.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('; '),
+          });
+          return;
+        }
+
+        // Determine quiet vs populated
+        if (isQuietAlert(validation.data)) {
+          setState({ status: 'quiet', alertDetail: validation.data });
+        } else {
+          setState({ status: 'populated', alertDetail: validation.data });
+        }
+      } catch (err: any) {
+        if (controller.signal.aborted) return;
         setState({
           status: 'error',
-          error: body.error || 'Transport error',
-          message: body.message || `HTTP ${res.status}`,
+          error: 'Network error',
+          message: err.message || 'Failed to fetch alert detail',
         });
-        return;
       }
+    })();
 
-      const body = await res.json();
-      const validation = AlertDetailSchema.safeParse(body.alertDetail);
-
-      if (!validation.success) {
-        setState({
-          status: 'malformed',
-          error: 'Data contract violation',
-          message: 'Alert detail response failed schema validation',
-          details: validation.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('; '),
-        });
-        return;
-      }
-
-      // Determine quiet vs populated
-      if (isQuietAlert(validation.data)) {
-        setState({ status: 'quiet', alertDetail: validation.data });
-      } else {
-        setState({ status: 'populated', alertDetail: validation.data });
-      }
-    } catch (err: any) {
-      setState({
-        status: 'error',
-        error: 'Network error',
-        message: err.message || 'Failed to fetch alert detail',
-      });
-    }
+    return () => {
+      controller.abort();
+    };
   }, [alertId]);
-
-  useEffect(() => {
-    fetchDetail();
-  }, [fetchDetail]);
 
   return state;
 }

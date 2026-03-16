@@ -23,10 +23,10 @@ export function useCorrelationOverlay(): {
   const refetch = useCallback(() => setFetchKey((k) => k + 1), []);
 
   useEffect(() => {
-    let cancelled = false;
+    const controller = new AbortController();
     setState({ kind: 'loading' });
 
-    fetch('/api/bff/correlation/events', {
+    fetch('/api/bff/correlation/events', { signal: controller.signal,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -35,7 +35,7 @@ export function useCorrelationOverlay(): {
       }),
     })
       .then(async (res) => {
-        if (cancelled) return;
+        if (controller.signal.aborted) return;
 
         if (!res.ok) {
           const body = await res.json().catch(() => ({}));
@@ -71,7 +71,7 @@ export function useCorrelationOverlay(): {
         }
       })
       .catch((err) => {
-        if (cancelled) return;
+        if (controller.signal.aborted) return;
         setState({
           kind: 'error',
           message: err.message || 'Network error',
@@ -79,7 +79,7 @@ export function useCorrelationOverlay(): {
       });
 
     return () => {
-      cancelled = true;
+      controller.abort();
     };
   }, [tw.fromMs, tw.untilMs, fetchKey]);
 

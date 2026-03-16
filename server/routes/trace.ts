@@ -39,7 +39,6 @@ const traceRouter = Router();
 /** SSE replay interval in ms between events (fixture mode). */
 const REPLAY_INTERVAL_MS = 150;
 
-const isDev = process.env.NODE_ENV !== 'production';
 
 // ─── SSE Helpers ─────────────────────────────────────────────────────────────
 
@@ -494,9 +493,9 @@ function loadFixtureEvents(fixtureName: string): TraceSSEEvent[] {
  * Select the appropriate fixture file based on entry mode and input value.
  * Sentinel values are ONLY used in dev/test, never in production.
  */
-function selectFixture(mode: TraceEntryMode, value: string): string {
+async function selectFixture(mode: TraceEntryMode, value: string): Promise<string> {
   // Sentinel routing: only in dev/test
-  if (isDev) {
+  if (await isFixtureMode()) {
     if (value === 'unknown.invalid' || value === '0' || value === 'bad-service::0') {
       return 'trace-resolution-error.fixture.jsonl';
     }
@@ -568,7 +567,7 @@ traceRouter.post('/run', async (req, res) => {
   }
 
   // ── FIXTURE MODE ──
-  const fixtureName = selectFixture(intent.mode, intent.value);
+  const fixtureName = await selectFixture(intent.mode, intent.value);
   const events = loadFixtureEvents(fixtureName);
 
   if (events.length === 0) {
@@ -614,7 +613,7 @@ traceRouter.post('/run', async (req, res) => {
  * NOT available in production.
  */
 traceRouter.get('/fixtures', async (_req, res) => {
-  if (!isDev) {
+  if (!(await isFixtureMode())) {
     res.status(404).json({ error: 'Not available in production' });
     return;
   }

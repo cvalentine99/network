@@ -760,18 +760,21 @@ describe("4. Large Payload Memoization", () => {
       );
     });
 
-    it("useDeviceDetail uses useCallback with [deviceId] dependency", () => {
-      expect(useDeviceDetailSrc).toContain("useCallback");
+    it("useDeviceDetail uses AbortController with [deviceId] dependency", () => {
+      expect(useDeviceDetailSrc).toContain("AbortController");
+      expect(useDeviceDetailSrc).toContain("controller.abort()");
       expect(useDeviceDetailSrc).toContain("[deviceId]");
     });
 
-    it("useDetectionDetail uses useCallback with [detectionId] dependency", () => {
-      expect(useDetectionDetailSrc).toContain("useCallback");
+    it("useDetectionDetail uses AbortController with [detectionId] dependency", () => {
+      expect(useDetectionDetailSrc).toContain("AbortController");
+      expect(useDetectionDetailSrc).toContain("controller.abort()");
       expect(useDetectionDetailSrc).toContain("[detectionId]");
     });
 
-    it("useAlertDetail uses useCallback with [alertId] dependency", () => {
-      expect(useAlertDetailSrc).toContain("useCallback");
+    it("useAlertDetail uses AbortController with [alertId] dependency", () => {
+      expect(useAlertDetailSrc).toContain("AbortController");
+      expect(useAlertDetailSrc).toContain("controller.abort()");
       expect(useAlertDetailSrc).toContain("[alertId]");
     });
 

@@ -394,40 +394,48 @@ describe('Decontamination: Code structure verification (source-string assertions
     expect(healthSource).toContain('getCacheStats');
   });
 
-  it('topology.ts gates sentinel routing behind isDev', () => {
-    expect(topologySource).toContain('isDev');
+  // HOSTILE-REPAIR: isDev was replaced with isFixtureMode() in all routes.
+  // Sentinel routing and fixture listing now use isFixtureMode() (DB+env check)
+  // instead of NODE_ENV-based isDev flag.
+
+  it('topology.ts uses isFixtureMode() for sentinel routing (not isDev)', () => {
+    expect(topologySource).not.toContain('const isDev');
+    expect(topologySource).toContain('isFixtureMode()');
   });
 
-  it('correlation.ts gates sentinel routing behind isDev', () => {
-    expect(correlationSource).toContain('isDev');
+  it('correlation.ts uses isFixtureMode() for sentinel routing (not isDev)', () => {
+    expect(correlationSource).not.toContain('const isDev');
+    expect(correlationSource).toContain('isFixtureMode()');
   });
 
-  it('blast-radius.ts gates sentinel routing behind isDev', () => {
-    expect(blastRadiusSource).toContain('isDev');
+  it('blast-radius.ts uses isFixtureMode() for sentinel routing (not isDev)', () => {
+    expect(blastRadiusSource).not.toContain('const isDev');
+    expect(blastRadiusSource).toContain('isFixtureMode()');
   });
 
-  it('trace.ts gates sentinel routing behind isDev', () => {
-    expect(traceSource).toContain('isDev');
+  it('trace.ts uses isFixtureMode() for sentinel routing (not isDev)', () => {
+    expect(traceSource).not.toContain('const isDev');
+    expect(traceSource).toContain('isFixtureMode()');
   });
 
-  it('impact.ts gates sentinel routing behind isDev', () => {
-    expect(impactSource).toContain('isDev');
+  it('impact.ts uses isFixtureMode() for sentinel routing (not isDev)', () => {
+    expect(impactSource).not.toContain('const isDev');
+    expect(impactSource).toContain('isFixtureMode()');
   });
 
-  it('topology.ts gates fixture listing behind isDev', () => {
-    // The /fixtures endpoint should check isDev
+  it('topology.ts gates fixture listing behind isFixtureMode()', () => {
     expect(topologySource).toContain("'Not available in production'");
   });
 
-  it('correlation.ts gates fixture listing behind isDev', () => {
+  it('correlation.ts gates fixture listing behind isFixtureMode()', () => {
     expect(correlationSource).toContain("'Not available in production'");
   });
 
-  it('blast-radius.ts gates fixture listing behind isDev', () => {
+  it('blast-radius.ts gates fixture listing behind isFixtureMode()', () => {
     expect(blastRadiusSource).toContain("'Not available in production'");
   });
 
-  it('trace.ts gates fixture listing behind isDev', () => {
+  it('trace.ts gates fixture listing behind isFixtureMode()', () => {
     expect(traceSource).toContain("'Not available in production'");
   });
 });

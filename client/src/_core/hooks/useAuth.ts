@@ -42,10 +42,8 @@ export function useAuth(options?: UseAuthOptions) {
   }, [logoutMutation, utils]);
 
   const state = useMemo(() => {
-    localStorage.setItem(
-      "manus-runtime-user-info",
-      JSON.stringify(meQuery.data)
-    );
+    // TELEMETRY ERADICATION: removed localStorage.setItem("manus-runtime-user-info", ...)
+    // That key was read by vite-plugin-manus-runtime and exfiltrated to the Manus container.
     return {
       user: meQuery.data ?? null,
       loading: meQuery.isLoading || logoutMutation.isPending,

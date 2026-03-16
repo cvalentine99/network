@@ -32,10 +32,10 @@ export function useTopology(): {
   const refetch = useCallback(() => setFetchKey((k) => k + 1), []);
 
   useEffect(() => {
-    let cancelled = false;
+    const controller = new AbortController();
     setState({ kind: 'loading' });
 
-    fetch('/api/bff/topology/query', {
+    fetch('/api/bff/topology/query', { signal: controller.signal,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ fromMs: tw.fromMs, toMs: tw.untilMs }),
@@ -45,7 +45,7 @@ export function useTopology(): {
         return res.json();
       })
       .then((json) => {
-        if (cancelled) return;
+        if (controller.signal.aborted) return;
         const parsed = TopologyBffResponseSchema.safeParse(json);
         if (!parsed.success) {
           setState({ kind: 'malformed', raw: json });
@@ -65,13 +65,13 @@ export function useTopology(): {
         }
       })
       .catch((err) => {
-        if (!cancelled) {
+        if (!controller.signal.aborted) {
           setState({ kind: 'error', message: String(err) });
         }
       });
 
     return () => {
-      cancelled = true;
+      controller.abort();
     };
   }, [tw.fromMs, tw.untilMs, fetchKey]);
 

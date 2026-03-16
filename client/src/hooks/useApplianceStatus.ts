@@ -11,8 +11,9 @@
  *   - connectionStatus = 'connected' → populated state
  *   - connectionStatus = 'error' → populated state (with error indicators in the data)
  *   - Does NOT depend on shared time window (appliance health is instantaneous)
+ *   - AbortController cancels in-flight requests on unmount
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { ApplianceStatusSchema } from '../../../shared/cockpit-validators';
 import type { ApplianceStatus } from '../../../shared/cockpit-types';
 
@@ -26,54 +27,64 @@ export type ApplianceStatusState =
 export function useApplianceStatus(): ApplianceStatusState {
   const [state, setState] = useState<ApplianceStatusState>({ status: 'loading' });
 
-  const fetchStatus = useCallback(async () => {
+  useEffect(() => {
+    const controller = new AbortController();
     setState({ status: 'loading' });
 
-    try {
-      const res = await fetch('/api/bff/impact/appliance-status');
+    (async () => {
+      try {
+        const res = await fetch('/api/bff/impact/appliance-status', {
+          signal: controller.signal,
+        });
+        if (controller.signal.aborted) return;
 
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({ error: 'Transport error', message: `HTTP ${res.status}` }));
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({ error: 'Transport error', message: `HTTP ${res.status}` }));
+          if (controller.signal.aborted) return;
+          setState({
+            status: 'error',
+            error: body.error || 'Transport error',
+            message: body.message || `HTTP ${res.status}`,
+          });
+          return;
+        }
+
+        const body = await res.json();
+        if (controller.signal.aborted) return;
+
+        const validation = ApplianceStatusSchema.safeParse(body.applianceStatus);
+
+        if (!validation.success) {
+          setState({
+            status: 'malformed',
+            error: 'Data contract violation',
+            message: 'Appliance status response failed schema validation',
+            details: validation.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('; '),
+          });
+          return;
+        }
+
+        // not_configured with empty hostname = quiet state
+        if (validation.data.connectionStatus === 'not_configured' && validation.data.hostname === '') {
+          setState({ status: 'quiet' });
+          return;
+        }
+
+        setState({ status: 'populated', applianceStatus: validation.data });
+      } catch (err: any) {
+        if (controller.signal.aborted) return;
         setState({
           status: 'error',
-          error: body.error || 'Transport error',
-          message: body.message || `HTTP ${res.status}`,
+          error: 'Network error',
+          message: err.message || 'Failed to fetch appliance status',
         });
-        return;
       }
+    })();
 
-      const body = await res.json();
-      const validation = ApplianceStatusSchema.safeParse(body.applianceStatus);
-
-      if (!validation.success) {
-        setState({
-          status: 'malformed',
-          error: 'Data contract violation',
-          message: 'Appliance status response failed schema validation',
-          details: validation.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('; '),
-        });
-        return;
-      }
-
-      // not_configured with empty hostname = quiet state
-      if (validation.data.connectionStatus === 'not_configured' && validation.data.hostname === '') {
-        setState({ status: 'quiet' });
-        return;
-      }
-
-      setState({ status: 'populated', applianceStatus: validation.data });
-    } catch (err: any) {
-      setState({
-        status: 'error',
-        error: 'Network error',
-        message: err.message || 'Failed to fetch appliance status',
-      });
-    }
+    return () => {
+      controller.abort();
+    };
   }, []);
-
-  useEffect(() => {
-    fetchStatus();
-  }, [fetchStatus]);
 
   return state;
 }

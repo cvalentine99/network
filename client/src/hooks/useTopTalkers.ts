@@ -29,7 +29,7 @@ export function useTopTalkers(): TopTalkersState {
   const [state, setState] = useState<TopTalkersState>({ status: 'loading' });
 
   useEffect(() => {
-    let cancelled = false;
+    const controller = new AbortController();
 
     async function fetchTopTalkers() {
       setState({ status: 'loading' });
@@ -41,9 +41,11 @@ export function useTopTalkers(): TopTalkersState {
           cycle: timeWindow.cycle,
         });
 
-        const res = await fetch(`/api/bff/impact/top-talkers?${params}`);
+        const res = await fetch(`/api/bff/impact/top-talkers?${params}`, {
+          signal: controller.signal,
+        });
 
-        if (cancelled) return;
+        if (controller.signal.aborted) return;
 
         if (!res.ok) {
           const body = await res.json().catch(() => ({ error: 'Unknown', message: `HTTP ${res.status}` }));
@@ -75,7 +77,7 @@ export function useTopTalkers(): TopTalkersState {
           setState({ status: 'populated', topTalkers: validation.data });
         }
       } catch (err: any) {
-        if (cancelled) return;
+        if (controller.signal.aborted) return;
         setState({
           status: 'transport-error',
           error: 'Network error',
@@ -87,7 +89,7 @@ export function useTopTalkers(): TopTalkersState {
     fetchTopTalkers();
 
     return () => {
-      cancelled = true;
+      controller.abort();
     };
   }, [timeWindow.fromMs, timeWindow.untilMs, timeWindow.cycle]); // eslint-disable-line react-hooks/exhaustive-deps
 

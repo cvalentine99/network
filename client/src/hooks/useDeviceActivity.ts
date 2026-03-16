@@ -9,8 +9,9 @@
  *   - Returns discriminated union: loading | populated | quiet | error | malformed
  *   - Refetches when deviceId changes
  *   - Validates response with Zod schema (audit M2)
+ *   - AbortController cancels in-flight requests on unmount or deviceId change
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { z } from 'zod';
 
 // ─── Zod Schema for BFF response validation (audit M2) ──────────────────
@@ -44,61 +45,70 @@ export type DeviceActivityState =
 export function useDeviceActivity(deviceId: number | null, limit = 50): DeviceActivityState {
   const [state, setState] = useState<DeviceActivityState>({ status: 'loading' });
 
-  const fetchActivity = useCallback(async () => {
+  useEffect(() => {
     if (deviceId === null) {
       setState({ status: 'loading' });
       return;
     }
 
+    const controller = new AbortController();
     setState({ status: 'loading' });
 
-    try {
-      const res = await fetch(`/api/bff/impact/device-activity?id=${deviceId}&limit=${limit}`);
+    (async () => {
+      try {
+        const res = await fetch(`/api/bff/impact/device-activity?id=${deviceId}&limit=${limit}`, {
+          signal: controller.signal,
+        });
+        if (controller.signal.aborted) return;
 
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({ error: 'Transport error', message: `HTTP ${res.status}` }));
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({ error: 'Transport error', message: `HTTP ${res.status}` }));
+          if (controller.signal.aborted) return;
+          setState({
+            status: 'error',
+            error: body.error || 'Transport error',
+            message: body.message || `HTTP ${res.status}`,
+          });
+          return;
+        }
+
+        const body = await res.json();
+        if (controller.signal.aborted) return;
+
+        // Validate response shape with Zod (audit M2)
+        const parsed = BffResponseSchema.safeParse(body);
+        if (!parsed.success) {
+          console.error('[useDeviceActivity] Response validation failed:', parsed.error.issues);
+          setState({
+            status: 'malformed',
+            error: 'Malformed response',
+            message: `BFF response failed schema validation: ${parsed.error.issues.map(i => i.message).join('; ')}`,
+          });
+          return;
+        }
+
+        const rows = parsed.data.activityRows;
+
+        if (rows.length === 0) {
+          setState({ status: 'quiet' });
+        } else {
+          setState({ status: 'populated', rows });
+        }
+      } catch (err: unknown) {
+        if (controller.signal.aborted) return;
+        const message = err instanceof Error ? err.message : 'Failed to fetch device activity';
         setState({
           status: 'error',
-          error: body.error || 'Transport error',
-          message: body.message || `HTTP ${res.status}`,
+          error: 'Network error',
+          message,
         });
-        return;
       }
+    })();
 
-      const body = await res.json();
-
-      // Validate response shape with Zod (audit M2)
-      const parsed = BffResponseSchema.safeParse(body);
-      if (!parsed.success) {
-        console.error('[useDeviceActivity] Response validation failed:', parsed.error.issues);
-        setState({
-          status: 'malformed',
-          error: 'Malformed response',
-          message: `BFF response failed schema validation: ${parsed.error.issues.map(i => i.message).join('; ')}`,
-        });
-        return;
-      }
-
-      const rows = parsed.data.activityRows;
-
-      if (rows.length === 0) {
-        setState({ status: 'quiet' });
-      } else {
-        setState({ status: 'populated', rows });
-      }
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to fetch device activity';
-      setState({
-        status: 'error',
-        error: 'Network error',
-        message,
-      });
-    }
+    return () => {
+      controller.abort();
+    };
   }, [deviceId, limit]);
-
-  useEffect(() => {
-    fetchActivity();
-  }, [fetchActivity]);
 
   return state;
 }

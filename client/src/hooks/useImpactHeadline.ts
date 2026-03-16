@@ -29,7 +29,7 @@ export function useImpactHeadline(): {
   const refetch = useCallback(() => setFetchKey((k) => k + 1), []);
 
   useEffect(() => {
-    let cancelled = false;
+    const controller = new AbortController();
     setState({ kind: 'loading' });
 
     const params = new URLSearchParams({
@@ -38,9 +38,9 @@ export function useImpactHeadline(): {
       cycle: tw.cycle,
     });
 
-    fetch(`/api/bff/impact/headline?${params}`)
+    fetch(`/api/bff/impact/headline?${params}`, { signal: controller.signal })
       .then(async (res) => {
-        if (cancelled) return;
+        if (controller.signal.aborted) return;
 
         if (!res.ok) {
           const body = await res.json().catch(() => ({}));
@@ -80,7 +80,7 @@ export function useImpactHeadline(): {
         }
       })
       .catch((err) => {
-        if (cancelled) return;
+        if (controller.signal.aborted) return;
         setState({
           kind: 'error',
           message: err.message || 'Network error',
@@ -88,7 +88,7 @@ export function useImpactHeadline(): {
       });
 
     return () => {
-      cancelled = true;
+      controller.abort();
     };
   }, [tw.fromMs, tw.untilMs, tw.cycle, fetchKey]);
 
