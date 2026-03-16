@@ -516,6 +516,7 @@ export const savedTopologyViews = mysqlTable("saved_topology_views", {
   criticalPathSource: int("critical_path_source"),
   criticalPathDestination: int("critical_path_destination"),
   searchTerm: varchar("search_term", { length: 255 }).notNull().default(""),
+  nodePositions: json("node_positions").$type<Record<string, { x: number; y: number }> | null>().default(null),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });

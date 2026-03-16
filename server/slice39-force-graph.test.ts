@@ -807,3 +807,214 @@ describe('Slice 41 — ForceGraph Source Code Contract', () => {
     expect(forceGraphSource).toContain('Number.isFinite(v.y)');
   });
 });
+
+
+// ═══════════════════════════════════════════════════════════════════════
+// Slice 42 — Saved Views Positions, Lock All, JSON Export/Import
+// ═══════════════════════════════════════════════════════════════════════
+
+describe('Slice 42 — Saved Views Position Integration', () => {
+  const schemaSource = readFileSync(join(process.cwd(), 'drizzle', 'schema.ts'), 'utf-8');
+  const dbSource = readFileSync(join(process.cwd(), 'server', 'db.ts'), 'utf-8');
+  const routersSource = readFileSync(join(process.cwd(), 'server', 'routers.ts'), 'utf-8');
+  const topologySource = readFileSync(join(process.cwd(), 'client', 'src', 'pages', 'Topology.tsx'), 'utf-8');
+  const forceGraphSource = readFileSync(join(process.cwd(), 'client', 'src', 'components', 'ForceGraph.tsx'), 'utf-8');
+
+  // ─── DB Schema ─────────────────────────────────────────────────
+  it('schema has node_positions JSON column on saved_topology_views', () => {
+    expect(schemaSource).toContain('nodePositions');
+    expect(schemaSource).toContain('node_positions');
+  });
+
+  // ─── DB helpers ────────────────────────────────────────────────
+  it('createSavedTopologyView accepts nodePositions parameter', () => {
+    expect(dbSource).toContain('nodePositions?: Record<string, { x: number; y: number }> | null');
+  });
+
+  it('updateSavedTopologyView accepts nodePositions parameter', () => {
+    // Should appear twice — once in create, once in update
+    const matches = dbSource.match(/nodePositions\?: Record<string, \{ x: number; y: number \}> \| null/g);
+    expect(matches).not.toBeNull();
+    expect(matches!.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('createSavedTopologyView persists nodePositions to DB', () => {
+    expect(dbSource).toContain('nodePositions: input.nodePositions ?? null');
+  });
+
+  // ─── tRPC router ──────────────────────────────────────────────
+  it('savedViews.create schema includes nodePositions with Zod validation', () => {
+    expect(routersSource).toContain('nodePositions: z.record(z.string(), z.object({ x: z.number().finite(), y: z.number().finite() }))');
+  });
+
+  it('savedViews.update schema includes nodePositions with Zod validation', () => {
+    // Both create and update should have the nodePositions Zod schema
+    const matches = routersSource.match(/nodePositions: z\.record/g);
+    expect(matches).not.toBeNull();
+    expect(matches!.length).toBeGreaterThanOrEqual(2);
+  });
+
+  // ─── ForceGraph handle ────────────────────────────────────────
+  it('ForceGraphHandle exposes getNodePositions method', () => {
+    expect(forceGraphSource).toContain('getNodePositions: () => Record<string, { x: number; y: number }>');
+  });
+
+  it('ForceGraphHandle exposes applyNodePositions method', () => {
+    expect(forceGraphSource).toContain('applyNodePositions: (positions: Record<string, { x: number; y: number }>) => void');
+  });
+
+  it('getNodePositions rejects NaN/Infinity values', () => {
+    expect(forceGraphSource).toContain('Number.isFinite(n.x) && Number.isFinite(n.y)');
+  });
+
+  it('applyNodePositions validates each position entry', () => {
+    expect(forceGraphSource).toContain('Number.isFinite(v.x) && Number.isFinite(v.y)');
+  });
+
+  // ─── Topology integration ─────────────────────────────────────
+  it('SavedViewsPanel currentState includes nodePositions', () => {
+    expect(topologySource).toContain('nodePositions: forceGraphRef.current?.getNodePositions() ?? null');
+  });
+
+  it('handleLoadView restores nodePositions via applyNodePositions', () => {
+    expect(topologySource).toContain('forceGraphRef.current?.applyNodePositions(view.nodePositions)');
+  });
+
+  it('SavedViewsPanel passes nodePositions to createMutation', () => {
+    expect(topologySource).toContain('nodePositions: currentState.nodePositions');
+  });
+});
+
+describe('Slice 42 — Lock All Toggle', () => {
+  const forceGraphSource = readFileSync(join(process.cwd(), 'client', 'src', 'components', 'ForceGraph.tsx'), 'utf-8');
+  const topologySource = readFileSync(join(process.cwd(), 'client', 'src', 'pages', 'Topology.tsx'), 'utf-8');
+
+  // ─── ForceGraph handle ────────────────────────────────────────
+  it('ForceGraphHandle exposes isLocked boolean', () => {
+    expect(forceGraphSource).toContain('isLocked: boolean');
+  });
+
+  it('ForceGraphHandle exposes toggleLock method', () => {
+    expect(forceGraphSource).toContain('toggleLock: () => void');
+  });
+
+  it('isLocked state is initialized to false', () => {
+    expect(forceGraphSource).toContain('const [isLocked, setIsLocked] = useState(false)');
+  });
+
+  it('toggleLock pins all nodes when locking', () => {
+    expect(forceGraphSource).toContain('n.fx = n.x');
+    expect(forceGraphSource).toContain('n.fy = n.y');
+  });
+
+  it('toggleLock stops simulation when locking', () => {
+    expect(forceGraphSource).toContain("simulationRef.current?.stop()");
+  });
+
+  it('toggleLock restarts simulation when unlocking', () => {
+    expect(forceGraphSource).toContain("simulationRef.current?.alpha(0.3).restart()");
+  });
+
+  it('drag handlers check isLockedRef before allowing drag', () => {
+    expect(forceGraphSource).toContain('if (isLockedRef.current) return;');
+    // Should appear in all three handlers: start, drag, end
+    const matches = forceGraphSource.match(/if \(isLockedRef\.current\) return;/g);
+    expect(matches).not.toBeNull();
+    expect(matches!.length).toBe(3);
+  });
+
+  it('resetLayout also resets isLocked to false', () => {
+    expect(forceGraphSource).toContain('setIsLocked(false)');
+  });
+
+  // ─── Topology toolbar ─────────────────────────────────────────
+  it('Topology.tsx has Lock/Unlock icons imported', () => {
+    expect(topologySource).toContain('Lock,');
+    expect(topologySource).toContain('Unlock,');
+  });
+
+  it('Topology.tsx has toggle-lock button with data-testid', () => {
+    expect(topologySource).toContain('data-testid="toggle-lock"');
+  });
+
+  it('Topology.tsx calls forceGraphRef.current?.toggleLock()', () => {
+    expect(topologySource).toContain('forceGraphRef.current?.toggleLock()');
+  });
+
+  it('Lock button has amber highlight when locked', () => {
+    expect(topologySource).toContain('bg-amber-500/20 text-amber-400');
+  });
+});
+
+describe('Slice 42 — JSON Layout Export/Import', () => {
+  const topologySource = readFileSync(join(process.cwd(), 'client', 'src', 'pages', 'Topology.tsx'), 'utf-8');
+
+  // ─── Export ────────────────────────────────────────────────────
+  it('ExportMenu accepts getNodePositions prop', () => {
+    expect(topologySource).toContain('getNodePositions?: () => Record<string, { x: number; y: number }>');
+  });
+
+  it('ExportMenu accepts applyNodePositions prop', () => {
+    expect(topologySource).toContain('applyNodePositions?: (positions: Record<string, { x: number; y: number }>) => void');
+  });
+
+  it('Export layout uses format version string', () => {
+    expect(topologySource).toContain("_format: 'network-performance-topology-layout-v1'");
+  });
+
+  it('Export layout includes nodeCount and positions', () => {
+    expect(topologySource).toContain('nodeCount: count');
+    expect(topologySource).toContain('positions,');
+  });
+
+  it('Export layout button has data-testid', () => {
+    expect(topologySource).toContain('data-testid="export-layout-json"');
+  });
+
+  it('Export layout produces a .json file download', () => {
+    expect(topologySource).toContain('topology-layout-');
+    expect(topologySource).toContain('.json');
+  });
+
+  // ─── Import ────────────────────────────────────────────────────
+  it('Import layout button has data-testid', () => {
+    expect(topologySource).toContain('data-testid="import-layout-json"');
+  });
+
+  it('Import validates format version string', () => {
+    expect(topologySource).toContain("raw._format !== 'network-performance-topology-layout-v1'");
+  });
+
+  it('Import validates positions object exists', () => {
+    expect(topologySource).toContain("!raw.positions || typeof raw.positions !== 'object'");
+  });
+
+  it('Import validates each position has finite x and y', () => {
+    expect(topologySource).toContain('Number.isFinite(pos.x) && Number.isFinite(pos.y)');
+  });
+
+  it('Import rejects files with zero valid positions', () => {
+    expect(topologySource).toContain("'No valid positions in layout file'");
+  });
+
+  it('Import calls applyNodePositions with clean data', () => {
+    expect(topologySource).toContain('applyNodePositions(clean)');
+  });
+
+  it('Hidden file input accepts only JSON files', () => {
+    expect(topologySource).toContain('accept=".json,application/json"');
+  });
+
+  it('File input resets after import to allow re-import', () => {
+    expect(topologySource).toContain("e.target.value = ''");
+  });
+
+  // ─── Topology passes props to ExportMenu ──────────────────────
+  it('ExportMenu call site passes getNodePositions', () => {
+    expect(topologySource).toContain('getNodePositions={() => forceGraphRef.current?.getNodePositions()');
+  });
+
+  it('ExportMenu call site passes applyNodePositions', () => {
+    expect(topologySource).toContain('applyNodePositions={(pos) => forceGraphRef.current?.applyNodePositions(pos)}');
+  });
+});

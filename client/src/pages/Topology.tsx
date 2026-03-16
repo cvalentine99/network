@@ -55,6 +55,9 @@ import {
   EyeOff,
   ArrowRight,
   RotateCcw,
+  Lock,
+  Unlock,
+  Upload,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { trpc } from '@/lib/trpc';
@@ -572,10 +575,14 @@ function ExportMenu({
   payload,
   svgRef,
   onClose,
+  getNodePositions,
+  applyNodePositions,
 }: {
   payload: TopologyPayload;
   svgRef: React.RefObject<SVGSVGElement | null>;
   onClose: () => void;
+  getNodePositions?: () => Record<string, { x: number; y: number }>;
+  applyNodePositions?: (positions: Record<string, { x: number; y: number }>) => void;
 }) {
   const handleExport = useCallback((format: 'json' | 'csv' | 'nodes-csv' | 'edges-csv' | 'svg' | 'png') => {
     try {
@@ -622,6 +629,78 @@ function ExportMenu({
     }
   }, [payload, svgRef, onClose]);
 
+  // ─── Layout JSON export (Slice 42) ─────────────────────────────
+  const handleExportLayout = useCallback(() => {
+    if (!getNodePositions) { toast.error('No layout data available'); return; }
+    const positions = getNodePositions();
+    const count = Object.keys(positions).length;
+    if (count === 0) { toast.error('No node positions to export'); return; }
+    const data = {
+      _format: 'network-performance-topology-layout-v1',
+      exportedAt: new Date().toISOString(),
+      nodeCount: count,
+      positions,
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const ts = new Intl.DateTimeFormat('sv-SE', { dateStyle: 'short', timeStyle: 'medium' }).format(new Date()).replace(/[: ]/g, '-');
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `topology-layout-${ts}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`Exported layout for ${count} nodes`);
+    onClose();
+  }, [getNodePositions, onClose]);
+
+  // ─── Layout JSON import (Slice 42) ─────────────────────────────
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const handleImportLayout = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !applyNodePositions) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const raw = JSON.parse(reader.result as string);
+        if (raw._format !== 'network-performance-topology-layout-v1') {
+          toast.error('Invalid layout file format');
+          return;
+        }
+        if (!raw.positions || typeof raw.positions !== 'object') {
+          toast.error('No positions found in layout file');
+          return;
+        }
+        // Validate each position entry
+        const clean: Record<string, { x: number; y: number }> = {};
+        let imported = 0;
+        for (const [k, v] of Object.entries(raw.positions)) {
+          const pos = v as { x?: number; y?: number };
+          if (typeof pos?.x === 'number' && typeof pos?.y === 'number' &&
+              Number.isFinite(pos.x) && Number.isFinite(pos.y)) {
+            clean[k] = { x: pos.x, y: pos.y };
+            imported++;
+          }
+        }
+        if (imported === 0) {
+          toast.error('No valid positions in layout file');
+          return;
+        }
+        applyNodePositions(clean);
+        toast.success(`Imported layout for ${imported} nodes`);
+        onClose();
+      } catch {
+        toast.error('Failed to parse layout file');
+      }
+    };
+    reader.readAsText(file);
+    // Reset input so the same file can be re-imported
+    e.target.value = '';
+  }, [applyNodePositions, onClose]);
+
   return (
     <div
       className="absolute right-0 top-full mt-1 w-48 bg-[#161b22] border border-white/[0.08] rounded-lg shadow-xl z-30 py-1"
@@ -646,6 +725,29 @@ function ExportMenu({
       <button onClick={() => handleExport('png')} className="w-full text-left px-3 py-1.5 text-xs text-zinc-300 hover:bg-white/[0.06]">
         Export as PNG
       </button>
+      <div className="border-t border-white/[0.06] my-1" />
+      <button
+        onClick={handleExportLayout}
+        className="w-full text-left px-3 py-1.5 text-xs text-zinc-300 hover:bg-white/[0.06] flex items-center gap-1.5"
+        data-testid="export-layout-json"
+      >
+        <Download size={11} /> Export layout JSON
+      </button>
+      <button
+        onClick={handleImportLayout}
+        className="w-full text-left px-3 py-1.5 text-xs text-zinc-300 hover:bg-white/[0.06] flex items-center gap-1.5"
+        data-testid="import-layout-json"
+      >
+        <Upload size={11} /> Import layout JSON
+      </button>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".json,application/json"
+        className="hidden"
+        onChange={handleFileChange}
+        data-testid="import-layout-input"
+      />
     </div>
   );
 }
@@ -663,6 +765,7 @@ function SavedViewsPanel({
     anomalyOverlayEnabled: boolean;
     criticalPathSource: number | null;
     criticalPathDestination: number | null;
+    nodePositions: Record<string, { x: number; y: number }> | null;
   };
 }) {
   const [saveName, setSaveName] = useState('');
@@ -701,6 +804,7 @@ function SavedViewsPanel({
       anomalyThreshold: 50,
       panX: 0,
       panY: 0,
+      nodePositions: currentState.nodePositions,
     });
   };
 
@@ -910,6 +1014,13 @@ export default function Topology() {
     if (view.collapsedSubnets) {
       setCollapsedSubnets(new Set(JSON.parse(view.collapsedSubnets || '[]')));
     }
+    // Restore node positions if the saved view includes them (Slice 42)
+    if (view.nodePositions && typeof view.nodePositions === 'object') {
+      // Apply after a tick so ForceGraph has rendered
+      setTimeout(() => {
+        forceGraphRef.current?.applyNodePositions(view.nodePositions);
+      }, 200);
+    }
     setShowSavedViews(false);
     toast.success(`Loaded view: ${view.name}`);
   }, []);
@@ -1106,6 +1217,23 @@ export default function Topology() {
               >
                 <RotateCcw size={14} />
               </button>
+              {/* Lock All toggle — freeze/unfreeze simulation (Slice 42) */}
+              <button
+                onClick={() => {
+                  forceGraphRef.current?.toggleLock();
+                  const willBeLocked = !forceGraphRef.current?.isLocked;
+                  toast.success(willBeLocked ? 'Layout unlocked — simulation resumed' : 'Layout locked — nodes frozen');
+                }}
+                className={`p-1.5 rounded transition-colors ${
+                  forceGraphRef.current?.isLocked
+                    ? 'bg-amber-500/20 text-amber-400'
+                    : 'hover:bg-white/[0.06] text-zinc-400'
+                }`}
+                title={forceGraphRef.current?.isLocked ? 'Unlock layout (resume simulation)' : 'Lock layout (freeze all nodes)'}
+                data-testid="toggle-lock"
+              >
+                {forceGraphRef.current?.isLocked ? <Lock size={14} /> : <Unlock size={14} />}
+              </button>
             </>
           )}
 
@@ -1120,7 +1248,13 @@ export default function Topology() {
               <Download size={14} />
             </button>
             {showExportMenu && (
-              <ExportMenu payload={payload} svgRef={{ current: forceGraphRef.current?.svgElement ?? svgRef.current } as React.RefObject<SVGSVGElement | null>} onClose={() => setShowExportMenu(false)} />
+              <ExportMenu
+                payload={payload}
+                svgRef={{ current: forceGraphRef.current?.svgElement ?? svgRef.current } as React.RefObject<SVGSVGElement | null>}
+                onClose={() => setShowExportMenu(false)}
+                getNodePositions={() => forceGraphRef.current?.getNodePositions() ?? {}}
+                applyNodePositions={(pos) => forceGraphRef.current?.applyNodePositions(pos)}
+              />
             )}
           </div>
 
@@ -1213,6 +1347,7 @@ export default function Topology() {
               anomalyOverlayEnabled: showAnomalyOverlay,
               criticalPathSource: pathSourceId,
               criticalPathDestination: pathDestId,
+              nodePositions: forceGraphRef.current?.getNodePositions() ?? null,
             }}
           />
         </div>

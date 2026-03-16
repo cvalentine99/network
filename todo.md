@@ -569,3 +569,14 @@ These items are tracked here for the live integration phase.
 - [x] Add "Reset Layout" button to clear saved positions and re-run simulation
 - [x] Write tests for position save/restore/clear logic — 23 new tests, 2561 total passing
 - [x] Generate truth receipt — SLICE-41-RECEIPT.md
+
+# SLICE 42 — Saved Views Positions, Lock All, JSON Export/Import
+
+- [x] Saved Views: capture node positions when saving a view (DB column + tRPC schema + SavedViewsPanel)
+- [x] Saved Views: restore node positions when loading a view (handleLoadView + applyNodePositions)
+- [x] Lock All toggle: freeze/unfreeze entire simulation (toggleLock + isLockedRef drag guard)
+- [x] Lock All: toolbar button with Lock/Unlock icon (amber highlight when locked)
+- [x] Export layout as JSON: download current node positions (ExportMenu + format v1)
+- [x] Import layout from JSON: upload and restore positions (file input + validation)
+- [x] Write tests for all three features — 41 new tests, 2602 total passing, 0 failures
+- [x] Generate truth receipt — SLICE-42-RECEIPT.md

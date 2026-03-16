@@ -213,6 +213,7 @@ const savedViewsRouter = router({
       criticalPathSource: z.number().int().positive().nullable().default(null),
       criticalPathDestination: z.number().int().positive().nullable().default(null),
       searchTerm: z.string().default(''),
+      nodePositions: z.record(z.string(), z.object({ x: z.number().finite(), y: z.number().finite() })).nullable().default(null),
     }))
     .mutation(async ({ input }) => {
       const id = await db.createSavedTopologyView({
@@ -238,6 +239,7 @@ const savedViewsRouter = router({
       criticalPathSource: z.number().int().positive().nullable().optional(),
       criticalPathDestination: z.number().int().positive().nullable().optional(),
       searchTerm: z.string().optional(),
+      nodePositions: z.record(z.string(), z.object({ x: z.number().finite(), y: z.number().finite() })).nullable().optional(),
     }))
     .mutation(async ({ input }) => {
       const { id, ...rest } = input;

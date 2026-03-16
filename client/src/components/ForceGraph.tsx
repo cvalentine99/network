@@ -187,6 +187,10 @@ export interface ForceGraphHandle {
   resetZoom: () => void;
   resetLayout: () => void;
   hasCustomLayout: boolean;
+  isLocked: boolean;
+  toggleLock: () => void;
+  getNodePositions: () => Record<string, { x: number; y: number }>;
+  applyNodePositions: (positions: Record<string, { x: number; y: number }>) => void;
 }
 
 // ─── Component ───────────────────────────────────────────────────
@@ -212,6 +216,7 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
   const linksRef = useRef<SimLink[]>([]);
   const savedPositionsRef = useRef<Map<number, SavedPosition>>(loadSavedPositions());
   const [hasCustomLayout, setHasCustomLayout] = useState(() => loadSavedPositions().size > 0);
+  const [isLocked, setIsLocked] = useState(false);
 
   // ─── Tooltip state ──────────────────────────────────────────────
   const [tooltip, setTooltip] = useState<{
@@ -279,6 +284,7 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
       clearSavedPositions();
       savedPositionsRef.current = new Map();
       setHasCustomLayout(false);
+      setIsLocked(false);
       // Unpin all nodes and restart simulation
       for (const n of nodesRef.current) {
         n.fx = null;
@@ -287,7 +293,65 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
       simulationRef.current?.alpha(0.8).restart();
     },
     hasCustomLayout,
-  }), [hasCustomLayout]);
+    isLocked,
+    toggleLock: () => {
+      setIsLocked((prev) => {
+        const next = !prev;
+        if (next) {
+          // Lock: pin all nodes at current positions and stop simulation
+          for (const n of nodesRef.current) {
+            n.fx = n.x;
+            n.fy = n.y;
+          }
+          simulationRef.current?.stop();
+        } else {
+          // Unlock: unpin nodes that weren't manually dragged and restart
+          const saved = savedPositionsRef.current;
+          for (const n of nodesRef.current) {
+            if (!saved.has(n.id)) {
+              n.fx = null;
+              n.fy = null;
+            }
+          }
+          simulationRef.current?.alpha(0.3).restart();
+        }
+        return next;
+      });
+    },
+    getNodePositions: () => {
+      const positions: Record<string, { x: number; y: number }> = {};
+      for (const n of nodesRef.current) {
+        if (n.x != null && n.y != null && Number.isFinite(n.x) && Number.isFinite(n.y)) {
+          positions[String(n.id)] = { x: n.x, y: n.y };
+        }
+      }
+      return positions;
+    },
+    applyNodePositions: (positions: Record<string, { x: number; y: number }>) => {
+      const posMap = new Map<number, SavedPosition>();
+      for (const [k, v] of Object.entries(positions)) {
+        const id = Number(k);
+        if (!Number.isNaN(id) && Number.isFinite(v.x) && Number.isFinite(v.y)) {
+          posMap.set(id, v);
+        }
+      }
+      // Apply positions to current nodes
+      for (const n of nodesRef.current) {
+        const pos = posMap.get(n.id);
+        if (pos) {
+          n.x = pos.x;
+          n.y = pos.y;
+          n.fx = pos.x;
+          n.fy = pos.y;
+        }
+      }
+      // Save to localStorage too
+      savedPositionsRef.current = posMap;
+      saveSavedPositions(posMap);
+      setHasCustomLayout(posMap.size > 0);
+      forceRender((v) => v + 1);
+    },
+  }), [hasCustomLayout, isLocked]);
 
   // ─── Responsive sizing ─────────────────────────────────────────
   useEffect(() => {
@@ -495,9 +559,13 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
     };
   }, []);
 
-  // ─── Drag handler ──────────────────────────────────────────────
+  // ─── Drag handler (disabled when locked) ───────────────────────
+  const isLockedRef = useRef(isLocked);
+  isLockedRef.current = isLocked;
+
   const handleDragStart = useCallback(
     (event: { active: number }, d: SimNode) => {
+      if (isLockedRef.current) return;
       if (!event.active) simulationRef.current?.alphaTarget(0.3).restart();
       d.fx = d.x;
       d.fy = d.y;
@@ -507,6 +575,7 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
 
   const handleDrag = useCallback(
     (event: { x: number; y: number }, d: SimNode) => {
+      if (isLockedRef.current) return;
       d.fx = event.x;
       d.fy = event.y;
     },
@@ -515,6 +584,7 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
 
   const handleDragEnd = useCallback(
     (event: { active: number }, d: SimNode) => {
+      if (isLockedRef.current) return;
       if (!event.active) simulationRef.current?.alphaTarget(0);
       // Pin the node at its dragged position and persist to localStorage (Slice 41)
       d.fx = d.x;

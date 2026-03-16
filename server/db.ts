@@ -770,6 +770,7 @@ export async function createSavedTopologyView(input: {
   criticalPathSource: number | null;
   criticalPathDestination: number | null;
   searchTerm: string;
+  nodePositions?: Record<string, { x: number; y: number }> | null;
 }) {
   const db = await getDb();
   if (!db) return null;
@@ -788,6 +789,7 @@ export async function createSavedTopologyView(input: {
     criticalPathSource: input.criticalPathSource,
     criticalPathDestination: input.criticalPathDestination,
     searchTerm: input.searchTerm,
+    nodePositions: input.nodePositions ?? null,
   });
   return result.insertId;
 }
@@ -806,6 +808,7 @@ export async function updateSavedTopologyView(id: number, userId: string, input:
   criticalPathSource?: number | null;
   criticalPathDestination?: number | null;
   searchTerm?: string;
+  nodePositions?: Record<string, { x: number; y: number }> | null;
 }) {
   const db = await getDb();
   if (!db) return false;
