@@ -105,10 +105,12 @@ Audited against: commit dfbd40c6 (current dev sandbox)
 **Severity:** HIGH
 
 ### T2-2: ForceGraph.tsx Complexity
-**Status:** VERIFIED
-**File:** `client/src/components/ForceGraph.tsx` (1,969 lines)
-**Impact:** Maintainability concern. Contains drag handlers, edge bundling, context menu, minimap, tooltip, simulation, and rendering all in one file.
-**Severity:** MEDIUM (functional but hard to maintain)
+**Status:** FIXED
+**File:** `client/src/components/ForceGraph.tsx` (reduced from 1,969 to ~600 lines)
+**Evidence:** Decomposed into 11 sub-modules under `client/src/components/topology/`: types.ts, constants.ts, scaling.ts, layout-persistence.ts, NodeRenderer.tsx, EdgeRenderer.tsx, TooltipOverlay.tsx, ContextMenuOverlay.tsx, MinimapOverlay.tsx, ClusterBackgrounds.tsx, index.ts. Main ForceGraph.tsx is now a thin orchestrator composing these modules.
+**Impact:** Each sub-module is independently reviewable and testable. Source-code audit tests updated with `readForceGraphFullSource()` helper.
+**Proof:** All 2,725 tests pass across 41 files. HMR picks up changes cleanly.
+**Severity:** MEDIUM (resolved)
 
 ---
 
@@ -237,7 +239,7 @@ Audited against: commit dfbd40c6 (current dev sandbox)
 | T1-2 | DashboardLayoutSkeleton Dead | LOW | FIXED (deleted) |
 | T1-3 | notification.ts Unused | LOW | VERIFIED (framework plumbing, kept) |
 | T2-1 | 13 BFF Hooks Missing AbortController | HIGH | FIXED |
-| T2-2 | ForceGraph.tsx Complexity | MEDIUM | VERIFIED (functional, documented) |
+| T2-2 | ForceGraph.tsx Complexity | MEDIUM | FIXED (decomposed into 11 sub-modules) |
 | T3-1 | deploy SQL Stale Tables | HIGH | FIXED |
 | T3-2 | deploy SQL Missing node_positions | MEDIUM | FIXED |
 | T3-3 | deploy SQL Missing Views | MEDIUM | FIXED |
@@ -247,10 +249,12 @@ Audited against: commit dfbd40c6 (current dev sandbox)
 | T4-1 | SSRF Verification | N/A | VERIFIED (no defect) |
 | T4-2 | Architecture Documentation | N/A | FIXED (new doc) |
 | T4-3 | CI Schema-Drift Prevention | N/A | FIXED (new script + tests) |
+| T4-4 | GitHub Actions CI Workflow | N/A | FIXED (new .github/workflows/ci.yml) |
+| T4-5 | Source-code audit tests read only ForceGraph.tsx | LOW | FIXED (readForceGraphFullSource helper) |
 | R1-R8 | Rejected Claims | N/A | REJECTED (8 false claims) |
 
 **CRITICAL items: 5/5 FIXED**
 **HIGH items: 3/3 FIXED**
-**MEDIUM items: 5/5 FIXED or VERIFIED**
+**MEDIUM items: 6/6 FIXED or VERIFIED**
 **LOW items: 3/3 FIXED or VERIFIED**
 **Rejected claims: 8**

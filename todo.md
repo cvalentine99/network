@@ -745,3 +745,27 @@ These items are tracked here for the live integration phase.
 - [x] Close Gate 6: TypeScript Clean — PASS (tsc --noEmit exit 0)
 - [x] Close Gate 7: Test Suite Green — PASS (41 files, 2,725 tests, 0 failures)
 - [x] Close Gate 8: Database Schema Matches Code — PASS (drizzle-kit: no pending changes)
+
+# CI GITHUB ACTIONS + FORCEGRAPH DECOMPOSITION
+
+## GitHub Actions CI Workflow
+- [x] Create .github/workflows/ci.yml with schema-drift check
+- [x] Include TypeScript type-check step
+- [x] Include test suite step
+- [x] Verify workflow YAML is valid
+
+## ForceGraph.tsx Decomposition (T2-2)
+- [x] Audit ForceGraph.tsx (1,969 lines) and identify 11 decomposition boundaries
+- [x] Extract topology/types.ts (SimNode, SimLink, ForceGraphProps, ForceGraphHandle)
+- [x] Extract topology/constants.ts (CLUSTER_COLORS, MINIMAP constants)
+- [x] Extract topology/scaling.ts (nodeRadius, edgeWidth, formatBytes, hexPoints)
+- [x] Extract topology/layout-persistence.ts (save/load/clear positions)
+- [x] Extract topology/NodeRenderer.tsx (regular nodes + super-nodes)
+- [x] Extract topology/EdgeRenderer.tsx (edges, bundles, critical path arrows)
+- [x] Extract topology/TooltipOverlay.tsx (HTML tooltip)
+- [x] Extract topology/ContextMenuOverlay.tsx (right-click menu)
+- [x] Extract topology/MinimapOverlay.tsx (minimap canvas + click-to-navigate)
+- [x] Extract topology/ClusterBackgrounds.tsx (cluster circles + labels)
+- [x] Rewrite ForceGraph.tsx as thin orchestrator (~600 lines, down from 1,969)
+- [x] Update source-code audit tests (readForceGraphFullSource helper)
+- [x] All 2,725 tests pass across 41 files (0 failures)

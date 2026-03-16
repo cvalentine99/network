@@ -719,10 +719,18 @@ describe('Slice 21 — UI data-testid Coverage', () => {
     'utf-8'
   );
   // ForceGraph.tsx now owns the SVG rendering (Slice 40), so check both files
-  const forceGraphTsx = fs.readFileSync(
+  // After decomposition, sub-modules live in topology/ directory
+  let forceGraphTsx = fs.readFileSync(
     path.resolve(__dirname, '../client/src/components/ForceGraph.tsx'),
     'utf-8'
   );
+  const subDir = path.resolve(__dirname, '../client/src/components/topology');
+  try {
+    const subFiles = fs.readdirSync(subDir).filter((f: string) => f.endsWith('.ts') || f.endsWith('.tsx'));
+    for (const f of subFiles) {
+      forceGraphTsx += '\n' + fs.readFileSync(path.join(subDir, f), 'utf-8');
+    }
+  } catch { /* sub-dir may not exist */ }
   const combinedSource = topologyTsx + forceGraphTsx;
 
   const requiredTestIds = [

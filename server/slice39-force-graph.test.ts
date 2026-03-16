@@ -11,11 +11,25 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'fs';
+import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 import { TopologyPayloadSchema } from '../shared/topology-validators';
 import type { TopologyPayload, TopologyNode, TopologyEdge } from '../shared/topology-types';
 import { TOPOLOGY_PERFORMANCE, ROLE_DISPLAY } from '../shared/topology-types';
+
+// ─── ForceGraph Source Loader (reads main + sub-modules) ─────────
+function readForceGraphFullSource(): string {
+  const mainPath = join(process.cwd(), 'client', 'src', 'components', 'ForceGraph.tsx');
+  const subDir = join(process.cwd(), 'client', 'src', 'components', 'topology');
+  let source = readFileSync(mainPath, 'utf-8');
+  try {
+    const files = readdirSync(subDir).filter(f => f.endsWith('.ts') || f.endsWith('.tsx'));
+    for (const f of files) {
+      source += '\n' + readFileSync(join(subDir, f), 'utf-8');
+    }
+  } catch { /* sub-dir may not exist in older snapshots */ }
+  return source;
+}
 
 // ─── Fixture Loaders ──────────────────────────────────────────────
 const FIXTURE_DIR = join(process.cwd(), 'fixtures', 'topology');
@@ -564,29 +578,20 @@ describe('Slice 40 — ConstellationView Dead Code Removal', () => {
   });
 
   it('ForceGraph.tsx exists and contains ForceGraph component', () => {
-    const forceGraphSource = readFileSync(
-      join(process.cwd(), 'client', 'src', 'components', 'ForceGraph.tsx'),
-      'utf-8'
-    );
+    const forceGraphSource = readForceGraphFullSource();
     expect(forceGraphSource).toContain('const ForceGraph');
     expect(forceGraphSource).toContain('export default ForceGraph');
   });
 
   it('ForceGraph.tsx contains tooltip rendering logic', () => {
-    const forceGraphSource = readFileSync(
-      join(process.cwd(), 'client', 'src', 'components', 'ForceGraph.tsx'),
-      'utf-8'
-    );
+    const forceGraphSource = readForceGraphFullSource();
     expect(forceGraphSource).toContain('topology-tooltip');
     expect(forceGraphSource).toContain('NodeTooltipData');
     expect(forceGraphSource).toContain('EdgeTooltipData');
   });
 
   it('ForceGraph.tsx contains edge hover hit area for labels', () => {
-    const forceGraphSource = readFileSync(
-      join(process.cwd(), 'client', 'src', 'components', 'ForceGraph.tsx'),
-      'utf-8'
-    );
+    const forceGraphSource = readForceGraphFullSource();
     expect(forceGraphSource).toContain('edge-hit-');
     expect(forceGraphSource).toContain('handleEdgeMouseEnter');
   });
@@ -737,10 +742,7 @@ describe('Slice 41 — Layout Persistence Logic', () => {
 });
 
 describe('Slice 41 — ForceGraph Source Code Contract', () => {
-  const forceGraphSource = readFileSync(
-    join(process.cwd(), 'client', 'src', 'components', 'ForceGraph.tsx'),
-    'utf-8'
-  );
+  const forceGraphSource = readForceGraphFullSource();
   const topologySource = readFileSync(
     join(process.cwd(), 'client', 'src', 'pages', 'Topology.tsx'),
     'utf-8'
@@ -771,8 +773,8 @@ describe('Slice 41 — ForceGraph Source Code Contract', () => {
   });
 
   it('ForceGraph pins restored nodes with fx/fy', () => {
-    expect(forceGraphSource).toContain('fx: existing ? existing.fx : (saved ? saved.x : undefined)');
-    expect(forceGraphSource).toContain('fy: existing ? existing.fy : (saved ? saved.y : undefined)');
+    expect(forceGraphSource).toContain('fx: existing ? existing.fx : saved ? saved.x : undefined');
+    expect(forceGraphSource).toContain('fy: existing ? existing.fy : saved ? saved.y : undefined');
   });
 
   it('ForceGraph pins dragged nodes on drag end (fx = d.x)', () => {
@@ -818,7 +820,7 @@ describe('Slice 42 — Saved Views Position Integration', () => {
   const dbSource = readFileSync(join(process.cwd(), 'server', 'db.ts'), 'utf-8');
   const routersSource = readFileSync(join(process.cwd(), 'server', 'routers.ts'), 'utf-8');
   const topologySource = readFileSync(join(process.cwd(), 'client', 'src', 'pages', 'Topology.tsx'), 'utf-8');
-  const forceGraphSource = readFileSync(join(process.cwd(), 'client', 'src', 'components', 'ForceGraph.tsx'), 'utf-8');
+  const forceGraphSource = readForceGraphFullSource();
 
   // ─── DB Schema ─────────────────────────────────────────────────
   it('schema has node_positions JSON column on saved_topology_views', () => {
@@ -886,7 +888,7 @@ describe('Slice 42 — Saved Views Position Integration', () => {
 });
 
 describe('Slice 42 — Lock All Toggle', () => {
-  const forceGraphSource = readFileSync(join(process.cwd(), 'client', 'src', 'components', 'ForceGraph.tsx'), 'utf-8');
+  const forceGraphSource = readForceGraphFullSource();
   const topologySource = readFileSync(join(process.cwd(), 'client', 'src', 'pages', 'Topology.tsx'), 'utf-8');
 
   // ─── ForceGraph handle ────────────────────────────────────────
@@ -1024,10 +1026,7 @@ describe('Slice 42 — JSON Layout Export/Import', () => {
 // SLICE 43 — Minimap, Node Grouping, Real-Time Pulse Animation
 // ═══════════════════════════════════════════════════════════════════
 
-const forceGraphSource43 = readFileSync(
-  join(process.cwd(), 'client', 'src', 'components', 'ForceGraph.tsx'),
-  'utf-8'
-);
+const forceGraphSource43 = readForceGraphFullSource();
 const topologySource43 = readFileSync(
   join(process.cwd(), 'client', 'src', 'pages', 'Topology.tsx'),
   'utf-8'
@@ -1043,8 +1042,8 @@ describe('Slice 43 — Minimap overlay', () => {
     expect(forceGraphSource43).toContain('MINIMAP_HEIGHT');
   });
 
-  it('ForceGraph has minimapCanvasRef', () => {
-    expect(forceGraphSource43).toContain('minimapCanvasRef');
+  it('ForceGraph minimap has canvasRef', () => {
+    expect(forceGraphSource43).toContain('canvasRef');
   });
 
   it('ForceGraph renders minimap canvas with data-testid', () => {
