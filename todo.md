@@ -594,3 +594,18 @@ These items are tracked here for the live integration phase.
 - [x] Real-time pulse: Zap toggle button in toolbar with cyan highlight when active
 - [x] Write tests for all three features — 44 new tests, 2646 total passing, 0 failures
 - [x] Generate truth receipt — SLICE-43-RECEIPT.md
+
+# SLICE 44 — Right-Click Context Menu + Edge Bundling
+
+- [x] Right-click context menu on nodes with actions: Trace in Flow Theater, Show Blast Radius, Copy IP, Pin/Unpin
+- [x] Context menu: positioned at cursor, dismisses on click-away or Escape
+- [x] Context menu: Pin/Unpin toggles node fixed position (fx/fy)
+- [x] Context menu: Copy IP copies node IP to clipboard with toast confirmation
+- [x] Context menu: Trace in Flow Theater navigates via buildFlowTheaterUrl (hostname mode)
+- [x] Context menu: Show Blast Radius navigates via buildBlastRadiusUrl (device-id mode)
+- [x] Context menu: suppress browser default right-click menu on graph nodes
+- [x] Edge bundling: when 200+ nodes visible, bundle parallel edges between same cluster pairs
+- [x] Edge bundling: single thick bundled line with combined traffic label
+- [x] Edge bundling: auto-enable at threshold, manual toggle in toolbar
+- [x] Write tests for both features (37 tests passing)
+- [x] Generate truth receipt

@@ -63,10 +63,15 @@ import {
   Expand,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useLocation } from 'wouter';
 import { trpc } from '@/lib/trpc';
 import { useTopology, type TopologyState } from '@/hooks/useTopology';
 import CrossSurfaceNavButton from '@/components/CrossSurfaceNavButton';
-import { buildTopologyToBlastRadiusLink } from '../../../shared/cross-surface-nav-types';
+import {
+  buildTopologyToBlastRadiusLink,
+  buildFlowTheaterUrl,
+  buildBlastRadiusUrl,
+} from '../../../shared/cross-surface-nav-types';
 import type {
   TopologyNode,
   TopologyEdge,
@@ -939,9 +944,22 @@ export default function Topology() {
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showSavedViews, setShowSavedViews] = useState(false);
   const [pulseEnabled, setPulseEnabled] = useState(false);
+  const [edgeBundlingEnabled, setEdgeBundlingEnabled] = useState(false);
   // isLiveData: true when connected to a live ExtraHop appliance (not fixture/mock)
   // Currently always false — deferred by contract. Set to true when live integration is wired.
   const isLiveData = false;
+  const [, setLocation] = useLocation();
+
+  // Context menu navigation callbacks (Slice 44)
+  const handleTraceInFlowTheater = useCallback((_nodeId: number, displayName: string) => {
+    const url = buildFlowTheaterUrl({ mode: 'hostname', value: displayName, autoSubmit: true });
+    setLocation(url);
+  }, [setLocation]);
+
+  const handleShowBlastRadius = useCallback((nodeId: number, _displayName: string) => {
+    const url = buildBlastRadiusUrl({ mode: 'device-id', value: String(nodeId), autoSubmit: true });
+    setLocation(url);
+  }, [setLocation]);
 
   // Critical path state
   const [pathSourceId, setPathSourceId] = useState<number | null>(null);
@@ -1263,6 +1281,25 @@ export default function Topology() {
               >
                 <Shrink size={14} />
               </button>
+              {/* Edge Bundling toggle (Slice 44) */}
+              <button
+                onClick={() => {
+                  setEdgeBundlingEnabled((prev) => {
+                    const next = !prev;
+                    toast.success(next ? 'Edge bundling enabled (200+ nodes)' : 'Edge bundling disabled');
+                    return next;
+                  });
+                }}
+                className={`p-1.5 rounded transition-colors ${
+                  edgeBundlingEnabled
+                    ? 'bg-violet-500/20 text-violet-400'
+                    : 'hover:bg-white/[0.06] text-zinc-400'
+                }`}
+                title={edgeBundlingEnabled ? 'Disable edge bundling' : 'Enable edge bundling (200+ nodes)'}
+                data-testid="toggle-edge-bundling"
+              >
+                <Layers size={14} />
+              </button>
               {/* Pulse Animation toggle (Slice 43) */}
               <button
                 onClick={() => {
@@ -1421,6 +1458,9 @@ export default function Topology() {
               anomalyOverlay={anomalyOverlay}
               showAnomalyOverlay={showAnomalyOverlay}
               pulseEnabled={pulseEnabled}
+              edgeBundlingEnabled={edgeBundlingEnabled}
+              onTraceInFlowTheater={handleTraceInFlowTheater}
+              onShowBlastRadius={handleShowBlastRadius}
             />
             {/* Detail Panel */}
             {selectedNode && (

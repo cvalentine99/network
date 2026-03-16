@@ -18,6 +18,8 @@
  * - Minimap overlay: bottom-right inset showing full topology + viewport rect (Slice 43)
  * - Node grouping: collapse/expand clusters into super-nodes (Slice 43)
  * - Real-time pulse animation: edge dash animation proportional to traffic (Slice 43)
+ * - Right-click context menu: Trace in Flow Theater, Show Blast Radius, Copy IP, Pin/Unpin (Slice 44)
+ * - Edge bundling: bundle parallel inter-cluster edges into single thick curved lines (Slice 44)
  *
  * Live integration: deferred by contract.
  */
@@ -197,6 +199,39 @@ interface EdgeTooltipData {
 
 type TooltipData = NodeTooltipData | SuperNodeTooltipData | EdgeTooltipData;
 
+// ─── Context Menu types (Slice 44) ──────────────────────────────
+export interface ContextMenuAction {
+  label: string;
+  icon: string; // emoji or text icon
+  action: () => void;
+  disabled?: boolean;
+}
+
+export interface ContextMenuState {
+  x: number;
+  y: number;
+  nodeId: number;
+  displayName: string;
+  ipaddr: string;
+  isPinned: boolean;
+}
+
+// ─── Edge Bundle types (Slice 44) ───────────────────────────────
+interface EdgeBundle {
+  sourceClusterId: string;
+  targetClusterId: string;
+  edges: SimLink[];
+  totalBytes: number;
+  edgeCount: number;
+  hasDetection: boolean;
+  /** Centroid of source cluster nodes */
+  srcCx: number;
+  srcCy: number;
+  /** Centroid of target cluster nodes */
+  tgtCx: number;
+  tgtCy: number;
+}
+
 // ─── Props ───────────────────────────────────────────────────────
 export interface ForceGraphProps {
   payload: TopologyPayload;
@@ -210,6 +245,12 @@ export interface ForceGraphProps {
   pulseEnabled?: boolean;
   /** Whether the data source is live (not fixture) — pulse only animates when live */
   isLiveData?: boolean;
+  /** Whether edge bundling is enabled (Slice 44) — auto-enables at 200+ nodes */
+  edgeBundlingEnabled?: boolean;
+  /** Callback when user selects "Trace in Flow Theater" from context menu (Slice 44) */
+  onTraceInFlowTheater?: (nodeId: number, displayName: string) => void;
+  /** Callback when user selects "Show Blast Radius" from context menu (Slice 44) */
+  onShowBlastRadius?: (nodeId: number, displayName: string) => void;
 }
 
 export interface ForceGraphHandle {
@@ -250,6 +291,9 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
     showAnomalyOverlay,
     pulseEnabled = false,
     isLiveData = false,
+    edgeBundlingEnabled = false,
+    onTraceInFlowTheater,
+    onShowBlastRadius,
   },
   ref
 ) {
@@ -324,6 +368,82 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
       setTooltip(null);
       tooltipTimeoutRef.current = null;
     }, 100);
+  }, []);
+
+  // ─── Context Menu state (Slice 44) ────────────────────────────
+  const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
+
+  const handleContextMenu = useCallback(
+    (e: React.MouseEvent, simNode: SimNode) => {
+      e.preventDefault();
+      e.stopPropagation();
+      hideTooltip();
+      const container = containerRef.current;
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      const isPinned = simNode.fx != null && simNode.fy != null;
+      setContextMenu({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+        nodeId: simNode.id,
+        displayName: simNode.node.displayName,
+        ipaddr: simNode.node.ipaddr || '',
+        isPinned,
+      });
+    },
+    [hideTooltip]
+  );
+
+  const closeContextMenu = useCallback(() => {
+    setContextMenu(null);
+  }, []);
+
+  // Close context menu on click-away or Escape
+  useEffect(() => {
+    if (!contextMenu) return;
+    const handleClick = () => setContextMenu(null);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setContextMenu(null);
+    };
+    window.addEventListener('click', handleClick);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('click', handleClick);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [contextMenu]);
+
+  const handleCopyIp = useCallback(async (ip: string) => {
+    try {
+      await navigator.clipboard.writeText(ip);
+    } catch {
+      // Fallback for environments without clipboard API
+    }
+    setContextMenu(null);
+  }, []);
+
+  const handleTogglePin = useCallback((nodeId: number) => {
+    const node = nodesRef.current.find((n) => n.id === nodeId);
+    if (!node) return;
+    if (node.fx != null && node.fy != null) {
+      // Unpin
+      node.fx = null;
+      node.fy = null;
+      savedPositionsRef.current.delete(nodeId);
+      saveSavedPositions(savedPositionsRef.current);
+      simulationRef.current?.alpha(0.3).restart();
+    } else {
+      // Pin at current position
+      node.fx = node.x;
+      node.fy = node.y;
+      if (node.x != null && node.y != null && Number.isFinite(node.x) && Number.isFinite(node.y)) {
+        savedPositionsRef.current.set(nodeId, { x: node.x, y: node.y });
+        saveSavedPositions(savedPositionsRef.current);
+        setHasCustomLayout(true);
+      }
+    }
+    setContextMenu(null);
+    forceRender((v) => v + 1);
   }, []);
 
   // Expose handle for parent
@@ -1033,7 +1153,7 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
     [showTooltip, nodeNameMap]
   );
 
-  // ─── Pulse dash computation ───────────────────────────────────
+  // ─── Pulse dash computation ───────────────────────────────
   const getPulseDash = useCallback(
     (link: SimLink) => {
       if (!shouldPulse) return undefined;
@@ -1047,6 +1167,107 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
       };
     },
     [shouldPulse, maxEdgeBytes]
+  );
+
+  // ─── Edge Bundling computation (Slice 44) ────────────────────
+  const EDGE_BUNDLE_THRESHOLD = 200;
+  const shouldBundle = edgeBundlingEnabled && nodes.length >= EDGE_BUNDLE_THRESHOLD;
+
+  const edgeBundles = useMemo((): EdgeBundle[] => {
+    if (!shouldBundle) return [];
+
+    // Group edges by cluster pair
+    const bundleMap = new Map<string, { links: SimLink[]; totalBytes: number; hasDetection: boolean }>();
+    const clusterMap = new Map<string, SimNode[]>();
+
+    // Build cluster node map for centroids
+    for (const n of nodes) {
+      if (!clusterMap.has(n.clusterId)) clusterMap.set(n.clusterId, []);
+      clusterMap.get(n.clusterId)!.push(n);
+    }
+
+    for (const link of links) {
+      const src = link.source as SimNode;
+      const tgt = link.target as SimNode;
+      if (src.clusterId === tgt.clusterId) continue; // Skip intra-cluster edges
+      const key = src.clusterId < tgt.clusterId
+        ? `${src.clusterId}||${tgt.clusterId}`
+        : `${tgt.clusterId}||${src.clusterId}`;
+      if (!bundleMap.has(key)) {
+        bundleMap.set(key, { links: [], totalBytes: 0, hasDetection: false });
+      }
+      const b = bundleMap.get(key)!;
+      b.links.push(link);
+      b.totalBytes += link.edge.bytes;
+      b.hasDetection = b.hasDetection || link.edge.hasDetection;
+    }
+
+    const bundles: EdgeBundle[] = [];
+    for (const entry of Array.from(bundleMap.entries())) {
+      const [key, data] = entry;
+      if (data.links.length < 2) continue; // Only bundle when 2+ edges
+      const [srcCluster, tgtCluster] = key.split('||');
+      const srcNodes = clusterMap.get(srcCluster) || [];
+      const tgtNodes = clusterMap.get(tgtCluster) || [];
+
+      const srcCx = srcNodes.length > 0
+        ? srcNodes.reduce((s, n) => s + (n.x ?? 0), 0) / srcNodes.length
+        : 0;
+      const srcCy = srcNodes.length > 0
+        ? srcNodes.reduce((s, n) => s + (n.y ?? 0), 0) / srcNodes.length
+        : 0;
+      const tgtCx = tgtNodes.length > 0
+        ? tgtNodes.reduce((s, n) => s + (n.x ?? 0), 0) / tgtNodes.length
+        : 0;
+      const tgtCy = tgtNodes.length > 0
+        ? tgtNodes.reduce((s, n) => s + (n.y ?? 0), 0) / tgtNodes.length
+        : 0;
+
+      bundles.push({
+        sourceClusterId: srcCluster,
+        targetClusterId: tgtCluster,
+        edges: data.links,
+        totalBytes: data.totalBytes,
+        edgeCount: data.links.length,
+        hasDetection: data.hasDetection,
+        srcCx, srcCy, tgtCx, tgtCy,
+      });
+    }
+    return bundles;
+  }, [shouldBundle, nodes, links]);
+
+  // Set of edge indices that are bundled (to hide individual edges)
+  const bundledEdgeSet = useMemo(() => {
+    if (!shouldBundle) return new Set<number>();
+    const set = new Set<number>();
+    for (const bundle of edgeBundles) {
+      for (const link of bundle.edges) {
+        const idx = links.indexOf(link);
+        if (idx >= 0) set.add(idx);
+      }
+    }
+    return set;
+  }, [shouldBundle, edgeBundles, links]);
+
+  // ─── Edge bundle tooltip handler (Slice 44) ──────────────────
+  const handleBundleMouseEnter = useCallback(
+    (e: React.MouseEvent, bundle: EdgeBundle) => {
+      const srcLabel = clusterLabelMap.get(bundle.sourceClusterId) || bundle.sourceClusterId;
+      const tgtLabel = clusterLabelMap.get(bundle.targetClusterId) || bundle.targetClusterId;
+      showTooltip(
+        {
+          kind: 'edge',
+          protocol: `${bundle.edgeCount} bundled edges`,
+          traffic: formatBytes(bundle.totalBytes),
+          sourceName: srcLabel,
+          targetName: tgtLabel,
+          hasDetection: bundle.hasDetection,
+        },
+        e.clientX,
+        e.clientY
+      );
+    },
+    [showTooltip, clusterLabelMap]
   );
 
   return (
@@ -1063,6 +1284,11 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
         data-testid="topology-svg"
         style={{ cursor: 'grab', background: 'transparent' }}
         onMouseLeave={hideTooltip}
+        onContextMenu={(e) => {
+          // Suppress default context menu on the SVG canvas
+          // Node-level context menu is handled per-node
+          e.preventDefault();
+        }}
       >
         <defs>
           <radialGradient id="node-glow-fg">
@@ -1135,6 +1361,8 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
           {/* Edges */}
           <g data-testid="topology-edges">
             {links.map((link, i) => {
+              // Skip edges that are bundled (Slice 44)
+              if (shouldBundle && bundledEdgeSet.has(i)) return null;
               const src = link.source as SimNode;
               const tgt = link.target as SimNode;
               if (src.x == null || tgt.x == null) return null;
@@ -1199,6 +1427,71 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
             })}
           </g>
 
+          {/* Edge Bundles (Slice 44) */}
+          {shouldBundle && edgeBundles.length > 0 && (
+            <g data-testid="topology-edge-bundles">
+              {edgeBundles.map((bundle, i) => {
+                const { srcCx, srcCy, tgtCx, tgtCy } = bundle;
+                if (!Number.isFinite(srcCx) || !Number.isFinite(tgtCx)) return null;
+                const bundleWidth = Math.min(
+                  Math.max(2, Math.log2(bundle.edgeCount + 1) * 3),
+                  TOPOLOGY_PERFORMANCE.EDGE_WIDTH_MAX
+                );
+                const midX = (srcCx + tgtCx) / 2;
+                const midY = (srcCy + tgtCy) / 2;
+                const dx = tgtCx - srcCx;
+                const dy = tgtCy - srcCy;
+                const len = Math.sqrt(dx * dx + dy * dy);
+                // Slight curve offset perpendicular to the line
+                const perpX = len > 0 ? -dy / len * 20 : 0;
+                const perpY = len > 0 ? dx / len * 20 : 0;
+                const ctrlX = midX + perpX;
+                const ctrlY = midY + perpY;
+
+                return (
+                  <g key={`bundle-${i}`}>
+                    {/* Invisible hit area */}
+                    <path
+                      d={`M ${srcCx} ${srcCy} Q ${ctrlX} ${ctrlY} ${tgtCx} ${tgtCy}`}
+                      stroke="transparent"
+                      strokeWidth={Math.max(bundleWidth + 10, 16)}
+                      fill="none"
+                      style={{ cursor: 'pointer' }}
+                      onMouseEnter={(e) => handleBundleMouseEnter(e, bundle)}
+                      onMouseMove={(e) => handleBundleMouseEnter(e, bundle)}
+                      onMouseLeave={hideTooltip}
+                      data-testid={`edge-bundle-${bundle.sourceClusterId}-${bundle.targetClusterId}`}
+                    />
+                    {/* Visible bundle path */}
+                    <path
+                      d={`M ${srcCx} ${srcCy} Q ${ctrlX} ${ctrlY} ${tgtCx} ${tgtCy}`}
+                      stroke={bundle.hasDetection ? '#ef4444' : '#6366f1'}
+                      strokeWidth={bundleWidth}
+                      strokeOpacity={0.5}
+                      fill="none"
+                      strokeLinecap="round"
+                      strokeDasharray={`${bundleWidth * 2} ${bundleWidth}`}
+                      style={{ pointerEvents: 'none' }}
+                    />
+                    {/* Bundle count label */}
+                    <text
+                      x={ctrlX}
+                      y={ctrlY - 8}
+                      textAnchor="middle"
+                      fill="#a78bfa"
+                      fontSize={9}
+                      fontWeight={600}
+                      fontFamily="JetBrains Mono, monospace"
+                      style={{ pointerEvents: 'none' }}
+                    >
+                      {bundle.edgeCount} edges · {formatBytes(bundle.totalBytes)}
+                    </text>
+                  </g>
+                );
+              })}
+            </g>
+          )}
+
           {/* Critical path direction arrows */}
           {criticalPath?.pathFound &&
             criticalPath.path.length > 1 &&
@@ -1256,6 +1549,11 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
                   onMouseEnter={(e) => handleNodeMouseEnter(e, simNode)}
                   onMouseMove={(e) => handleNodeMouseEnter(e, simNode)}
                   onMouseLeave={hideTooltip}
+                  onContextMenu={(e) => {
+                    if (!simNode.isSuperNode) {
+                      handleContextMenu(e, simNode);
+                    }
+                  }}
                   style={{ cursor: 'pointer' }}
                   data-testid={simNode.isSuperNode ? `topology-supernode-${simNode.clusterId}` : `topology-node-${n.id}`}
                   opacity={isDimmed ? 0.15 : 1}
@@ -1530,6 +1828,81 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* ─── Context Menu (Slice 44) ──────────────────────────────── */}
+      {contextMenu && (
+        <div
+          data-testid="topology-context-menu"
+          className="absolute z-[60]"
+          style={{
+            left: contextMenu.x,
+            top: contextMenu.y,
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div
+            className="rounded-lg border shadow-2xl text-xs min-w-[180px] py-1"
+            style={{
+              background: 'rgba(15, 23, 42, 0.97)',
+              borderColor: 'rgba(71, 85, 105, 0.5)',
+              backdropFilter: 'blur(12px)',
+            }}
+          >
+            {/* Header */}
+            <div className="px-3 py-1.5 border-b border-white/[0.06]">
+              <div className="font-semibold text-white text-xs truncate">{contextMenu.displayName}</div>
+              {contextMenu.ipaddr && (
+                <div className="text-[10px] text-slate-400 font-mono">{contextMenu.ipaddr}</div>
+              )}
+            </div>
+            {/* Actions */}
+            <button
+              className="w-full px-3 py-1.5 text-left hover:bg-white/[0.06] text-slate-300 flex items-center gap-2 transition-colors"
+              onClick={() => {
+                onTraceInFlowTheater?.(contextMenu.nodeId, contextMenu.displayName);
+                closeContextMenu();
+              }}
+              data-testid="ctx-trace-flow-theater"
+            >
+              <span className="w-4 text-center text-cyan-400">⇝</span>
+              <span>Trace in Flow Theater</span>
+            </button>
+            <button
+              className="w-full px-3 py-1.5 text-left hover:bg-white/[0.06] text-slate-300 flex items-center gap-2 transition-colors"
+              onClick={() => {
+                onShowBlastRadius?.(contextMenu.nodeId, contextMenu.displayName);
+                closeContextMenu();
+              }}
+              data-testid="ctx-show-blast-radius"
+            >
+              <span className="w-4 text-center text-amber-400">◎</span>
+              <span>Show Blast Radius</span>
+            </button>
+            <div className="border-t border-white/[0.06] my-0.5" />
+            <button
+              className={`w-full px-3 py-1.5 text-left hover:bg-white/[0.06] flex items-center gap-2 transition-colors ${
+                contextMenu.ipaddr ? 'text-slate-300' : 'text-slate-600 cursor-not-allowed'
+              }`}
+              onClick={() => {
+                if (contextMenu.ipaddr) handleCopyIp(contextMenu.ipaddr);
+              }}
+              disabled={!contextMenu.ipaddr}
+              data-testid="ctx-copy-ip"
+            >
+              <span className="w-4 text-center text-green-400">⎘</span>
+              <span>Copy IP{contextMenu.ipaddr ? '' : ' (no IP)'}</span>
+            </button>
+            <button
+              className="w-full px-3 py-1.5 text-left hover:bg-white/[0.06] text-slate-300 flex items-center gap-2 transition-colors"
+              onClick={() => handleTogglePin(contextMenu.nodeId)}
+              data-testid="ctx-toggle-pin"
+            >
+              <span className="w-4 text-center text-violet-400">{contextMenu.isPinned ? '✖' : '⌖'}</span>
+              <span>{contextMenu.isPinned ? 'Unpin Node' : 'Pin Node'}</span>
+            </button>
           </div>
         </div>
       )}
