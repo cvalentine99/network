@@ -60,6 +60,7 @@ const ENTRY_MODE_LABELS: Record<TraceEntryMode, string> = {
   device: "Device ID",
   "service-row": "Service Row",
   ip: "IP Address",
+  cidr: "Subnet (CIDR)",
 };
 
 const ENTRY_MODE_PLACEHOLDERS: Record<TraceEntryMode, string> = {
@@ -67,6 +68,7 @@ const ENTRY_MODE_PLACEHOLDERS: Record<TraceEntryMode, string> = {
   device: "e.g. 1042",
   "service-row": "e.g. SMB::1042",
   ip: "e.g. 10.1.20.42",
+  cidr: "e.g. 10.1.20.0/24",
 };
 
 // ─── Step Status Styling ────────────────────────────────────────────────────
@@ -345,6 +347,7 @@ export default function FlowTheater() {
                   <SelectItem value="device">Device ID</SelectItem>
                   <SelectItem value="service-row">Service Row</SelectItem>
                   <SelectItem value="ip">IP Address</SelectItem>
+                  <SelectItem value="cidr">Subnet (CIDR)</SelectItem>
                 </SelectContent>
               </Select>
             </div>

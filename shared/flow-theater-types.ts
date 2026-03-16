@@ -11,7 +11,7 @@ import type { EpochMs, TimeWindow } from './cockpit-types';
 
 // ─── Entry Modes ─────────────────────────────────────────────────────────────
 
-export type TraceEntryMode = 'hostname' | 'device' | 'service-row' | 'ip';
+export type TraceEntryMode = 'hostname' | 'device' | 'service-row' | 'ip' | 'cidr';
 
 /**
  * TraceIntent: the client-provided input that initiates a trace.
@@ -20,7 +20,7 @@ export type TraceEntryMode = 'hostname' | 'device' | 'service-row' | 'ip';
 export interface TraceIntent {
   /** Which entry mode the user selected */
   mode: TraceEntryMode;
-  /** The raw input value: hostname string, device ID number, service-row key, or IP address */
+  /** The raw input value: hostname string, device ID number, service-row key, IP address, or CIDR notation */
   value: string;
   /** Shared time window from the dashboard context */
   timeWindow: TimeWindow;

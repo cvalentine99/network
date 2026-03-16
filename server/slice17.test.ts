@@ -89,6 +89,9 @@ describe('Slice 17 > TraceEntryModeSchema', () => {
   it('accepts ip', () => {
     expect(TraceEntryModeSchema.parse('ip')).toBe('ip');
   });
+  it('accepts cidr', () => {
+    expect(TraceEntryModeSchema.parse('cidr')).toBe('cidr');
+  });
   it('rejects invalid mode', () => {
     expect(TraceEntryModeSchema.safeParse('mac-address').success).toBe(false);
   });
@@ -168,6 +171,15 @@ describe('Slice 17 > TraceIntentSchema', () => {
     const result = TraceIntentSchema.safeParse({
       mode: 'ip',
       value: '10.1.20.42',
+      timeWindow: VALID_TIME_WINDOW,
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts valid cidr intent', () => {
+    const result = TraceIntentSchema.safeParse({
+      mode: 'cidr',
+      value: '10.1.20.0/24',
       timeWindow: VALID_TIME_WINDOW,
     });
     expect(result.success).toBe(true);
@@ -961,6 +973,15 @@ describe('Slice 17 > Entry mode coverage', () => {
     const complete = data.events.find((e: any) => e.type === 'complete');
     expect(complete.terminalStatus).toBe('complete');
     expect(complete.summary.resolvedDevice.resolvedVia).toBe('ip');
+  });
+
+  it('cidr entry mode has complete fixture', () => {
+    const data = loadJsonFixture('flow-theater.cidr-complete.fixture.json');
+    expect(data.intent.mode).toBe('cidr');
+    expect(data.intent.value).toBe('10.1.20.0/24');
+    const complete = data.events.find((e: any) => e.type === 'complete');
+    expect(complete.terminalStatus).toBe('complete');
+    expect(complete.summary.resolvedDevice.resolvedVia).toBe('cidr');
   });
 
   it('quiet terminal state fixture exists', () => {

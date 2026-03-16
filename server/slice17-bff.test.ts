@@ -14,6 +14,7 @@
  *   7. POST /api/bff/trace/run — device mode returns device fixture stream
  *   8. POST /api/bff/trace/run — service-row mode returns service-row fixture stream
  *  8b. POST /api/bff/trace/run — ip mode returns ip fixture stream (+ error/quiet sentinels)
+ *  8c. POST /api/bff/trace/run — cidr mode returns cidr fixture stream (+ error/quiet sentinels)
  *   9. GET /api/bff/trace/fixtures — returns fixture list in fixture mode
  *  10. SSE response headers are correct
  *  11. selectFixture mapping: sentinel values route to correct fixtures
@@ -447,6 +448,47 @@ describe('Slice 17 BFF > POST /api/bff/trace/run ip mode', () => {
   });
 });
 
+// ─── 8c. POST /api/bff/trace/run — cidr mode ─────────────────────────────────
+
+describe('Slice 17 BFF > POST /api/bff/trace/run cidr mode', () => {
+  it('cidr mode returns complete stream', async () => {
+    const result = await consumeSSE('/api/bff/trace/run', {
+      mode: 'cidr',
+      value: '10.1.20.0/24',
+      timeWindow: VALID_TIME_WINDOW,
+    });
+    expect(result.status).toBe(200);
+    const lastEvent = result.events[result.events.length - 1];
+    expect(lastEvent.type).toBe('complete');
+    expect(lastEvent.terminalStatus).toBe('complete');
+  });
+
+  it('cidr error sentinel returns error stream', async () => {
+    const result = await consumeSSE('/api/bff/trace/run', {
+      mode: 'cidr',
+      value: '0.0.0.0/32',
+      timeWindow: VALID_TIME_WINDOW,
+    });
+    expect(result.status).toBe(200);
+    const lastEvent = result.events[result.events.length - 1];
+    expect(lastEvent.type).toBe('error');
+  });
+
+  it('cidr quiet sentinel returns quiet stream', async () => {
+    const result = await consumeSSE('/api/bff/trace/run', {
+      mode: 'cidr',
+      value: '192.168.255.0/24',
+      timeWindow: VALID_TIME_WINDOW,
+    });
+    expect(result.status).toBe(200);
+    const lastEvent = result.events[result.events.length - 1];
+    expect(['complete']).toContain(lastEvent.type);
+    if (lastEvent.type === 'complete') {
+      expect(lastEvent.terminalStatus).toBe('quiet');
+    }
+  });
+});
+
 // ─── 9. GET /api/bff/trace/fixtures ────────────────────────────────────────
 
 describe('Slice 17 BFF > GET /api/bff/trace/fixtures', () => {
@@ -473,6 +515,11 @@ describe('Slice 17 BFF > GET /api/bff/trace/fixtures', () => {
   it('includes ip-complete fixture', async () => {
     const result = await fetchJSON('/api/bff/trace/fixtures');
     expect(result.body.fixtures).toContain('trace-ip-complete.fixture.jsonl');
+  });
+
+  it('includes cidr-complete fixture', async () => {
+    const result = await fetchJSON('/api/bff/trace/fixtures');
+    expect(result.body.fixtures).toContain('trace-cidr-complete.fixture.jsonl');
   });
 });
 

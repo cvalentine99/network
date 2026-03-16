@@ -206,6 +206,54 @@ async function executeLiveTrace(
         path: `/api/v1/devices?search_type=ip&value=${encodeURIComponent(value)}&limit=1`,
         cacheTtlMs: 30_000,
       });
+    } else if (mode === 'cidr') {
+      // CIDR/subnet mode: parse notation, search for devices in the subnet range.
+      // ExtraHop REST API supports POST /api/v1/devices/search with a filter body
+      // that can match IP ranges. We parse the CIDR to extract the network and
+      // broadcast addresses, then use search_type=any with the network address
+      // and filter results to the subnet range.
+      const cidrMatch = value.match(/^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\/(\d{1,2})$/);
+      if (!cidrMatch) throw new Error(`Invalid CIDR notation: ${value}`);
+      const [, networkStr, prefixStr] = cidrMatch;
+      const prefix = parseInt(prefixStr, 10);
+      if (prefix < 8 || prefix > 32) throw new Error(`CIDR prefix must be between /8 and /32: /${prefix}`);
+
+      // Parse network address to integer
+      const octets = networkStr.split('.').map(Number);
+      if (octets.some(o => o < 0 || o > 255)) throw new Error(`Invalid IP octets in CIDR: ${networkStr}`);
+      const networkInt = ((octets[0] << 24) | (octets[1] << 16) | (octets[2] << 8) | octets[3]) >>> 0;
+      const mask = prefix === 0 ? 0 : (0xFFFFFFFF << (32 - prefix)) >>> 0;
+      const broadcastInt = (networkInt | (~mask >>> 0)) >>> 0;
+
+      // Helper: integer to IP string
+      const intToIp = (n: number) => `${(n >>> 24) & 0xFF}.${(n >>> 16) & 0xFF}.${(n >>> 8) & 0xFF}.${n & 0xFF}`;
+
+      // Use ExtraHop device search to find devices, then filter to subnet range.
+      // We search by the network address first to get candidate devices.
+      const candidateResult = await ehRequest<any[]>({
+        method: 'GET',
+        path: `/api/v1/devices?search_type=any&limit=500&active_from=${fromMs}&active_until=${untilMs}`,
+        cacheTtlMs: 30_000,
+      });
+
+      const allDevices = Array.isArray(candidateResult?.data) ? candidateResult.data : [];
+
+      // Filter devices whose ipaddr4 falls within the CIDR range
+      const subnetDevices = allDevices.filter((d: any) => {
+        const ip = d.ipaddr4 || d.ipaddr || '';
+        if (!ip) return false;
+        const parts = ip.split('.').map(Number);
+        if (parts.length !== 4 || parts.some((p: number) => isNaN(p))) return false;
+        const ipInt = ((parts[0] << 24) | (parts[1] << 16) | (parts[2] << 8) | parts[3]) >>> 0;
+        return ipInt >= networkInt && ipInt <= broadcastInt;
+      });
+
+      if (subnetDevices.length === 0) {
+        throw new Error(`No devices found in subnet ${value} (range ${intToIp(networkInt)}–${intToIp(broadcastInt)})`);
+      }
+
+      // Use the first device as the primary trace target, report total count
+      searchResult = { data: subnetDevices };
     }
 
     const devices = Array.isArray(searchResult?.data) ? searchResult.data : [searchResult?.data];
@@ -214,9 +262,10 @@ async function executeLiveTrace(
     }
 
     const rawDev = devices[0];
+    const deviceCount = devices.length;
     return {
-      detail: `Resolved to device ${rawDev.id}`,
-      count: null,
+      detail: mode === 'cidr' ? `Resolved ${deviceCount} device(s) in subnet ${value}` : `Resolved to device ${rawDev.id}`,
+      count: mode === 'cidr' ? deviceCount : null,
       result: rawDev,
     };
   });
@@ -503,13 +552,13 @@ function loadFixtureEvents(fixtureName: string): TraceSSEEvent[] {
 async function selectFixture(mode: TraceEntryMode, value: string): Promise<string> {
   // Sentinel routing: only in dev/test
   if (await isFixtureMode()) {
-    if (value === 'unknown.invalid' || value === '0' || value === 'bad-service::0' || value === '0.0.0.0') {
+    if (value === 'unknown.invalid' || value === '0' || value === 'bad-service::0' || value === '0.0.0.0' || value === '0.0.0.0/32') {
       return 'trace-resolution-error.fixture.jsonl';
     }
-    if (value === 'quiet.lab.local' || value === '9999' || value === 'idle-svc::2087' || value === '192.168.0.0') {
+    if (value === 'quiet.lab.local' || value === '9999' || value === 'idle-svc::2087' || value === '192.168.0.0' || value === '192.168.255.0/24') {
       return 'trace-hostname-quiet.fixture.jsonl';
     }
-    if (value === 'partial.lab.local' || value === '8888' || value === '10.255.255.255') {
+    if (value === 'partial.lab.local' || value === '8888' || value === '10.255.255.255' || value === '172.31.255.0/24') {
       return 'trace-partial-error.fixture.jsonl';
     }
   }
@@ -523,6 +572,8 @@ async function selectFixture(mode: TraceEntryMode, value: string): Promise<strin
       return 'trace-service-row-complete.fixture.jsonl';
     case 'ip':
       return 'trace-ip-complete.fixture.jsonl';
+    case 'cidr':
+      return 'trace-cidr-complete.fixture.jsonl';
     default:
       return 'trace-hostname-complete.fixture.jsonl';
   }

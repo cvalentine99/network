@@ -41,7 +41,7 @@ export type NavigableSurface =
 export type BlastRadiusEntryMode = 'device-id' | 'hostname' | 'ip-address';
 
 /** Flow Theater entry modes (matches FlowTheater page's TraceEntryMode) */
-export type FlowTheaterEntryMode = 'hostname' | 'device' | 'service-row' | 'ip';
+export type FlowTheaterEntryMode = 'hostname' | 'device' | 'service-row' | 'ip' | 'cidr';
 
 /** Intent to navigate to Blast Radius with a pre-filled query */
 export interface BlastRadiusNavIntent {
@@ -126,7 +126,7 @@ export interface ParsedFlowTheaterNav {
 }
 
 const BlastRadiusModeSchema = z.enum(['device-id', 'hostname', 'ip-address']);
-const FlowTheaterModeSchema = z.enum(['hostname', 'device', 'service-row', 'ip']);
+const FlowTheaterModeSchema = z.enum(['hostname', 'device', 'service-row', 'ip', 'cidr']);
 
 /**
  * Parse Blast Radius nav params from a URLSearchParams instance.

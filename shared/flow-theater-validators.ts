@@ -10,7 +10,7 @@ import { z } from 'zod';
 
 // ─── Enums ───────────────────────────────────────────────────────────────────
 
-export const TraceEntryModeSchema = z.enum(['hostname', 'device', 'service-row', 'ip']);
+export const TraceEntryModeSchema = z.enum(['hostname', 'device', 'service-row', 'ip', 'cidr']);
 
 export const TraceStepStatusSchema = z.enum(['idle', 'running', 'complete', 'quiet', 'error']);
 

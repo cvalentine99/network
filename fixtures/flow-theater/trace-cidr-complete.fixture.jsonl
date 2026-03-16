@@ -1,0 +1,19 @@
+{"type":"step","stepId":"input-accepted","status":"running","detail":"Validating cidr 10.1.20.0/24","durationMs":null,"count":null,"timestamp":1710001800100}
+{"type":"step","stepId":"input-accepted","status":"complete","detail":"cidr input accepted","durationMs":42,"count":null,"timestamp":1710001800142}
+{"type":"step","stepId":"entry-resolution","status":"running","detail":"Resolving cidr to device","durationMs":null,"count":null,"timestamp":1710001800146}
+{"type":"heartbeat","timestamp":1710001800200,"activeSteps":1}
+{"type":"step","stepId":"entry-resolution","status":"complete","detail":"Resolved 7 device(s) in subnet 10.1.20.0/24","durationMs":285,"count":7,"timestamp":1710001800431}
+{"type":"step","stepId":"device-resolved","status":"running","detail":"Loading device identity","durationMs":null,"count":null,"timestamp":1710001800435}
+{"type":"step","stepId":"device-resolved","status":"complete","detail":"dc01.lab.local (10.1.20.42) — primary of 7 subnet devices","durationMs":80,"count":null,"timestamp":1710001800515}
+{"type":"step","stepId":"activity-timeline","status":"running","detail":"Querying activity records","durationMs":null,"count":null,"timestamp":1710001800520}
+{"type":"step","stepId":"metric-timeline","status":"running","detail":"Querying metric data points","durationMs":null,"count":null,"timestamp":1710001800520}
+{"type":"step","stepId":"records-search","status":"running","detail":"Searching records","durationMs":null,"count":null,"timestamp":1710001800520}
+{"type":"step","stepId":"detection-alert","status":"running","detail":"Querying detections and alerts","durationMs":null,"count":null,"timestamp":1710001800520}
+{"type":"step","stepId":"trace-assembly","status":"running","detail":"Assembling trace results","durationMs":null,"count":null,"timestamp":1710001800520}
+{"type":"heartbeat","timestamp":1710001800600,"activeSteps":5}
+{"type":"step","stepId":"activity-timeline","status":"complete","detail":"312 activity records across 7 devices","durationMs":480,"count":312,"timestamp":1710001801000}
+{"type":"step","stepId":"metric-timeline","status":"complete","detail":"4,291 metric data points across 7 devices","durationMs":560,"count":4291,"timestamp":1710001801080}
+{"type":"step","stepId":"records-search","status":"complete","detail":"87 records found across 7 devices","durationMs":390,"count":87,"timestamp":1710001800910}
+{"type":"step","stepId":"detection-alert","status":"complete","detail":"5 detections, 2 alerts across 7 devices","durationMs":310,"count":7,"timestamp":1710001800830}
+{"type":"step","stepId":"trace-assembly","status":"complete","detail":"Trace assembled for subnet 10.1.20.0/24","durationMs":620,"count":null,"timestamp":1710001801140}
+{"type":"complete","terminalStatus":"complete","totalDurationMs":1045,"timestamp":1710001801150,"summary":{"resolvedDevice":{"resolvedVia":"cidr","originalInput":"10.1.20.0/24","device":{"id":1042,"displayName":"dc01.lab.local","ipaddr":"10.1.20.42","macaddr":"00:50:56:A1:2B:3C","role":"domain_controller","vendor":"VMware"}},"activityCount":312,"metricPointCount":4291,"recordCount":87,"detectionCount":5,"alertCount":2,"stepTimings":[{"stepId":"input-accepted","status":"complete","durationMs":42},{"stepId":"entry-resolution","status":"complete","durationMs":285},{"stepId":"device-resolved","status":"complete","durationMs":80},{"stepId":"activity-timeline","status":"complete","durationMs":480},{"stepId":"metric-timeline","status":"complete","durationMs":560},{"stepId":"records-search","status":"complete","durationMs":390},{"stepId":"detection-alert","status":"complete","durationMs":310},{"stepId":"trace-assembly","status":"complete","durationMs":620}]}}

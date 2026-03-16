@@ -779,3 +779,25 @@ These items are tracked here for the live integration phase.
 - [x] Add IP-mode fixtures: trace-ip-complete.fixture.jsonl + flow-theater.ip-complete.fixture.json
 - [x] Add tests: slice17.test.ts (schema validation), slice17-bff.test.ts (3 BFF route tests: complete/error/quiet sentinels), slice23.test.ts (round-trip + mode enumeration)
 - [x] All 2,737 tests pass across 41 files (12 new tests, 0 failures)
+
+# FLOW THEATER — CIDR/SUBNET ENTRY MODE
+
+- [x] Audit current entry mode patterns for CIDR planning
+- [x] Add 'cidr' to TraceEntryMode in shared/flow-theater-types.ts
+- [x] Add 'cidr' to TraceEntryModeSchema in shared/flow-theater-validators.ts
+- [x] Add 'cidr' to FlowTheaterEntryMode in shared/cross-surface-nav-types.ts
+- [x] Add CIDR resolution branch to BFF trace route (server/routes/trace.ts) — parseCidr helper, ExtraHop search_type=ip per-host, parallel trace
+- [x] Add CIDR sentinel values to selectFixture (0.0.0.0/32 error, 192.168.255.0/24 quiet, 10.1.20.0/24 complete)
+- [x] Add 'Subnet (CIDR)' SelectItem to FlowTheater.tsx entry mode dropdown
+- [x] Add CIDR to ENTRY_MODE_LABELS and ENTRY_MODE_PLACEHOLDERS
+- [x] Create trace-cidr-complete.fixture.jsonl
+- [x] Create flow-theater.cidr-complete.fixture.json
+- [x] Add CIDR schema validation tests (slice17.test.ts)
+- [x] Add CIDR BFF route tests: complete, error sentinel, quiet sentinel (slice17-bff.test.ts)
+- [x] Add CIDR fixture existence test (slice17.test.ts)
+- [x] Add CIDR round-trip test to slice23.test.ts
+- [x] All 2,749 tests pass across 41 files (24 new tests, 0 failures)
+
+# GITHUB EXPORT
+
+- [ ] Export repo to GitHub via Settings > GitHub
