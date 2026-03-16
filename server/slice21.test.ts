@@ -718,6 +718,12 @@ describe('Slice 21 — UI data-testid Coverage', () => {
     path.resolve(__dirname, '../client/src/pages/Topology.tsx'),
     'utf-8'
   );
+  // ForceGraph.tsx now owns the SVG rendering (Slice 40), so check both files
+  const forceGraphTsx = fs.readFileSync(
+    path.resolve(__dirname, '../client/src/components/ForceGraph.tsx'),
+    'utf-8'
+  );
+  const combinedSource = topologyTsx + forceGraphTsx;
 
   const requiredTestIds = [
     'topology-loading',
@@ -737,7 +743,7 @@ describe('Slice 21 — UI data-testid Coverage', () => {
 
   for (const testId of requiredTestIds) {
     it(`has data-testid="${testId}"`, () => {
-      expect(topologyTsx).toContain(`data-testid="${testId}"`);
+      expect(combinedSource).toContain(`data-testid="${testId}"`);
     });
   }
 });

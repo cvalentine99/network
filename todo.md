@@ -553,3 +553,11 @@ These items are tracked here for the live integration phase.
 - [x] Write vitest tests for ForceGraph component — 38 tests passing in slice39-force-graph.test.ts
 - [x] Verify all 5 UI states: loading, quiet, populated, error, malformed — populated screenshot captured, all states tested in vitest
 - [x] Generate grep proof and truth receipt — SLICE-39-RECEIPT.md
+
+# SLICE 40 — Node Tooltips, Edge Labels, Dead Code Cleanup (Mar 16 2026)
+
+- [x] Node tooltip on hover: device name, IP, traffic, detection count
+- [x] Edge label on hover: protocol name and traffic volume
+- [x] Remove ConstellationView dead code from Topology.tsx (~305 lines removed, 1261 lines remain)
+- [x] Update tests for tooltip/edge label behavior — 23 new tests, slice21 updated for ForceGraph split
+- [x] Run full test suite: 38 files, 2538 tests, 0 failures

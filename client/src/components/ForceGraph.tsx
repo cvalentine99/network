@@ -1,5 +1,5 @@
 /**
- * ForceGraph — D3-force-directed topology visualization (Slice 39)
+ * ForceGraph — D3-force-directed topology visualization (Slice 39 + 40)
  *
  * CONTRACT:
  * - Renders TopologyPayload as an interactive force-directed graph
@@ -9,6 +9,8 @@
  * - Node sizing by traffic volume, edge width by bytes
  * - Optimized for ultrawide monitors (5120x1440)
  * - Exposes SVG ref for export (PNG/SVG)
+ * - Node tooltip on hover: device name, IP, traffic, detection count (Slice 40)
+ * - Edge label on hover: protocol name and traffic volume (Slice 40)
  *
  * Live integration: deferred by contract.
  */
@@ -35,12 +37,11 @@ import {
 } from 'd3-force';
 import { select } from 'd3-selection';
 import { zoom as d3Zoom, zoomIdentity, type ZoomBehavior } from 'd3-zoom';
-import { drag as d3Drag, type SubjectPosition } from 'd3-drag';
+import { drag as d3Drag } from 'd3-drag';
 import type {
   TopologyNode,
   TopologyEdge,
   TopologyPayload,
-  TopologyDeviceRole,
 } from '../../../shared/topology-types';
 import { ROLE_DISPLAY, TOPOLOGY_PERFORMANCE } from '../../../shared/topology-types';
 import type {
@@ -48,7 +49,6 @@ import type {
   AnomalyOverlayPayload,
   EdgeAnomaly,
   NodeAnomaly,
-  AnomalySeverity,
 } from '../../../shared/topology-advanced-types';
 import { ANOMALY_SEVERITY_COLORS } from '../../../shared/topology-advanced-types';
 import { getPathNodeIds, getPathEdgeKeys } from '../../../shared/topology-critical-path';
@@ -98,6 +98,29 @@ const CLUSTER_COLORS = [
   '#6366f1', '#ec4899', '#84cc16', '#14b8a6', '#ef4444',
 ];
 
+// ─── Tooltip types ──────────────────────────────────────────────
+interface NodeTooltipData {
+  kind: 'node';
+  name: string;
+  ip: string;
+  role: string;
+  traffic: string;
+  detections: number;
+  alerts: number;
+  cluster: string;
+}
+
+interface EdgeTooltipData {
+  kind: 'edge';
+  protocol: string;
+  traffic: string;
+  sourceName: string;
+  targetName: string;
+  hasDetection: boolean;
+}
+
+type TooltipData = NodeTooltipData | EdgeTooltipData;
+
 // ─── Props ───────────────────────────────────────────────────────
 export interface ForceGraphProps {
   payload: TopologyPayload;
@@ -137,6 +160,39 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
   const [, forceRender] = useState(0);
   const nodesRef = useRef<SimNode[]>([]);
   const linksRef = useRef<SimLink[]>([]);
+
+  // ─── Tooltip state ──────────────────────────────────────────────
+  const [tooltip, setTooltip] = useState<{
+    data: TooltipData;
+    x: number;
+    y: number;
+  } | null>(null);
+  const tooltipTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showTooltip = useCallback(
+    (data: TooltipData, clientX: number, clientY: number) => {
+      if (tooltipTimeoutRef.current) {
+        clearTimeout(tooltipTimeoutRef.current);
+        tooltipTimeoutRef.current = null;
+      }
+      const container = containerRef.current;
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      setTooltip({
+        data,
+        x: clientX - rect.left,
+        y: clientY - rect.top,
+      });
+    },
+    []
+  );
+
+  const hideTooltip = useCallback(() => {
+    tooltipTimeoutRef.current = setTimeout(() => {
+      setTooltip(null);
+      tooltipTimeoutRef.current = null;
+    }, 100);
+  }, []);
 
   // Expose handle for parent (zoom controls + SVG ref for export)
   useImperativeHandle(ref, () => ({
@@ -202,6 +258,13 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
     return m;
   }, [payload.clusters]);
 
+  // ─── Cluster label map (for tooltip) ───────────────────────────
+  const clusterLabelMap = useMemo(() => {
+    const m = new Map<string, string>();
+    payload.clusters.forEach((c) => m.set(c.id, c.label));
+    return m;
+  }, [payload.clusters]);
+
   // ─── Cluster center targets for cluster gravity ────────────────
   const clusterCenters = useMemo(() => {
     const centers = new Map<string, { x: number; y: number }>();
@@ -217,6 +280,13 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
     });
     return centers;
   }, [payload.clusters, dimensions]);
+
+  // ─── Node map for edge tooltip lookups ─────────────────────────
+  const nodeNameMap = useMemo(() => {
+    const m = new Map<number, string>();
+    payload.nodes.forEach((n) => m.set(n.id, n.displayName));
+    return m;
+  }, [payload.nodes]);
 
   // ─── Search highlighting ───────────────────────────────────────
   const matchingIds = useMemo(() => {
@@ -261,10 +331,8 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
 
   // ─── Build simulation data ─────────────────────────────────────
   useEffect(() => {
-    // Build nodes
     const nodeById = new Map<number, SimNode>();
     const simNodes: SimNode[] = payload.nodes.map((n) => {
-      // Preserve existing positions if we have them
       const existing = nodesRef.current.find((prev) => prev.id === n.id);
       const center = clusterCenters.get(n.clusterId) || {
         x: dimensions.width / 2,
@@ -284,7 +352,6 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
       return sn;
     });
 
-    // Build links
     const simLinks: SimLink[] = payload.edges
       .filter((e) => nodeById.has(e.sourceId) && nodeById.has(e.targetId))
       .map((e) => ({
@@ -297,12 +364,10 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
     nodesRef.current = simNodes;
     linksRef.current = simLinks;
 
-    // Stop previous simulation
     if (simulationRef.current) {
       simulationRef.current.stop();
     }
 
-    // Create simulation
     const sim = forceSimulation<SimNode>(simNodes)
       .force(
         'link',
@@ -314,7 +379,6 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
       .force('charge', forceManyBody<SimNode>().strength(-200).distanceMax(400))
       .force('center', forceCenter(dimensions.width / 2, dimensions.height / 2).strength(0.05))
       .force('collide', forceCollide<SimNode>().radius((d) => d.radius + 8).strength(0.7))
-      // Cluster gravity: pull nodes toward their cluster center
       .force(
         'clusterX',
         forceX<SimNode>((d) => clusterCenters.get(d.clusterId)?.x ?? dimensions.width / 2).strength(0.12)
@@ -355,8 +419,6 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
 
     zoomBehaviorRef.current = zoomBehavior;
     select(svg).call(zoomBehavior);
-
-    // Disable double-click zoom (conflicts with node selection)
     select(svg).on('dblclick.zoom', null);
 
     return () => {
@@ -463,10 +525,52 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
     [selectedNodeId, matchingIds, pathNodeIds, anomalyNodeMap, payload.edges]
   );
 
+  // ─── Node hover handler ───────────────────────────────────────
+  const handleNodeMouseEnter = useCallback(
+    (e: React.MouseEvent, simNode: SimNode) => {
+      const n = simNode.node;
+      showTooltip(
+        {
+          kind: 'node',
+          name: n.displayName,
+          ip: n.ipaddr || 'N/A',
+          role: ROLE_DISPLAY[n.role]?.label || n.role,
+          traffic: formatBytes(n.totalBytes),
+          detections: n.activeDetections,
+          alerts: n.activeAlerts,
+          cluster: clusterLabelMap.get(n.clusterId) || n.clusterId,
+        },
+        e.clientX,
+        e.clientY
+      );
+    },
+    [showTooltip, clusterLabelMap]
+  );
+
+  // ─── Edge hover handler ───────────────────────────────────────
+  const handleEdgeMouseEnter = useCallback(
+    (e: React.MouseEvent, link: SimLink) => {
+      const edge = link.edge;
+      showTooltip(
+        {
+          kind: 'edge',
+          protocol: edge.protocol || 'Unknown',
+          traffic: formatBytes(edge.bytes),
+          sourceName: nodeNameMap.get(edge.sourceId) || `Device ${edge.sourceId}`,
+          targetName: nodeNameMap.get(edge.targetId) || `Device ${edge.targetId}`,
+          hasDetection: edge.hasDetection,
+        },
+        e.clientX,
+        e.clientY
+      );
+    },
+    [showTooltip, nodeNameMap]
+  );
+
   return (
     <div
       ref={containerRef}
-      className="w-full h-full"
+      className="w-full h-full relative"
       data-testid="force-graph-container"
     >
       <svg
@@ -476,6 +580,7 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
         className="w-full h-full"
         data-testid="topology-svg"
         style={{ cursor: 'grab', background: 'transparent' }}
+        onMouseLeave={hideTooltip}
       >
         <defs>
           <radialGradient id="node-glow-fg">
@@ -489,7 +594,6 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
-          {/* Glow filter for hovered/selected nodes */}
           <filter id="node-select-glow" x="-100%" y="-100%" width="300%" height="300%">
             <feGaussianBlur stdDeviation="4" result="blur" />
             <feMerge>
@@ -556,6 +660,21 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
 
               return (
                 <g key={`edge-${i}`}>
+                  {/* Invisible wider hit area for hover */}
+                  <line
+                    x1={src.x}
+                    y1={src.y}
+                    x2={tgt.x}
+                    y2={tgt.y}
+                    stroke="transparent"
+                    strokeWidth={Math.max(strokeW + 8, 12)}
+                    style={{ cursor: 'pointer' }}
+                    onMouseEnter={(e) => handleEdgeMouseEnter(e, link)}
+                    onMouseMove={(e) => handleEdgeMouseEnter(e, link)}
+                    onMouseLeave={hideTooltip}
+                    data-testid={`edge-hit-${link.edge.sourceId}-${link.edge.targetId}`}
+                  />
+                  {/* Visible edge line */}
                   <line
                     x1={src.x}
                     y1={src.y}
@@ -566,6 +685,7 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
                     strokeOpacity={strokeOp}
                     filter={isOnPath ? 'url(#path-glow-fg)' : undefined}
                     strokeLinecap="round"
+                    style={{ pointerEvents: 'none' }}
                   />
                   {/* Anomaly label on edge */}
                   {anomaly && (
@@ -577,6 +697,7 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
                       fontSize={8}
                       fontWeight={600}
                       fontFamily="Inter, system-ui, sans-serif"
+                      style={{ pointerEvents: 'none' }}
                     >
                       {anomaly.direction === 'spike' ? '+' : '-'}
                       {Math.abs(Math.round(anomaly.deviationPercent))}%
@@ -630,6 +751,9 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
                     e.stopPropagation();
                     onSelectNode(isSelected ? null : n.id);
                   }}
+                  onMouseEnter={(e) => handleNodeMouseEnter(e, simNode)}
+                  onMouseMove={(e) => handleNodeMouseEnter(e, simNode)}
+                  onMouseLeave={hideTooltip}
                   style={{ cursor: 'pointer' }}
                   data-testid={`topology-node-${n.id}`}
                   opacity={isDimmed ? 0.15 : 1}
@@ -732,6 +856,75 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
           </g>
         </g>
       </svg>
+
+      {/* ─── Floating Tooltip (HTML overlay) ─────────────────────── */}
+      {tooltip && (
+        <div
+          data-testid="topology-tooltip"
+          className="absolute pointer-events-none z-50"
+          style={{
+            left: tooltip.x + 16,
+            top: tooltip.y - 8,
+            maxWidth: 280,
+          }}
+        >
+          <div
+            className="rounded-lg border shadow-xl text-xs"
+            style={{
+              background: 'rgba(15, 23, 42, 0.95)',
+              borderColor: 'rgba(71, 85, 105, 0.5)',
+              backdropFilter: 'blur(8px)',
+            }}
+          >
+            {tooltip.data.kind === 'node' && (
+              <div className="p-3 space-y-1.5">
+                <div className="font-semibold text-white text-sm truncate">
+                  {tooltip.data.name}
+                </div>
+                <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-slate-300">
+                  <span className="text-slate-500">IP</span>
+                  <span className="font-mono text-xs">{tooltip.data.ip}</span>
+                  <span className="text-slate-500">Role</span>
+                  <span>{tooltip.data.role}</span>
+                  <span className="text-slate-500">Cluster</span>
+                  <span className="truncate">{tooltip.data.cluster}</span>
+                  <span className="text-slate-500">Traffic</span>
+                  <span className="font-mono text-amber-400">{tooltip.data.traffic}</span>
+                  <span className="text-slate-500">Detections</span>
+                  <span className={tooltip.data.detections > 0 ? 'text-red-400 font-semibold' : ''}>
+                    {tooltip.data.detections}
+                  </span>
+                  <span className="text-slate-500">Alerts</span>
+                  <span className={tooltip.data.alerts > 0 ? 'text-orange-400 font-semibold' : ''}>
+                    {tooltip.data.alerts}
+                  </span>
+                </div>
+              </div>
+            )}
+            {tooltip.data.kind === 'edge' && (
+              <div className="p-3 space-y-1.5">
+                <div className="font-semibold text-white text-sm flex items-center gap-2">
+                  <span className="truncate max-w-[90px]">{tooltip.data.sourceName}</span>
+                  <span className="text-slate-500 text-xs flex-shrink-0">&rarr;</span>
+                  <span className="truncate max-w-[90px]">{tooltip.data.targetName}</span>
+                </div>
+                <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-slate-300">
+                  <span className="text-slate-500">Protocol</span>
+                  <span className="font-mono text-cyan-400">{tooltip.data.protocol}</span>
+                  <span className="text-slate-500">Traffic</span>
+                  <span className="font-mono text-amber-400">{tooltip.data.traffic}</span>
+                  {tooltip.data.hasDetection && (
+                    <>
+                      <span className="text-slate-500">Status</span>
+                      <span className="text-red-400 font-semibold">Detection active</span>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 });

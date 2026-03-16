@@ -387,3 +387,216 @@ describe('Slice 39 — formatBytes helper', () => {
     expect(formatBytes(1000000000)).toBe('1.0 GB');
   });
 });
+
+// ═══════════════════════════════════════════════════════════════════
+// SLICE 40 — NODE TOOLTIP DATA CONTRACT
+// ═══════════════════════════════════════════════════════════════════
+
+describe('Slice 40 — Node Tooltip Data Contract', () => {
+  it('every populated node has displayName for tooltip', () => {
+    for (const node of populated.nodes) {
+      expect(typeof node.displayName).toBe('string');
+      expect(node.displayName.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('every populated node has ipaddr or null for tooltip', () => {
+    for (const node of populated.nodes) {
+      expect(
+        node.ipaddr === null || node.ipaddr === undefined || typeof node.ipaddr === 'string'
+      ).toBe(true);
+    }
+  });
+
+  it('every populated node has numeric totalBytes for tooltip traffic display', () => {
+    for (const node of populated.nodes) {
+      expect(typeof node.totalBytes).toBe('number');
+      expect(Number.isFinite(node.totalBytes)).toBe(true);
+      expect(node.totalBytes).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('every populated node has numeric activeDetections for tooltip', () => {
+    for (const node of populated.nodes) {
+      expect(typeof node.activeDetections).toBe('number');
+      expect(Number.isFinite(node.activeDetections)).toBe(true);
+      expect(node.activeDetections).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('every populated node has numeric activeAlerts for tooltip', () => {
+    for (const node of populated.nodes) {
+      expect(typeof node.activeAlerts).toBe('number');
+      expect(Number.isFinite(node.activeAlerts)).toBe(true);
+      expect(node.activeAlerts).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('every populated node has a role that maps to ROLE_DISPLAY for tooltip', () => {
+    for (const node of populated.nodes) {
+      const meta = ROLE_DISPLAY[node.role];
+      expect(meta).toBeDefined();
+      expect(typeof meta.label).toBe('string');
+      expect(meta.label.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('every populated node has a clusterId that maps to a cluster label for tooltip', () => {
+    const clusterLabels = new Map(populated.clusters.map((c: any) => [c.id, c.label]));
+    for (const node of populated.nodes) {
+      expect(clusterLabels.has(node.clusterId)).toBe(true);
+      const label = clusterLabels.get(node.clusterId);
+      expect(typeof label).toBe('string');
+      expect(label!.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('large-scale nodes all have valid tooltip fields (no NaN/undefined)', () => {
+    for (const node of largeScale.nodes) {
+      expect(typeof node.displayName).toBe('string');
+      expect(Number.isFinite(node.totalBytes)).toBe(true);
+      expect(Number.isFinite(node.activeDetections)).toBe(true);
+      expect(Number.isFinite(node.activeAlerts)).toBe(true);
+    }
+  });
+
+  it('quiet fixture produces no tooltip data (zero nodes)', () => {
+    expect(quiet.nodes.length).toBe(0);
+    // ForceGraph should render no node tooltips in quiet state
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// SLICE 40 — EDGE LABEL DATA CONTRACT
+// ═══════════════════════════════════════════════════════════════════
+
+describe('Slice 40 — Edge Label Data Contract', () => {
+  it('every populated edge has a protocol string for label', () => {
+    for (const edge of populated.edges) {
+      expect(typeof edge.protocol).toBe('string');
+      expect(edge.protocol.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('every populated edge has numeric bytes for traffic display', () => {
+    for (const edge of populated.edges) {
+      expect(typeof edge.bytes).toBe('number');
+      expect(Number.isFinite(edge.bytes)).toBe(true);
+      expect(edge.bytes).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('every populated edge has boolean hasDetection for status indicator', () => {
+    for (const edge of populated.edges) {
+      expect(typeof edge.hasDetection).toBe('boolean');
+    }
+  });
+
+  it('every populated edge sourceId/targetId maps to a node displayName for label', () => {
+    const nodeNames = new Map(populated.nodes.map((n: TopologyNode) => [n.id, n.displayName]));
+    for (const edge of populated.edges) {
+      expect(nodeNames.has(edge.sourceId)).toBe(true);
+      expect(nodeNames.has(edge.targetId)).toBe(true);
+      expect(typeof nodeNames.get(edge.sourceId)).toBe('string');
+      expect(typeof nodeNames.get(edge.targetId)).toBe('string');
+    }
+  });
+
+  it('large-scale edges all have valid label fields (no NaN/undefined)', () => {
+    for (const edge of largeScale.edges) {
+      expect(typeof edge.protocol).toBe('string');
+      expect(Number.isFinite(edge.bytes)).toBe(true);
+      expect(typeof edge.hasDetection).toBe('boolean');
+    }
+  });
+
+  it('quiet fixture produces no edge labels (zero edges)', () => {
+    expect(quiet.edges.length).toBe(0);
+    // ForceGraph should render no edge labels in quiet state
+  });
+
+  it('formatBytes produces readable traffic labels for edge tooltip', () => {
+    function formatBytes(b: number): string {
+      if (b >= 1e9) return `${(b / 1e9).toFixed(1)} GB`;
+      if (b >= 1e6) return `${(b / 1e6).toFixed(1)} MB`;
+      if (b >= 1e3) return `${(b / 1e3).toFixed(1)} KB`;
+      return `${b} B`;
+    }
+
+    // Verify all edge bytes produce readable strings
+    for (const edge of populated.edges) {
+      const label = formatBytes(edge.bytes);
+      expect(typeof label).toBe('string');
+      expect(label.length).toBeGreaterThan(0);
+      expect(label).toMatch(/^\d+(\.\d+)?\s+(B|KB|MB|GB)$/);
+    }
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// SLICE 40 — CONSTELLATION VIEW DEAD CODE REMOVAL
+// ═══════════════════════════════════════════════════════════════════
+
+describe('Slice 40 — ConstellationView Dead Code Removal', () => {
+  it('Topology.tsx no longer contains ConstellationView function', () => {
+    const topologySource = readFileSync(
+      join(process.cwd(), 'client', 'src', 'pages', 'Topology.tsx'),
+      'utf-8'
+    );
+    // The function definition should not exist
+    expect(topologySource).not.toMatch(/function ConstellationView\s*\(/);
+  });
+
+  it('Topology.tsx no longer contains computeLayout function', () => {
+    const topologySource = readFileSync(
+      join(process.cwd(), 'client', 'src', 'pages', 'Topology.tsx'),
+      'utf-8'
+    );
+    expect(topologySource).not.toMatch(/function computeLayout\s*\(/);
+  });
+
+  it('Topology.tsx no longer contains NodePos interface', () => {
+    const topologySource = readFileSync(
+      join(process.cwd(), 'client', 'src', 'pages', 'Topology.tsx'),
+      'utf-8'
+    );
+    expect(topologySource).not.toMatch(/interface NodePos\s*\{/);
+  });
+
+  it('ForceGraph.tsx exists and contains ForceGraph component', () => {
+    const forceGraphSource = readFileSync(
+      join(process.cwd(), 'client', 'src', 'components', 'ForceGraph.tsx'),
+      'utf-8'
+    );
+    expect(forceGraphSource).toContain('const ForceGraph');
+    expect(forceGraphSource).toContain('export default ForceGraph');
+  });
+
+  it('ForceGraph.tsx contains tooltip rendering logic', () => {
+    const forceGraphSource = readFileSync(
+      join(process.cwd(), 'client', 'src', 'components', 'ForceGraph.tsx'),
+      'utf-8'
+    );
+    expect(forceGraphSource).toContain('topology-tooltip');
+    expect(forceGraphSource).toContain('NodeTooltipData');
+    expect(forceGraphSource).toContain('EdgeTooltipData');
+  });
+
+  it('ForceGraph.tsx contains edge hover hit area for labels', () => {
+    const forceGraphSource = readFileSync(
+      join(process.cwd(), 'client', 'src', 'components', 'ForceGraph.tsx'),
+      'utf-8'
+    );
+    expect(forceGraphSource).toContain('edge-hit-');
+    expect(forceGraphSource).toContain('handleEdgeMouseEnter');
+  });
+
+  it('Topology.tsx imports ForceGraph', () => {
+    const topologySource = readFileSync(
+      join(process.cwd(), 'client', 'src', 'pages', 'Topology.tsx'),
+      'utf-8'
+    );
+    expect(topologySource).toContain("ForceGraph");
+    expect(topologySource).toContain("@/components/ForceGraph");
+  });
+});
