@@ -580,3 +580,17 @@ These items are tracked here for the live integration phase.
 - [x] Import layout from JSON: upload and restore positions (file input + validation)
 - [x] Write tests for all three features — 41 new tests, 2602 total passing, 0 failures
 - [x] Generate truth receipt — SLICE-42-RECEIPT.md
+
+# SLICE 43 — Minimap, Node Grouping, Real-Time Pulse Animation
+
+- [x] Minimap overlay: small inset canvas in bottom-right corner showing full topology (180x120 canvas)
+- [x] Minimap viewport rectangle: semi-transparent box showing current zoom/pan area (amber outline)
+- [x] Minimap click-to-navigate: click on minimap to pan the main view
+- [x] Node grouping: collapse entire subnet into a single super-node (collapseCluster on handle)
+- [x] Node grouping: expand super-node back to individual nodes (expandCluster on handle)
+- [x] Node grouping: Collapse/Expand All button in toolbar (Shrink icon)
+- [x] Real-time pulse animation: edge stroke-dashoffset animated proportional to traffic (requestAnimationFrame)
+- [x] Real-time pulse: only active when isLiveData=true (deferred by contract, currently always false)
+- [x] Real-time pulse: Zap toggle button in toolbar with cyan highlight when active
+- [x] Write tests for all three features — 44 new tests, 2646 total passing, 0 failures
+- [x] Generate truth receipt — SLICE-43-RECEIPT.md

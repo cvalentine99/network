@@ -1,5 +1,5 @@
 /**
- * ForceGraph — D3-force-directed topology visualization (Slice 39 + 40)
+ * ForceGraph — D3-force-directed topology visualization (Slices 39-43)
  *
  * CONTRACT:
  * - Renders TopologyPayload as an interactive force-directed graph
@@ -13,6 +13,11 @@
  * - Edge label on hover: protocol name and traffic volume (Slice 40)
  * - Layout persistence: saves node positions to localStorage on drag-end (Slice 41)
  * - Restores pinned positions on page load; Reset Layout clears saved state
+ * - Lock All toggle: freeze/unfreeze simulation (Slice 42)
+ * - getNodePositions / applyNodePositions for Saved Views (Slice 42)
+ * - Minimap overlay: bottom-right inset showing full topology + viewport rect (Slice 43)
+ * - Node grouping: collapse/expand clusters into super-nodes (Slice 43)
+ * - Real-time pulse animation: edge dash animation proportional to traffic (Slice 43)
  *
  * Live integration: deferred by contract.
  */
@@ -62,11 +67,25 @@ interface SimNode extends SimulationNodeDatum {
   node: TopologyNode;
   clusterId: string;
   radius: number;
+  /** True if this is a collapsed super-node representing a cluster */
+  isSuperNode?: boolean;
+  /** For super-nodes: the IDs of the collapsed child nodes */
+  childNodeIds?: number[];
+  /** For super-nodes: aggregated total bytes */
+  superBytes?: number;
+  /** For super-nodes: aggregated detection count */
+  superDetections?: number;
+  /** For super-nodes: aggregated alert count */
+  superAlerts?: number;
 }
 
 interface SimLink extends SimulationLinkDatum<SimNode> {
   edge: TopologyEdge;
   width: number;
+  /** For super-node edges: aggregated from multiple real edges */
+  isSuperEdge?: boolean;
+  /** Aggregated bytes for super-edges */
+  superBytes?: number;
 }
 
 // ─── Scaling helpers ─────────────────────────────────────────────
@@ -158,6 +177,15 @@ interface NodeTooltipData {
   cluster: string;
 }
 
+interface SuperNodeTooltipData {
+  kind: 'supernode';
+  clusterLabel: string;
+  nodeCount: number;
+  totalTraffic: string;
+  detections: number;
+  alerts: number;
+}
+
 interface EdgeTooltipData {
   kind: 'edge';
   protocol: string;
@@ -167,7 +195,7 @@ interface EdgeTooltipData {
   hasDetection: boolean;
 }
 
-type TooltipData = NodeTooltipData | EdgeTooltipData;
+type TooltipData = NodeTooltipData | SuperNodeTooltipData | EdgeTooltipData;
 
 // ─── Props ───────────────────────────────────────────────────────
 export interface ForceGraphProps {
@@ -178,6 +206,10 @@ export interface ForceGraphProps {
   criticalPath: CriticalPathResult | null;
   anomalyOverlay: AnomalyOverlayPayload | null;
   showAnomalyOverlay: boolean;
+  /** Whether pulse animation is enabled (Slice 43) */
+  pulseEnabled?: boolean;
+  /** Whether the data source is live (not fixture) — pulse only animates when live */
+  isLiveData?: boolean;
 }
 
 export interface ForceGraphHandle {
@@ -191,7 +223,20 @@ export interface ForceGraphHandle {
   toggleLock: () => void;
   getNodePositions: () => Record<string, { x: number; y: number }>;
   applyNodePositions: (positions: Record<string, { x: number; y: number }>) => void;
+  /** Collapse a cluster into a super-node (Slice 43) */
+  collapseCluster: (clusterId: string) => void;
+  /** Expand a collapsed super-node back to individual nodes (Slice 43) */
+  expandCluster: (clusterId: string) => void;
+  /** Get the set of currently collapsed cluster IDs (Slice 43) */
+  collapsedClusters: Set<string>;
+  /** Toggle collapse for a cluster (Slice 43) */
+  toggleCluster: (clusterId: string) => void;
 }
+
+// ─── Minimap constants ──────────────────────────────────────────
+const MINIMAP_WIDTH = 180;
+const MINIMAP_HEIGHT = 120;
+const MINIMAP_PADDING = 12;
 
 // ─── Component ───────────────────────────────────────────────────
 const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceGraph(
@@ -203,11 +248,14 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
     criticalPath,
     anomalyOverlay,
     showAnomalyOverlay,
+    pulseEnabled = false,
+    isLiveData = false,
   },
   ref
 ) {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const minimapCanvasRef = useRef<HTMLCanvasElement>(null);
   const simulationRef = useRef<ReturnType<typeof forceSimulation<SimNode>> | null>(null);
   const zoomBehaviorRef = useRef<ZoomBehavior<SVGSVGElement, unknown> | null>(null);
   const [dimensions, setDimensions] = useState({ width: 1200, height: 700 });
@@ -217,6 +265,33 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
   const savedPositionsRef = useRef<Map<number, SavedPosition>>(loadSavedPositions());
   const [hasCustomLayout, setHasCustomLayout] = useState(() => loadSavedPositions().size > 0);
   const [isLocked, setIsLocked] = useState(false);
+
+  // ─── Collapsed clusters state (Slice 43) ──────────────────────
+  const [collapsedClusters, setCollapsedClusters] = useState<Set<string>>(new Set());
+
+  // ─── Pulse animation (Slice 43) ───────────────────────────────
+  const pulseOffsetRef = useRef(0);
+  const pulseAnimFrameRef = useRef<number>(0);
+  const shouldPulse = pulseEnabled && isLiveData;
+
+  useEffect(() => {
+    if (!shouldPulse) {
+      pulseOffsetRef.current = 0;
+      return;
+    }
+    let running = true;
+    const animate = () => {
+      if (!running) return;
+      pulseOffsetRef.current = (pulseOffsetRef.current + 0.5) % 100;
+      forceRender((v) => v + 1);
+      pulseAnimFrameRef.current = requestAnimationFrame(animate);
+    };
+    pulseAnimFrameRef.current = requestAnimationFrame(animate);
+    return () => {
+      running = false;
+      cancelAnimationFrame(pulseAnimFrameRef.current);
+    };
+  }, [shouldPulse]);
 
   // ─── Tooltip state ──────────────────────────────────────────────
   const [tooltip, setTooltip] = useState<{
@@ -251,7 +326,7 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
     }, 100);
   }, []);
 
-  // Expose handle for parent (zoom controls + SVG ref for export + layout reset)
+  // Expose handle for parent
   useImperativeHandle(ref, () => ({
     get svgElement() {
       return svgRef.current;
@@ -285,7 +360,7 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
       savedPositionsRef.current = new Map();
       setHasCustomLayout(false);
       setIsLocked(false);
-      // Unpin all nodes and restart simulation
+      setCollapsedClusters(new Set());
       for (const n of nodesRef.current) {
         n.fx = null;
         n.fy = null;
@@ -298,14 +373,12 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
       setIsLocked((prev) => {
         const next = !prev;
         if (next) {
-          // Lock: pin all nodes at current positions and stop simulation
           for (const n of nodesRef.current) {
             n.fx = n.x;
             n.fy = n.y;
           }
           simulationRef.current?.stop();
         } else {
-          // Unlock: unpin nodes that weren't manually dragged and restart
           const saved = savedPositionsRef.current;
           for (const n of nodesRef.current) {
             if (!saved.has(n.id)) {
@@ -335,7 +408,6 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
           posMap.set(id, v);
         }
       }
-      // Apply positions to current nodes
       for (const n of nodesRef.current) {
         const pos = posMap.get(n.id);
         if (pos) {
@@ -345,13 +417,38 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
           n.fy = pos.y;
         }
       }
-      // Save to localStorage too
       savedPositionsRef.current = posMap;
       saveSavedPositions(posMap);
       setHasCustomLayout(posMap.size > 0);
       forceRender((v) => v + 1);
     },
-  }), [hasCustomLayout, isLocked]);
+    collapsedClusters,
+    collapseCluster: (clusterId: string) => {
+      setCollapsedClusters((prev) => {
+        const next = new Set(prev);
+        next.add(clusterId);
+        return next;
+      });
+    },
+    expandCluster: (clusterId: string) => {
+      setCollapsedClusters((prev) => {
+        const next = new Set(prev);
+        next.delete(clusterId);
+        return next;
+      });
+    },
+    toggleCluster: (clusterId: string) => {
+      setCollapsedClusters((prev) => {
+        const next = new Set(prev);
+        if (next.has(clusterId)) {
+          next.delete(clusterId);
+        } else {
+          next.add(clusterId);
+        }
+        return next;
+      });
+    },
+  }), [hasCustomLayout, isLocked, collapsedClusters]);
 
   // ─── Responsive sizing ─────────────────────────────────────────
   useEffect(() => {
@@ -369,14 +466,96 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
     return () => ro.disconnect();
   }, []);
 
+  // ─── Build effective payload with collapsed clusters ───────────
+  const effectivePayload = useMemo(() => {
+    if (collapsedClusters.size === 0) return payload;
+
+    const collapsedNodeIds = new Set<number>();
+    const superNodes: TopologyNode[] = [];
+
+    for (const clusterId of Array.from(collapsedClusters)) {
+      const cluster = payload.clusters.find((c) => c.id === clusterId);
+      if (!cluster) continue;
+      const clusterNodes = payload.nodes.filter((n) => n.clusterId === clusterId);
+      if (clusterNodes.length === 0) continue;
+
+      for (const n of clusterNodes) collapsedNodeIds.add(n.id);
+
+      // Create a super-node with a negative ID to avoid collision
+      const superNodeId = -(Math.abs(clusterId.split('').reduce((a: number, c: string) => a + c.charCodeAt(0), 0)) + 1);
+      const totalBytes = clusterNodes.reduce((s, n) => s + n.totalBytes, 0);
+      const totalDetections = clusterNodes.reduce((s, n) => s + n.activeDetections, 0);
+      const totalAlerts = clusterNodes.reduce((s, n) => s + n.activeAlerts, 0);
+
+      superNodes.push({
+        id: superNodeId,
+        displayName: `${cluster.label} (${clusterNodes.length})`,
+        ipaddr: '',
+        macaddr: '',
+        role: 'server' as TopologyNode['role'],
+        clusterId,
+        totalBytes,
+        activeDetections: totalDetections,
+        activeAlerts: totalAlerts,
+        critical: clusterNodes.some((n) => n.critical),
+        _isSuperNode: true,
+        _childNodeIds: clusterNodes.map((n) => n.id),
+      } as TopologyNode & { _isSuperNode: boolean; _childNodeIds: number[] });
+    }
+
+    // Keep non-collapsed nodes + add super-nodes
+    const effectiveNodes = [
+      ...payload.nodes.filter((n) => !collapsedNodeIds.has(n.id)),
+      ...superNodes,
+    ];
+
+    // Remap edges: if source or target is collapsed, remap to super-node
+    const nodeToSuper = new Map<number, number>();
+    for (const sn of superNodes) {
+      const ext = sn as TopologyNode & { _childNodeIds: number[] };
+      for (const childId of ext._childNodeIds) {
+        nodeToSuper.set(childId, sn.id);
+      }
+    }
+
+    const edgeMap = new Map<string, TopologyEdge>();
+    for (const e of payload.edges) {
+      const srcId = nodeToSuper.get(e.sourceId) ?? e.sourceId;
+      const tgtId = nodeToSuper.get(e.targetId) ?? e.targetId;
+      if (srcId === tgtId) continue; // Skip intra-cluster edges
+      const key = srcId < tgtId ? `${srcId}-${tgtId}` : `${tgtId}-${srcId}`;
+      const existing = edgeMap.get(key);
+      if (existing) {
+        // Aggregate
+        edgeMap.set(key, {
+          ...existing,
+          bytes: existing.bytes + e.bytes,
+          hasDetection: existing.hasDetection || e.hasDetection,
+        });
+      } else {
+        edgeMap.set(key, {
+          ...e,
+          sourceId: srcId,
+          targetId: tgtId,
+        });
+      }
+    }
+
+    return {
+      ...payload,
+      nodes: effectiveNodes,
+      edges: Array.from(edgeMap.values()),
+    };
+  }, [payload, collapsedClusters]);
+
   // ─── Precompute max values ─────────────────────────────────────
   const maxNodeBytes = useMemo(
-    () => Math.max(...payload.nodes.map((n) => n.totalBytes), 1),
-    [payload]
+    () => Math.max(...effectivePayload.nodes.map((n) => n.totalBytes), 1),
+    [effectivePayload]
   );
   const maxEdgeBytes = useMemo(
-    () => Math.max(...payload.edges.map((e) => e.bytes), 1),
-    [payload]
+    () => Math.max(...effectivePayload.edges.map((e) => e.bytes), 1),
+    [effectivePayload]
   );
 
   // ─── Cluster color map ─────────────────────────────────────────
@@ -412,16 +591,16 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
   // ─── Node map for edge tooltip lookups ─────────────────────────
   const nodeNameMap = useMemo(() => {
     const m = new Map<number, string>();
-    payload.nodes.forEach((n) => m.set(n.id, n.displayName));
+    effectivePayload.nodes.forEach((n) => m.set(n.id, n.displayName));
     return m;
-  }, [payload.nodes]);
+  }, [effectivePayload.nodes]);
 
   // ─── Search highlighting ───────────────────────────────────────
   const matchingIds = useMemo(() => {
     if (!searchTerm) return null;
     const lower = searchTerm.toLowerCase();
     return new Set(
-      payload.nodes
+      effectivePayload.nodes
         .filter(
           (n) =>
             n.displayName.toLowerCase().includes(lower) ||
@@ -429,7 +608,7 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
         )
         .map((n) => n.id)
     );
-  }, [payload.nodes, searchTerm]);
+  }, [effectivePayload.nodes, searchTerm]);
 
   // ─── Critical path sets ────────────────────────────────────────
   const pathNodeIds = useMemo(
@@ -460,32 +639,38 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
   // ─── Build simulation data ─────────────────────────────────────
   useEffect(() => {
     const nodeById = new Map<number, SimNode>();
-    const simNodes: SimNode[] = payload.nodes.map((n) => {
+    const simNodes: SimNode[] = effectivePayload.nodes.map((n) => {
       const existing = nodesRef.current.find((prev) => prev.id === n.id);
       const center = clusterCenters.get(n.clusterId) || {
         x: dimensions.width / 2,
         y: dimensions.height / 2,
       };
-      // Restore saved position from localStorage if available (Slice 41)
       const saved = savedPositionsRef.current.get(n.id);
+      const ext = n as TopologyNode & { _isSuperNode?: boolean; _childNodeIds?: number[] };
       const sn: SimNode = {
         id: n.id,
         node: n,
         clusterId: n.clusterId,
-        radius: nodeRadius(n.totalBytes, maxNodeBytes),
+        radius: ext._isSuperNode
+          ? Math.max(nodeRadius(n.totalBytes, maxNodeBytes), TOPOLOGY_PERFORMANCE.NODE_SIZE_MAX * 0.8)
+          : nodeRadius(n.totalBytes, maxNodeBytes),
         x: existing?.x ?? saved?.x ?? center.x + (Math.random() - 0.5) * 80,
         y: existing?.y ?? saved?.y ?? center.y + (Math.random() - 0.5) * 80,
         vx: existing?.vx ?? 0,
         vy: existing?.vy ?? 0,
-        // Pin node if it has a saved position (user previously dragged it)
         fx: existing ? existing.fx : (saved ? saved.x : undefined),
         fy: existing ? existing.fy : (saved ? saved.y : undefined),
+        isSuperNode: ext._isSuperNode ?? false,
+        childNodeIds: ext._childNodeIds,
+        superBytes: ext._isSuperNode ? n.totalBytes : undefined,
+        superDetections: ext._isSuperNode ? n.activeDetections : undefined,
+        superAlerts: ext._isSuperNode ? n.activeAlerts : undefined,
       };
       nodeById.set(n.id, sn);
       return sn;
     });
 
-    const simLinks: SimLink[] = payload.edges
+    const simLinks: SimLink[] = effectivePayload.edges
       .filter((e) => nodeById.has(e.sourceId) && nodeById.has(e.targetId))
       .map((e) => ({
         source: nodeById.get(e.sourceId)!,
@@ -531,7 +716,7 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
     return () => {
       sim.stop();
     };
-  }, [payload, dimensions, maxNodeBytes, maxEdgeBytes, clusterCenters]);
+  }, [effectivePayload, dimensions, maxNodeBytes, maxEdgeBytes, clusterCenters]);
 
   // ─── D3 Zoom ───────────────────────────────────────────────────
   const [transform, setTransform] = useState({ x: 0, y: 0, k: 1 });
@@ -586,7 +771,6 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
     (event: { active: number }, d: SimNode) => {
       if (isLockedRef.current) return;
       if (!event.active) simulationRef.current?.alphaTarget(0);
-      // Pin the node at its dragged position and persist to localStorage (Slice 41)
       d.fx = d.x;
       d.fy = d.y;
       if (d.x != null && d.y != null && Number.isFinite(d.x) && Number.isFinite(d.y)) {
@@ -611,6 +795,128 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
 
     nodeGroups.call(dragBehavior);
   });
+
+  // ─── Minimap rendering (Slice 43) ─────────────────────────────
+  useEffect(() => {
+    const canvas = minimapCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const nodes = nodesRef.current;
+    const links = linksRef.current;
+    if (nodes.length === 0) return;
+
+    // Compute bounding box of all nodes
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (const n of nodes) {
+      if (n.x == null || n.y == null) continue;
+      minX = Math.min(minX, n.x - n.radius);
+      minY = Math.min(minY, n.y - n.radius);
+      maxX = Math.max(maxX, n.x + n.radius);
+      maxY = Math.max(maxY, n.y + n.radius);
+    }
+    if (!Number.isFinite(minX)) return;
+
+    const pad = 30;
+    minX -= pad; minY -= pad; maxX += pad; maxY += pad;
+    const worldW = maxX - minX;
+    const worldH = maxY - minY;
+    const scaleX = MINIMAP_WIDTH / worldW;
+    const scaleY = MINIMAP_HEIGHT / worldH;
+    const scale = Math.min(scaleX, scaleY);
+
+    const offsetX = (MINIMAP_WIDTH - worldW * scale) / 2;
+    const offsetY = (MINIMAP_HEIGHT - worldH * scale) / 2;
+
+    // Clear
+    ctx.clearRect(0, 0, MINIMAP_WIDTH, MINIMAP_HEIGHT);
+
+    // Background
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+    ctx.fillRect(0, 0, MINIMAP_WIDTH, MINIMAP_HEIGHT);
+
+    // Border
+    ctx.strokeStyle = 'rgba(71, 85, 105, 0.4)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(0, 0, MINIMAP_WIDTH, MINIMAP_HEIGHT);
+
+    // Draw edges
+    ctx.strokeStyle = 'rgba(71, 85, 105, 0.3)';
+    ctx.lineWidth = 0.5;
+    for (const link of links) {
+      const src = link.source as SimNode;
+      const tgt = link.target as SimNode;
+      if (src.x == null || tgt.x == null) continue;
+      ctx.beginPath();
+      ctx.moveTo((src.x - minX) * scale + offsetX, (src.y! - minY) * scale + offsetY);
+      ctx.lineTo((tgt.x - minX) * scale + offsetX, (tgt.y! - minY) * scale + offsetY);
+      ctx.stroke();
+    }
+
+    // Draw nodes
+    for (const n of nodes) {
+      if (n.x == null || n.y == null) continue;
+      const nx = (n.x - minX) * scale + offsetX;
+      const ny = (n.y - minY) * scale + offsetY;
+      const nr = Math.max(n.radius * scale, 1.5);
+      const color = n.isSuperNode
+        ? (clusterColorMap.get(n.clusterId) || '#94a3b8')
+        : (ROLE_DISPLAY[n.node.role]?.color || '#94a3b8');
+      ctx.fillStyle = color;
+      ctx.globalAlpha = n.id === selectedNodeId ? 1 : 0.7;
+      ctx.beginPath();
+      ctx.arc(nx, ny, nr, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // Draw viewport rectangle
+    const vx = (-transform.x / transform.k - minX) * scale + offsetX;
+    const vy = (-transform.y / transform.k - minY) * scale + offsetY;
+    const vw = (dimensions.width / transform.k) * scale;
+    const vh = (dimensions.height / transform.k) * scale;
+
+    ctx.strokeStyle = 'rgba(251, 191, 36, 0.7)';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(vx, vy, vw, vh);
+    ctx.fillStyle = 'rgba(251, 191, 36, 0.05)';
+    ctx.fillRect(vx, vy, vw, vh);
+
+    // Store world bounds for click-to-navigate
+    (canvas as any)._worldBounds = { minX, minY, worldW, worldH, scale, offsetX, offsetY };
+  });
+
+  // ─── Minimap click-to-navigate ────────────────────────────────
+  const handleMinimapClick = useCallback(
+    (e: React.MouseEvent<HTMLCanvasElement>) => {
+      const canvas = minimapCanvasRef.current;
+      if (!canvas || !svgRef.current || !zoomBehaviorRef.current) return;
+      const bounds = (canvas as any)._worldBounds;
+      if (!bounds) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+
+      // Convert minimap coords to world coords
+      const worldX = (clickX - bounds.offsetX) / bounds.scale + bounds.minX;
+      const worldY = (clickY - bounds.offsetY) / bounds.scale + bounds.minY;
+
+      // Center the main view on this world position
+      const newX = dimensions.width / 2 - worldX * transform.k;
+      const newY = dimensions.height / 2 - worldY * transform.k;
+
+      select(svgRef.current)
+        .transition()
+        .duration(300)
+        .call(
+          zoomBehaviorRef.current.transform,
+          zoomIdentity.translate(newX, newY).scale(transform.k)
+        );
+    },
+    [dimensions, transform]
+  );
 
   // ─── Render helpers ────────────────────────────────────────────
   const nodes = nodesRef.current;
@@ -653,7 +959,7 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
       const isSelected = selectedNodeId === n.id;
       const isConnected =
         selectedNodeId !== null &&
-        payload.edges.some(
+        effectivePayload.edges.some(
           (e) =>
             (e.sourceId === selectedNodeId && e.targetId === n.id) ||
             (e.targetId === selectedNodeId && e.sourceId === n.id)
@@ -667,27 +973,42 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
 
       return { isSelected, isDimmed, isOnPath, nodeAnom, hasIssue };
     },
-    [selectedNodeId, matchingIds, pathNodeIds, anomalyNodeMap, payload.edges]
+    [selectedNodeId, matchingIds, pathNodeIds, anomalyNodeMap, effectivePayload.edges]
   );
 
   // ─── Node hover handler ───────────────────────────────────────
   const handleNodeMouseEnter = useCallback(
     (e: React.MouseEvent, simNode: SimNode) => {
-      const n = simNode.node;
-      showTooltip(
-        {
-          kind: 'node',
-          name: n.displayName,
-          ip: n.ipaddr || 'N/A',
-          role: ROLE_DISPLAY[n.role]?.label || n.role,
-          traffic: formatBytes(n.totalBytes),
-          detections: n.activeDetections,
-          alerts: n.activeAlerts,
-          cluster: clusterLabelMap.get(n.clusterId) || n.clusterId,
-        },
-        e.clientX,
-        e.clientY
-      );
+      if (simNode.isSuperNode) {
+        showTooltip(
+          {
+            kind: 'supernode',
+            clusterLabel: clusterLabelMap.get(simNode.clusterId) || simNode.clusterId,
+            nodeCount: simNode.childNodeIds?.length ?? 0,
+            totalTraffic: formatBytes(simNode.superBytes ?? 0),
+            detections: simNode.superDetections ?? 0,
+            alerts: simNode.superAlerts ?? 0,
+          },
+          e.clientX,
+          e.clientY
+        );
+      } else {
+        const n = simNode.node;
+        showTooltip(
+          {
+            kind: 'node',
+            name: n.displayName,
+            ip: n.ipaddr || 'N/A',
+            role: ROLE_DISPLAY[n.role]?.label || n.role,
+            traffic: formatBytes(n.totalBytes),
+            detections: n.activeDetections,
+            alerts: n.activeAlerts,
+            cluster: clusterLabelMap.get(n.clusterId) || n.clusterId,
+          },
+          e.clientX,
+          e.clientY
+        );
+      }
     },
     [showTooltip, clusterLabelMap]
   );
@@ -710,6 +1031,22 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
       );
     },
     [showTooltip, nodeNameMap]
+  );
+
+  // ─── Pulse dash computation ───────────────────────────────────
+  const getPulseDash = useCallback(
+    (link: SimLink) => {
+      if (!shouldPulse) return undefined;
+      // Dash speed proportional to traffic: more bytes = faster pulse
+      const ratio = link.edge.bytes / maxEdgeBytes;
+      const dashLen = 6 + ratio * 14;
+      const gapLen = 4 + (1 - ratio) * 8;
+      return {
+        strokeDasharray: `${dashLen} ${gapLen}`,
+        strokeDashoffset: -pulseOffsetRef.current * (0.5 + ratio * 1.5),
+      };
+    },
+    [shouldPulse, maxEdgeBytes]
   );
 
   return (
@@ -751,7 +1088,9 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
         <g transform={`translate(${transform.x},${transform.y}) scale(${transform.k})`}>
           {/* Cluster background regions */}
           {payload.clusters.map((c, i) => {
-            const clusterNodes = nodes.filter((sn) => sn.clusterId === c.id);
+            // Don't draw cluster background for collapsed clusters
+            if (collapsedClusters.has(c.id)) return null;
+            const clusterNodes = nodes.filter((sn) => sn.clusterId === c.id && !sn.isSuperNode);
             if (clusterNodes.length === 0) return null;
             const avgX =
               clusterNodes.reduce((s, sn) => s + (sn.x ?? 0), 0) / clusterNodes.length;
@@ -802,6 +1141,7 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
 
               const { strokeColor, strokeOp, strokeW, isOnPath, anomaly } =
                 getEdgeStyle(link);
+              const pulseDash = getPulseDash(link);
 
               return (
                 <g key={`edge-${i}`}>
@@ -830,7 +1170,13 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
                     strokeOpacity={strokeOp}
                     filter={isOnPath ? 'url(#path-glow-fg)' : undefined}
                     strokeLinecap="round"
-                    style={{ pointerEvents: 'none' }}
+                    style={{
+                      pointerEvents: 'none',
+                      ...(pulseDash ? {
+                        strokeDasharray: pulseDash.strokeDasharray,
+                        strokeDashoffset: pulseDash.strokeDashoffset,
+                      } : {}),
+                    }}
                   />
                   {/* Anomaly label on edge */}
                   {anomaly && (
@@ -882,7 +1228,9 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
               if (simNode.x == null || simNode.y == null) return null;
               const n = simNode.node;
               const r = simNode.radius;
-              const color = ROLE_DISPLAY[n.role].color;
+              const color = simNode.isSuperNode
+                ? (clusterColorMap.get(simNode.clusterId) || '#94a3b8')
+                : ROLE_DISPLAY[n.role].color;
               const clusterColor = clusterColorMap.get(n.clusterId) || '#475569';
               const { isSelected, isDimmed, isOnPath, nodeAnom, hasIssue } =
                 getNodeStyle(simNode);
@@ -894,106 +1242,174 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
                   transform={`translate(${simNode.x}, ${simNode.y})`}
                   onClick={(e) => {
                     e.stopPropagation();
-                    onSelectNode(isSelected ? null : n.id);
+                    if (simNode.isSuperNode) {
+                      // Double-click or click on super-node expands it
+                      setCollapsedClusters((prev) => {
+                        const next = new Set(prev);
+                        next.delete(simNode.clusterId);
+                        return next;
+                      });
+                    } else {
+                      onSelectNode(isSelected ? null : n.id);
+                    }
                   }}
                   onMouseEnter={(e) => handleNodeMouseEnter(e, simNode)}
                   onMouseMove={(e) => handleNodeMouseEnter(e, simNode)}
                   onMouseLeave={hideTooltip}
                   style={{ cursor: 'pointer' }}
-                  data-testid={`topology-node-${n.id}`}
+                  data-testid={simNode.isSuperNode ? `topology-supernode-${simNode.clusterId}` : `topology-node-${n.id}`}
                   opacity={isDimmed ? 0.15 : 1}
                 >
-                  {/* Anomaly ring */}
-                  {nodeAnom && (
-                    <circle
-                      r={r + 10}
-                      fill="none"
-                      stroke={ANOMALY_SEVERITY_COLORS[nodeAnom.severity]}
-                      strokeWidth={2}
-                      strokeOpacity={0.6}
-                      strokeDasharray="4 2"
-                    />
-                  )}
-                  {/* Critical path ring */}
-                  {isOnPath && (
-                    <circle
-                      r={r + 7}
-                      fill="none"
-                      stroke="#22d3ee"
-                      strokeWidth={2}
-                      strokeOpacity={0.8}
-                      filter="url(#path-glow-fg)"
-                    />
-                  )}
-                  {/* Issue/critical glow */}
-                  {(n.critical || hasIssue) && !isOnPath && !nodeAnom && (
-                    <circle
-                      r={r + 8}
-                      fill="none"
-                      stroke={hasIssue ? '#ef4444' : '#f59e0b'}
-                      strokeWidth={1.5}
-                      strokeOpacity={0.4}
-                      strokeDasharray={hasIssue ? 'none' : '3 3'}
-                    />
-                  )}
-                  {/* Selection glow */}
-                  {isSelected && (
-                    <circle
-                      r={r + 12}
-                      fill="none"
-                      stroke="#fff"
-                      strokeWidth={1}
-                      strokeOpacity={0.3}
-                      filter="url(#node-select-glow)"
-                    />
-                  )}
-                  {/* Node circle */}
-                  <circle
-                    r={r}
-                    fill={color}
-                    fillOpacity={isSelected ? 0.9 : 0.65}
-                    stroke={isOnPath ? '#22d3ee' : isSelected ? '#fff' : clusterColor}
-                    strokeWidth={isSelected || isOnPath ? 2.5 : 1}
-                    strokeOpacity={isSelected || isOnPath ? 1 : 0.35}
-                  />
-                  {/* Icon indicator for role (small dot) */}
-                  {r >= 12 && (
-                    <circle
-                      r={3}
-                      cx={0}
-                      cy={0}
-                      fill="#fff"
-                      fillOpacity={0.5}
-                    />
-                  )}
-                  {/* Label */}
-                  {(r > 14 || isSelected || isOnPath) && (
-                    <text
-                      y={r + 14}
-                      textAnchor="middle"
-                      fill={isOnPath ? '#22d3ee' : isSelected ? '#fff' : '#94a3b8'}
-                      fontSize={10}
-                      fontWeight={isSelected || isOnPath ? 600 : 400}
-                      fontFamily="Inter, system-ui, sans-serif"
-                      style={{ pointerEvents: 'none', userSelect: 'none' }}
-                    >
-                      {n.displayName.length > 18
-                        ? n.displayName.substring(0, 16) + '…'
-                        : n.displayName}
-                    </text>
-                  )}
-                  {/* Bytes label for selected */}
-                  {isSelected && (
-                    <text
-                      y={r + 26}
-                      textAnchor="middle"
-                      fill="#64748b"
-                      fontSize={8}
-                      fontFamily="JetBrains Mono, monospace"
-                      style={{ pointerEvents: 'none', userSelect: 'none' }}
-                    >
-                      {formatBytes(n.totalBytes)}
-                    </text>
+                  {/* Super-node: hexagonal shape */}
+                  {simNode.isSuperNode ? (
+                    <>
+                      {/* Hexagon background */}
+                      <polygon
+                        points={hexPoints(r + 4)}
+                        fill={color}
+                        fillOpacity={0.2}
+                        stroke={color}
+                        strokeWidth={2}
+                        strokeOpacity={0.6}
+                      />
+                      <polygon
+                        points={hexPoints(r - 2)}
+                        fill={color}
+                        fillOpacity={0.4}
+                      />
+                      {/* Count badge */}
+                      <text
+                        y={1}
+                        textAnchor="middle"
+                        dominantBaseline="central"
+                        fill="#fff"
+                        fontSize={Math.max(r * 0.5, 10)}
+                        fontWeight={700}
+                        fontFamily="JetBrains Mono, monospace"
+                        style={{ pointerEvents: 'none', userSelect: 'none' }}
+                      >
+                        {simNode.childNodeIds?.length ?? '?'}
+                      </text>
+                      {/* Label below */}
+                      <text
+                        y={r + 16}
+                        textAnchor="middle"
+                        fill={color}
+                        fontSize={10}
+                        fontWeight={600}
+                        fontFamily="Inter, system-ui, sans-serif"
+                        style={{ pointerEvents: 'none', userSelect: 'none' }}
+                      >
+                        {n.displayName.length > 22
+                          ? n.displayName.substring(0, 20) + '…'
+                          : n.displayName}
+                      </text>
+                      <text
+                        y={r + 28}
+                        textAnchor="middle"
+                        fill="#64748b"
+                        fontSize={8}
+                        fontFamily="JetBrains Mono, monospace"
+                        style={{ pointerEvents: 'none', userSelect: 'none' }}
+                      >
+                        click to expand
+                      </text>
+                    </>
+                  ) : (
+                    <>
+                      {/* Anomaly ring */}
+                      {nodeAnom && (
+                        <circle
+                          r={r + 10}
+                          fill="none"
+                          stroke={ANOMALY_SEVERITY_COLORS[nodeAnom.severity]}
+                          strokeWidth={2}
+                          strokeOpacity={0.6}
+                          strokeDasharray="4 2"
+                        />
+                      )}
+                      {/* Critical path ring */}
+                      {isOnPath && (
+                        <circle
+                          r={r + 7}
+                          fill="none"
+                          stroke="#22d3ee"
+                          strokeWidth={2}
+                          strokeOpacity={0.8}
+                          filter="url(#path-glow-fg)"
+                        />
+                      )}
+                      {/* Issue/critical glow */}
+                      {(n.critical || hasIssue) && !isOnPath && !nodeAnom && (
+                        <circle
+                          r={r + 8}
+                          fill="none"
+                          stroke={hasIssue ? '#ef4444' : '#f59e0b'}
+                          strokeWidth={1.5}
+                          strokeOpacity={0.4}
+                          strokeDasharray={hasIssue ? 'none' : '3 3'}
+                        />
+                      )}
+                      {/* Selection glow */}
+                      {isSelected && (
+                        <circle
+                          r={r + 12}
+                          fill="none"
+                          stroke="#fff"
+                          strokeWidth={1}
+                          strokeOpacity={0.3}
+                          filter="url(#node-select-glow)"
+                        />
+                      )}
+                      {/* Node circle */}
+                      <circle
+                        r={r}
+                        fill={color}
+                        fillOpacity={isSelected ? 0.9 : 0.65}
+                        stroke={isOnPath ? '#22d3ee' : isSelected ? '#fff' : clusterColor}
+                        strokeWidth={isSelected || isOnPath ? 2.5 : 1}
+                        strokeOpacity={isSelected || isOnPath ? 1 : 0.35}
+                      />
+                      {/* Icon indicator for role (small dot) */}
+                      {r >= 12 && (
+                        <circle
+                          r={3}
+                          cx={0}
+                          cy={0}
+                          fill="#fff"
+                          fillOpacity={0.5}
+                        />
+                      )}
+                      {/* Label */}
+                      {(r > 14 || isSelected || isOnPath) && (
+                        <text
+                          y={r + 14}
+                          textAnchor="middle"
+                          fill={isOnPath ? '#22d3ee' : isSelected ? '#fff' : '#94a3b8'}
+                          fontSize={10}
+                          fontWeight={isSelected || isOnPath ? 600 : 400}
+                          fontFamily="Inter, system-ui, sans-serif"
+                          style={{ pointerEvents: 'none', userSelect: 'none' }}
+                        >
+                          {n.displayName.length > 18
+                            ? n.displayName.substring(0, 16) + '…'
+                            : n.displayName}
+                        </text>
+                      )}
+                      {/* Bytes label for selected */}
+                      {isSelected && (
+                        <text
+                          y={r + 26}
+                          textAnchor="middle"
+                          fill="#64748b"
+                          fontSize={8}
+                          fontFamily="JetBrains Mono, monospace"
+                          style={{ pointerEvents: 'none', userSelect: 'none' }}
+                        >
+                          {formatBytes(n.totalBytes)}
+                        </text>
+                      )}
+                    </>
                   )}
                 </g>
               );
@@ -1001,6 +1417,30 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
           </g>
         </g>
       </svg>
+
+      {/* ─── Minimap overlay (Slice 43) ──────────────────────────── */}
+      <div
+        className="absolute z-40"
+        style={{
+          right: MINIMAP_PADDING,
+          bottom: MINIMAP_PADDING,
+          width: MINIMAP_WIDTH,
+          height: MINIMAP_HEIGHT,
+          borderRadius: 6,
+          overflow: 'hidden',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
+        }}
+        data-testid="topology-minimap"
+      >
+        <canvas
+          ref={minimapCanvasRef}
+          width={MINIMAP_WIDTH}
+          height={MINIMAP_HEIGHT}
+          style={{ cursor: 'crosshair', display: 'block' }}
+          onClick={handleMinimapClick}
+          data-testid="minimap-canvas"
+        />
+      </div>
 
       {/* ─── Floating Tooltip (HTML overlay) ─────────────────────── */}
       {tooltip && (
@@ -1046,6 +1486,29 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
                 </div>
               </div>
             )}
+            {tooltip.data.kind === 'supernode' && (
+              <div className="p-3 space-y-1.5">
+                <div className="font-semibold text-white text-sm truncate">
+                  {tooltip.data.clusterLabel}
+                </div>
+                <div className="text-[10px] text-slate-400 mb-1">Collapsed super-node</div>
+                <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-slate-300">
+                  <span className="text-slate-500">Nodes</span>
+                  <span className="font-mono">{tooltip.data.nodeCount}</span>
+                  <span className="text-slate-500">Traffic</span>
+                  <span className="font-mono text-amber-400">{tooltip.data.totalTraffic}</span>
+                  <span className="text-slate-500">Detections</span>
+                  <span className={tooltip.data.detections > 0 ? 'text-red-400 font-semibold' : ''}>
+                    {tooltip.data.detections}
+                  </span>
+                  <span className="text-slate-500">Alerts</span>
+                  <span className={tooltip.data.alerts > 0 ? 'text-orange-400 font-semibold' : ''}>
+                    {tooltip.data.alerts}
+                  </span>
+                </div>
+                <div className="text-[10px] text-cyan-400 mt-1">Click to expand</div>
+              </div>
+            )}
             {tooltip.data.kind === 'edge' && (
               <div className="p-3 space-y-1.5">
                 <div className="font-semibold text-white text-sm flex items-center gap-2">
@@ -1073,5 +1536,15 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
     </div>
   );
 });
+
+// ─── Hex helper for super-node shape ────────────────────────────
+function hexPoints(r: number): string {
+  const pts: string[] = [];
+  for (let i = 0; i < 6; i++) {
+    const angle = (Math.PI / 3) * i - Math.PI / 6;
+    pts.push(`${r * Math.cos(angle)},${r * Math.sin(angle)}`);
+  }
+  return pts.join(' ');
+}
 
 export default ForceGraph;

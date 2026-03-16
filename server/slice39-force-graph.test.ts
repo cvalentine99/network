@@ -1018,3 +1018,221 @@ describe('Slice 42 — JSON Layout Export/Import', () => {
     expect(topologySource).toContain('applyNodePositions={(pos) => forceGraphRef.current?.applyNodePositions(pos)}');
   });
 });
+
+
+// ═══════════════════════════════════════════════════════════════════
+// SLICE 43 — Minimap, Node Grouping, Real-Time Pulse Animation
+// ═══════════════════════════════════════════════════════════════════
+
+const forceGraphSource43 = readFileSync(
+  join(process.cwd(), 'client', 'src', 'components', 'ForceGraph.tsx'),
+  'utf-8'
+);
+const topologySource43 = readFileSync(
+  join(process.cwd(), 'client', 'src', 'pages', 'Topology.tsx'),
+  'utf-8'
+);
+
+// ─── Minimap Tests ───────────────────────────────────────────────
+describe('Slice 43 — Minimap overlay', () => {
+  it('ForceGraph defines MINIMAP_WIDTH constant', () => {
+    expect(forceGraphSource43).toContain('MINIMAP_WIDTH');
+  });
+
+  it('ForceGraph defines MINIMAP_HEIGHT constant', () => {
+    expect(forceGraphSource43).toContain('MINIMAP_HEIGHT');
+  });
+
+  it('ForceGraph has minimapCanvasRef', () => {
+    expect(forceGraphSource43).toContain('minimapCanvasRef');
+  });
+
+  it('ForceGraph renders minimap canvas with data-testid', () => {
+    expect(forceGraphSource43).toContain('data-testid="topology-minimap"');
+  });
+
+  it('ForceGraph renders minimap canvas element with data-testid', () => {
+    expect(forceGraphSource43).toContain('data-testid="minimap-canvas"');
+  });
+
+  it('minimap draws viewport rectangle (amber stroke)', () => {
+    expect(forceGraphSource43).toContain('rgba(251, 191, 36');
+  });
+
+  it('minimap has click-to-navigate handler', () => {
+    expect(forceGraphSource43).toContain('handleMinimapClick');
+  });
+
+  it('minimap canvas has crosshair cursor', () => {
+    expect(forceGraphSource43).toContain("cursor: 'crosshair'");
+  });
+
+  it('minimap draws edges as thin lines', () => {
+    expect(forceGraphSource43).toMatch(/ctx\.moveTo.*scale.*offsetX/);
+  });
+
+  it('minimap draws nodes as filled circles', () => {
+    expect(forceGraphSource43).toMatch(/ctx\.arc.*nr.*Math\.PI/);
+  });
+
+  it('minimap positioned absolute bottom-right', () => {
+    expect(forceGraphSource43).toContain('className="absolute z-40"');
+    expect(forceGraphSource43).toContain('right: MINIMAP_PADDING');
+    expect(forceGraphSource43).toContain('bottom: MINIMAP_PADDING');
+  });
+
+  it('minimap click converts minimap coords to world coords', () => {
+    expect(forceGraphSource43).toContain('_worldBounds');
+  });
+});
+
+// ─── Node Grouping Tests ─────────────────────────────────────────
+describe('Slice 43 — Node grouping (cluster collapse)', () => {
+  it('ForceGraph has collapsedClusters state', () => {
+    expect(forceGraphSource43).toContain('collapsedClusters');
+  });
+
+  it('ForceGraph exposes collapseCluster on handle', () => {
+    expect(forceGraphSource43).toContain('collapseCluster');
+  });
+
+  it('ForceGraph exposes expandCluster on handle', () => {
+    expect(forceGraphSource43).toContain('expandCluster');
+  });
+
+  it('collapsed clusters create super-nodes with negative IDs', () => {
+    expect(forceGraphSource43).toMatch(/superNodeId.*=.*-/);
+  });
+
+  it('super-nodes aggregate totalBytes from cluster members', () => {
+    // May use totalBytes or bytes depending on normalized vs raw
+    expect(forceGraphSource43).toMatch(/clusterNodes\.reduce.*totalBytes|clusterNodes\.reduce.*bytes/);
+  });
+
+  it('super-nodes aggregate activeDetections from cluster members', () => {
+    expect(forceGraphSource43).toContain('clusterNodes.reduce((s, n) => s + n.activeDetections, 0)');
+  });
+
+  it('super-nodes aggregate activeAlerts from cluster members', () => {
+    expect(forceGraphSource43).toContain('clusterNodes.reduce((s, n) => s + n.activeAlerts, 0)');
+  });
+
+  it('collapsed edges are remapped to super-node IDs', () => {
+    expect(forceGraphSource43).toContain('collapsedNodeIds.has');
+  });
+
+  it('super-nodes are marked with isSuperNode flag', () => {
+    expect(forceGraphSource43).toContain('isSuperNode: true');
+  });
+
+  it('super-nodes render with dashed stroke ring', () => {
+    expect(forceGraphSource43).toContain('strokeDasharray');
+  });
+
+  it('Topology toolbar has Collapse/Expand All button', () => {
+    expect(topologySource43).toContain('data-testid="toggle-collapse-all"');
+  });
+
+  it('Topology toolbar uses Shrink icon for collapse', () => {
+    expect(topologySource43).toContain('<Shrink');
+  });
+
+  it('effectivePayload filters out collapsed nodes', () => {
+    expect(forceGraphSource43).toContain('collapsedNodeIds');
+  });
+
+  it('super-node label shows cluster label + member count', () => {
+    expect(forceGraphSource43).toMatch(/cluster.*label.*clusterNodes.*length|clusterNodes.*length/);
+  });
+});
+
+// ─── Pulse Animation Tests ───────────────────────────────────────
+describe('Slice 43 — Real-time pulse animation', () => {
+  it('ForceGraph accepts pulseEnabled prop', () => {
+    expect(forceGraphSource43).toContain('pulseEnabled');
+  });
+
+  it('ForceGraph accepts isLiveData prop', () => {
+    expect(forceGraphSource43).toContain('isLiveData');
+  });
+
+  it('pulse only activates when both pulseEnabled and isLiveData are true', () => {
+    expect(forceGraphSource43).toContain('pulseEnabled && isLiveData');
+  });
+
+  it('pulse uses requestAnimationFrame for animation', () => {
+    expect(forceGraphSource43).toContain('requestAnimationFrame');
+  });
+
+  it('pulse uses cancelAnimationFrame for cleanup', () => {
+    expect(forceGraphSource43).toContain('cancelAnimationFrame');
+  });
+
+  it('pulse animates stroke-dashoffset', () => {
+    expect(forceGraphSource43).toContain('strokeDashoffset');
+  });
+
+  it('pulse speed scales with edge traffic (bytes)', () => {
+    expect(forceGraphSource43).toContain('link.edge.bytes / maxEdgeBytes');
+  });
+
+  it('Topology toolbar has pulse toggle button', () => {
+    expect(topologySource43).toContain('data-testid="toggle-pulse"');
+  });
+
+  it('Topology toolbar uses Zap icon for pulse', () => {
+    expect(topologySource43).toContain('<Zap');
+  });
+
+  it('pulse toggle has cyan highlight when active', () => {
+    expect(topologySource43).toContain('bg-cyan-500/20 text-cyan-400');
+  });
+
+  it('Topology has pulseEnabled state', () => {
+    expect(topologySource43).toContain('pulseEnabled');
+  });
+
+  it('Topology passes pulseEnabled to ForceGraph', () => {
+    expect(topologySource43).toContain('pulseEnabled={pulseEnabled}');
+  });
+
+  it('isLiveData is currently always false (deferred by contract)', () => {
+    expect(topologySource43).toContain('const isLiveData = false');
+  });
+});
+
+// ─── Fixture Validation for Grouping ─────────────────────────────
+describe('Slice 43 — Fixture validation for cluster grouping', () => {
+  const populated = loadPayload('topology.populated.fixture.json');
+
+  it('populated fixture has clusters for grouping', () => {
+    expect(populated.clusters.length).toBeGreaterThan(0);
+  });
+
+  it('every node has a clusterId matching a cluster', () => {
+    const clusterIds = new Set(populated.clusters.map((c) => c.id));
+    for (const node of populated.nodes) {
+      expect(clusterIds.has(node.clusterId)).toBe(true);
+    }
+  });
+
+  it('clusters have non-empty labels for super-node labels', () => {
+    for (const cluster of populated.clusters) {
+      expect(cluster.label.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('nodes have totalBytes for traffic aggregation', () => {
+    for (const node of populated.nodes) {
+      expect(typeof node.totalBytes).toBe('number');
+      expect(Number.isFinite(node.totalBytes)).toBe(true);
+    }
+  });
+
+  it('edges have bytes for pulse speed scaling', () => {
+    for (const edge of populated.edges) {
+      expect(typeof edge.bytes).toBe('number');
+      expect(Number.isFinite(edge.bytes)).toBe(true);
+    }
+  });
+});

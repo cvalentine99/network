@@ -58,6 +58,9 @@ import {
   Lock,
   Unlock,
   Upload,
+  Zap,
+  Shrink,
+  Expand,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { trpc } from '@/lib/trpc';
@@ -935,6 +938,10 @@ export default function Topology() {
   const [showAnomalyOverlay, setShowAnomalyOverlay] = useState(false);
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showSavedViews, setShowSavedViews] = useState(false);
+  const [pulseEnabled, setPulseEnabled] = useState(false);
+  // isLiveData: true when connected to a live ExtraHop appliance (not fixture/mock)
+  // Currently always false — deferred by contract. Set to true when live integration is wired.
+  const isLiveData = false;
 
   // Critical path state
   const [pathSourceId, setPathSourceId] = useState<number | null>(null);
@@ -1234,6 +1241,53 @@ export default function Topology() {
               >
                 {forceGraphRef.current?.isLocked ? <Lock size={14} /> : <Unlock size={14} />}
               </button>
+              {/* Collapse All Clusters — group subnets into super-nodes (Slice 43) */}
+              <button
+                onClick={() => {
+                  const allClusterIds = payload.clusters.map((c) => c.id);
+                  const currentCollapsed = forceGraphRef.current?.collapsedClusters ?? new Set();
+                  const allCollapsed = allClusterIds.every((id) => currentCollapsed.has(id));
+                  if (allCollapsed) {
+                    // Expand all
+                    for (const id of allClusterIds) forceGraphRef.current?.expandCluster(id);
+                    toast.success('All clusters expanded');
+                  } else {
+                    // Collapse all
+                    for (const id of allClusterIds) forceGraphRef.current?.collapseCluster(id);
+                    toast.success('All clusters collapsed into super-nodes');
+                  }
+                }}
+                className="p-1.5 rounded hover:bg-white/[0.06] text-zinc-400"
+                title="Collapse/Expand all clusters"
+                data-testid="toggle-collapse-all"
+              >
+                <Shrink size={14} />
+              </button>
+              {/* Pulse Animation toggle (Slice 43) */}
+              <button
+                onClick={() => {
+                  setPulseEnabled((prev) => {
+                    const next = !prev;
+                    if (next && !isLiveData) {
+                      toast.info('Pulse animation enabled — will animate when connected to live ExtraHop data');
+                    } else if (next) {
+                      toast.success('Pulse animation enabled');
+                    } else {
+                      toast.success('Pulse animation disabled');
+                    }
+                    return next;
+                  });
+                }}
+                className={`p-1.5 rounded transition-colors ${
+                  pulseEnabled
+                    ? 'bg-cyan-500/20 text-cyan-400'
+                    : 'hover:bg-white/[0.06] text-zinc-400'
+                }`}
+                title={pulseEnabled ? 'Disable pulse animation' : 'Enable pulse animation (live data only)'}
+                data-testid="toggle-pulse"
+              >
+                <Zap size={14} />
+              </button>
             </>
           )}
 
@@ -1366,6 +1420,7 @@ export default function Topology() {
               criticalPath={criticalPath}
               anomalyOverlay={anomalyOverlay}
               showAnomalyOverlay={showAnomalyOverlay}
+              pulseEnabled={pulseEnabled}
             />
             {/* Detail Panel */}
             {selectedNode && (
