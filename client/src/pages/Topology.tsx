@@ -54,6 +54,7 @@ import {
   Eye,
   EyeOff,
   ArrowRight,
+  RotateCcw,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { trpc } from '@/lib/trpc';
@@ -1092,6 +1093,18 @@ export default function Topology() {
                 title="Reset zoom"
               >
                 <Maximize2 size={14} />
+              </button>
+              {/* Reset Layout — clears saved node positions (Slice 41) */}
+              <button
+                onClick={() => {
+                  forceGraphRef.current?.resetLayout();
+                  toast.success('Layout reset — nodes will re-simulate');
+                }}
+                className="p-1.5 rounded hover:bg-white/[0.06] text-zinc-400"
+                title="Reset layout (clear pinned positions)"
+                data-testid="reset-layout"
+              >
+                <RotateCcw size={14} />
               </button>
             </>
           )}

@@ -600,3 +600,210 @@ describe('Slice 40 — ConstellationView Dead Code Removal', () => {
     expect(topologySource).toContain("@/components/ForceGraph");
   });
 });
+
+// ═══════════════════════════════════════════════════════════════════
+// SLICE 41 — LAYOUT PERSISTENCE TESTS
+// ═══════════════════════════════════════════════════════════════════
+
+describe('Slice 41 — Layout Persistence Logic', () => {
+  // ─── SavedPosition serialization contract ──────────────────────
+  interface SavedPosition {
+    x: number;
+    y: number;
+  }
+
+  function serializePositions(positions: Map<number, SavedPosition>): string {
+    const obj: Record<string, SavedPosition> = {};
+    positions.forEach((v, k) => {
+      obj[String(k)] = v;
+    });
+    return JSON.stringify(obj);
+  }
+
+  function deserializePositions(raw: string): Map<number, SavedPosition> {
+    const parsed = JSON.parse(raw) as Record<string, SavedPosition>;
+    const m = new Map<number, SavedPosition>();
+    for (const [k, v] of Object.entries(parsed)) {
+      const id = Number(k);
+      if (
+        !Number.isNaN(id) &&
+        v &&
+        typeof v.x === 'number' &&
+        typeof v.y === 'number' &&
+        Number.isFinite(v.x) &&
+        Number.isFinite(v.y)
+      ) {
+        m.set(id, v);
+      }
+    }
+    return m;
+  }
+
+  it('serializes and deserializes positions round-trip', () => {
+    const positions = new Map<number, SavedPosition>();
+    positions.set(1, { x: 100.5, y: 200.3 });
+    positions.set(42, { x: -50, y: 300 });
+    positions.set(999, { x: 0, y: 0 });
+
+    const serialized = serializePositions(positions);
+    const restored = deserializePositions(serialized);
+
+    expect(restored.size).toBe(3);
+    expect(restored.get(1)).toEqual({ x: 100.5, y: 200.3 });
+    expect(restored.get(42)).toEqual({ x: -50, y: 300 });
+    expect(restored.get(999)).toEqual({ x: 0, y: 0 });
+  });
+
+  it('handles empty positions map', () => {
+    const positions = new Map<number, SavedPosition>();
+    const serialized = serializePositions(positions);
+    expect(serialized).toBe('{}');
+    const restored = deserializePositions(serialized);
+    expect(restored.size).toBe(0);
+  });
+
+  it('rejects NaN values during deserialization', () => {
+    const raw = JSON.stringify({ '1': { x: NaN, y: 100 }, '2': { x: 200, y: 300 } });
+    // NaN is serialized as null in JSON, so x becomes null which fails typeof check
+    const restored = deserializePositions(raw);
+    expect(restored.has(1)).toBe(false);
+    expect(restored.get(2)).toEqual({ x: 200, y: 300 });
+  });
+
+  it('rejects Infinity values during deserialization', () => {
+    const raw = JSON.stringify({ '1': { x: Infinity, y: 100 } });
+    // Infinity is serialized as null in JSON
+    const restored = deserializePositions(raw);
+    expect(restored.has(1)).toBe(false);
+  });
+
+  it('rejects malformed entries during deserialization', () => {
+    const raw = JSON.stringify({
+      '1': { x: 100, y: 200 },
+      'abc': { x: 300, y: 400 },
+      '3': { x: 'not-a-number', y: 500 },
+      '4': null,
+      '5': { x: 100 },
+    });
+    const restored = deserializePositions(raw);
+    expect(restored.size).toBe(1);
+    expect(restored.get(1)).toEqual({ x: 100, y: 200 });
+  });
+
+  it('handles invalid JSON gracefully', () => {
+    expect(() => deserializePositions('not-json')).toThrow();
+    // In the component, this is wrapped in try/catch returning empty Map
+  });
+
+  it('preserves positions for all populated fixture nodes', () => {
+    const positions = new Map<number, SavedPosition>();
+    populated.nodes.forEach((n: TopologyNode, i: number) => {
+      positions.set(n.id, { x: i * 50, y: i * 30 });
+    });
+
+    const serialized = serializePositions(positions);
+    const restored = deserializePositions(serialized);
+
+    expect(restored.size).toBe(populated.nodes.length);
+    populated.nodes.forEach((n: TopologyNode, i: number) => {
+      expect(restored.get(n.id)).toEqual({ x: i * 50, y: i * 30 });
+    });
+  });
+
+  it('handles large-scale fixture node positions', () => {
+    const positions = new Map<number, SavedPosition>();
+    largeScale.nodes.forEach((n: TopologyNode) => {
+      positions.set(n.id, { x: Math.random() * 5120, y: Math.random() * 1440 });
+    });
+
+    const serialized = serializePositions(positions);
+    const restored = deserializePositions(serialized);
+
+    expect(restored.size).toBe(largeScale.nodes.length);
+  });
+
+  it('quiet fixture produces zero saved positions', () => {
+    const positions = new Map<number, SavedPosition>();
+    quiet.nodes.forEach((n: TopologyNode) => {
+      positions.set(n.id, { x: 0, y: 0 });
+    });
+
+    const serialized = serializePositions(positions);
+    const restored = deserializePositions(serialized);
+
+    // quiet fixture has 0 nodes
+    expect(restored.size).toBe(quiet.nodes.length);
+  });
+});
+
+describe('Slice 41 — ForceGraph Source Code Contract', () => {
+  const forceGraphSource = readFileSync(
+    join(process.cwd(), 'client', 'src', 'components', 'ForceGraph.tsx'),
+    'utf-8'
+  );
+  const topologySource = readFileSync(
+    join(process.cwd(), 'client', 'src', 'pages', 'Topology.tsx'),
+    'utf-8'
+  );
+
+  it('ForceGraph defines LAYOUT_STORAGE_KEY constant', () => {
+    expect(forceGraphSource).toContain("LAYOUT_STORAGE_KEY = 'topology-node-positions'");
+  });
+
+  it('ForceGraph exports resetLayout in ForceGraphHandle', () => {
+    expect(forceGraphSource).toContain('resetLayout: () => void');
+  });
+
+  it('ForceGraph exports hasCustomLayout in ForceGraphHandle', () => {
+    expect(forceGraphSource).toContain('hasCustomLayout: boolean');
+  });
+
+  it('ForceGraph calls localStorage.setItem on drag end', () => {
+    expect(forceGraphSource).toContain('localStorage.setItem(LAYOUT_STORAGE_KEY');
+  });
+
+  it('ForceGraph calls localStorage.getItem on load', () => {
+    expect(forceGraphSource).toContain('localStorage.getItem(LAYOUT_STORAGE_KEY)');
+  });
+
+  it('ForceGraph calls localStorage.removeItem on reset', () => {
+    expect(forceGraphSource).toContain('localStorage.removeItem(LAYOUT_STORAGE_KEY)');
+  });
+
+  it('ForceGraph pins restored nodes with fx/fy', () => {
+    expect(forceGraphSource).toContain('fx: existing ? existing.fx : (saved ? saved.x : undefined)');
+    expect(forceGraphSource).toContain('fy: existing ? existing.fy : (saved ? saved.y : undefined)');
+  });
+
+  it('ForceGraph pins dragged nodes on drag end (fx = d.x)', () => {
+    expect(forceGraphSource).toContain('d.fx = d.x');
+    expect(forceGraphSource).toContain('d.fy = d.y');
+  });
+
+  it('ForceGraph validates Number.isFinite before saving', () => {
+    expect(forceGraphSource).toContain('Number.isFinite(d.x)');
+    expect(forceGraphSource).toContain('Number.isFinite(d.y)');
+  });
+
+  it('ForceGraph resetLayout unpins all nodes', () => {
+    expect(forceGraphSource).toContain('n.fx = null');
+    expect(forceGraphSource).toContain('n.fy = null');
+  });
+
+  it('Topology.tsx has Reset Layout button with data-testid', () => {
+    expect(topologySource).toContain('data-testid="reset-layout"');
+  });
+
+  it('Topology.tsx calls forceGraphRef.current?.resetLayout()', () => {
+    expect(topologySource).toContain('forceGraphRef.current?.resetLayout()');
+  });
+
+  it('Topology.tsx imports RotateCcw icon for reset button', () => {
+    expect(topologySource).toContain('RotateCcw');
+  });
+
+  it('ForceGraph deserialization rejects NaN and Infinity', () => {
+    expect(forceGraphSource).toContain('Number.isFinite(v.x)');
+    expect(forceGraphSource).toContain('Number.isFinite(v.y)');
+  });
+});

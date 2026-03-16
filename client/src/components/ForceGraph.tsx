@@ -11,6 +11,8 @@
  * - Exposes SVG ref for export (PNG/SVG)
  * - Node tooltip on hover: device name, IP, traffic, detection count (Slice 40)
  * - Edge label on hover: protocol name and traffic volume (Slice 40)
+ * - Layout persistence: saves node positions to localStorage on drag-end (Slice 41)
+ * - Restores pinned positions on page load; Reset Layout clears saved state
  *
  * Live integration: deferred by contract.
  */
@@ -98,6 +100,52 @@ const CLUSTER_COLORS = [
   '#6366f1', '#ec4899', '#84cc16', '#14b8a6', '#ef4444',
 ];
 
+// ─── Layout persistence (Slice 41) ─────────────────────────────
+const LAYOUT_STORAGE_KEY = 'topology-node-positions';
+
+interface SavedPosition {
+  x: number;
+  y: number;
+}
+
+function loadSavedPositions(): Map<number, SavedPosition> {
+  try {
+    const raw = localStorage.getItem(LAYOUT_STORAGE_KEY);
+    if (!raw) return new Map();
+    const parsed = JSON.parse(raw) as Record<string, SavedPosition>;
+    const m = new Map<number, SavedPosition>();
+    for (const [k, v] of Object.entries(parsed)) {
+      const id = Number(k);
+      if (!Number.isNaN(id) && v && typeof v.x === 'number' && typeof v.y === 'number' && Number.isFinite(v.x) && Number.isFinite(v.y)) {
+        m.set(id, v);
+      }
+    }
+    return m;
+  } catch {
+    return new Map();
+  }
+}
+
+function saveSavedPositions(positions: Map<number, SavedPosition>): void {
+  try {
+    const obj: Record<string, SavedPosition> = {};
+    positions.forEach((v, k) => {
+      obj[String(k)] = v;
+    });
+    localStorage.setItem(LAYOUT_STORAGE_KEY, JSON.stringify(obj));
+  } catch {
+    // localStorage full or unavailable — silently ignore
+  }
+}
+
+function clearSavedPositions(): void {
+  try {
+    localStorage.removeItem(LAYOUT_STORAGE_KEY);
+  } catch {
+    // silently ignore
+  }
+}
+
 // ─── Tooltip types ──────────────────────────────────────────────
 interface NodeTooltipData {
   kind: 'node';
@@ -137,6 +185,8 @@ export interface ForceGraphHandle {
   zoomIn: () => void;
   zoomOut: () => void;
   resetZoom: () => void;
+  resetLayout: () => void;
+  hasCustomLayout: boolean;
 }
 
 // ─── Component ───────────────────────────────────────────────────
@@ -160,6 +210,8 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
   const [, forceRender] = useState(0);
   const nodesRef = useRef<SimNode[]>([]);
   const linksRef = useRef<SimLink[]>([]);
+  const savedPositionsRef = useRef<Map<number, SavedPosition>>(loadSavedPositions());
+  const [hasCustomLayout, setHasCustomLayout] = useState(() => loadSavedPositions().size > 0);
 
   // ─── Tooltip state ──────────────────────────────────────────────
   const [tooltip, setTooltip] = useState<{
@@ -194,7 +246,7 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
     }, 100);
   }, []);
 
-  // Expose handle for parent (zoom controls + SVG ref for export)
+  // Expose handle for parent (zoom controls + SVG ref for export + layout reset)
   useImperativeHandle(ref, () => ({
     get svgElement() {
       return svgRef.current;
@@ -223,7 +275,19 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
           .call(zoomBehaviorRef.current.transform, zoomIdentity);
       }
     },
-  }));
+    resetLayout: () => {
+      clearSavedPositions();
+      savedPositionsRef.current = new Map();
+      setHasCustomLayout(false);
+      // Unpin all nodes and restart simulation
+      for (const n of nodesRef.current) {
+        n.fx = null;
+        n.fy = null;
+      }
+      simulationRef.current?.alpha(0.8).restart();
+    },
+    hasCustomLayout,
+  }), [hasCustomLayout]);
 
   // ─── Responsive sizing ─────────────────────────────────────────
   useEffect(() => {
@@ -338,15 +402,20 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
         x: dimensions.width / 2,
         y: dimensions.height / 2,
       };
+      // Restore saved position from localStorage if available (Slice 41)
+      const saved = savedPositionsRef.current.get(n.id);
       const sn: SimNode = {
         id: n.id,
         node: n,
         clusterId: n.clusterId,
         radius: nodeRadius(n.totalBytes, maxNodeBytes),
-        x: existing?.x ?? center.x + (Math.random() - 0.5) * 80,
-        y: existing?.y ?? center.y + (Math.random() - 0.5) * 80,
+        x: existing?.x ?? saved?.x ?? center.x + (Math.random() - 0.5) * 80,
+        y: existing?.y ?? saved?.y ?? center.y + (Math.random() - 0.5) * 80,
         vx: existing?.vx ?? 0,
         vy: existing?.vy ?? 0,
+        // Pin node if it has a saved position (user previously dragged it)
+        fx: existing ? existing.fx : (saved ? saved.x : undefined),
+        fy: existing ? existing.fy : (saved ? saved.y : undefined),
       };
       nodeById.set(n.id, sn);
       return sn;
@@ -447,8 +516,14 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
   const handleDragEnd = useCallback(
     (event: { active: number }, d: SimNode) => {
       if (!event.active) simulationRef.current?.alphaTarget(0);
-      d.fx = null;
-      d.fy = null;
+      // Pin the node at its dragged position and persist to localStorage (Slice 41)
+      d.fx = d.x;
+      d.fy = d.y;
+      if (d.x != null && d.y != null && Number.isFinite(d.x) && Number.isFinite(d.y)) {
+        savedPositionsRef.current.set(d.id, { x: d.x, y: d.y });
+        saveSavedPositions(savedPositionsRef.current);
+        setHasCustomLayout(true);
+      }
     },
     []
   );

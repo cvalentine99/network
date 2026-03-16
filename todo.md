@@ -561,3 +561,11 @@ These items are tracked here for the live integration phase.
 - [x] Remove ConstellationView dead code from Topology.tsx (~305 lines removed, 1261 lines remain)
 - [x] Update tests for tooltip/edge label behavior — 23 new tests, slice21 updated for ForceGraph split
 - [x] Run full test suite: 38 files, 2538 tests, 0 failures
+
+# SLICE 41 — Topology Layout Persistence
+
+- [x] Save node positions to localStorage after drag-end
+- [x] Restore node positions from localStorage on page load (pin restored nodes)
+- [x] Add "Reset Layout" button to clear saved positions and re-run simulation
+- [x] Write tests for position save/restore/clear logic — 23 new tests, 2561 total passing
+- [x] Generate truth receipt — SLICE-41-RECEIPT.md
