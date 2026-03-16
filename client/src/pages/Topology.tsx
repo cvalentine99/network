@@ -17,6 +17,7 @@
  */
 
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
+import ForceGraph, { type ForceGraphHandle } from '@/components/ForceGraph';
 import {
   Network,
   AlertTriangle,
@@ -1212,11 +1213,13 @@ function SummaryBar({ payload }: { payload: TopologyPayload }) {
 export default function Topology() {
   const { state, refetch } = useTopology();
   const svgRef = useRef<SVGSVGElement | null>(null);
+  const forceGraphRef = useRef<ForceGraphHandle>(null);
 
   // View state
   const [viewMode, setViewMode] = useState<TopologyViewMode>('constellation');
   const [selectedNodeId, setSelectedNodeId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  // zoom state kept for saved views compatibility, but ForceGraph manages its own zoom
   const [zoom, setZoom] = useState(1);
 
   // Feature toggles
@@ -1467,21 +1470,21 @@ export default function Topology() {
           {viewMode === 'constellation' && (
             <>
               <button
-                onClick={() => setZoom((z) => Math.min(z + 0.2, 3))}
+                onClick={() => forceGraphRef.current?.zoomIn()}
                 className="p-1.5 rounded hover:bg-white/[0.06] text-zinc-400"
                 title="Zoom in"
               >
                 <ZoomIn size={14} />
               </button>
               <button
-                onClick={() => setZoom((z) => Math.max(z - 0.2, 0.4))}
+                onClick={() => forceGraphRef.current?.zoomOut()}
                 className="p-1.5 rounded hover:bg-white/[0.06] text-zinc-400"
                 title="Zoom out"
               >
                 <ZoomOut size={14} />
               </button>
               <button
-                onClick={() => setZoom(1)}
+                onClick={() => forceGraphRef.current?.resetZoom()}
                 className="p-1.5 rounded hover:bg-white/[0.06] text-zinc-400"
                 title="Reset zoom"
               >
@@ -1501,7 +1504,7 @@ export default function Topology() {
               <Download size={14} />
             </button>
             {showExportMenu && (
-              <ExportMenu payload={payload} svgRef={svgRef} onClose={() => setShowExportMenu(false)} />
+              <ExportMenu payload={payload} svgRef={{ current: forceGraphRef.current?.svgElement ?? svgRef.current } as React.RefObject<SVGSVGElement | null>} onClose={() => setShowExportMenu(false)} />
             )}
           </div>
 
@@ -1603,22 +1606,16 @@ export default function Topology() {
       <div className="flex-1 relative overflow-hidden">
         {viewMode === 'constellation' ? (
           <>
-            <div
-              className="w-full h-full"
-              style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}
-            >
-              <ConstellationView
-                payload={payload}
-                selectedNodeId={selectedNodeId}
-                onSelectNode={setSelectedNodeId}
-                searchTerm={searchTerm}
-                zoom={zoom}
-                criticalPath={criticalPath}
-                anomalyOverlay={anomalyOverlay}
-                showAnomalyOverlay={showAnomalyOverlay}
-                svgRef={svgRef}
-              />
-            </div>
+            <ForceGraph
+              ref={forceGraphRef}
+              payload={payload}
+              selectedNodeId={selectedNodeId}
+              onSelectNode={setSelectedNodeId}
+              searchTerm={searchTerm}
+              criticalPath={criticalPath}
+              anomalyOverlay={anomalyOverlay}
+              showAnomalyOverlay={showAnomalyOverlay}
+            />
             {/* Detail Panel */}
             {selectedNode && (
               <DetailPanel

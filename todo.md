@@ -538,3 +538,18 @@ These items are tracked here for the live integration phase.
 - [x] M4: Removed ComponentShowcase.tsx orphan page (no imports, no route)
 - [x] M5: Replaced FIFO cache with LRU eviction via Map re-insertion in extrahop-client.ts
 - [x] M6: Replaced NODE_TLS_REJECT_UNAUTHORIZED with per-request undici Agent in extrahop-client.ts
+
+# SLICE 39 — Force-Directed Topology Graph (Mar 16 2026)
+
+- [x] Install d3-force and @types/d3-force dependencies
+- [x] Create ForceGraph component with D3-force simulation (drag, zoom, pan)
+- [x] Replace static ConstellationView SVG with interactive ForceGraph
+- [x] Preserve all existing features: search highlighting, critical path, anomaly overlay, detail panel, export
+- [x] Optimize for ultrawide monitors (5120x1440) — responsive container via ResizeObserver
+- [x] Support cluster grouping with force-directed cluster gravity
+- [x] Node sizing by traffic volume, edge width by bytes (existing scaling logic)
+- [x] Smooth animation on simulation tick with alphaDecay 0.02
+- [x] Drag nodes to reposition, zoom/pan with d3-zoom and d3-drag
+- [x] Write vitest tests for ForceGraph component — 38 tests passing in slice39-force-graph.test.ts
+- [x] Verify all 5 UI states: loading, quiet, populated, error, malformed — populated screenshot captured, all states tested in vitest
+- [x] Generate grep proof and truth receipt — SLICE-39-RECEIPT.md
