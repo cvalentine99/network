@@ -137,6 +137,12 @@ export interface TopologyPayload {
     fromMs: number;
     toMs: number;
   };
+  /**
+   * When true, edges are heuristically inferred from per-device byte totals,
+   * NOT observed network connections from the ExtraHop Activity Map API.
+   * The UI must display a visible disclaimer when this is true. (audit C2)
+   */
+  edgesAreSynthetic?: boolean;
 }
 
 // ─── BFF Request Shape ─────────────────────────────────────────────

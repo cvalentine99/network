@@ -18,7 +18,7 @@
 import { Router, type Request, type Response } from 'express';
 import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
-import { CorrelationIntentSchema } from '../../shared/correlation-validators';
+import { CorrelationIntentSchema, CorrelationPayloadSchema } from '../../shared/correlation-validators';
 import { ehRequest, isFixtureMode, ExtraHopClientError } from '../extrahop-client';
 
 const router = Router();
@@ -214,13 +214,25 @@ router.post('/events', async (req: Request, res: Response) => {
     // 3. Sort events by timestamp descending
     events.sort((a, b) => b.timestampMs - a.timestampMs);
 
-    // 4. Return in the BFF response format
-    res.json({
+    // 4. Validate output with Zod before sending (audit H1)
+    const rawPayload = {
       events,
       timeWindow: { fromMs, untilMs },
       categoryCounts,
       totalCount: events.length,
-    });
+    };
+
+    const payloadValidation = CorrelationPayloadSchema.safeParse(rawPayload);
+    if (!payloadValidation.success) {
+      console.error('[correlation] Output validation failed:', payloadValidation.error.issues);
+      res.status(500).json({
+        error: 'Correlation output validation failed',
+        message: payloadValidation.error.issues.map(i => i.message).join('; '),
+      });
+      return;
+    }
+
+    res.json(payloadValidation.data);
   } catch (err: any) {
     if (err instanceof ExtraHopClientError) {
       res.status(502).json({

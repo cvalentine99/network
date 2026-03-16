@@ -19,7 +19,7 @@
 import { Router, Request, Response } from 'express';
 import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
-import { TopologyQueryRequestSchema } from '../../shared/topology-validators';
+import { TopologyQueryRequestSchema, TopologyPayloadSchema } from '../../shared/topology-validators';
 import { ehRequest, isFixtureMode, ExtraHopClientError } from '../extrahop-client';
 import { normalizeDeviceIdentity } from '../extrahop-normalizers';
 
@@ -225,15 +225,18 @@ router.post('/query', async (req: Request, res: Response) => {
       });
     }
 
-    // 6. Build edges from metrics (device-to-device communication)
-    // We use the metrics data to infer edges: any two devices with bytes = edge
-    // For a proper edge list, we'd need the activity map API, but we can approximate
-    // by creating edges between devices in the same cluster that have traffic
+    // 6. Build edges — SYNTHETIC / HEURISTIC (audit C2)
+    // WARNING: These edges are NOT observed network connections.
+    // They are heuristically inferred from per-device byte totals.
+    // Real edges require the ExtraHop Activity Map API (POST /activitymaps/query),
+    // which returns actual L2/L3/L7 connections with real protocols and latency.
+    // Until Activity Map integration is built, edges are synthetic approximations.
+    // The response includes edgesAreSynthetic=true so the UI can display a disclaimer.
     const edges: any[] = [];
     let edgeId = 0;
     const nodeIds = new Set(nodes.map(n => n.id));
 
-    // Simple heuristic: create edges between devices with the most traffic in the same cluster
+    // Heuristic: create edges between devices with the most traffic in the same cluster
     const clusterNodes = new Map<string, any[]>();
     for (const node of nodes) {
       if (!clusterNodes.has(node.clusterId)) {
@@ -287,20 +290,36 @@ router.post('/query', async (req: Request, res: Response) => {
       maxNodes,
     };
 
-    // 9. Return in the BFF envelope format
+    // 9. Build payload and validate with Zod before sending (audit H1)
+    const rawPayload = {
+      nodes,
+      edges,
+      clusters,
+      summary,
+      timeWindow: { fromMs, toMs },
+      edgesAreSynthetic: true,
+    };
+
+    const payloadValidation = TopologyPayloadSchema.safeParse(rawPayload);
+    if (!payloadValidation.success) {
+      console.error('[topology] Output validation failed:', payloadValidation.error.issues);
+      res.status(500).json({
+        _meta: { fixture: 'live', generatedAt: new Date().toISOString() },
+        intent: 'malformed',
+        payload: null,
+        error: `Topology output validation failed: ${payloadValidation.error.issues.map(i => i.message).join('; ')}`,
+      });
+      return;
+    }
+
+    // edgesAreSynthetic=true tells the UI to show a disclaimer (audit C2)
     res.json({
       _meta: {
         fixture: 'live',
         generatedAt: new Date().toISOString(),
       },
       intent: nodes.length > 0 ? 'populated' : 'quiet',
-      payload: {
-        nodes,
-        edges,
-        clusters,
-        summary,
-        timeWindow: { fromMs, toMs },
-      },
+      payload: payloadValidation.data,
       error: null,
     });
   } catch (err: any) {

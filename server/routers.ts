@@ -167,6 +167,16 @@ const metricsRouter = router({
 /* ─────────────────────────── Topology ─────────────────────────── */
 
 const topologyRouter = router({
+  /**
+   * Returns the latest topology snapshot from snap_topology tables.
+   * NOT IMPLEMENTED: No ETL process currently populates these tables.
+   * The snap_topology, snap_topology_node, and snap_topology_edge tables exist
+   * in the schema but are always empty. This endpoint will return null until
+   * a topology snapshot ETL is built. (audit H3)
+   *
+   * The actual live topology is served by POST /api/bff/topology/query
+   * which calls ExtraHop APIs directly (not from snapshot tables).
+   */
   latest: publicProcedure.query(async () => {
     return db.getLatestTopology();
   }),
@@ -330,7 +340,8 @@ const applianceConfigRouter = router({
 
   /** Test connection to the configured appliance */
   testConnection: publicProcedure.mutation(async () => {
-    const config = await db.getApplianceConfig();
+    // Use decrypted config — testConnection needs the real API key (audit C3)
+    const config = await db.getApplianceConfigDecrypted();
     if (!config) {
       return {
         success: false,
@@ -345,8 +356,9 @@ const applianceConfigRouter = router({
     // Attempt a basic connectivity check using the configured hostname
     const start = Date.now();
     try {
-      const protocol = config.verifySsl ? 'https' : 'http';
-      const url = `${protocol}://${config.hostname}/api/v1/extrahop`;
+      // ALWAYS use HTTPS — verifySsl controls certificate validation, NOT protocol.
+      // HTTP downgrade was a security bug (audit C1). API key must never travel unencrypted.
+      const url = `https://${config.hostname}/api/v1/extrahop`;
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000);
 

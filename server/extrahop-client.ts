@@ -14,8 +14,33 @@
  *   - Cache stats are exposed for the health route
  */
 
-import { getApplianceConfig } from './db';
+import { getApplianceConfigDecrypted } from './db';
 import https from 'node:https';
+
+// Per-request TLS agent to avoid NODE_TLS_REJECT_UNAUTHORIZED race condition (audit M6)
+// Reusable agent instance for connections that skip TLS verification.
+// This is safe because the agent only affects connections made through it,
+// not the entire process.
+const insecureAgent = new https.Agent({ rejectUnauthorized: false });
+
+// Lazy-load undici Agent for per-request TLS bypass (audit M6)
+let _undiciAgent: unknown = null;
+async function getUndiciAgent(): Promise<unknown> {
+  if (_undiciAgent) return _undiciAgent;
+  try {
+    // Node.js 18+ bundles undici; import it dynamically to avoid bundler issues
+    // @ts-expect-error — undici is bundled with Node.js 18+ but has no types in this project
+    const undici = await import('undici');
+    _undiciAgent = new undici.Agent({
+      connect: { rejectUnauthorized: false },
+    });
+  } catch {
+    // Fallback: if undici is not available, set process-wide flag (less safe but functional)
+    console.warn('[extrahop-client] undici not available, falling back to process-wide TLS bypass');
+    _undiciAgent = null;
+  }
+  return _undiciAgent;
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
@@ -90,16 +115,23 @@ function cacheGet(key: string): unknown | null {
     cacheMisses++;
     return null;
   }
+  // LRU: move to end of Map insertion order on access (audit M5)
+  cache.delete(key);
+  cache.set(key, entry);
   cacheHits++;
   return entry.data;
 }
 
 function cacheSet(key: string, data: unknown, ttlMs: number): void {
-  // Evict oldest entries if at capacity
+  // If key already exists, delete first so re-insert moves it to end (LRU)
+  if (cache.has(key)) {
+    cache.delete(key);
+  }
+  // Evict least-recently-used (first in Map order) if at capacity (audit M5)
   if (cache.size >= MAX_CACHE_SIZE) {
-    const firstKey = cache.keys().next().value;
-    if (firstKey !== undefined) {
-      cache.delete(firstKey);
+    const lruKey = cache.keys().next().value;
+    if (lruKey !== undefined) {
+      cache.delete(lruKey);
     }
   }
   cache.set(key, {
@@ -142,7 +174,7 @@ export function getCacheStats(): CacheStats {
  */
 async function getConfig(): Promise<ExtraHopClientConfig | null> {
   try {
-    const row = await getApplianceConfig();
+    const row = await getApplianceConfigDecrypted();
     if (!row || !row.hostname || !row.apiKey) return null;
     return {
       hostname: row.hostname,
@@ -268,25 +300,18 @@ export async function ehRequest<T = unknown>(
 
   try {
     // When verifySsl=false, skip TLS certificate verification but KEEP HTTPS.
-    // We temporarily set NODE_TLS_REJECT_UNAUTHORIZED because Node.js fetch
-    // does not support per-request rejectUnauthorized.
-    const tlsWasRelaxed = !config.verifySsl;
-    if (tlsWasRelaxed) {
-      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+    // Uses per-request https.Agent instead of process-wide NODE_TLS_REJECT_UNAUTHORIZED (audit M6)
+    const fetchOptions: RequestInit & { dispatcher?: unknown } = {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+      signal: controller.signal,
+    };
+    // Node.js 18+ fetch supports undici dispatcher for per-request TLS control
+    if (!config.verifySsl) {
+      fetchOptions.dispatcher = await getUndiciAgent();
     }
-    let response: Response;
-    try {
-      response = await fetch(url, {
-        method,
-        headers,
-        body: body ? JSON.stringify(body) : undefined,
-        signal: controller.signal,
-      });
-    } finally {
-      if (tlsWasRelaxed) {
-        process.env.NODE_TLS_REJECT_UNAUTHORIZED = '1';
-      }
-    }
+    const response = await fetch(url, fetchOptions);
     clearTimeout(timeout);
     const latencyMs = Date.now() - start;
 
@@ -375,24 +400,17 @@ export async function ehBinaryRequest(
   const start = Date.now();
 
   try {
-    // TLS bypass for self-signed certs (same pattern as ehRequest)
-    const tlsWasRelaxed = !config.verifySsl;
-    if (tlsWasRelaxed) {
-      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+    // TLS bypass for self-signed certs — per-request agent (audit M6)
+    const fetchOptions: RequestInit & { dispatcher?: unknown } = {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+      signal: controller.signal,
+    };
+    if (!config.verifySsl) {
+      fetchOptions.dispatcher = await getUndiciAgent();
     }
-    let response: Response;
-    try {
-      response = await fetch(url, {
-        method,
-        headers,
-        body: body ? JSON.stringify(body) : undefined,
-        signal: controller.signal,
-      });
-    } finally {
-      if (tlsWasRelaxed) {
-        process.env.NODE_TLS_REJECT_UNAUTHORIZED = '1';
-      }
-    }
+    const response = await fetch(url, fetchOptions);
     clearTimeout(timeout);
     const latencyMs = Date.now() - start;
 

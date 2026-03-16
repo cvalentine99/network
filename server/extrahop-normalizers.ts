@@ -31,6 +31,113 @@ import { bindMetricValues, computeRate, type RawStatRow } from '../shared/normal
 import type { MetricSpec } from '../shared/cockpit-types';
 
 // ─── Safe number helper ──────────────────────────────────────────────────
+// ─── ExtraHop Raw API Types (audit M1) ──────────────────────────────────
+// Replaces 'any' in normalizer function signatures with typed interfaces.
+// Fields are optional because the API may omit them depending on device type/state.
+
+/** Raw device from GET /api/v1/devices */
+export interface ExtraHopRawDevice {
+  id?: number;
+  display_name?: string;
+  extrahop_id?: string;
+  discovery_id?: string;
+  ipaddr4?: string | null;
+  ipaddr6?: string | null;
+  macaddr?: string;
+  device_class?: string | null;
+  role?: string | null;
+  auto_role?: string | null;
+  vendor?: string | null;
+  is_l3?: boolean;
+  vlanid?: number | null;
+  parent_id?: number | null;
+  node_id?: number | null;
+  analysis?: string | null;
+  analysis_level?: number | null;
+  mod_time?: number | null;
+  discover_time?: number | null;
+  user_mod_time?: number | null;
+  critical?: boolean;
+  cloud_instance_id?: string | null;
+  cloud_account?: string | null;
+  [key: string]: unknown;
+}
+
+/** Raw detection from GET /api/v1/detections */
+export interface ExtraHopRawDetection {
+  id?: number;
+  display_name?: string;
+  type?: string;
+  risk_score?: number | null;
+  categories?: string[];
+  start_time?: number;
+  end_time?: number | null;
+  mod_time?: number;
+  status?: string | null;
+  resolution?: string | null;
+  participants?: Array<{
+    role?: string;
+    object_type?: string;
+    object_id?: number;
+    hostname?: string | null;
+    object_value?: string | null;
+  }>;
+  mitre_tactics?: Array<{ id?: string; name?: string }>;
+  mitre_techniques?: Array<{ id?: string; name?: string }>;
+  description?: string | null;
+  ticket_id?: string | null;
+  assignee?: string | null;
+  url?: string | null;
+  [key: string]: unknown;
+}
+
+/** Raw alert from GET /api/v1/alerts */
+export interface ExtraHopRawAlert {
+  id?: number;
+  name?: string;
+  author?: string;
+  severity?: number;
+  type?: string;
+  stat_name?: string;
+  interval_length?: number;
+  fire_count?: number;
+  mod_time?: number;
+  description?: string | null;
+  apply_all?: boolean;
+  disabled?: boolean;
+  object_type?: string;
+  protocols?: string[];
+  [key: string]: unknown;
+}
+
+/** Raw appliance from GET /api/v1/extrahop */
+export interface ExtraHopRawAppliance {
+  hostname?: string;
+  platform?: string;
+  firmware_version?: string;
+  version?: string;
+  edition?: string;
+  license?: { status?: string; modules?: Record<string, unknown>; features?: Record<string, unknown> };
+  display_host?: string;
+  displayHost?: string;
+  uuid?: string;
+  mgmt_ipaddr?: string;
+  mgmtIpaddr?: string;
+  capture_name?: string;
+  captureName?: string;
+  capture_mac?: string;
+  captureMac?: string;
+  licensed_modules?: unknown[];
+  licensedModules?: unknown[];
+  licensed_options?: unknown[];
+  licensedOptions?: unknown[];
+  process_count?: number;
+  processCount?: number;
+  services?: Record<string, { enabled: boolean }>;
+  [key: string]: unknown;
+}
+
+// ─── Safe helpers ───────────────────────────────────────────────────────────
 function safeNum(v: unknown, fallback: number = 0): number {
   if (typeof v === 'number' && Number.isFinite(v)) return v;
   return fallback;
@@ -95,7 +202,7 @@ const HEADLINE_SPECS: MetricSpec[] = [
 ];
 
 export function normalizeHeadline(
-  rawStats: any[],
+  rawStats: RawStatRow[],
   durationMs: number,
   baselineBytes?: number | null
 ): HeadlineResult {
@@ -145,7 +252,7 @@ const TIMESERIES_SPECS: MetricSpec[] = [
   { name: 'pkts_out' },
 ];
 
-export function normalizeTimeseries(rawStats: any[]): SeriesPoint[] {
+export function normalizeTimeseries(rawStats: RawStatRow[]): SeriesPoint[] {
   const points: SeriesPoint[] = [];
 
   for (const stat of rawStats) {
@@ -185,7 +292,7 @@ export function normalizeTimeseries(rawStats: any[]): SeriesPoint[] {
  * We merge device identity from the devices API.
  */
 
-export function normalizeDeviceIdentity(raw: any): DeviceIdentity {
+export function normalizeDeviceIdentity(raw: ExtraHopRawDevice): DeviceIdentity {
   return {
     id: safeNum(raw.id),
     displayName: safeStr(raw.display_name ?? raw.displayName),
@@ -254,7 +361,7 @@ export function normalizeDeviceIdentity(raw: any): DeviceIdentity {
  *   }
  * ]
  */
-export function normalizeDetection(raw: any): NormalizedDetection {
+export function normalizeDetection(raw: ExtraHopRawDetection): NormalizedDetection {
   const startTime = safeNum(raw.start_time ?? raw.startTime);
   const endTime = safeNum(raw.end_time ?? raw.endTime);
   const createTime = safeNum(raw.mod_time ?? raw.createTime ?? raw.create_time);
@@ -266,7 +373,7 @@ export function normalizeDetection(raw: any): NormalizedDetection {
     displayName: safeStr(raw.display_name ?? raw.displayName ?? raw.title),
     categories: Array.isArray(raw.categories) ? raw.categories.map(String) : [],
     participants: Array.isArray(raw.participants)
-      ? raw.participants.map((p: any) => ({
+      ? raw.participants.map((p: { role?: string; object_type?: string; object_id?: number; hostname?: string | null; object_value?: string | null; ipaddr?: string | null }) => ({
           object_type: safeStr(p.object_type, 'device') as 'device' | 'ipaddr',
           object_id: p.object_id != null ? safeNum(p.object_id) : undefined,
           ipaddr: safeNullStr(p.ipaddr) ?? undefined,
@@ -285,14 +392,16 @@ export function normalizeDetection(raw: any): NormalizedDetection {
     resolution: safeNullStr(raw.resolution),
     assignee: safeNullStr(raw.assignee),
     ticketId: safeNullStr(raw.ticket_id ?? raw.ticketId),
-    mitreTactics: Array.isArray(raw.mitre_tactics ?? raw.mitreTactics)
-      ? (raw.mitre_tactics ?? raw.mitreTactics).map(String)
+    mitreTactics: Array.isArray(raw.mitre_tactics)
+      ? (raw.mitre_tactics as unknown[]).map(String)
       : [],
-    mitreTechniques: Array.isArray(raw.mitre_techniques ?? raw.mitreTechniques)
-      ? (raw.mitre_techniques ?? raw.mitreTechniques).map(String)
+    mitreTechniques: Array.isArray(raw.mitre_techniques)
+      ? (raw.mitre_techniques as unknown[]).map(String)
       : [],
-    isUserCreated: safeBool(raw.is_user_created ?? raw.isUserCreated),
-    properties: raw.properties && typeof raw.properties === 'object' ? raw.properties : {},
+    isUserCreated: safeBool(raw.is_user_created),
+    properties: (raw.properties && typeof raw.properties === 'object'
+      ? raw.properties as Record<string, unknown>
+      : {} as Record<string, unknown>),
     url: safeNullStr(raw.url) ?? `/extrahop/#/detections/detail/${safeNum(raw.id)}`,
   };
 }
@@ -331,7 +440,7 @@ const SEVERITY_LABELS: Record<number, 'low' | 'medium' | 'high' | 'critical'> = 
   7: 'critical',
 };
 
-export function normalizeAlert(raw: any): NormalizedAlert {
+export function normalizeAlert(raw: ExtraHopRawAlert): NormalizedAlert {
   const severity = safeNum(raw.severity);
   return {
     id: safeNum(raw.id),
@@ -358,7 +467,7 @@ export function normalizeAlert(raw: any): NormalizedAlert {
  * GET /api/v1/extrahop response → ApplianceIdentity
  * (Also used by health route, but exported here for reuse)
  */
-export function normalizeApplianceIdentity(raw: any): ApplianceIdentity {
+export function normalizeApplianceIdentity(raw: ExtraHopRawAppliance): ApplianceIdentity {
   return {
     version: safeStr(raw.version),
     edition: safeStr(raw.edition),
@@ -369,13 +478,15 @@ export function normalizeApplianceIdentity(raw: any): ApplianceIdentity {
     captureName: safeStr(raw.capture_name ?? raw.captureName),
     captureMac: safeStr(raw.capture_mac ?? raw.captureMac),
     licensedModules: Array.isArray(raw.licensed_modules ?? raw.licensedModules)
-      ? (raw.licensed_modules ?? raw.licensedModules).map(String)
+      ? ((raw.licensed_modules ?? raw.licensedModules) as unknown[]).map(String)
       : [],
     licensedOptions: Array.isArray(raw.licensed_options ?? raw.licensedOptions)
-      ? (raw.licensed_options ?? raw.licensedOptions).map(String)
+      ? ((raw.licensed_options ?? raw.licensedOptions) as unknown[]).map(String)
       : [],
     processCount: safeNum(raw.process_count ?? raw.processCount),
-    services: raw.services && typeof raw.services === 'object' ? raw.services : {},
+    services: (raw.services && typeof raw.services === 'object'
+      ? raw.services as Record<string, { enabled: boolean }>
+      : {} as Record<string, { enabled: boolean }>),
   };
 }
 
@@ -401,7 +512,7 @@ export interface ApplianceStatusResult {
 }
 
 export function normalizeApplianceStatus(
-  raw: any,
+  raw: ExtraHopRawAppliance,
   connectionStatus: 'connected' | 'not_configured' | 'error'
 ): ApplianceStatusResult {
   // Determine capture status from the raw response
@@ -427,7 +538,7 @@ export function normalizeApplianceStatus(
     captureInterface: safeStr(raw.capture_name ?? raw.captureName ?? 'Default'),
     licenseStatus,
     licensedModules: Array.isArray(raw.licensed_modules ?? raw.licensedModules)
-      ? (raw.licensed_modules ?? raw.licensedModules).map(String)
+      ? ((raw.licensed_modules ?? raw.licensedModules) as unknown[]).map(String)
       : [],
     uptimeSeconds: Math.round(process.uptime()),
     connectionStatus,
@@ -462,7 +573,7 @@ export interface DeviceActivityRecord {
 }
 
 export function normalizeDeviceActivity(
-  rawRecords: any[],
+  rawRecords: Record<string, unknown>[],
   deviceId: number,
   polledAt: Date = new Date()
 ): DeviceActivityRecord[] {

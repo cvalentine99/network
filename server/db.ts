@@ -560,6 +560,11 @@ export async function getActivityMaps() {
 
 /* ─────────────────────────── Topology ─────────────────────────── */
 
+/**
+ * Get the latest topology snapshot from snap_topology tables.
+ * NOT IMPLEMENTED: No ETL process currently populates these tables.
+ * Will always return null until a topology snapshot ETL is built. (audit H3)
+ */
 export async function getLatestTopology() {
   const db = await getDb();
   if (!db) return null;
@@ -572,6 +577,11 @@ export async function getLatestTopology() {
 
 /* ─────────────────────────── Records ─────────────────────────── */
 
+/**
+ * DEAD CODE: No tRPC route or Express endpoint calls this function.
+ * The fact_record_search table exists but no ETL populates it.
+ * Kept for future Records feature. (audit H6)
+ */
 export async function getRecordSearches(opts?: { limit?: number; offset?: number }) {
   const db = await getDb();
   if (!db) return { rows: [], total: 0 };
@@ -585,6 +595,11 @@ export async function getRecordSearches(opts?: { limit?: number; offset?: number
   return { rows, total: totalResult?.count ?? 0 };
 }
 
+/**
+ * DEAD CODE: No tRPC route or Express endpoint calls this function.
+ * The fact_record table exists but no ETL populates it.
+ * Kept for future Records feature. (audit H6)
+ */
 export async function getRecordsBySearch(searchId: number) {
   const db = await getDb();
   if (!db) return [];
@@ -607,7 +622,8 @@ export async function getApplianceConfig() {
 /**
  * Upsert the appliance configuration.
  * If a row exists, update it. If not, insert a new one.
- * Returns the saved row.
+ * API key is encrypted at rest using AES-256-GCM (audit C3).
+ * Returns the saved row (with encrypted apiKey — callers must use getApplianceConfigDecrypted).
  */
 export async function upsertApplianceConfig(input: {
   hostname: string;
@@ -619,6 +635,10 @@ export async function upsertApplianceConfig(input: {
   const db = await getDb();
   if (!db) throw new Error('Database not available');
 
+  // Encrypt the API key before storing (audit C3)
+  const { encryptApiKey } = await import('./crypto');
+  const encryptedApiKey = encryptApiKey(input.apiKey);
+
   const existing = await getApplianceConfig();
 
   if (existing) {
@@ -626,7 +646,7 @@ export async function upsertApplianceConfig(input: {
       .update(applianceConfig)
       .set({
         hostname: input.hostname,
-        apiKey: input.apiKey,
+        apiKey: encryptedApiKey,
         verifySsl: input.verifySsl,
         cloudServicesEnabled: input.cloudServicesEnabled,
         nickname: input.nickname,
@@ -640,13 +660,32 @@ export async function upsertApplianceConfig(input: {
   } else {
     await db.insert(applianceConfig).values({
       hostname: input.hostname,
-      apiKey: input.apiKey,
+      apiKey: encryptedApiKey,
       verifySsl: input.verifySsl,
       cloudServicesEnabled: input.cloudServicesEnabled,
       nickname: input.nickname,
     });
     const [inserted] = await db.select().from(applianceConfig).orderBy(desc(applianceConfig.id)).limit(1);
     return inserted;
+  }
+}
+
+/**
+ * Get appliance config with the API key decrypted.
+ * This is the function that should be used by code that needs the actual API key
+ * (e.g., ExtraHop client, test connection). (audit C3)
+ */
+export async function getApplianceConfigDecrypted() {
+  const row = await getApplianceConfig();
+  if (!row) return null;
+  try {
+    const { decryptApiKey, isEncryptedApiKey } = await import('./crypto');
+    // Handle migration: if the key is not encrypted (legacy plaintext), return as-is
+    const apiKey = isEncryptedApiKey(row.apiKey) ? decryptApiKey(row.apiKey) : row.apiKey;
+    return { ...row, apiKey };
+  } catch {
+    // If decryption fails, return the row with the raw value (migration scenario)
+    return row;
   }
 }
 
@@ -685,6 +724,11 @@ export async function deleteApplianceConfig(id: number) {
 
 /* ─────────────────────────── Schema Health ─────────────────────────── */
 
+/**
+ * Called by schemaRouter.latestDrift tRPC route.
+ * The schema_drift_log table exists and is populated by bootstrap.sh.
+ * Returns null if no drift checks have been run yet. (audit H6 — wired, not dead)
+ */
 export async function getLatestDriftLog() {
   const db = await getDb();
   if (!db) return null;

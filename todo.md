@@ -513,3 +513,28 @@ These items are tracked here for the live integration phase.
 - [x] Fix AUDIT-RESPONSE.md: correct BASELINE_NOT_AVAILABLE to BASELINE_NOT_IMPLEMENTED
 ## Finding 7: All corrections verified with grep proof before delivery
 - [x] Run grep proof for every fix and include output in delivery — SLICE-37-GREP-PROOF.md
+
+# COMPREHENSIVE CODEBASE AUDIT FIXES (Slice 38)
+## Source: comprehensive-codebase-audit.docx — Chase Valentine / Claude Opus 4.6 — 2026-03-15
+
+### CRITICAL
+- [x] C1: Fix HTTP downgrade bug in routers.ts testConnection line 348 — always use HTTPS
+- [x] C2: Topology live mode fabricated edges — added edgesAreSynthetic flag, visible amber disclaimer banner, honest source comments
+- [x] C3: ExtraHop API key stored plaintext — AES-256-GCM encryption via crypto.ts, decrypt on read
+- [x] C4: 35F Multi-Appliance Merge dead code — removed dead imports (mergeTopologies, GitMerge), updated contract header to say REMOVED
+
+### HIGH
+- [x] H1: Add Zod output validation to topology.ts and correlation.ts live responses
+- [x] H2: Add secondary indexes to Drizzle schema for all FK/lookup columns — 30+ indexes applied via SQL
+- [x] H3: Topology snapshot ETL not implemented — documented honestly in db.ts and routers.ts (tables kept for future use)
+- [x] H4: Add security headers to both nginx configs (X-Frame-Options, CSP, X-Content-Type-Options, X-XSS-Protection, Referrer-Policy; HSTS commented pending TLS)
+- [x] H5: JWT_SECRET guard — crypto.ts already throws on empty secret; env.ts is Manus platform template (cannot modify _core/)
+- [x] H6: Documented 4 DB functions — 2 truly dead (getRecordSearches, getRecordsBySearch), 2 wired but tables empty (getLatestTopology, getLatestDriftLog)
+
+### MEDIUM
+- [x] M1: Reduced 'any' in normalizers from 10 to 0 — added ExtraHopRawDevice/Detection/Alert/Appliance interfaces
+- [x] M2: Added Zod BffResponseSchema validation to useDeviceActivity hook + malformed state
+- [x] M3: Created server/_core/README.md documenting platform template status and audit note
+- [x] M4: Removed ComponentShowcase.tsx orphan page (no imports, no route)
+- [x] M5: Replaced FIFO cache with LRU eviction via Map re-insertion in extrahop-client.ts
+- [x] M6: Replaced NODE_TLS_REJECT_UNAUTHORIZED with per-request undici Agent in extrahop-client.ts

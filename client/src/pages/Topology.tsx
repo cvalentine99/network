@@ -8,7 +8,7 @@
  *   35C: Anomaly Detection Overlay — flag edges/nodes deviating from baseline
  *   35D: Export Topology — PNG/SVG/JSON/CSV export
  *   35E: Saved Views — persist/recall filter/grouping/zoom configs (DB-backed, no auth)
- *   35F: Multi-Appliance Merge — merge topologies from multiple ExtraHop appliances
+ *   35F: Multi-Appliance Merge — REMOVED (dead code, audit C4). Shared utility exists but no UI/endpoint wired.
  * - All data from BFF routes — never contacts ExtraHop directly
  * - Shared time window via useTimeWindow()
  * - No Manus OAuth dependency — all features work locally
@@ -48,7 +48,6 @@ import {
   Save,
   FolderOpen,
   Trash2,
-  GitMerge,
   ChevronDown,
   ChevronRight,
   Eye,
@@ -90,7 +89,9 @@ import {
   downloadExport,
   downloadBinaryExport,
 } from '../../../shared/topology-export';
-import { mergeTopologies } from '../../../shared/topology-merge';
+// mergeTopologies import removed — dead code with no UI or endpoint (audit C4)
+// The shared utility (topology-merge.ts) still exists and passes tests,
+// but is not wired to any user-reachable path.
 
 // ─── Icon Map ──────────────────────────────────────────────────────
 const ICON_MAP: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
@@ -1528,6 +1529,20 @@ export default function Topology() {
       <div className="px-4 py-2 border-b border-white/[0.04]">
         <SummaryBar payload={payload} />
       </div>
+
+      {/* Synthetic edges disclaimer (audit C2) */}
+      {payload.edgesAreSynthetic && (
+        <div
+          className="flex items-center gap-2 px-4 py-2 bg-amber-500/10 border-b border-amber-500/20"
+          data-testid="synthetic-edges-disclaimer"
+        >
+          <AlertTriangle size={14} className="text-amber-400 shrink-0" />
+          <span className="text-[11px] text-amber-300">
+            <strong>Edges are inferred, not observed.</strong> Connections shown are heuristically derived from per-device byte totals.
+            Real protocol, latency, and connection data requires ExtraHop Activity Map API integration (not yet implemented).
+          </span>
+        </div>
+      )}
 
       {/* Feature panels (collapsible) */}
       {showCriticalPath && (

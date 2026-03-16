@@ -73,6 +73,7 @@ export const TopologyPayloadSchema = z.object({
     fromMs: z.number().int().positive(),
     toMs: z.number().int().positive(),
   }),
+  edgesAreSynthetic: z.boolean().optional(),
 });
 
 // ─── BFF Request ───────────────────────────────────────────────────
