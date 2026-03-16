@@ -86,8 +86,11 @@ describe('Slice 17 > TraceEntryModeSchema', () => {
   it('accepts service-row', () => {
     expect(TraceEntryModeSchema.parse('service-row')).toBe('service-row');
   });
+  it('accepts ip', () => {
+    expect(TraceEntryModeSchema.parse('ip')).toBe('ip');
+  });
   it('rejects invalid mode', () => {
-    expect(TraceEntryModeSchema.safeParse('ip-address').success).toBe(false);
+    expect(TraceEntryModeSchema.safeParse('mac-address').success).toBe(false);
   });
   it('rejects empty string', () => {
     expect(TraceEntryModeSchema.safeParse('').success).toBe(false);
@@ -161,10 +164,19 @@ describe('Slice 17 > TraceIntentSchema', () => {
     expect(result.success).toBe(false);
   });
 
+  it('accepts valid ip intent', () => {
+    const result = TraceIntentSchema.safeParse({
+      mode: 'ip',
+      value: '10.1.20.42',
+      timeWindow: VALID_TIME_WINDOW,
+    });
+    expect(result.success).toBe(true);
+  });
+
   it('rejects invalid mode', () => {
     const result = TraceIntentSchema.safeParse({
-      mode: 'ip-address',
-      value: '10.1.20.42',
+      mode: 'mac-address',
+      value: '00:50:56:A1:2B:3C',
       timeWindow: VALID_TIME_WINDOW,
     });
     expect(result.success).toBe(false);
@@ -940,6 +952,15 @@ describe('Slice 17 > Entry mode coverage', () => {
     expect(data.intent.mode).toBe('service-row');
     const complete = data.events.find((e: any) => e.type === 'complete');
     expect(complete.terminalStatus).toBe('complete');
+  });
+
+  it('ip entry mode has complete fixture', () => {
+    const data = loadJsonFixture('flow-theater.ip-complete.fixture.json');
+    expect(data.intent.mode).toBe('ip');
+    expect(data.intent.value).toBe('10.1.20.42');
+    const complete = data.events.find((e: any) => e.type === 'complete');
+    expect(complete.terminalStatus).toBe('complete');
+    expect(complete.summary.resolvedDevice.resolvedVia).toBe('ip');
   });
 
   it('quiet terminal state fixture exists', () => {

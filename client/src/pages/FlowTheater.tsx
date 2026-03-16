@@ -4,7 +4,7 @@
  * Dedicated surface: "Where is the time going?"
  * Entry form → SSE trace → 8-step rail → summary card.
  *
- * Entry modes: hostname | device ID | service-row key
+ * Entry modes: hostname | device ID | IP address | service-row key
  * SSE events: step | heartbeat | complete | error
  * Terminal states: complete | quiet | error
  */
@@ -59,12 +59,14 @@ const ENTRY_MODE_LABELS: Record<TraceEntryMode, string> = {
   hostname: "Hostname",
   device: "Device ID",
   "service-row": "Service Row",
+  ip: "IP Address",
 };
 
 const ENTRY_MODE_PLACEHOLDERS: Record<TraceEntryMode, string> = {
   hostname: "e.g. dc01.lab.local",
   device: "e.g. 1042",
   "service-row": "e.g. SMB::1042",
+  ip: "e.g. 10.1.20.42",
 };
 
 // ─── Step Status Styling ────────────────────────────────────────────────────
@@ -342,6 +344,7 @@ export default function FlowTheater() {
                   <SelectItem value="hostname">Hostname</SelectItem>
                   <SelectItem value="device">Device ID</SelectItem>
                   <SelectItem value="service-row">Service Row</SelectItem>
+                  <SelectItem value="ip">IP Address</SelectItem>
                 </SelectContent>
               </Select>
             </div>

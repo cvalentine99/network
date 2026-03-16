@@ -13,6 +13,7 @@
  *   6. POST /api/bff/trace/run — quiet sentinel returns quiet fixture stream
  *   7. POST /api/bff/trace/run — device mode returns device fixture stream
  *   8. POST /api/bff/trace/run — service-row mode returns service-row fixture stream
+ *  8b. POST /api/bff/trace/run — ip mode returns ip fixture stream (+ error/quiet sentinels)
  *   9. GET /api/bff/trace/fixtures — returns fixture list in fixture mode
  *  10. SSE response headers are correct
  *  11. selectFixture mapping: sentinel values route to correct fixtures
@@ -405,6 +406,47 @@ describe('Slice 17 BFF > POST /api/bff/trace/run service-row mode', () => {
   });
 });
 
+// ─── 8b. IP mode ─────────────────────────────────────────────────────────
+
+describe('Slice 17 BFF > POST /api/bff/trace/run ip mode', () => {
+  it('ip mode returns complete stream', async () => {
+    const result = await consumeSSE('/api/bff/trace/run', {
+      mode: 'ip',
+      value: '10.1.20.42',
+      timeWindow: VALID_TIME_WINDOW,
+    });
+    expect(result.status).toBe(200);
+    const lastEvent = result.events[result.events.length - 1];
+    expect(lastEvent.type).toBe('complete');
+    expect(lastEvent.terminalStatus).toBe('complete');
+  });
+
+  it('ip error sentinel returns error stream', async () => {
+    const result = await consumeSSE('/api/bff/trace/run', {
+      mode: 'ip',
+      value: '0.0.0.0',
+      timeWindow: VALID_TIME_WINDOW,
+    });
+    expect(result.status).toBe(200);
+    const lastEvent = result.events[result.events.length - 1];
+    expect(lastEvent.type).toBe('error');
+  });
+
+  it('ip quiet sentinel returns quiet stream', async () => {
+    const result = await consumeSSE('/api/bff/trace/run', {
+      mode: 'ip',
+      value: '192.168.0.0',
+      timeWindow: VALID_TIME_WINDOW,
+    });
+    expect(result.status).toBe(200);
+    const lastEvent = result.events[result.events.length - 1];
+    expect(['complete']).toContain(lastEvent.type);
+    if (lastEvent.type === 'complete') {
+      expect(lastEvent.terminalStatus).toBe('quiet');
+    }
+  });
+});
+
 // ─── 9. GET /api/bff/trace/fixtures ────────────────────────────────────────
 
 describe('Slice 17 BFF > GET /api/bff/trace/fixtures', () => {
@@ -426,6 +468,11 @@ describe('Slice 17 BFF > GET /api/bff/trace/fixtures', () => {
   it('includes hostname-complete fixture', async () => {
     const result = await fetchJSON('/api/bff/trace/fixtures');
     expect(result.body.fixtures).toContain('trace-hostname-complete.fixture.jsonl');
+  });
+
+  it('includes ip-complete fixture', async () => {
+    const result = await fetchJSON('/api/bff/trace/fixtures');
+    expect(result.body.fixtures).toContain('trace-ip-complete.fixture.jsonl');
   });
 });
 

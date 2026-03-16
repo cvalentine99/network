@@ -212,7 +212,7 @@ export const SURFACE_DESCRIPTIONS: SurfaceDescription[] = [
     name: 'Flow Theater',
     path: '/flow-theater',
     question: 'Where is the time going for a specific device?',
-    description: 'An 8-step trace that queries all ExtraHop data sources for a single device. Enter a hostname, device ID, or service row key, and watch the trace progress through input acceptance, device resolution, activity map, metrics, records, detections, alerts, and packet checks.',
+    description: 'An 8-step trace that queries all ExtraHop data sources for a single device. Enter a hostname, device ID, IP address, or service row key, and watch the trace progress through input acceptance, device resolution, activity map, metrics, records, detections, alerts, and packet checks.',
     integrationStatus: 'fixture-proven',
   },
   {

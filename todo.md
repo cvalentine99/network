@@ -769,3 +769,13 @@ These items are tracked here for the live integration phase.
 - [x] Rewrite ForceGraph.tsx as thin orchestrator (~600 lines, down from 1,969)
 - [x] Update source-code audit tests (readForceGraphFullSource helper)
 - [x] All 2,725 tests pass across 41 files (0 failures)
+
+# FLOW THEATER — IP ENTRY MODE
+
+- [x] Audit current entry modes (hostname, device, service-row) — confirmed 'ip' was missing, explicitly rejected by schema
+- [x] Add 'ip' entry mode to shared trace types and validators (flow-theater-types.ts, flow-theater-validators.ts, cross-surface-nav-types.ts)
+- [x] Update BFF trace route to accept IP entry mode (server/routes/trace.ts) — uses ExtraHop search_type=ip, sentinel values 0.0.0.0/192.168.0.0/10.255.255.255
+- [x] Update Flow Theater UI form to include IP entry option (FlowTheater.tsx) — SelectItem, labels, placeholders
+- [x] Add IP-mode fixtures: trace-ip-complete.fixture.jsonl + flow-theater.ip-complete.fixture.json
+- [x] Add tests: slice17.test.ts (schema validation), slice17-bff.test.ts (3 BFF route tests: complete/error/quiet sentinels), slice23.test.ts (round-trip + mode enumeration)
+- [x] All 2,737 tests pass across 41 files (12 new tests, 0 failures)

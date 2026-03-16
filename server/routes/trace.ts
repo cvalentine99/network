@@ -199,6 +199,13 @@ async function executeLiveTrace(
         cacheTtlMs: 30_000,
       });
       searchResult = { data: [dev.data] };
+    } else if (mode === 'ip') {
+      // Search devices by IP address (same ExtraHop API as Blast Radius)
+      searchResult = await ehRequest<any[]>({
+        method: 'GET',
+        path: `/api/v1/devices?search_type=ip&value=${encodeURIComponent(value)}&limit=1`,
+        cacheTtlMs: 30_000,
+      });
     }
 
     const devices = Array.isArray(searchResult?.data) ? searchResult.data : [searchResult?.data];
@@ -496,13 +503,13 @@ function loadFixtureEvents(fixtureName: string): TraceSSEEvent[] {
 async function selectFixture(mode: TraceEntryMode, value: string): Promise<string> {
   // Sentinel routing: only in dev/test
   if (await isFixtureMode()) {
-    if (value === 'unknown.invalid' || value === '0' || value === 'bad-service::0') {
+    if (value === 'unknown.invalid' || value === '0' || value === 'bad-service::0' || value === '0.0.0.0') {
       return 'trace-resolution-error.fixture.jsonl';
     }
-    if (value === 'quiet.lab.local' || value === '9999' || value === 'idle-svc::2087') {
+    if (value === 'quiet.lab.local' || value === '9999' || value === 'idle-svc::2087' || value === '192.168.0.0') {
       return 'trace-hostname-quiet.fixture.jsonl';
     }
-    if (value === 'partial.lab.local' || value === '8888') {
+    if (value === 'partial.lab.local' || value === '8888' || value === '10.255.255.255') {
       return 'trace-partial-error.fixture.jsonl';
     }
   }
@@ -514,6 +521,8 @@ async function selectFixture(mode: TraceEntryMode, value: string): Promise<strin
       return 'trace-device-complete.fixture.jsonl';
     case 'service-row':
       return 'trace-service-row-complete.fixture.jsonl';
+    case 'ip':
+      return 'trace-ip-complete.fixture.jsonl';
     default:
       return 'trace-hostname-complete.fixture.jsonl';
   }

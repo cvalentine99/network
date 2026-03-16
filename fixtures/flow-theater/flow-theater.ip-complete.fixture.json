@@ -1,0 +1,243 @@
+{
+  "_meta": {
+    "fixture": "flow-theater.ip-complete",
+    "description": "SSE event sequence for an IP address entry trace that completes successfully with all 8 steps.",
+    "entryMode": "ip",
+    "terminalStatus": "complete",
+    "totalEvents": 19,
+    "totalSteps": 8
+  },
+  "intent": {
+    "mode": "ip",
+    "value": "10.1.20.42",
+    "timeWindow": {
+      "fromMs": 1710000000000,
+      "untilMs": 1710001800000,
+      "durationMs": 1800000,
+      "cycle": "30sec"
+    }
+  },
+  "events": [
+    {
+      "type": "step",
+      "stepId": "input-accepted",
+      "status": "running",
+      "detail": "Validating ip 10.1.20.42",
+      "durationMs": null,
+      "count": null,
+      "timestamp": 1710001800100
+    },
+    {
+      "type": "step",
+      "stepId": "input-accepted",
+      "status": "complete",
+      "detail": "IP address accepted",
+      "durationMs": 45,
+      "count": null,
+      "timestamp": 1710001800145
+    },
+    {
+      "type": "step",
+      "stepId": "entry-resolution",
+      "status": "running",
+      "detail": "Resolving ip to device",
+      "durationMs": null,
+      "count": null,
+      "timestamp": 1710001800150
+    },
+    {
+      "type": "heartbeat",
+      "timestamp": 1710001800200,
+      "activeSteps": 1
+    },
+    {
+      "type": "step",
+      "stepId": "entry-resolution",
+      "status": "complete",
+      "detail": "Resolved to device 1042",
+      "durationMs": 120,
+      "count": null,
+      "timestamp": 1710001800270
+    },
+    {
+      "type": "step",
+      "stepId": "device-resolved",
+      "status": "running",
+      "detail": "Loading device identity",
+      "durationMs": null,
+      "count": null,
+      "timestamp": 1710001800275
+    },
+    {
+      "type": "step",
+      "stepId": "device-resolved",
+      "status": "complete",
+      "detail": "10.1.20.42 (10.1.20.42)",
+      "durationMs": 80,
+      "count": null,
+      "timestamp": 1710001800355
+    },
+    {
+      "type": "step",
+      "stepId": "activity-timeline",
+      "status": "running",
+      "detail": "Querying activity records",
+      "durationMs": null,
+      "count": null,
+      "timestamp": 1710001800360
+    },
+    {
+      "type": "step",
+      "stepId": "metric-timeline",
+      "status": "running",
+      "detail": "Querying metric data points",
+      "durationMs": null,
+      "count": null,
+      "timestamp": 1710001800360
+    },
+    {
+      "type": "step",
+      "stepId": "records-search",
+      "status": "running",
+      "detail": "Searching records",
+      "durationMs": null,
+      "count": null,
+      "timestamp": 1710001800360
+    },
+    {
+      "type": "step",
+      "stepId": "detection-alert",
+      "status": "running",
+      "detail": "Querying detections and alerts",
+      "durationMs": null,
+      "count": null,
+      "timestamp": 1710001800360
+    },
+    {
+      "type": "step",
+      "stepId": "trace-assembly",
+      "status": "running",
+      "detail": "Assembling trace results",
+      "durationMs": null,
+      "count": null,
+      "timestamp": 1710001800360
+    },
+    {
+      "type": "heartbeat",
+      "timestamp": 1710001800500,
+      "activeSteps": 5
+    },
+    {
+      "type": "step",
+      "stepId": "activity-timeline",
+      "status": "complete",
+      "detail": "142 activity records",
+      "durationMs": 340,
+      "count": 142,
+      "timestamp": 1710001800700
+    },
+    {
+      "type": "step",
+      "stepId": "metric-timeline",
+      "status": "complete",
+      "detail": "1,847 metric data points",
+      "durationMs": 410,
+      "count": 1847,
+      "timestamp": 1710001800770
+    },
+    {
+      "type": "step",
+      "stepId": "records-search",
+      "status": "complete",
+      "detail": "38 records found",
+      "durationMs": 280,
+      "count": 38,
+      "timestamp": 1710001800640
+    },
+    {
+      "type": "step",
+      "stepId": "detection-alert",
+      "status": "complete",
+      "detail": "3 detections, 1 alert",
+      "durationMs": 220,
+      "count": 4,
+      "timestamp": 1710001800580
+    },
+    {
+      "type": "step",
+      "stepId": "trace-assembly",
+      "status": "complete",
+      "detail": "Trace assembled",
+      "durationMs": 450,
+      "count": null,
+      "timestamp": 1710001800810
+    },
+    {
+      "type": "complete",
+      "terminalStatus": "complete",
+      "totalDurationMs": 710,
+      "timestamp": 1710001800820,
+      "summary": {
+        "resolvedDevice": {
+          "resolvedVia": "ip",
+          "originalInput": "10.1.20.42",
+          "device": {
+            "id": 1042,
+            "displayName": "dc01.lab.local",
+            "ipaddr": "10.1.20.42",
+            "macaddr": "00:50:56:A1:2B:3C",
+            "role": "domain_controller",
+            "vendor": "VMware"
+          }
+        },
+        "activityCount": 142,
+        "metricPointCount": 1847,
+        "recordCount": 38,
+        "detectionCount": 3,
+        "alertCount": 1,
+        "stepTimings": [
+          {
+            "stepId": "input-accepted",
+            "status": "complete",
+            "durationMs": 45
+          },
+          {
+            "stepId": "entry-resolution",
+            "status": "complete",
+            "durationMs": 120
+          },
+          {
+            "stepId": "device-resolved",
+            "status": "complete",
+            "durationMs": 80
+          },
+          {
+            "stepId": "activity-timeline",
+            "status": "complete",
+            "durationMs": 340
+          },
+          {
+            "stepId": "metric-timeline",
+            "status": "complete",
+            "durationMs": 410
+          },
+          {
+            "stepId": "records-search",
+            "status": "complete",
+            "durationMs": 280
+          },
+          {
+            "stepId": "detection-alert",
+            "status": "complete",
+            "durationMs": 220
+          },
+          {
+            "stepId": "trace-assembly",
+            "status": "complete",
+            "durationMs": 450
+          }
+        ]
+      }
+    }
+  ]
+}

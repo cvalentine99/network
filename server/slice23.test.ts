@@ -111,7 +111,7 @@ describe('Slice 23 — URL Builders', () => {
     });
 
     it('always starts with /flow-theater?', () => {
-      const modes: FlowTheaterEntryMode[] = ['hostname', 'device', 'service-row'];
+      const modes: FlowTheaterEntryMode[] = ['hostname', 'device', 'service-row', 'ip'];
       for (const mode of modes) {
         const url = buildFlowTheaterUrl({ mode, value: 'test' });
         expect(url).toMatch(/^\/flow-theater\?/);
@@ -184,6 +184,13 @@ describe('Slice 23 — URL Parsers', () => {
       const params = new URLSearchParams(url.split('?')[1]);
       const parsed = parseFlowTheaterNav(params);
       expect(parsed).toEqual({ mode: 'service-row', value: 'SMB::1042', autoSubmit: true });
+    });
+
+    it('round-trips ip mode', () => {
+      const url = buildFlowTheaterUrl({ mode: 'ip', value: '10.1.20.42', autoSubmit: true });
+      const params = new URLSearchParams(url.split('?')[1]);
+      const parsed = parseFlowTheaterNav(params);
+      expect(parsed).toEqual({ mode: 'ip', value: '10.1.20.42', autoSubmit: true });
     });
 
     it('returns null for empty params', () => {
