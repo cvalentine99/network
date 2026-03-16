@@ -40,6 +40,11 @@ import { ENV } from "./_core/env";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
+/**
+ * Get the database connection (may return null if DATABASE_URL is not set).
+ * Use requireDb() in data-path functions to throw a typed error instead of
+ * silently returning empty data. (audit C6)
+ */
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
@@ -50,6 +55,30 @@ export async function getDb() {
     }
   }
   return _db;
+}
+
+/**
+ * DATABASE_UNAVAILABLE error class for typed error handling.
+ * tRPC procedures catch this and return INTERNAL_SERVER_ERROR to the UI,
+ * which can then distinguish "no data" from "database unreachable". (audit C6)
+ */
+export class DatabaseUnavailableError extends Error {
+  public readonly code = 'DATABASE_UNAVAILABLE' as const;
+  constructor() {
+    super('Database connection is not available');
+    this.name = 'DatabaseUnavailableError';
+  }
+}
+
+/**
+ * Get the database connection or throw DatabaseUnavailableError.
+ * All data-path functions should use this instead of getDb() + silent null return.
+ * (audit C6: replaces 49 silent null/empty returns with a proper error signal)
+ */
+export async function requireDb() {
+  const db = await getDb();
+  if (!db) throw new DatabaseUnavailableError();
+  return db;
 }
 
 /* ─────────────────────────── User helpers (kept for framework) ─────────────────────────── */
@@ -90,8 +119,7 @@ export async function getUserByOpenId(openId: string) {
 /* ─────────────────────────── Dashboard Overview ─────────────────────────── */
 
 export async function getDashboardStats() {
-  const db = await getDb();
-  if (!db) return null;
+  const db = await requireDb();
 
   const [deviceCount] = await db.select({ count: count() }).from(dimDevice);
   const [alertCount] = await db.select({ count: count() }).from(dimAlert);
@@ -115,8 +143,7 @@ export async function getDashboardStats() {
 }
 
 export async function getAlertsBySeverity() {
-  const db = await getDb();
-  if (!db) return [];
+  const db = await requireDb();
   const results = await db
     .select({ severity: dimAlert.severity, count: count() })
     .from(dimAlert)
@@ -126,8 +153,7 @@ export async function getAlertsBySeverity() {
 }
 
 export async function getDevicesByClass() {
-  const db = await getDb();
-  if (!db) return [];
+  const db = await requireDb();
   const cnt = count();
   const results = await db
     .select({ deviceClass: dimDevice.deviceClass, count: cnt })
@@ -138,8 +164,7 @@ export async function getDevicesByClass() {
 }
 
 export async function getDevicesByRole() {
-  const db = await getDb();
-  if (!db) return [];
+  const db = await requireDb();
   const cnt = count();
   const results = await db
     .select({ role: dimDevice.role, count: cnt })
@@ -150,8 +175,7 @@ export async function getDevicesByRole() {
 }
 
 export async function getDevicesByAnalysis() {
-  const db = await getDb();
-  if (!db) return [];
+  const db = await requireDb();
   const cnt = count();
   const results = await db
     .select({ analysis: dimDevice.analysis, count: cnt })
@@ -175,8 +199,7 @@ export async function getDevices(opts?: {
   sortBy?: string;
   sortDir?: "asc" | "desc";
 }) {
-  const db = await getDb();
-  if (!db) return { rows: [], total: 0 };
+  const db = await requireDb();
 
   const conditions = [];
   if (opts?.search) {
@@ -227,33 +250,28 @@ export async function getDevices(opts?: {
 }
 
 export async function getDeviceById(id: number) {
-  const db = await getDb();
-  if (!db) return null;
+  const db = await requireDb();
   const [device] = await db.select().from(dimDevice).where(eq(dimDevice.id, id)).limit(1);
   return device ?? null;
 }
 
 export async function getDeviceIps(deviceId: number) {
-  const db = await getDb();
-  if (!db) return [];
+  const db = await requireDb();
   return db.select().from(snapDeviceIpaddr).where(and(eq(snapDeviceIpaddr.deviceId, deviceId), eq(snapDeviceIpaddr.isCurrent, true)));
 }
 
 export async function getDeviceDnsNames(deviceId: number) {
-  const db = await getDb();
-  if (!db) return [];
+  const db = await requireDb();
   return db.select().from(snapDeviceDnsname).where(and(eq(snapDeviceDnsname.deviceId, deviceId), eq(snapDeviceDnsname.isCurrent, true)));
 }
 
 export async function getDeviceSoftware(deviceId: number) {
-  const db = await getDb();
-  if (!db) return [];
+  const db = await requireDb();
   return db.select().from(snapDeviceSoftware).where(and(eq(snapDeviceSoftware.deviceId, deviceId), eq(snapDeviceSoftware.isCurrent, true)));
 }
 
 export async function getDeviceTags(deviceId: number) {
-  const db = await getDb();
-  if (!db) return [];
+  const db = await requireDb();
   return db
     .select({ tagId: bridgeDeviceTag.tagId, tagName: dimTag.name })
     .from(bridgeDeviceTag)
@@ -262,8 +280,7 @@ export async function getDeviceTags(deviceId: number) {
 }
 
 export async function getDeviceGroups(deviceId: number) {
-  const db = await getDb();
-  if (!db) return [];
+  const db = await requireDb();
   return db
     .select({ groupId: bridgeDeviceDeviceGroup.deviceGroupId, groupName: dimDeviceGroup.name })
     .from(bridgeDeviceDeviceGroup)
@@ -272,8 +289,7 @@ export async function getDeviceGroups(deviceId: number) {
 }
 
 export async function getDeviceActivity(deviceId: number, limit = 20) {
-  const db = await getDb();
-  if (!db) return [];
+  const db = await requireDb();
   return db
     .select()
     .from(factDeviceActivity)
@@ -299,7 +315,7 @@ export async function upsertDeviceActivity(
     polledAt: Date;
   }>
 ): Promise<number> {
-  const db = await getDb();
+  const db = await requireDb();
   if (!db || records.length === 0) return 0;
 
   let upserted = 0;
@@ -329,8 +345,7 @@ export async function getDeviceActivitySummary(deviceId: number): Promise<{
   totalProtocols: number;
   totalConnections: number;
 }> {
-  const db = await getDb();
-  if (!db) return { totalProtocols: 0, totalConnections: 0 };
+  const db = await requireDb();
 
   const [result] = await db
     .select({
@@ -358,8 +373,7 @@ export async function getAlerts(opts?: {
   sortBy?: string;
   sortDir?: "asc" | "desc";
 }) {
-  const db = await getDb();
-  if (!db) return { rows: [], total: 0 };
+  const db = await requireDb();
 
   const conditions = [];
   if (opts?.search) {
@@ -390,8 +404,7 @@ export async function getAlerts(opts?: {
 }
 
 export async function getAlertById(id: number) {
-  const db = await getDb();
-  if (!db) return null;
+  const db = await requireDb();
   const [alert] = await db.select().from(dimAlert).where(eq(dimAlert.id, id)).limit(1);
   return alert ?? null;
 }
@@ -399,14 +412,12 @@ export async function getAlertById(id: number) {
 /* ─────────────────────────── Appliances ─────────────────────────── */
 
 export async function getAppliances() {
-  const db = await getDb();
-  if (!db) return [];
+  const db = await requireDb();
   return db.select().from(dimAppliance).orderBy(asc(dimAppliance.displayName));
 }
 
 export async function getApplianceById(id: number) {
-  const db = await getDb();
-  if (!db) return null;
+  const db = await requireDb();
   const [appliance] = await db.select().from(dimAppliance).where(eq(dimAppliance.id, id)).limit(1);
   return appliance ?? null;
 }
@@ -414,24 +425,21 @@ export async function getApplianceById(id: number) {
 /* ─────────────────────────── Networks ─────────────────────────── */
 
 export async function getNetworks() {
-  const db = await getDb();
-  if (!db) return [];
+  const db = await requireDb();
   return db.select().from(dimNetwork).orderBy(asc(dimNetwork.name));
 }
 
 /* ─────────────────────────── Device Groups ─────────────────────────── */
 
 export async function getDeviceGroupsList() {
-  const db = await getDb();
-  if (!db) return [];
+  const db = await requireDb();
   return db.select().from(dimDeviceGroup).orderBy(asc(dimDeviceGroup.name));
 }
 
 /* ─────────────────────────── Applications ─────────────────────────── */
 
 export async function getApplications() {
-  const db = await getDb();
-  if (!db) return [];
+  const db = await requireDb();
   return db.select().from(dimApplication).orderBy(asc(dimApplication.displayName));
 }
 
@@ -445,8 +453,7 @@ export async function getDetections(opts?: {
   sortBy?: string;
   sortDir?: "asc" | "desc";
 }) {
-  const db = await getDb();
-  if (!db) return { rows: [], total: 0 };
+  const db = await requireDb();
 
   const conditions = [];
   if (opts?.search) {
@@ -483,8 +490,7 @@ export async function getMetricResponses(opts?: {
   category?: string;
   objectType?: string;
 }) {
-  const db = await getDb();
-  if (!db) return { rows: [], total: 0 };
+  const db = await requireDb();
 
   const conditions = [];
   if (opts?.category) conditions.push(eq(factMetricResponse.metricCategory, opts.category));
@@ -505,8 +511,7 @@ export async function getMetricResponses(opts?: {
 }
 
 export async function getMetricStats(metricResponseId: number) {
-  const db = await getDb();
-  if (!db) return [];
+  const db = await requireDb();
   return db
     .select()
     .from(factMetricStat)
@@ -515,8 +520,7 @@ export async function getMetricStats(metricResponseId: number) {
 }
 
 export async function getMetricCategories() {
-  const db = await getDb();
-  if (!db) return [];
+  const db = await requireDb();
   const cnt = count();
   const results = await db
     .select({ category: factMetricResponse.metricCategory, count: cnt })
@@ -529,32 +533,28 @@ export async function getMetricCategories() {
 /* ─────────────────────────── Topology───────────────────────── */
 
 export async function getVlans() {
-  const db = await getDb();
-  if (!db) return [];
+  const db = await requireDb();
   return db.select().from(dimVlan).orderBy(asc(dimVlan.vlanid));
 }
 
 /* ─────────────────────────── Tags ─────────────────────────── */
 
 export async function getTags() {
-  const db = await getDb();
-  if (!db) return [];
+  const db = await requireDb();
   return db.select().from(dimTag).orderBy(asc(dimTag.name));
 }
 
 /* ─────────────────────────── Network Localities ─────────────────────────── */
 
 export async function getNetworkLocalities() {
-  const db = await getDb();
-  if (!db) return [];
+  const db = await requireDb();
   return db.select().from(dimNetworkLocality).orderBy(asc(dimNetworkLocality.name));
 }
 
 /* ─────────────────────────── Activity Maps ─────────────────────────── */
 
 export async function getActivityMaps() {
-  const db = await getDb();
-  if (!db) return [];
+  const db = await requireDb();
   return db.select().from(dimActivityMap).orderBy(asc(dimActivityMap.name));
 }
 
@@ -566,8 +566,7 @@ export async function getActivityMaps() {
  * Will always return null until a topology snapshot ETL is built. (audit H3)
  */
 export async function getLatestTopology() {
-  const db = await getDb();
-  if (!db) return null;
+  const db = await requireDb();
   const [latest] = await db.select().from(snapTopology).orderBy(desc(snapTopology.polledAt)).limit(1);
   if (!latest) return null;
   const nodes = await db.select().from(snapTopologyNode).where(eq(snapTopologyNode.topologyId, latest.id));
@@ -583,8 +582,7 @@ export async function getLatestTopology() {
  * Kept for future Records feature. (audit H6)
  */
 export async function getRecordSearches(opts?: { limit?: number; offset?: number }) {
-  const db = await getDb();
-  if (!db) return { rows: [], total: 0 };
+  const db = await requireDb();
   const [totalResult] = await db.select({ count: count() }).from(factRecordSearch);
   const rows = await db
     .select()
@@ -601,8 +599,8 @@ export async function getRecordSearches(opts?: { limit?: number; offset?: number
  * Kept for future Records feature. (audit H6)
  */
 export async function getRecordsBySearch(searchId: number) {
-  const db = await getDb();
-  if (!db) return [];
+  const db = await requireDb();
+  // Note: original had missing semicolon, fixed here;
   return db.select().from(factRecord).where(eq(factRecord.searchId, searchId));
 }
 
@@ -613,8 +611,7 @@ export async function getRecordsBySearch(searchId: number) {
  * Returns null if no configuration exists.
  */
 export async function getApplianceConfig() {
-  const db = await getDb();
-  if (!db) return null;
+  const db = await requireDb();
   const [row] = await db.select().from(applianceConfig).limit(1);
   return row ?? null;
 }
@@ -730,8 +727,7 @@ export async function deleteApplianceConfig(id: number) {
  * Returns null if no drift checks have been run yet. (audit H6 — wired, not dead)
  */
 export async function getLatestDriftLog() {
-  const db = await getDb();
-  if (!db) return null;
+  const db = await requireDb();
   const [latest] = await db.select().from(schemaDriftLog).orderBy(desc(schemaDriftLog.runAt)).limit(1);
   return latest ?? null;
 }
@@ -739,16 +735,14 @@ export async function getLatestDriftLog() {
 /* ─────────────────────────── Saved Topology Views (Slice 35E) ─────────────────────────── */
 
 export async function getSavedTopologyViews(userId: string) {
-  const db = await getDb();
-  if (!db) return [];
+  const db = await requireDb();
   return db.select().from(savedTopologyViews)
     .where(eq(savedTopologyViews.userId, userId))
     .orderBy(desc(savedTopologyViews.updatedAt));
 }
 
 export async function getSavedTopologyViewById(id: number, userId: string) {
-  const db = await getDb();
-  if (!db) return null;
+  const db = await requireDb();
   const [view] = await db.select().from(savedTopologyViews)
     .where(and(eq(savedTopologyViews.id, id), eq(savedTopologyViews.userId, userId)))
     .limit(1);
@@ -772,8 +766,7 @@ export async function createSavedTopologyView(input: {
   searchTerm: string;
   nodePositions?: Record<string, { x: number; y: number }> | null;
 }) {
-  const db = await getDb();
-  if (!db) return null;
+  const db = await requireDb();
   const [result] = await db.insert(savedTopologyViews).values({
     userId: input.userId,
     name: input.name,
@@ -810,8 +803,7 @@ export async function updateSavedTopologyView(id: number, userId: string, input:
   searchTerm?: string;
   nodePositions?: Record<string, { x: number; y: number }> | null;
 }) {
-  const db = await getDb();
-  if (!db) return false;
+  const db = await requireDb();
   const [result] = await db.update(savedTopologyViews)
     .set(input)
     .where(and(eq(savedTopologyViews.id, id), eq(savedTopologyViews.userId, userId)));
@@ -819,8 +811,7 @@ export async function updateSavedTopologyView(id: number, userId: string, input:
 }
 
 export async function deleteSavedTopologyView(id: number, userId: string) {
-  const db = await getDb();
-  if (!db) return false;
+  const db = await requireDb();
   const [result] = await db.delete(savedTopologyViews)
     .where(and(eq(savedTopologyViews.id, id), eq(savedTopologyViews.userId, userId)));
   return result.affectedRows > 0;

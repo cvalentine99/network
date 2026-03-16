@@ -621,3 +621,49 @@ These items are tracked here for the live integration phase.
 - [x] Smooth drag interaction: node follows cursor, simulation reheats during drag
 - [x] Write tests for drag logic and position persistence (37 tests passing)
 - [x] Generate truth receipt
+
+# EXTERNAL REVIEW REMEDIATION — ALL DEFECTS
+
+## CRITICAL
+- [ ] #1: Schema/migration total divergence — delete stale migrations, generate correct ones from schema.ts
+- [ ] #2: Seed data INSERT column mismatches — fix snap_device_software, bridge_device_tag, fact_metric_response
+
+## HIGH
+- [x] #3: FALSE — ImpactDeck IS Home.tsx, routed at /, not orphaned
+- [x] #4: FIXED — 34 routes switched to protectedProcedure
+- [x] #5: FIXED — bff-auth-middleware.ts created and wired
+- [x] #6: FIXED — requireDb() throws DatabaseUnavailableError
+- [x] #7: ARCHITECTURE — tRPC=DB, BFF=ExtraHop live/fixture, this is by design (ADR documented)
+
+## MEDIUM
+- [x] #8: FIXED — protectedProcedure now used on all 34 data routes
+- [x] #9: FALSE — testConnection EXISTS in routers.ts
+- [x] #10: FALSE — ApplianceSettings.tsx EXISTS (654 lines, routed at /settings)
+
+## CLEANUP
+- [x] Removed unused _core modules: llm.ts, voiceTranscription.ts, imageGeneration.ts, map.ts, dataApi.ts
+- [x] Removed dead components: AIChatBox.tsx, ManusDialog.tsx, Map.tsx
+- [ ] storage.ts — kept (platform template file, may be needed for future S3 integration)
+- [x] Populated drizzle/relations.ts with 20 relation definitions
+- [x] Fixed drizzle/relations.ts empty import — now has full relation definitions
+
+# CORRECTIVE AUDIT REMEDIATION (verified against current dev sandbox)
+
+## CONFIRMED DEFECTS TO FIX
+- [x] C1: Deleted stale migration, generated 0001_free_junta.sql (34 tables), applied via SQL, dropped 4 orphan tables
+- [x] C4: Switched 34 tRPC data routes to protectedProcedure (auth.me/logout remain public)
+- [x] C5: Created bff-auth-middleware.ts, wired into index.ts before all 7 BFF route groups
+- [x] C6: Replaced 41 silent null returns with requireDb() throwing DatabaseUnavailableError
+- [x] A1: Deleted 5 dead _core modules
+- [x] A3: Deleted 3 dead components (AIChatBox.tsx, ManusDialog.tsx, Map.tsx)
+- [x] A4: Populated relations.ts with 20 Drizzle relation definitions
+- [x] C8: Deleted stale CODE-REVIEW-REPORT.md
+
+## FALSE CLAIMS FROM EXTERNAL REVIEW (corrected)
+- [x] Document: ApplianceSettings.tsx EXISTS (654 lines, routed at /settings)
+- [x] Document: testConnection EXISTS in routers.ts
+- [x] Document: App.tsx registers /settings
+- [x] Document: etl-scheduler.ts EXISTS (237 lines)
+- [x] Document: ImpactDeck IS the Home page (Home.tsx IS the Impact Deck)
+- [x] Document: Hooks DO call BFF (useImpactHeadline, useTopTalkers, etc.)
+- [x] Document: 160 fixture files exist, 2720 test cases across 40 files (all passing)

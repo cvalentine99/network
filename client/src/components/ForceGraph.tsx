@@ -48,6 +48,7 @@ import {
   type SimulationLinkDatum,
 } from 'd3-force';
 import { select } from 'd3-selection';
+import 'd3-transition'; // Side-effect: extends d3-selection with .transition()
 import { zoom as d3Zoom, zoomIdentity, type ZoomBehavior } from 'd3-zoom';
 import { drag as d3Drag } from 'd3-drag';
 import type {

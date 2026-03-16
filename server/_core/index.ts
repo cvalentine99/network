@@ -15,6 +15,7 @@ import topologyRouter from "../routes/topology";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { startEtlScheduler } from "../etl-scheduler";
+import { requireBffAuth } from "../bff-auth-middleware";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -44,6 +45,8 @@ async function startServer() {
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
   // BFF routes (browser → BFF → ExtraHop; browser never contacts ExtraHop directly)
+  // All BFF routes require authentication (audit C5)
+  app.use('/api/bff', requireBffAuth);
   app.use('/api/bff/health', healthRouter);
   app.use('/api/bff/impact', impactRouter);
   app.use('/api/bff/packets', packetsRouter);

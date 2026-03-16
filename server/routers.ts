@@ -1,7 +1,7 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, router } from "./_core/trpc";
+import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
 import { clearConfigCache } from "./extrahop-client";
@@ -9,23 +9,23 @@ import { clearConfigCache } from "./extrahop-client";
 /* ─────────────────────────── Dashboard Overview ─────────────────────────── */
 
 const dashboardRouter = router({
-  stats: publicProcedure.query(async () => {
+  stats: protectedProcedure.query(async () => {
     return db.getDashboardStats();
   }),
 
-  alertsBySeverity: publicProcedure.query(async () => {
+  alertsBySeverity: protectedProcedure.query(async () => {
     return db.getAlertsBySeverity();
   }),
 
-  devicesByClass: publicProcedure.query(async () => {
+  devicesByClass: protectedProcedure.query(async () => {
     return db.getDevicesByClass();
   }),
 
-  devicesByRole: publicProcedure.query(async () => {
+  devicesByRole: protectedProcedure.query(async () => {
     return db.getDevicesByRole();
   }),
 
-  devicesByAnalysis: publicProcedure.query(async () => {
+  devicesByAnalysis: protectedProcedure.query(async () => {
     return db.getDevicesByAnalysis();
   }),
 });
@@ -33,7 +33,7 @@ const dashboardRouter = router({
 /* ─────────────────────────── Devices ─────────────────────────── */
 
 const devicesRouter = router({
-  list: publicProcedure
+  list: protectedProcedure
     .input(
       z.object({
         limit: z.number().min(1).max(200).optional().default(50),
@@ -52,7 +52,7 @@ const devicesRouter = router({
       return db.getDevices(input ?? {});
     }),
 
-  byId: publicProcedure
+  byId: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ input }) => {
       const device = await db.getDeviceById(input.id);
@@ -72,7 +72,7 @@ const devicesRouter = router({
 /* ─────────────────────────── Alerts ─────────────────────────── */
 
 const alertsRouter = router({
-  list: publicProcedure
+  list: protectedProcedure
     .input(
       z.object({
         limit: z.number().min(1).max(200).optional().default(50),
@@ -89,7 +89,7 @@ const alertsRouter = router({
       return db.getAlerts(input ?? {});
     }),
 
-  byId: publicProcedure
+  byId: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ input }) => {
       return db.getAlertById(input.id);
@@ -99,11 +99,11 @@ const alertsRouter = router({
 /* ─────────────────────────── Appliances ─────────────────────────── */
 
 const appliancesRouter = router({
-  list: publicProcedure.query(async () => {
+  list: protectedProcedure.query(async () => {
     return db.getAppliances();
   }),
 
-  byId: publicProcedure
+  byId: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ input }) => {
       return db.getApplianceById(input.id);
@@ -113,7 +113,7 @@ const appliancesRouter = router({
 /* ─────────────────────────── Networks ─────────────────────────── */
 
 const networksRouter = router({
-  list: publicProcedure.query(async () => {
+  list: protectedProcedure.query(async () => {
     return db.getNetworks();
   }),
 });
@@ -121,7 +121,7 @@ const networksRouter = router({
 /* ─────────────────────────── Detections ─────────────────────────── */
 
 const detectionsRouter = router({
-  list: publicProcedure
+  list: protectedProcedure
     .input(
       z.object({
         limit: z.number().min(1).max(200).optional().default(50),
@@ -140,7 +140,7 @@ const detectionsRouter = router({
 /* ─────────────────────────── Metrics ─────────────────────────── */
 
 const metricsRouter = router({
-  responses: publicProcedure
+  responses: protectedProcedure
     .input(
       z.object({
         limit: z.number().min(1).max(200).optional().default(50),
@@ -153,13 +153,13 @@ const metricsRouter = router({
       return db.getMetricResponses(input ?? {});
     }),
 
-  stats: publicProcedure
+  stats: protectedProcedure
     .input(z.object({ metricResponseId: z.number() }))
     .query(async ({ input }) => {
       return db.getMetricStats(input.metricResponseId);
     }),
 
-  categories: publicProcedure.query(async () => {
+  categories: protectedProcedure.query(async () => {
     return db.getMetricCategories();
   }),
 });
@@ -177,7 +177,7 @@ const topologyRouter = router({
    * The actual live topology is served by POST /api/bff/topology/query
    * which calls ExtraHop APIs directly (not from snapshot tables).
    */
-  latest: publicProcedure.query(async () => {
+  latest: protectedProcedure.query(async () => {
     return db.getLatestTopology();
   }),
 });
@@ -188,17 +188,17 @@ const topologyRouter = router({
 const LOCAL_USER_ID = 'local';
 
 const savedViewsRouter = router({
-  list: publicProcedure.query(async () => {
+  list: protectedProcedure.query(async () => {
     return db.getSavedTopologyViews(LOCAL_USER_ID);
   }),
 
-  get: publicProcedure
+  get: protectedProcedure
     .input(z.object({ id: z.number().int().positive() }))
     .query(async ({ input }) => {
       return db.getSavedTopologyViewById(input.id, LOCAL_USER_ID);
     }),
 
-  create: publicProcedure
+  create: protectedProcedure
     .input(z.object({
       name: z.string().min(1).max(100),
       viewMode: z.string().default('constellation'),
@@ -223,7 +223,7 @@ const savedViewsRouter = router({
       return { id };
     }),
 
-  update: publicProcedure
+  update: protectedProcedure
     .input(z.object({
       id: z.number().int().positive(),
       name: z.string().min(1).max(100).optional(),
@@ -247,7 +247,7 @@ const savedViewsRouter = router({
       return { success: ok };
     }),
 
-  delete: publicProcedure
+  delete: protectedProcedure
     .input(z.object({ id: z.number().int().positive() }))
     .mutation(async ({ input }) => {
       const ok = await db.deleteSavedTopologyView(input.id, LOCAL_USER_ID);
@@ -258,27 +258,27 @@ const savedViewsRouter = router({
 /* ─────────────────────────── Reference Data ─────────────────────────── */
 
 const referenceRouter = router({
-  deviceGroups: publicProcedure.query(async () => {
+  deviceGroups: protectedProcedure.query(async () => {
     return db.getDeviceGroupsList();
   }),
 
-  applications: publicProcedure.query(async () => {
+  applications: protectedProcedure.query(async () => {
     return db.getApplications();
   }),
 
-  vlans: publicProcedure.query(async () => {
+  vlans: protectedProcedure.query(async () => {
     return db.getVlans();
   }),
 
-  tags: publicProcedure.query(async () => {
+  tags: protectedProcedure.query(async () => {
     return db.getTags();
   }),
 
-  networkLocalities: publicProcedure.query(async () => {
+  networkLocalities: protectedProcedure.query(async () => {
     return db.getNetworkLocalities();
   }),
 
-  activityMaps: publicProcedure.query(async () => {
+  activityMaps: protectedProcedure.query(async () => {
     return db.getActivityMaps();
   }),
 });
@@ -286,7 +286,7 @@ const referenceRouter = router({
 /* ─────────────────────────── Schema Health ─────────────────────────── */
 
 const schemaRouter = router({
-  latestDrift: publicProcedure.query(async () => {
+  latestDrift: protectedProcedure.query(async () => {
     return db.getLatestDriftLog();
   }),
 });
@@ -297,7 +297,7 @@ import { ApplianceConfigInputSchema, maskApiKey } from '../shared/appliance-conf
 
 const applianceConfigRouter = router({
   /** Get current appliance config (API key masked) */
-  get: publicProcedure.query(async () => {
+  get: protectedProcedure.query(async () => {
     const row = await db.getApplianceConfig();
     if (!row) return null;
     return {
@@ -317,7 +317,7 @@ const applianceConfigRouter = router({
   }),
 
   /** Save (upsert) appliance config */
-  save: publicProcedure
+  save: protectedProcedure
     .input(ApplianceConfigInputSchema)
     .mutation(async ({ input }) => {
       const row = await db.upsertApplianceConfig(input);
@@ -341,7 +341,7 @@ const applianceConfigRouter = router({
     }),
 
   /** Test connection to the configured appliance */
-  testConnection: publicProcedure.mutation(async () => {
+  testConnection: protectedProcedure.mutation(async () => {
     // Use decrypted config — testConnection needs the real API key (audit C3)
     const config = await db.getApplianceConfigDecrypted();
     if (!config) {
@@ -416,7 +416,7 @@ const applianceConfigRouter = router({
   }),
 
   /** Delete appliance config (reset to unconfigured) */
-  delete: publicProcedure
+  delete: protectedProcedure
     .input(z.object({ id: z.number().int().positive() }))
     .mutation(async ({ input }) => {
       await db.deleteApplianceConfig(input.id);

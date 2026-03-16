@@ -8,9 +8,20 @@ import type { TrpcContext } from "./_core/context";
  * Since there's no mock data, queries return empty results from the real DB.
  */
 
-function createPublicContext(): TrpcContext {
+/** Authenticated test context — routes now use protectedProcedure (audit C4) */
+function createAuthContext(): TrpcContext {
   return {
-    user: null,
+    user: {
+      id: 1,
+      openId: 'test-open-id',
+      name: 'Test User',
+      email: 'test@example.com',
+      loginMethod: 'password',
+      role: 'admin',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      lastSignedIn: new Date(),
+    },
     req: {
       protocol: "https",
       headers: {},
@@ -23,7 +34,7 @@ function createPublicContext(): TrpcContext {
 
 describe("dashboard procedures", () => {
   it("dashboard.stats returns numeric counts", async () => {
-    const ctx = createPublicContext();
+    const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
     const result = await caller.dashboard.stats();
     expect(result).toHaveProperty("totalDevices");
@@ -39,21 +50,21 @@ describe("dashboard procedures", () => {
   });
 
   it("dashboard.alertsBySeverity returns severity breakdown array", async () => {
-    const ctx = createPublicContext();
+    const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
     const result = await caller.dashboard.alertsBySeverity();
     expect(Array.isArray(result)).toBe(true);
   });
 
   it("dashboard.devicesByClass returns class breakdown array", async () => {
-    const ctx = createPublicContext();
+    const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
     const result = await caller.dashboard.devicesByClass();
     expect(Array.isArray(result)).toBe(true);
   });
 
   it("dashboard.devicesByRole returns role breakdown array", async () => {
-    const ctx = createPublicContext();
+    const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
     const result = await caller.dashboard.devicesByRole();
     expect(Array.isArray(result)).toBe(true);
@@ -62,7 +73,7 @@ describe("dashboard procedures", () => {
 
 describe("devices procedures", () => {
   it("devices.list returns rows and total with default input", async () => {
-    const ctx = createPublicContext();
+    const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
     const result = await caller.devices.list();
     expect(result).toHaveProperty("rows");
@@ -72,7 +83,7 @@ describe("devices procedures", () => {
   });
 
   it("devices.list accepts filter parameters", async () => {
-    const ctx = createPublicContext();
+    const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
     const result = await caller.devices.list({
       limit: 10,
@@ -87,7 +98,7 @@ describe("devices procedures", () => {
   });
 
   it("devices.byId returns null for non-existent device", async () => {
-    const ctx = createPublicContext();
+    const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
     const result = await caller.devices.byId({ id: 999999 });
     expect(result).toBeNull();
@@ -96,7 +107,7 @@ describe("devices procedures", () => {
 
 describe("alerts procedures", () => {
   it("alerts.list returns rows and total", async () => {
-    const ctx = createPublicContext();
+    const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
     const result = await caller.alerts.list();
     expect(result).toHaveProperty("rows");
@@ -105,7 +116,7 @@ describe("alerts procedures", () => {
   });
 
   it("alerts.list accepts severity filter", async () => {
-    const ctx = createPublicContext();
+    const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
     const result = await caller.alerts.list({
       severity: 7,
@@ -118,7 +129,7 @@ describe("alerts procedures", () => {
 
 describe("networks procedures", () => {
   it("networks.list returns an array", async () => {
-    const ctx = createPublicContext();
+    const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
     const result = await caller.networks.list();
     expect(Array.isArray(result)).toBe(true);
@@ -127,7 +138,7 @@ describe("networks procedures", () => {
 
 describe("appliances procedures", () => {
   it("appliances.list returns an array", async () => {
-    const ctx = createPublicContext();
+    const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
     const result = await caller.appliances.list();
     expect(Array.isArray(result)).toBe(true);
@@ -136,7 +147,7 @@ describe("appliances procedures", () => {
 
 describe("detections procedures", () => {
   it("detections.list returns rows and total", async () => {
-    const ctx = createPublicContext();
+    const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
     const result = await caller.detections.list();
     expect(result).toHaveProperty("rows");
@@ -147,7 +158,7 @@ describe("detections procedures", () => {
 
 describe("metrics procedures", () => {
   it("metrics.responses returns rows and total", async () => {
-    const ctx = createPublicContext();
+    const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
     const result = await caller.metrics.responses();
     expect(result).toHaveProperty("rows");
@@ -155,7 +166,7 @@ describe("metrics procedures", () => {
   });
 
   it("metrics.categories returns an array", async () => {
-    const ctx = createPublicContext();
+    const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
     const result = await caller.metrics.categories();
     expect(Array.isArray(result)).toBe(true);
@@ -164,28 +175,28 @@ describe("metrics procedures", () => {
 
 describe("reference data procedures", () => {
   it("reference.deviceGroups returns an array", async () => {
-    const ctx = createPublicContext();
+    const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
     const result = await caller.reference.deviceGroups();
     expect(Array.isArray(result)).toBe(true);
   });
 
   it("reference.applications returns an array", async () => {
-    const ctx = createPublicContext();
+    const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
     const result = await caller.reference.applications();
     expect(Array.isArray(result)).toBe(true);
   });
 
   it("reference.vlans returns an array", async () => {
-    const ctx = createPublicContext();
+    const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
     const result = await caller.reference.vlans();
     expect(Array.isArray(result)).toBe(true);
   });
 
   it("reference.tags returns an array", async () => {
-    const ctx = createPublicContext();
+    const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
     const result = await caller.reference.tags();
     expect(Array.isArray(result)).toBe(true);
