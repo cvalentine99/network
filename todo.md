@@ -804,12 +804,16 @@ These items are tracked here for the live integration phase.
 
 # BAREMETAL DOCKER DEPLOYMENT PACKAGE
 
-- [ ] Audit project structure, package.json scripts, and existing deploy/ directory
-- [ ] Create multi-stage Dockerfile (build + production)
-- [ ] Create docker-compose.yml (app + MySQL + Nginx)
-- [ ] Create .env.template with all required environment variables
-- [ ] Create deploy.sh bootstrap script (one-command deploy)
-- [ ] Create Nginx reverse proxy config
-- [ ] Create MySQL schema init script (from deploy/full-schema.sql)
-- [ ] Create DEPLOY.md with step-by-step instructions
-- [ ] Package into downloadable archive
+- [x] Audit project structure, package.json scripts, and existing deploy/ directory
+- [x] Create multi-stage Dockerfile (build + production) — deploy/docker/Dockerfile
+- [x] Create docker-compose.yml (app + MySQL + Nginx) — deploy/docker/docker-compose.yml
+- [x] Create .env.template with all required environment variables — deploy/env.template (no stale Manus OAuth URLs)
+- [x] Create deploy.sh bootstrap script (one-command deploy) — deploy/docker/up.sh + deploy/bootstrap.sh
+- [x] Create Nginx reverse proxy config — deploy/docker/nginx.conf (rate limiting + security headers + SSE)
+- [x] Create MySQL schema init script — deploy/docker/mysql-init/01-schema.sql (35 tables + 16 views)
+- [x] Create DEPLOYMENT.md with step-by-step instructions (3 deployment options, env var reference, ExtraHop config, troubleshooting)
+- [x] Package into downloadable archive — 801K, 489 files, zero stale OAuth URLs
+- [x] Removed stale deploy/DEPLOY.md (superseded by DEPLOYMENT.md)
+- [x] Removed stale deploy/.dockerignore (root .dockerignore is authoritative)
+- [x] Fixed table count in start-local.sh (39 → 35)
+- [x] Cleaned Manus OAuth references from env.template and DEPLOYMENT.md

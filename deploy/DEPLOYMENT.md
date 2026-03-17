@@ -104,7 +104,7 @@ cp deploy/env.example .env
 nano .env
 ```
 
-For Docker Compose, you can use the default `DATABASE_URL` since the compose file overrides it with the internal service connection. However, you must set `JWT_SECRET` and any Manus OAuth variables you need.
+For Docker Compose, you can use the default `DATABASE_URL` since the compose file overrides it with the internal service connection. The `docker-compose.yml` already sets lab-appropriate defaults for all variables. You only need to customize `JWT_SECRET` (for production) and ExtraHop appliance settings.
 
 You may also set these Docker-specific variables in `.env`:
 
@@ -245,15 +245,14 @@ The following table documents every environment variable the application reads. 
 | `NODE_ENV` | Yes | — | Must be `production` for deployed instances |
 | `DATABASE_URL` | Yes | — | MySQL connection string: `mysql://user:pass@host:3306/db` |
 | `JWT_SECRET` | Yes | — | Session cookie signing secret (min 32 random chars) |
-| `VITE_APP_ID` | Yes | — | Manus OAuth application ID |
-| `OAUTH_SERVER_URL` | Yes | `https://api.manus.im` | Manus OAuth backend base URL |
-| `VITE_OAUTH_PORTAL_URL` | Yes | `https://id.manus.im` | Manus login portal URL (frontend) |
-| `OWNER_OPEN_ID` | No | — | Owner's Manus OpenID for admin checks |
-| `OWNER_NAME` | No | — | Owner display name |
-| `BUILT_IN_FORGE_API_URL` | No | — | Server-side Forge API URL |
-| `BUILT_IN_FORGE_API_KEY` | No | — | Server-side Forge API bearer token |
-| `VITE_FRONTEND_FORGE_API_URL` | No | — | Frontend Forge API URL |
-| `VITE_FRONTEND_FORGE_API_KEY` | No | — | Frontend Forge API bearer token |
+| `VITE_APP_ID` | No | `local-lab` | Application identifier (set to any string for lab deploy) |
+| `OAUTH_SERVER_URL` | No | (empty) | OAuth server URL (leave empty for lab/local deploy) |
+| `OWNER_OPEN_ID` | No | `local-lab-owner` | Owner identifier for admin checks |
+| `OWNER_NAME` | No | `Lab Admin` | Owner display name |
+| `BUILT_IN_FORGE_API_URL` | No | (empty) | Server-side Forge API URL (unused in lab deploy) |
+| `BUILT_IN_FORGE_API_KEY` | No | (empty) | Server-side Forge API bearer token (unused in lab deploy) |
+| `VITE_FRONTEND_FORGE_API_URL` | No | (empty) | Frontend Forge API URL (unused in lab deploy) |
+| `VITE_FRONTEND_FORGE_API_KEY` | No | (empty) | Frontend Forge API bearer token (unused in lab deploy) |
 | `EH_HOST` | No | — | ExtraHop appliance hostname (overrides DB config) |
 | `EH_API_KEY` | No | — | ExtraHop API key (overrides DB config) |
 | `ETL_INTERVAL_MS` | No | `300000` | ETL polling interval in milliseconds |
