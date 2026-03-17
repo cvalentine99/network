@@ -87,31 +87,44 @@ export async function runEtlCycle(): Promise<{
   const polledAt = new Date();
 
   // Step 2: For each device, fetch activity and upsert
-  // Process sequentially to avoid overwhelming the ExtraHop appliance
-  for (const deviceId of deviceIds) {
-    try {
-      const activityResponse = await ehRequest<any[]>({
-        method: 'GET',
-        path: `/api/v1/devices/${deviceId}/activity`,
-        cacheTtlMs: 0, // No cache for ETL — we want fresh data
-        timeoutMs: 10_000,
-      });
+  // Process in parallel batches to improve throughput without overwhelming
+  // the ExtraHop appliance. Configurable via ETL_BATCH_SIZE env var.
+  const BATCH_SIZE = Math.max(1, parseInt(process.env.ETL_BATCH_SIZE || '5', 10));
 
-      const rawActivity = Array.isArray(activityResponse.data) ? activityResponse.data : [];
-      const normalizedRecords = normalizeDeviceActivity(rawActivity, deviceId, polledAt);
+  for (let i = 0; i < deviceIds.length; i += BATCH_SIZE) {
+    const batch = deviceIds.slice(i, i + BATCH_SIZE);
+    const results = await Promise.allSettled(
+      batch.map(async (deviceId) => {
+        const activityResponse = await ehRequest<any[]>({
+          method: 'GET',
+          path: `/api/v1/devices/${deviceId}/activity`,
+          cacheTtlMs: 0, // No cache for ETL — we want fresh data
+          timeoutMs: 10_000,
+        });
 
-      if (normalizedRecords.length > 0) {
-        const upserted = await upsertDeviceActivity(normalizedRecords);
-        totalRecordsUpserted += upserted;
+        const rawActivity = Array.isArray(activityResponse.data) ? activityResponse.data : [];
+        const normalizedRecords = normalizeDeviceActivity(rawActivity, deviceId, polledAt);
+
+        if (normalizedRecords.length > 0) {
+          const upserted = await upsertDeviceActivity(normalizedRecords);
+          return { deviceId, upserted };
+        }
+        return { deviceId, upserted: 0 };
+      })
+    );
+
+    for (let j = 0; j < results.length; j++) {
+      const result = results[j];
+      if (result.status === 'fulfilled') {
+        devicesSucceeded++;
+        totalRecordsUpserted += result.value.upserted;
+      } else {
+        // Per-device failure isolation — log and continue
+        errors.push({
+          deviceId: batch[j],
+          error: result.reason?.message || 'Unknown error',
+        });
       }
-
-      devicesSucceeded++;
-    } catch (err: any) {
-      // Per-device failure isolation — log and continue
-      errors.push({
-        deviceId,
-        error: err.message || 'Unknown error',
-      });
     }
   }
 

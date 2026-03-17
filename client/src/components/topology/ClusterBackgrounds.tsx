@@ -2,6 +2,7 @@
  * Topology ForceGraph — Cluster background regions (dashed circles + labels)
  */
 
+import { memo } from 'react';
 import type { SimNode } from './types';
 import type { TopologyPayload } from '../../../../shared/topology-types';
 import { CLUSTER_COLORS } from './constants';
@@ -12,7 +13,7 @@ interface ClusterBackgroundsProps {
   collapsedClusters: Set<string>;
 }
 
-export default function ClusterBackgrounds({
+function ClusterBackgrounds({
   clusters,
   nodes,
   collapsedClusters,
@@ -66,3 +67,5 @@ export default function ClusterBackgrounds({
     </>
   );
 }
+
+export default memo(ClusterBackgrounds);

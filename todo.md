@@ -817,3 +817,16 @@ These items are tracked here for the live integration phase.
 - [x] Removed stale deploy/.dockerignore (root .dockerignore is authoritative)
 - [x] Fixed table count in start-local.sh (39 → 35)
 - [x] Cleaned Manus OAuth references from env.template and DEPLOYMENT.md
+
+# CODE REVIEW — TOP 10 RECOMMENDATIONS
+
+- [x] Rec 1: Validate JWT_SECRET at startup, change sameSite to "lax", add helmet middleware (env.ts, cookies.ts, index.ts)
+- [x] Rec 2: Constrain sortBy to enum, apply rate limiter (dev=10k/min, prod=120+60/min) (routers.ts, index.ts)
+- [x] Rec 3: Unify ExtraHop clients — already consolidated. ehClient.ts does not exist; all imports use extrahop-client.ts
+- [x] Rec 4: React.memo on EdgeRenderer, NodeRenderer, ClusterBackgrounds, MinimapOverlay; throttle simulation ticks via rAF (ForceGraph.tsx, renderers)
+- [x] Rec 5: React.lazy() code splitting for 8 heavy pages + Vite manualChunks for vendor splitting (App.tsx, vite.config.ts)
+- [x] Rec 6: Decompose Topology.tsx from 1505→590 lines; 6 sub-components extracted (DetailPanel, SubnetMapView, CriticalPathPanel, AnomalySummaryPanel, ExportMenu, SavedViewsPanel)
+- [x] Rec 7: Extract generic useBffQuery hook with AbortController, error handling, caching, retry (useBffQuery.ts)
+- [x] Rec 8: Add 10 database indexes for high-traffic query patterns (02-indexes.sql)
+- [x] Rec 9: Fix all 2749 tests — updated source-string assertions for React.lazy + decomposition, fixed rate limiter 429s in test suite
+- [x] Rec 10: Parallelize ETL with batched concurrent requests (ETL_BATCH_SIZE=5, Promise.allSettled) (etl-scheduler.ts)

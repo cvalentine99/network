@@ -75,7 +75,8 @@ describe('Slice 20 — Route Registration', () => {
 
   it('App.tsx imports Correlation page component', () => {
     const src = readFileSync(APP_TSX, 'utf-8');
-    expect(src).toMatch(/import\s+Correlation\s+from/);
+    // Accepts both direct import and React.lazy import (Rec 5 code splitting)
+    expect(src).toMatch(/(?:import\s+Correlation\s+from|const\s+Correlation\s*=\s*lazy)/);
   });
 
   it('/correlation route uses Correlation component', () => {

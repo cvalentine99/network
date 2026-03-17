@@ -2,7 +2,7 @@
  * Topology ForceGraph — Minimap overlay (canvas-based inset)
  */
 
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback, memo } from 'react';
 import { select } from 'd3-selection';
 import { zoomIdentity, type ZoomBehavior } from 'd3-zoom';
 import type { SimNode, SimLink } from './types';
@@ -20,7 +20,7 @@ interface MinimapOverlayProps {
   zoomBehaviorRef: React.MutableRefObject<ZoomBehavior<SVGSVGElement, unknown> | null>;
 }
 
-export default function MinimapOverlay({
+function MinimapOverlay({
   nodes,
   links,
   selectedNodeId,
@@ -183,3 +183,5 @@ export default function MinimapOverlay({
     </div>
   );
 }
+
+export default memo(MinimapOverlay);

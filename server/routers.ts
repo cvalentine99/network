@@ -60,7 +60,7 @@ const devicesRouter = router({
         analysis: z.string().optional(),
         critical: z.boolean().optional(),
         onWatchlist: z.boolean().optional(),
-        sortBy: z.string().optional(),
+        sortBy: z.enum(["displayName", "ipaddr4", "deviceClass", "role", "vendor", "analysis", "lastSeenTime", "discoverTime"]).optional(),
         sortDir: z.enum(["asc", "desc"]).optional().default("asc"),
       }).optional()
     )
@@ -97,7 +97,7 @@ const alertsRouter = router({
         severity: z.number().optional(),
         type: z.string().optional(),
         disabled: z.boolean().optional(),
-        sortBy: z.string().optional(),
+        sortBy: z.enum(["name", "severity", "type", "statName"]).optional(),
         sortDir: z.enum(["asc", "desc"]).optional().default("asc"),
       }).optional()
     )
@@ -144,7 +144,7 @@ const detectionsRouter = router({
         offset: z.number().min(0).optional().default(0),
         search: z.string().optional(),
         status: z.string().optional(),
-        sortBy: z.string().optional(),
+        sortBy: z.enum(["title", "riskScore", "status", "startTime", "createTime"]).optional(),
         sortDir: z.enum(["asc", "desc"]).optional().default("desc"),
       }).optional()
     )

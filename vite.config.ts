@@ -32,6 +32,28 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        // Rec 5: Vendor splitting — keep heavy libraries in their own chunks
+        // so they are cached independently of application code.
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('d3-') || id.includes('d3-force') || id.includes('d3-selection') || id.includes('d3-zoom') || id.includes('d3-drag')) {
+              return 'vendor-d3';
+            }
+            if (id.includes('recharts') || id.includes('victory')) {
+              return 'vendor-charts';
+            }
+            if (id.includes('lucide-react')) {
+              return 'vendor-icons';
+            }
+            if (id.includes('react-dom')) {
+              return 'vendor-react';
+            }
+          }
+        },
+      },
+    },
   },
   server: {
     host: true,

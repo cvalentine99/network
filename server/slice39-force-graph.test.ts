@@ -17,7 +17,20 @@ import { TopologyPayloadSchema } from '../shared/topology-validators';
 import type { TopologyPayload, TopologyNode, TopologyEdge } from '../shared/topology-types';
 import { TOPOLOGY_PERFORMANCE, ROLE_DISPLAY } from '../shared/topology-types';
 
-// ─── ForceGraph Source Loader (reads main + sub-modules) ─────────
+// ─── Source Loaders (reads main + sub-modules) ─────────────────────
+// Topology page source now spans Topology.tsx + extracted sub-components
+function readTopologyFullSource(): string {
+  const mainPath = join(process.cwd(), 'client', 'src', 'pages', 'Topology.tsx');
+  const subDir = join(process.cwd(), 'client', 'src', 'components', 'topology');
+  let source = readFileSync(mainPath, 'utf-8');
+  try {
+    const files = readdirSync(subDir).filter(f => f.endsWith('.ts') || f.endsWith('.tsx'));
+    for (const f of files) {
+      source += '\n' + readFileSync(join(subDir, f), 'utf-8');
+    }
+  } catch { /* sub-dir may not exist in older snapshots */ }
+  return source;
+}
 function readForceGraphFullSource(): string {
   const mainPath = join(process.cwd(), 'client', 'src', 'components', 'ForceGraph.tsx');
   const subDir = join(process.cwd(), 'client', 'src', 'components', 'topology');
@@ -819,7 +832,7 @@ describe('Slice 42 — Saved Views Position Integration', () => {
   const schemaSource = readFileSync(join(process.cwd(), 'drizzle', 'schema.ts'), 'utf-8');
   const dbSource = readFileSync(join(process.cwd(), 'server', 'db.ts'), 'utf-8');
   const routersSource = readFileSync(join(process.cwd(), 'server', 'routers.ts'), 'utf-8');
-  const topologySource = readFileSync(join(process.cwd(), 'client', 'src', 'pages', 'Topology.tsx'), 'utf-8');
+  const topologySource = readTopologyFullSource();
   const forceGraphSource = readForceGraphFullSource();
 
   // ─── DB Schema ─────────────────────────────────────────────────
@@ -889,7 +902,7 @@ describe('Slice 42 — Saved Views Position Integration', () => {
 
 describe('Slice 42 — Lock All Toggle', () => {
   const forceGraphSource = readForceGraphFullSource();
-  const topologySource = readFileSync(join(process.cwd(), 'client', 'src', 'pages', 'Topology.tsx'), 'utf-8');
+  const topologySource = readTopologyFullSource();
 
   // ─── ForceGraph handle ────────────────────────────────────────
   it('ForceGraphHandle exposes isLocked boolean', () => {
@@ -949,7 +962,7 @@ describe('Slice 42 — Lock All Toggle', () => {
 });
 
 describe('Slice 42 — JSON Layout Export/Import', () => {
-  const topologySource = readFileSync(join(process.cwd(), 'client', 'src', 'pages', 'Topology.tsx'), 'utf-8');
+  const topologySource = readTopologyFullSource();
 
   // ─── Export ────────────────────────────────────────────────────
   it('ExportMenu accepts getNodePositions prop', () => {
@@ -1027,10 +1040,7 @@ describe('Slice 42 — JSON Layout Export/Import', () => {
 // ═══════════════════════════════════════════════════════════════════
 
 const forceGraphSource43 = readForceGraphFullSource();
-const topologySource43 = readFileSync(
-  join(process.cwd(), 'client', 'src', 'pages', 'Topology.tsx'),
-  'utf-8'
-);
+const topologySource43 = readTopologyFullSource();
 
 // ─── Minimap Tests ───────────────────────────────────────────────
 describe('Slice 43 — Minimap overlay', () => {

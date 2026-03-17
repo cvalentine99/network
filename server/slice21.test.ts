@@ -669,7 +669,8 @@ describe('Slice 21 — Route Registration', () => {
   });
 
   it('Topology component is imported', () => {
-    expect(appTsx).toContain('import Topology from');
+    // Accepts both direct import and React.lazy import (Rec 5 code splitting)
+    expect(appTsx).toMatch(/(?:import Topology from|const Topology\s*=\s*lazy)/);
   });
 
   it('Topology component is used in Route', () => {

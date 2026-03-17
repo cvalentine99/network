@@ -2,6 +2,7 @@
  * Topology ForceGraph — Edge rendering (individual edges, bundles, critical path arrows)
  */
 
+import { memo } from 'react';
 import type { SimNode, SimLink, EdgeBundle, CriticalPathResult } from './types';
 import { ANOMALY_SEVERITY_COLORS } from '../../../../shared/topology-advanced-types';
 import type { EdgeAnomaly } from '../../../../shared/topology-advanced-types';
@@ -30,7 +31,7 @@ interface EdgeRendererProps {
   onMouseLeave: () => void;
 }
 
-export default function EdgeRenderer({
+function EdgeRenderer({
   links,
   nodes,
   shouldBundle,
@@ -204,3 +205,5 @@ export default function EdgeRenderer({
     </>
   );
 }
+
+export default memo(EdgeRenderer);

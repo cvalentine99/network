@@ -2,6 +2,7 @@
  * Topology ForceGraph — Node rendering (regular nodes + super-nodes)
  */
 
+import { memo } from 'react';
 import type { SimNode } from './types';
 import { ROLE_DISPLAY } from '../../../../shared/topology-types';
 import { ANOMALY_SEVERITY_COLORS } from '../../../../shared/topology-advanced-types';
@@ -26,7 +27,7 @@ interface NodeRendererProps {
   onNodeContextMenu: (e: React.MouseEvent, simNode: SimNode) => void;
 }
 
-export default function NodeRenderer({
+function NodeRenderer({
   nodes,
   clusterColorMap,
   getNodeStyle,
@@ -230,3 +231,5 @@ export default function NodeRenderer({
     </g>
   );
 }
+
+export default memo(NodeRenderer);

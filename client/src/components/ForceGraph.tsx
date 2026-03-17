@@ -604,11 +604,31 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
         forceY<SimNode>((d) => clusterCenters.get(d.clusterId)?.y ?? dimensions.height / 2).strength(0.12)
       )
       .alphaDecay(0.02)
-      .velocityDecay(0.3)
-      .on('tick', () => forceRender((v) => v + 1));
+      .velocityDecay(0.3);
+
+    // Throttle simulation ticks to ~30fps via rAF (Rec 4)
+    // Instead of re-rendering on every d3-force tick (can be 60+ fps),
+    // we batch tick updates and only trigger a React render once per animation frame.
+    let rafId: number | null = null;
+    let tickPending = false;
+    sim.on('tick', () => {
+      tickPending = true;
+      if (rafId === null) {
+        rafId = requestAnimationFrame(() => {
+          if (tickPending) {
+            forceRender((v) => v + 1);
+            tickPending = false;
+          }
+          rafId = null;
+        });
+      }
+    });
 
     simulationRef.current = sim;
-    return () => { sim.stop(); };
+    return () => {
+      sim.stop();
+      if (rafId !== null) cancelAnimationFrame(rafId);
+    };
   }, [effectivePayload, dimensions, maxNodeBytes, maxEdgeBytes, clusterCenters]);
 
   // ─── D3 Zoom ──────────────────────────────────────────────────
