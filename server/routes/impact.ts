@@ -8,7 +8,7 @@
  *   - Sentinel ID routing gated behind NODE_ENV !== 'production'
  *   - TTL cache applied to expensive metric queries (30s default)
  */
-import { Router } from 'express';
+import { Router, type Response as ExpressResponse } from 'express';
 import {
   TimeWindowQuerySchema,
   ImpactHeadlineSchema,
@@ -56,13 +56,13 @@ const APPLIANCE_CACHE_TTL = 120_000; // 2min for appliance identity
 /**
  * Format ExtraHop client errors into HTTP responses.
  */
-function handleEhError(res: any, err: any, route: string) {
+// BE-M15: Type the error handler properly
+function handleEhError(res: ExpressResponse, err: unknown, route: string) {
   if (err instanceof ExtraHopClientError) {
     const status = err.code === 'NO_CONFIG' ? 503
       : err.code === 'TIMEOUT' ? 504
       : err.code === 'NETWORK_ERROR' ? 502
-      : err.httpStatus >= 400 ? err.httpStatus
-      : 502;
+      : (err.httpStatus >= 400 ? err.httpStatus : 502);
     return res.status(status).json({
       error: `ExtraHop ${route} API error`,
       message: err.message,
@@ -71,7 +71,7 @@ function handleEhError(res: any, err: any, route: string) {
   }
   return res.status(500).json({
     error: `Impact ${route} fetch failed`,
-    message: err.message || 'Unknown error',
+    message: err instanceof Error ? err.message : 'Unknown error',
   });
 }
 
@@ -234,7 +234,7 @@ impactRouter.get('/headline', async (req, res) => {
     }
 
     return res.json({ headline: headlineResult.data, timeWindow });
-  } catch (err: any) {
+  } catch (err: unknown) {
     return handleEhError(res, err, 'headline');
   }
 });
@@ -319,7 +319,7 @@ impactRouter.get('/timeseries', async (req, res) => {
     }
 
     return res.json({ timeseries: validation.data, timeWindow });
-  } catch (err: any) {
+  } catch (err: unknown) {
     return handleEhError(res, err, 'timeseries');
   }
 });
@@ -466,7 +466,7 @@ impactRouter.get('/top-talkers', async (req, res) => {
     }
 
     return res.json({ topTalkers: validation.data, timeWindow });
-  } catch (err: any) {
+  } catch (err: unknown) {
     return handleEhError(res, err, 'top-talkers');
   }
 });
@@ -536,7 +536,7 @@ impactRouter.get('/detections', async (req, res) => {
     }
 
     return res.json({ detections: validation.data, timeWindow });
-  } catch (err: any) {
+  } catch (err: unknown) {
     return handleEhError(res, err, 'detections');
   }
 });
@@ -606,7 +606,7 @@ impactRouter.get('/alerts', async (req, res) => {
     }
 
     return res.json({ alerts: validation.data, timeWindow });
-  } catch (err: any) {
+  } catch (err: unknown) {
     return handleEhError(res, err, 'alerts');
   }
 });
@@ -735,7 +735,7 @@ impactRouter.get('/appliance-status', async (_req, res) => {
     }
 
     return res.json({ applianceStatus: validation.data });
-  } catch (err: any) {
+  } catch (err: unknown) {
     return handleEhError(res, err, 'appliance-status');
   }
 });
@@ -935,7 +935,7 @@ impactRouter.get('/device-detail', async (req, res) => {
     }
 
     return res.json({ deviceDetail: validation.data });
-  } catch (err: any) {
+  } catch (err: unknown) {
     return handleEhError(res, err, 'device-detail');
   }
 });
@@ -1039,7 +1039,7 @@ impactRouter.get('/detection-detail', async (req, res) => {
     }
 
     return res.json({ detectionDetail: validation.data });
-  } catch (err: any) {
+  } catch (err: unknown) {
     return handleEhError(res, err, 'detection-detail');
   }
 });
@@ -1156,7 +1156,7 @@ impactRouter.get('/alert-detail', async (req, res) => {
     }
 
     return res.json({ alertDetail: validation.data });
-  } catch (err: any) {
+  } catch (err: unknown) {
     return handleEhError(res, err, 'alert-detail');
   }
 });
@@ -1255,7 +1255,7 @@ impactRouter.get('/device-activity', async (req, res) => {
     } catch {
       return res.json({ activityRows: [] });
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     return handleEhError(res, err, 'device-activity');
   }
 });

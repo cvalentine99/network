@@ -54,7 +54,7 @@ const devicesRouter = router({
       z.object({
         limit: z.number().min(1).max(200).optional().default(50),
         offset: z.number().min(0).optional().default(0),
-        search: z.string().optional(),
+        search: z.string().max(200).optional(),
         deviceClass: z.string().optional(),
         role: z.string().optional(),
         analysis: z.string().optional(),
@@ -93,7 +93,7 @@ const alertsRouter = router({
       z.object({
         limit: z.number().min(1).max(200).optional().default(50),
         offset: z.number().min(0).optional().default(0),
-        search: z.string().optional(),
+        search: z.string().max(200).optional(),
         severity: z.number().optional(),
         type: z.string().optional(),
         disabled: z.boolean().optional(),
@@ -142,7 +142,7 @@ const detectionsRouter = router({
       z.object({
         limit: z.number().min(1).max(200).optional().default(50),
         offset: z.number().min(0).optional().default(0),
-        search: z.string().optional(),
+        search: z.string().max(200).optional(),
         status: z.string().optional(),
         sortBy: z.enum(["title", "riskScore", "status", "startTime", "createTime"]).optional(),
         sortDir: z.enum(["asc", "desc"]).optional().default("desc"),
@@ -200,18 +200,20 @@ const topologyRouter = router({
 
 /* ─────────────────────────── Saved Topology Views (Slice 35E) ─────────────────────────── */
 
-/** Local-only user ID — no Manus OAuth required */
-const LOCAL_USER_ID = 'local';
+// SEC-H2 / BE-H1: Use authenticated user ID instead of hardcoded LOCAL_USER_ID
+function getUserId(ctx: { user?: { openId?: string } | null }): string {
+  return ctx.user?.openId ?? 'local';
+}
 
 const savedViewsRouter = router({
-  list: protectedProcedure.query(async () => {
-    return db.getSavedTopologyViews(LOCAL_USER_ID);
+  list: protectedProcedure.query(async ({ ctx }) => {
+    return db.getSavedTopologyViews(getUserId(ctx));
   }),
 
   get: protectedProcedure
     .input(z.object({ id: z.number().int().positive() }))
-    .query(async ({ input }) => {
-      return db.getSavedTopologyViewById(input.id, LOCAL_USER_ID);
+    .query(async ({ input, ctx }) => {
+      return db.getSavedTopologyViewById(input.id, getUserId(ctx));
     }),
 
   create: protectedProcedure
@@ -231,9 +233,9 @@ const savedViewsRouter = router({
       searchTerm: z.string().default(''),
       nodePositions: z.record(z.string(), z.object({ x: z.number().finite(), y: z.number().finite() })).nullable().default(null),
     }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const id = await db.createSavedTopologyView({
-        userId: LOCAL_USER_ID,
+        userId: getUserId(ctx),
         ...input,
       });
       return { id };
@@ -257,16 +259,16 @@ const savedViewsRouter = router({
       searchTerm: z.string().optional(),
       nodePositions: z.record(z.string(), z.object({ x: z.number().finite(), y: z.number().finite() })).nullable().optional(),
     }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const { id, ...rest } = input;
-      const ok = await db.updateSavedTopologyView(id, LOCAL_USER_ID, rest);
+      const ok = await db.updateSavedTopologyView(id, getUserId(ctx), rest);
       return { success: ok };
     }),
 
   delete: protectedProcedure
     .input(z.object({ id: z.number().int().positive() }))
-    .mutation(async ({ input }) => {
-      const ok = await db.deleteSavedTopologyView(input.id, LOCAL_USER_ID);
+    .mutation(async ({ input, ctx }) => {
+      const ok = await db.deleteSavedTopologyView(input.id, getUserId(ctx));
       return { success: ok };
     }),
 });
@@ -422,16 +424,22 @@ const applianceConfigRouter = router({
         });
         return { success: false, message: msg, latencyMs, testedAt };
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       const latencyMs = Date.now() - start;
-      const msg = err.name === 'AbortError'
+      const errMsg = err instanceof Error ? err.message : 'Unknown error';
+      const msg = (err instanceof Error && err.name === 'AbortError')
         ? 'Connection timed out (10s)'
-        : `Connection failed: ${err.message || 'Unknown error'}`;
-      await db.updateApplianceTestResult({
-        id: config.id,
-        lastTestResult: 'failure',
-        lastTestMessage: msg,
-      });
+        : `Connection failed: ${errMsg}`;
+      // BE-C5: Wrap DB update in try/catch to prevent unhandled rejection
+      try {
+        await db.updateApplianceTestResult({
+          id: config.id,
+          lastTestResult: 'failure',
+          lastTestMessage: msg,
+        });
+      } catch (dbErr: unknown) {
+        console.error('[testConnection] Failed to update test result in DB:', dbErr instanceof Error ? dbErr.message : dbErr);
+      }
       return { success: false, message: msg, latencyMs, testedAt };
     }
   }),

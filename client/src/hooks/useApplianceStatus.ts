@@ -71,12 +71,12 @@ export function useApplianceStatus(): ApplianceStatusState {
         }
 
         setState({ status: 'populated', applianceStatus: validation.data });
-      } catch (err: any) {
+      } catch (err: unknown) {
         if (controller.signal.aborted) return;
         setState({
           status: 'error',
           error: 'Network error',
-          message: err.message || 'Failed to fetch appliance status',
+          message: err instanceof Error ? err.message : 'Failed to fetch appliance status',
         });
       }
     })();

@@ -76,12 +76,12 @@ export function useTopTalkers(): TopTalkersState {
         } else {
           setState({ status: 'populated', topTalkers: validation.data });
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         if (controller.signal.aborted) return;
         setState({
           status: 'transport-error',
           error: 'Network error',
-          message: err.message || 'Failed to fetch top talkers',
+          message: err instanceof Error ? err.message : 'Failed to fetch top talkers',
         });
       }
     }

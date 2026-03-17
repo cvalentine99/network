@@ -147,16 +147,22 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
   // ─── Pulse animation ──────────────────────────────────────────
   const shouldPulse = pulseEnabled && isLiveData;
 
+  // FE-C2: Throttle pulse animation to ~15fps to reduce React reconciliation overhead
   useEffect(() => {
     if (!shouldPulse) {
       pulseOffsetRef.current = 0;
       return;
     }
     let running = true;
-    const animate = () => {
+    let lastFrame = 0;
+    const animate = (timestamp: number) => {
       if (!running) return;
-      pulseOffsetRef.current = (pulseOffsetRef.current + 0.5) % 100;
-      forceRender((v) => v + 1);
+      // Throttle to ~15fps for pulse animation (66ms interval)
+      if (timestamp - lastFrame > 66) {
+        lastFrame = timestamp;
+        pulseOffsetRef.current = (pulseOffsetRef.current + 0.5) % 100;
+        forceRender((v) => v + 1);
+      }
       pulseAnimFrameRef.current = requestAnimationFrame(animate);
     };
     pulseAnimFrameRef.current = requestAnimationFrame(animate);
@@ -606,7 +612,7 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
       .alphaDecay(0.02)
       .velocityDecay(0.3);
 
-    // Throttle simulation ticks to ~30fps via rAF (Rec 4)
+    // Throttle simulation ticks to ~30fps via rAF (Rec 4 + PERF-C2)
     // Instead of re-rendering on every d3-force tick (can be 60+ fps),
     // we batch tick updates and only trigger a React render once per animation frame.
     let rafId: number | null = null;
@@ -684,6 +690,7 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
     []
   );
 
+  // FE-H7: Add dependency array and cleanup to drag effect
   useEffect(() => {
     const svg = svgRef.current;
     if (!svg) return;
@@ -693,7 +700,10 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
       .on('drag', (event, d) => handleDrag(event, d))
       .on('end', (event, d) => handleDragEnd(event, d));
     nodeGroups.call(dragBehavior);
-  });
+    return () => {
+      nodeGroups.on('.drag', null);
+    };
+  }, [handleDragStart, handleDrag, handleDragEnd]);
 
   // ─── Render helpers (callbacks for sub-components) ────────────
   const nodes = nodesRef.current;
@@ -729,17 +739,25 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
     [selectedNodeId, pathEdgeKeys, anomalyEdgeMap]
   );
 
+  // FE-H6: Precompute adjacency map for O(1) connected-node lookup instead of O(N*E) per frame
+  const adjacencyMap = useMemo(() => {
+    const map = new Map<number, Set<number>>();
+    for (const e of effectivePayload.edges) {
+      if (!map.has(e.sourceId)) map.set(e.sourceId, new Set());
+      if (!map.has(e.targetId)) map.set(e.targetId, new Set());
+      map.get(e.sourceId)!.add(e.targetId);
+      map.get(e.targetId)!.add(e.sourceId);
+    }
+    return map;
+  }, [effectivePayload.edges]);
+
   const getNodeStyle = useCallback(
     (simNode: SimNode) => {
       const n = simNode.node;
       const isSelected = selectedNodeId === n.id;
       const isConnected =
         selectedNodeId !== null &&
-        effectivePayload.edges.some(
-          (e) =>
-            (e.sourceId === selectedNodeId && e.targetId === n.id) ||
-            (e.targetId === selectedNodeId && e.sourceId === n.id)
-        );
+        (adjacencyMap.get(selectedNodeId)?.has(n.id) ?? false);
       const isDimmed =
         (selectedNodeId !== null && !isSelected && !isConnected) ||
         (matchingIds !== null && !matchingIds.has(n.id));
@@ -748,7 +766,7 @@ const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceG
       const hasIssue = n.activeDetections > 0 || n.activeAlerts > 0;
       return { isSelected, isDimmed, isOnPath, nodeAnom, hasIssue };
     },
-    [selectedNodeId, matchingIds, pathNodeIds, anomalyNodeMap, effectivePayload.edges]
+    [selectedNodeId, matchingIds, pathNodeIds, anomalyNodeMap, adjacencyMap]
   );
 
   const handleNodeMouseEnter = useCallback(

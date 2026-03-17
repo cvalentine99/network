@@ -33,3 +33,12 @@ export const ENV = {
   forgeApiUrl: process.env.BUILT_IN_FORGE_API_URL ?? "",
   forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
 };
+
+// SEC-C1: Validate JWT_SECRET at startup — refuse to start with weak/missing secret in production
+if (ENV.isProduction && (!ENV.cookieSecret || ENV.cookieSecret.length < 32)) {
+  console.error('FATAL: JWT_SECRET must be set and at least 32 characters in production');
+  process.exit(1);
+}
+if (!ENV.cookieSecret) {
+  console.warn('[SECURITY] JWT_SECRET is not set. Using empty secret is only acceptable in development.');
+}

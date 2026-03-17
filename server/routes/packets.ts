@@ -149,7 +149,7 @@ packetsRouter.post('/metadata', async (req, res) => {
       }
 
       return res.json({ metadata: validation.data });
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (err instanceof ExtraHopClientError && err.code === 'NO_CONFIG') {
         return res.status(503).json({
           error: 'Packet store not configured',
@@ -159,10 +159,10 @@ packetsRouter.post('/metadata', async (req, res) => {
       }
       throw err;
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     return res.status(500).json({
       error: 'PCAP metadata fetch failed',
-      message: err.message || 'Unknown error',
+      message: err instanceof Error ? err.message : 'Unknown error',
     });
   }
 });
@@ -289,7 +289,7 @@ packetsRouter.post('/download', async (req, res) => {
 
       // Send raw binary — NOT JSON
       return res.end(binaryResp.buffer);
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (err instanceof ExtraHopClientError && err.code === 'NO_CONFIG') {
         return res.status(503).json({
           error: 'Packet store not configured',
@@ -299,10 +299,10 @@ packetsRouter.post('/download', async (req, res) => {
       }
       throw err;
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     return res.status(500).json({
       error: 'PCAP download failed',
-      message: err.message || 'Unknown error',
+      message: err instanceof Error ? err.message : 'Unknown error',
     });
   }
 });

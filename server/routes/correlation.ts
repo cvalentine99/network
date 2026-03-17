@@ -232,7 +232,7 @@ router.post('/events', async (req: Request, res: Response) => {
     }
 
     res.json(payloadValidation.data);
-  } catch (err: any) {
+  } catch (err: unknown) {
     if (err instanceof ExtraHopClientError) {
       res.status(502).json({
         error: 'ExtraHop API error',
@@ -243,7 +243,7 @@ router.post('/events', async (req: Request, res: Response) => {
     }
     res.status(500).json({
       error: 'Correlation fetch failed',
-      message: err.message || 'Unknown error',
+      message: err instanceof Error ? err.message : 'Unknown error',
     });
   }
 });
@@ -265,8 +265,14 @@ router.get('/fixtures', async (_req: Request, res: Response) => {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
 function loadFixture(filename: string): unknown {
-  const raw = readFileSync(join(FIXTURE_DIR, filename), 'utf-8');
-  return JSON.parse(raw);
+  // BE-H4: Wrap in try/catch to avoid leaking raw filesystem errors
+  try {
+    const raw = readFileSync(join(FIXTURE_DIR, filename), 'utf-8');
+    return JSON.parse(raw);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Unknown error';
+    throw new Error(`Failed to load fixture "${filename}": ${msg}`);
+  }
 }
 
 export default router;

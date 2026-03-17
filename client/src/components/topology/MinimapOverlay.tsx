@@ -2,7 +2,7 @@
  * Topology ForceGraph — Minimap overlay (canvas-based inset)
  */
 
-import { useRef, useEffect, useCallback, memo } from 'react';
+import React, { useRef, useEffect, useCallback } from 'react';
 import { select } from 'd3-selection';
 import { zoomIdentity, type ZoomBehavior } from 'd3-zoom';
 import type { SimNode, SimLink } from './types';
@@ -125,7 +125,8 @@ function MinimapOverlay({
 
     // Store world bounds for click-to-navigate
     (canvas as any)._worldBounds = { minX, minY, worldW, worldH, scale, offsetX, offsetY };
-  });
+  // PERF-C4: Add dependency array to prevent re-render on every frame
+  }, [nodes, links, selectedNodeId, clusterColorMap, transform, dimensions]);
 
   // Click-to-navigate
   const handleMinimapClick = useCallback(
@@ -184,4 +185,5 @@ function MinimapOverlay({
   );
 }
 
-export default memo(MinimapOverlay);
+// PERF-C2: Memoize canvas sub-component to prevent re-render on every simulation tick
+export default React.memo(MinimapOverlay);

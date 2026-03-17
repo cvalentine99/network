@@ -145,11 +145,11 @@ async function executeLiveTrace(
       sendSSE(res, stepComplete(stepId, detail, dur, count));
       stepTimings.push({ stepId, status: 'complete', durationMs: dur });
       return result;
-    } catch (err: any) {
+    } catch (err: unknown) {
       const dur = Date.now() - start;
       const msg = err instanceof ExtraHopClientError
-        ? err.message
-        : (err.message || 'Unknown error');
+        ? err instanceof Error ? err.message : "Unknown error"
+        : (err instanceof Error ? err.message : 'Unknown error');
       sendSSE(res, stepError(stepId, msg, dur));
       stepTimings.push({ stepId, status: 'error', durationMs: dur });
       return null;
@@ -419,7 +419,7 @@ async function executeLiveTrace(
         count: records.length,
         result: records,
       };
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Records API may not be available on all appliances
       if (err instanceof ExtraHopClientError && (err.httpStatus === 404 || err.httpStatus === 501)) {
         recordCount = 0;
@@ -607,16 +607,17 @@ traceRouter.post('/run', async (req, res) => {
 
   // ── LIVE MODE ──
   if (!(await isFixtureMode())) {
+    // BE-C6: Properly handle async trace execution with typed error
     executeLiveTrace(
       res,
       intent.mode,
       intent.value,
       intent.timeWindow.fromMs,
       intent.timeWindow.untilMs,
-    ).catch((err: any) => {
+    ).catch((err: unknown) => {
       const errorEvent: TraceSSEEvent = {
         type: 'error',
-        message: err.message || 'Unexpected trace error',
+        message: err instanceof Error ? err.message : 'Unexpected trace error',
         failedStepId: null,
         timestamp: Date.now(),
       };

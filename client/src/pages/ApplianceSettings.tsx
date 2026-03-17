@@ -304,8 +304,8 @@ export default function ApplianceSettings() {
       setHasUnsavedChanges(false);
       setFormErrors({});
       utils.applianceConfig.get.invalidate();
-    } catch (err: any) {
-      setFormErrors({ _save: err.message || 'Failed to save configuration' });
+    } catch (err: unknown) {
+      setFormErrors({ _save: err instanceof Error ? err.message : 'Failed to save configuration' });
     }
   }
 
@@ -332,8 +332,8 @@ export default function ApplianceSettings() {
       setHasUnsavedChanges(false);
       setFormErrors({});
       utils.applianceConfig.get.invalidate();
-    } catch (err: any) {
-      setFormErrors({ _delete: err.message || 'Failed to delete configuration' });
+    } catch (err: unknown) {
+      setFormErrors({ _delete: err instanceof Error ? err.message : 'Failed to delete configuration' });
     }
   }
 

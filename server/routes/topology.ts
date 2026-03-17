@@ -321,13 +321,13 @@ router.post('/query', async (req: Request, res: Response) => {
       payload: payloadValidation.data,
       error: null,
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     if (err instanceof ExtraHopClientError) {
       res.status(502).json({
         _meta: { fixture: 'live', generatedAt: new Date().toISOString() },
         intent: 'error',
         payload: null,
-        error: err.message,
+        error: err instanceof Error ? err.message : "Unknown error",
       });
       return;
     }
@@ -335,7 +335,7 @@ router.post('/query', async (req: Request, res: Response) => {
       _meta: { fixture: 'live', generatedAt: new Date().toISOString() },
       intent: 'error',
       payload: null,
-      error: `Topology fetch failed: ${err.message || 'Unknown error'}`,
+      error: `Topology fetch failed: ${err instanceof Error ? err.message : 'Unknown error'}`,
     });
   }
 });

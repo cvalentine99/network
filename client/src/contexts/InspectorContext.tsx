@@ -23,7 +23,7 @@
  *   - Closing the inspector via X button calls clear()
  *   - History stack uses pure functions from shared/inspector-history.ts
  */
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from 'react';
 import type {
   InspectorSelection,
   InspectorHistoryEntry,
@@ -151,25 +151,28 @@ export function InspectorProvider({ children }: { children: ReactNode }) {
     setIsOpen((prev) => !prev);
   }, []);
 
+  // FE-M14: Memoize context value to prevent unnecessary re-renders of consumers
+  const contextValue = useMemo(() => ({
+    selection,
+    isOpen,
+    history,
+    canGoBack: history.length > 0,
+    selectDevice,
+    selectDetection,
+    selectAlert,
+    selectDeviceByIdentity,
+    selectDetectionEntity,
+    selectAlertEntity,
+    goBack,
+    goToIndex,
+    clear,
+    toggle,
+  }), [selection, isOpen, history, selectDevice, selectDetection, selectAlert,
+       selectDeviceByIdentity, selectDetectionEntity, selectAlertEntity,
+       goBack, goToIndex, clear, toggle]);
+
   return (
-    <InspectorContext.Provider
-      value={{
-        selection,
-        isOpen,
-        history,
-        canGoBack: history.length > 0,
-        selectDevice,
-        selectDetection,
-        selectAlert,
-        selectDeviceByIdentity,
-        selectDetectionEntity,
-        selectAlertEntity,
-        goBack,
-        goToIndex,
-        clear,
-        toggle,
-      }}
-    >
+    <InspectorContext.Provider value={contextValue}>
       {children}
     </InspectorContext.Provider>
   );

@@ -48,7 +48,19 @@ export async function requireBffAuth(
   next: NextFunction,
 ): Promise<void> {
   // Fixture mode: bypass auth — no real data to protect
+  // BE-C2: Set synthetic user so downstream handlers always find req.user
   if (isFixtureModeSync()) {
+    req.user = {
+      id: 0,
+      openId: 'fixture-user',
+      name: 'Fixture User',
+      email: 'fixture@localhost',
+      loginMethod: 'fixture',
+      role: 'admin',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      lastSignedIn: new Date(),
+    } as User;
     return next();
   }
 

@@ -70,12 +70,12 @@ export function useAlerts(): AlertsState {
         }
 
         setState({ status: 'populated', alerts: validation.data });
-      } catch (err: any) {
+      } catch (err: unknown) {
         if (controller.signal.aborted) return;
         setState({
           status: 'error',
           error: 'Network error',
-          message: err.message || 'Failed to fetch alerts',
+          message: err instanceof Error ? err.message : 'Failed to fetch alerts',
         });
       }
     })();

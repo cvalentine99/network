@@ -102,12 +102,12 @@ export function useDetectionDetail(detectionId: number | null): DetectionDetailS
         } else {
           setState({ status: 'populated', detectionDetail: validation.data });
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         if (controller.signal.aborted) return;
         setState({
           status: 'error',
           error: 'Network error',
-          message: err.message || 'Failed to fetch detection detail',
+          message: err instanceof Error ? err.message : 'Failed to fetch detection detail',
         });
       }
     })();

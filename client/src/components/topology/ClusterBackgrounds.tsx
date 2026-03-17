@@ -2,7 +2,7 @@
  * Topology ForceGraph — Cluster background regions (dashed circles + labels)
  */
 
-import { memo } from 'react';
+import React from 'react';
 import type { SimNode } from './types';
 import type { TopologyPayload } from '../../../../shared/topology-types';
 import { CLUSTER_COLORS } from './constants';
@@ -68,4 +68,5 @@ function ClusterBackgrounds({
   );
 }
 
-export default memo(ClusterBackgrounds);
+// PERF-C2: Memoize SVG sub-component to prevent re-render on every simulation tick
+export default React.memo(ClusterBackgrounds);

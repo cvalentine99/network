@@ -2,7 +2,7 @@
  * Topology ForceGraph — Edge rendering (individual edges, bundles, critical path arrows)
  */
 
-import { memo } from 'react';
+import React from 'react';
 import type { SimNode, SimLink, EdgeBundle, CriticalPathResult } from './types';
 import { ANOMALY_SEVERITY_COLORS } from '../../../../shared/topology-advanced-types';
 import type { EdgeAnomaly } from '../../../../shared/topology-advanced-types';
@@ -206,4 +206,5 @@ function EdgeRenderer({
   );
 }
 
-export default memo(EdgeRenderer);
+// PERF-C2: Memoize SVG sub-component to prevent re-render on every simulation tick
+export default React.memo(EdgeRenderer);

@@ -341,7 +341,7 @@ export default function BlastRadius() {
         setState(prev => ({
           ...prev,
           status: 'error',
-          errorMessage: err.message || `Request failed with status ${resp.status}`,
+          errorMessage: `Request failed with status ${resp.status}`,
         }));
         return;
       }
@@ -373,12 +373,12 @@ export default function BlastRadius() {
           payload,
         }));
       }
-    } catch (err: any) {
-      if (err.name === 'AbortError') return;
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === 'AbortError') return;
       setState(prev => ({
         ...prev,
         status: 'error',
-        errorMessage: err.message || 'Network request failed',
+        errorMessage: err instanceof Error ? err.message : 'Network request failed',
       }));
     }
   }, [inputValue, inputMode]);

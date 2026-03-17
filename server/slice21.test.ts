@@ -668,8 +668,8 @@ describe('Slice 21 — Route Registration', () => {
     expect(appTsx).toContain('path="/topology"');
   });
 
-  it('Topology component is imported', () => {
-    // Accepts both direct import and React.lazy import (Rec 5 code splitting)
+  it('Topology component is imported (static or lazy)', () => {
+    // Rec 5 + PERF-C1: Accept both direct import and React.lazy import
     expect(appTsx).toMatch(/(?:import Topology from|const Topology\s*=\s*lazy)/);
   });
 

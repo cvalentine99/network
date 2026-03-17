@@ -17,7 +17,7 @@ import { isFixtureModeSync, ehRequest } from './extrahop-client';
 import { normalizeDeviceActivity } from './extrahop-normalizers';
 import { upsertDeviceActivity, requireDb } from './db';
 import { dimDevice } from '../drizzle/schema';
-import { isNotNull } from 'drizzle-orm';
+// isNotNull removed — BE-H12: we now query all devices, not just those with lastSeenTime
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
@@ -78,31 +78,33 @@ export async function runEtlCycle(): Promise<{
   // Step 1: Get all active device IDs from dim_device
   const db = await requireDb();
 
+  // BE-H12: Include all devices, not just those with lastSeenTime (new devices have null)
   const devices = await db
     .select({ id: dimDevice.id })
-    .from(dimDevice)
-    .where(isNotNull(dimDevice.lastSeenTime));
+    .from(dimDevice);
 
   const deviceIds = devices.map(d => d.id);
   const polledAt = new Date();
 
-  // Step 2: For each device, fetch activity and upsert
-  // Process in parallel batches to improve throughput without overwhelming
-  // the ExtraHop appliance. Configurable via ETL_BATCH_SIZE env var.
+  // BE-H11 + Rec: Process devices in parallel batches to improve throughput
+  // without overwhelming the ExtraHop appliance. Configurable via ETL_BATCH_SIZE.
   const BATCH_SIZE = Math.max(1, parseInt(process.env.ETL_BATCH_SIZE || '5', 10));
 
   for (let i = 0; i < deviceIds.length; i += BATCH_SIZE) {
     const batch = deviceIds.slice(i, i + BATCH_SIZE);
     const results = await Promise.allSettled(
       batch.map(async (deviceId) => {
-        const activityResponse = await ehRequest<any[]>({
+        // BE-M15: Use unknown[] instead of any[] for type safety
+        const activityResponse = await ehRequest<unknown[]>({
           method: 'GET',
           path: `/api/v1/devices/${deviceId}/activity`,
           cacheTtlMs: 0, // No cache for ETL — we want fresh data
           timeoutMs: 10_000,
         });
 
-        const rawActivity = Array.isArray(activityResponse.data) ? activityResponse.data : [];
+        const rawActivity = Array.isArray(activityResponse.data)
+          ? (activityResponse.data as Record<string, unknown>[])
+          : [];
         const normalizedRecords = normalizeDeviceActivity(rawActivity, deviceId, polledAt);
 
         if (normalizedRecords.length > 0) {
@@ -122,7 +124,7 @@ export async function runEtlCycle(): Promise<{
         // Per-device failure isolation — log and continue
         errors.push({
           deviceId: batch[j],
-          error: result.reason?.message || 'Unknown error',
+          error: result.reason instanceof Error ? result.reason.message : 'Unknown error',
         });
       }
     }
@@ -207,9 +209,9 @@ async function executeEtlCycle(): Promise<void> {
     } else {
       console.log(`[ETL] Cycle complete: ${result.devicesPolled} devices, ${result.recordsUpserted} records upserted (${result.durationMs}ms)`);
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     status.totalErrors++;
-    console.error(`[ETL] Cycle failed: ${err.message || 'Unknown error'}`);
+    console.error(`[ETL] Cycle failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
   } finally {
     isRunning = false;
     if (status.running && status.intervalMs > 0) {

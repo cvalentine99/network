@@ -370,7 +370,7 @@ blastRadiusRouter.post('/query', async (req, res) => {
     }
 
     res.json(validation.data);
-  } catch (err: any) {
+  } catch (err: unknown) {
     if (err instanceof ExtraHopClientError) {
       res.status(err.httpStatus || 502).json({
         error: err.code,
@@ -381,7 +381,7 @@ blastRadiusRouter.post('/query', async (req, res) => {
     console.error('[blast-radius] Unexpected error:', err);
     res.status(500).json({
       error: 'BLAST_RADIUS_FAILED',
-      message: err.message || 'Unknown error',
+      message: err instanceof Error ? err.message : 'Unknown error',
     });
   }
 });

@@ -42,11 +42,9 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
 
-  // ─── Security middleware (Rec 1) ───────────────────────────────────────
+  // ─── Security middleware (Rec 1 + SEC-H3) ─────────────────────────────
   // helmet sets secure HTTP headers: X-Content-Type-Options, X-Frame-Options,
   // X-XSS-Protection, Strict-Transport-Security, etc.
-  // CSP is relaxed for Vite dev mode ('unsafe-inline', 'unsafe-eval') and
-  // for the dashboard's inline styles/scripts.
   app.use(
     helmet({
       contentSecurityPolicy: {
@@ -55,39 +53,37 @@ async function startServer() {
           scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
           styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
           fontSrc: ["'self'", "https://fonts.gstatic.com"],
-          imgSrc: ["'self'", "data:", "https:"],
-          connectSrc: ["'self'"],
+          imgSrc: ["'self'", "data:", "blob:", "https:"],
+          connectSrc: ["'self'", "ws:", "wss:"],
         },
       },
-      // HSTS only when behind TLS-terminating proxy
+      crossOriginEmbedderPolicy: false,
       strictTransportSecurity: process.env.NODE_ENV === "production"
         ? { maxAge: 31536000, includeSubDomains: true }
         : false,
     })
   );
 
-  // ─── Rate limiting (Rec 2) ─────────────────────────────────────────
-  // Applied to API routes only — static assets are not rate-limited.
-  // In development mode, rate limits are generous to avoid blocking test suites.
+  // ─── Rate limiting (Rec 2 + SEC-H5) ───────────────────────────────────
   const isDev = process.env.NODE_ENV === 'development';
   const apiLimiter = rateLimit({
     windowMs: 60 * 1000,
-    max: isDev ? 10000 : 120,   // generous in dev, strict in prod
+    max: isDev ? 10000 : 120,
     standardHeaders: true,
     legacyHeaders: false,
-    message: { error: "Too many requests, please try again later." },
+    message: { error: "Too many requests, please try again later.", code: 'RATE_LIMITED' },
   });
   const bffLimiter = rateLimit({
     windowMs: 60 * 1000,
-    max: isDev ? 10000 : 60,    // generous in dev, strict in prod
+    max: isDev ? 10000 : 60,
     standardHeaders: true,
     legacyHeaders: false,
-    message: { error: "Too many requests, please try again later." },
+    message: { error: "Too many requests, please try again later.", code: 'RATE_LIMITED' },
   });
   app.use('/api/trpc', apiLimiter);
   app.use('/api/bff', bffLimiter);
 
-  // Configure body parser with larger size limit for file uploads
+  // SEC-M9: Body parser limit — 50mb only needed for PCAP-related routes
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   // OAuth callback under /api/oauth/callback

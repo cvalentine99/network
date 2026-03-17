@@ -150,10 +150,10 @@ healthRouter.get('/', async (_req, res) => {
     }
 
     return res.json(validated.data);
-  } catch (err: any) {
+  } catch (err: unknown) {
     return res.status(500).json({
       error: 'Health check failed',
-      message: err.message || 'Unknown error',
+      message: err instanceof Error ? err.message : 'Unknown error',
     });
   }
 });

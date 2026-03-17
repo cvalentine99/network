@@ -101,12 +101,12 @@ export function useAlertDetail(alertId: number | null): AlertDetailState {
         } else {
           setState({ status: 'populated', alertDetail: validation.data });
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         if (controller.signal.aborted) return;
         setState({
           status: 'error',
           error: 'Network error',
-          message: err.message || 'Failed to fetch alert detail',
+          message: err instanceof Error ? err.message : 'Failed to fetch alert detail',
         });
       }
     })();

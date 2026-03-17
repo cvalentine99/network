@@ -161,12 +161,12 @@ export function usePcapDownload() {
         message: null,
         code: null,
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       setState({
         status: 'error',
         metadata: null,
         error: 'Transport error',
-        message: err.message || 'Network request failed',
+        message: err instanceof Error ? err.message : 'Network request failed',
         code: 'TRANSPORT_ERROR',
       });
     }

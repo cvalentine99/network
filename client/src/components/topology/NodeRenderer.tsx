@@ -2,7 +2,7 @@
  * Topology ForceGraph — Node rendering (regular nodes + super-nodes)
  */
 
-import { memo } from 'react';
+import React from 'react';
 import type { SimNode } from './types';
 import { ROLE_DISPLAY } from '../../../../shared/topology-types';
 import { ANOMALY_SEVERITY_COLORS } from '../../../../shared/topology-advanced-types';
@@ -232,4 +232,5 @@ function NodeRenderer({
   );
 }
 
-export default memo(NodeRenderer);
+// PERF-C2: Memoize SVG sub-component to prevent re-render on every simulation tick
+export default React.memo(NodeRenderer);

@@ -37,29 +37,27 @@ describe('Schema Drift Check', () => {
     expect(output).toContain('No schema changes, nothing to migrate');
   });
 
-  it('migration files exist for all expected migrations', () => {
+  // TEST-H3: Dynamic migration count instead of hardcoded value
+  it('migration files exist and follow naming convention', () => {
     const sqlFiles = readdirSync(DRIZZLE_DIR)
       .filter(f => f.endsWith('.sql'))
       .sort();
 
-    // We expect exactly 3 migrations: 0000, 0001, 0002
-    expect(sqlFiles.length).toBe(3);
-    expect(sqlFiles[0]).toMatch(/^0000_/);
-    expect(sqlFiles[1]).toMatch(/^0001_/);
-    expect(sqlFiles[2]).toMatch(/^0002_/);
+    // At least the initial migrations should exist
+    expect(sqlFiles.length).toBeGreaterThanOrEqual(1);
+    // All migration files should follow the NNNN_ naming convention
+    for (const file of sqlFiles) {
+      expect(file).toMatch(/^\d{4}_/);
+    }
   });
 
   it('meta snapshot files match migration count', () => {
     const metaDir = join(DRIZZLE_DIR, 'meta');
     const snapshots = readdirSync(metaDir).filter(f => f.endsWith('_snapshot.json'));
+    const sqlFiles = readdirSync(DRIZZLE_DIR).filter(f => f.endsWith('.sql'));
 
     // Should have one snapshot per migration
-    expect(snapshots.length).toBe(3);
-    expect(snapshots.sort()).toEqual([
-      '0000_snapshot.json',
-      '0001_snapshot.json',
-      '0002_snapshot.json',
-    ]);
+    expect(snapshots.length).toBe(sqlFiles.length);
   });
 
   it('ci/check-schema-drift.sh exists and is executable', () => {

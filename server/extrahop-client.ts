@@ -179,7 +179,8 @@ async function getConfig(): Promise<ExtraHopClientConfig | null> {
     return {
       hostname: row.hostname,
       apiKey: row.apiKey,
-      verifySsl: row.verifySsl,
+      // SEC-H4: Default to true if not explicitly set — TLS verification should be opt-out
+      verifySsl: row.verifySsl !== false,
     };
   } catch {
     return null;
@@ -345,13 +346,12 @@ export async function ehRequest<T = unknown>(
       latencyMs,
       cached: false,
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
     clearTimeout(timeout);
     const latencyMs = Date.now() - start;
 
     if (err instanceof ExtraHopClientError) throw err;
-
-    if (err.name === 'AbortError') {
+    if (err instanceof Error && err.name === 'AbortError') {
       throw new ExtraHopClientError(
         `ExtraHop API request timed out after ${timeoutMs}ms: ${method} ${path}`,
         'TIMEOUT',
@@ -360,7 +360,7 @@ export async function ehRequest<T = unknown>(
     }
 
     throw new ExtraHopClientError(
-      `ExtraHop API request failed: ${err.message || 'Unknown error'}`,
+      `ExtraHop API request failed: ${err instanceof Error ? err.message : 'Unknown error'}`,
       'NETWORK_ERROR',
       0
     );
@@ -440,11 +440,10 @@ export async function ehBinaryRequest(
       latencyMs,
       contentType,
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
     clearTimeout(timeout);
     if (err instanceof ExtraHopClientError) throw err;
-
-    if (err.name === 'AbortError') {
+    if (err instanceof Error && err.name === 'AbortError') {
       throw new ExtraHopClientError(
         `ExtraHop PCAP request timed out after ${timeoutMs}ms`,
         'TIMEOUT',
@@ -453,7 +452,7 @@ export async function ehBinaryRequest(
     }
 
     throw new ExtraHopClientError(
-      `ExtraHop PCAP request failed: ${err.message || 'Unknown error'}`,
+      `ExtraHop PCAP request failed: ${err instanceof Error ? err.message : 'Unknown error'}`,
       'NETWORK_ERROR',
       0
     );
