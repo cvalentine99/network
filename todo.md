@@ -801,3 +801,15 @@ These items are tracked here for the live integration phase.
 # GITHUB EXPORT
 
 - [ ] Export repo to GitHub via Settings > GitHub
+
+# BAREMETAL DOCKER DEPLOYMENT PACKAGE
+
+- [ ] Audit project structure, package.json scripts, and existing deploy/ directory
+- [ ] Create multi-stage Dockerfile (build + production)
+- [ ] Create docker-compose.yml (app + MySQL + Nginx)
+- [ ] Create .env.template with all required environment variables
+- [ ] Create deploy.sh bootstrap script (one-command deploy)
+- [ ] Create Nginx reverse proxy config
+- [ ] Create MySQL schema init script (from deploy/full-schema.sql)
+- [ ] Create DEPLOY.md with step-by-step instructions
+- [ ] Package into downloadable archive

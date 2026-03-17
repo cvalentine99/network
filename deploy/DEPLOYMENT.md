@@ -1,7 +1,7 @@
 # Network Performance Dashboard — Deployment Guide
 
-**Version:** dfbd40c6  
-**Date:** 2026-03-16  
+**Version:** c3c2e692  
+**Date:** 2026-03-17  
 **Stack:** Node.js 22 + Express 4 + tRPC 11 + React 19 + Vite 7 + MySQL 8 + Drizzle ORM
 
 ---
@@ -118,7 +118,7 @@ You may also set these Docker-specific variables in `.env`:
 ### Step 2: Build and start
 
 ```bash
-docker compose -f deploy/docker-compose.yml up -d --build
+cd deploy/docker && docker compose up -d --build
 ```
 
 Docker Compose will:
@@ -132,26 +132,26 @@ Docker Compose will:
 
 ```bash
 # Check all containers are healthy
-docker compose -f deploy/docker-compose.yml ps
+cd deploy/docker && docker compose ps
 
 # Check the app responds
 curl http://localhost/
 
 # View application logs
-docker compose -f deploy/docker-compose.yml logs -f app
+cd deploy/docker && docker compose logs -f app
 ```
 
 ### Stopping and restarting
 
 ```bash
 # Stop everything
-docker compose -f deploy/docker-compose.yml down
+cd deploy/docker && docker compose down
 
 # Stop and destroy data (fresh start)
-docker compose -f deploy/docker-compose.yml down -v
+cd deploy/docker && docker compose down -v
 
 # Restart just the app (after code changes)
-docker compose -f deploy/docker-compose.yml up -d --build app
+cd deploy/docker && docker compose up -d --build app
 ```
 
 ---
@@ -270,6 +270,7 @@ The application uses Drizzle ORM with MySQL. The schema is defined in `drizzle/s
 |---|---|---|---|
 | 0000 | `0000_amusing_nomad.sql` | 1 (users) | Authentication and user management |
 | 0001 | `0001_free_junta.sql` | 34 | Full ExtraHop data model: raw layer, dimension tables, fact tables, bridge tables, snapshot tables, appliance config |
+| 0002 | `0002_dizzy_the_ringo_kid.sql` | 0 (ALTER only) | Align polled_at DEFAULT CURRENT_TIMESTAMP(3) across 19 tables |
 
 The 34 domain tables follow a star-schema pattern:
 
@@ -333,8 +334,8 @@ Then update the volume mounts in `docker-compose.yml` to point to the generated 
 ./deploy/start.sh             # Start in foreground (Ctrl+C to stop)
 
 # Docker
-docker compose -f deploy/docker-compose.yml up -d
-docker compose -f deploy/docker-compose.yml down
+cd deploy/docker && docker compose up -d
+cd deploy/docker && docker compose down
 ```
 
 ### Health checks
@@ -344,7 +345,7 @@ docker compose -f deploy/docker-compose.yml down
 ./deploy/health-check.sh
 
 # Docker
-docker compose -f deploy/docker-compose.yml ps
+cd deploy/docker && docker compose ps
 ```
 
 ### Logs
@@ -354,9 +355,9 @@ docker compose -f deploy/docker-compose.yml ps
 tail -f netperf.log
 
 # Docker
-docker compose -f deploy/docker-compose.yml logs -f app
-docker compose -f deploy/docker-compose.yml logs -f db
-docker compose -f deploy/docker-compose.yml logs -f nginx
+cd deploy/docker && docker compose logs -f app
+cd deploy/docker && docker compose logs -f db
+cd deploy/docker && docker compose logs -f nginx
 ```
 
 ### Database backup
@@ -366,7 +367,7 @@ docker compose -f deploy/docker-compose.yml logs -f nginx
 mysqldump -h HOST -u USER -pPASS DATABASE > backup_$(date +%Y%m%d).sql
 
 # Docker
-docker compose -f deploy/docker-compose.yml exec db \
+cd deploy/docker && docker compose exec db \
   mysqldump -u root -p"$MYSQL_ROOT_PASSWORD" network_perf > backup_$(date +%Y%m%d).sql
 ```
 
@@ -387,7 +388,7 @@ pnpm install --frozen-lockfile
 ./deploy/stop.sh && ./deploy/start.sh --daemon
 
 # Docker: just rebuild
-docker compose -f deploy/docker-compose.yml up -d --build app
+cd deploy/docker && docker compose up -d --build app
 ```
 
 ---
@@ -422,8 +423,10 @@ The `deploy/` directory contains the following files:
 | `stop.sh` | Graceful shutdown of daemon process | Yes |
 | `health-check.sh` | Verify all endpoints respond correctly | Yes |
 | `env.example` | Environment variable template with documentation | No |
-| `Dockerfile` | Multi-stage Docker image (build → slim production) | No |
-| `docker-compose.yml` | Full stack: MySQL + App + Nginx with health checks | No |
-| `nginx.conf` | Reverse proxy with rate limiting, SSE support, caching | No |
-| `.dockerignore` | Excludes node_modules, .git, logs from Docker context | No |
+| `docker/Dockerfile` | Multi-stage Docker image (build → slim production) | No |
+| `docker/docker-compose.yml` | Full stack: MySQL + App + Nginx with health checks | No |
+| `docker/nginx.conf` | Reverse proxy with rate limiting, SSE support, caching | No |
+| `docker/up.sh` | Docker Compose wrapper with verification and health checks | Yes |
+| `docker/mysql-init/01-schema.sql` | Full schema auto-applied on first MySQL start | No |
+| `full-schema.sql` | Portable schema (35 tables + 16 views) for manual apply | No |
 | `DEPLOYMENT.md` | This document | No |

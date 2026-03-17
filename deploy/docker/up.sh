@@ -123,11 +123,11 @@ verify() {
 
 # MySQL table count
 TABLE_COUNT=$(docker exec netperf-mysql mysql -u netperf -pnetperf_test_2026 netperf_app -N -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='netperf_app';" 2>/dev/null || echo "0")
-if [ "$TABLE_COUNT" -ge 39 ] 2>/dev/null; then
+if [ "$TABLE_COUNT" -ge 35 ] 2>/dev/null; then
   pass "MySQL schema: $TABLE_COUNT tables"
   PASS=$((PASS + 1))
 else
-  fail "MySQL schema: expected ≥39 tables, got $TABLE_COUNT"
+  fail "MySQL schema: expected ≥35 tables, got $TABLE_COUNT"
   FAIL_COUNT=$((FAIL_COUNT + 1))
 fi
 
